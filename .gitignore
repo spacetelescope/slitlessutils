@@ -1,0 +1,11 @@
+*.pyc
+*.py~
+**/build
+**/OLD
+**/FOO
+**/__pycache__
+*.DS_STORE
+test/
+*~
+*.so
+*egg-info
