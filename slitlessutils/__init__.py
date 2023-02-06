@@ -1,7 +1,7 @@
 # main imports
-from .info import __code__
+from .info import __version__#__code__
 from .core import *
 from . import examples
 
-from .logger import initialize_logger
-LOGGER=initialize_logger(__code__)
+from .logger import start_logging,end_logging,initialize_logger
+LOGGER=initialize_logger()

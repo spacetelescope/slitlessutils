@@ -1,84 +1,368 @@
-import os
+
+import configparser
 import glob
+import json
+import os
 
 from .logger import LOGGER
-
+from .core.utilities import headers
 
 
 # file suffixes.  Probably shouldn't ever change these, but here they are:
 SUFFIXES={'1d spectra':'x1d',
           '2d spectra':'x2d',
+          '3d spectra':'x3d',
+          'L-curve':'lcv',
           'group':'grp',
           'matrix':'mat',
           'wfssimage':'flt'}
 
 
-class Config:
-    ''' Establishes the global configuration '''
 
-    # make this a singleton
+class Parameter:
+    """
+    A class to contain a configuration parameter
+
+
+    Parameters
+    ----------
+    keyword : str
+        The fits-header based keyword name (ie. must be <=8 char long)
+
+    value : any type (must implement str())
+        The keyword value
+    
+    comment : str
+        The fits header comment card
+
+    editable : bool, optional
+        Flag that this parameter can be editted
+    
+    """
+    
+    def __init__(self,keyword,value,comment,editable=True):
+        self.keyword=keyword
+        self.value=value
+        self.comment=comment
+        self.editable=editable
+
+    @classmethod
+    def from_config(cls,p):
+        """
+        Classmethod to load config parameter from a config file
+
+        Parameters
+        ----------
+        p : `configparser.Section`
+            The section from the config file
+
+        Returns
+        -------
+        obj : `Parameter`
+            The output parameter
+        """
+
+        try:
+            value=int(p['value'])
+        except:
+            try:
+                value=float(p['value'])
+            except:
+                value=p['value']
+
+        obj=cls(p['keyword'],value,p['comment'])
+
+        return obj
+    
+    def __iter__(self):
+        """
+        Method to implement an iter (so can be cast as a `dict`)
+        """
+        yield ('value',self.value)
+        yield ('keyword',self.keyword)
+        yield ('comment',self.comment)
+
+    def update_header(self,hdr):
+        """
+        Method to update an `astropy.io.fits.Header`
+        
+        Parameters
+        ----------
+        hdr : `astropy.io.fits.Header`
+            The fits header to update
+        
+        """
+        hdr.set(self.keyword,value=str(self.value),comment=self.comment)
+
+    def __str__(self):
+        return f'{self.keyword:8} {self.value}'
+
+        
+    
+class Config(dict):
+    """
+    A singleton class to hold and establish the global configuration
+
+    Parameters
+    ----------
+    kwargs : dict, optional
+       A dictinary of keyword/value pairs to override default values.
+    
+    """
+    
+
+    # a list of required keywords:
+    REQUIRED = ('fluxscale','fluxunits','compression','compression_opts')
+
+    # the default config filename:
+    DEFAULTS = 'defaults.cfg'
+
+    # name of the environment variable
+    ENVVAR = 'slitlessutils_config' 
+
+
+    # enable the singleton 
     _instance = None
-    def __new__(cls,*args,**kwargs):
-        if cls._instance is None:
-            obj = super().__new__(cls)
-            obj.fluxscale = 1e-17               # output numerical flux scale
-            obj.fluxunits = 'erg/(s*cm**2*AA)'  # output flux units
-            obj.confpath = '/Users/rryan/slitlessutils_config/'
-            obj.compression = 'gzip'            # compression type for H5PY
-            obj.compression_opts = 9            # compression level for H5PY
+    def __new__(cls,conffile=None,**kwargs):
+        if not cls._instance:
+
+            # make a new config object
+            cls._instance=super().__new__(cls)
+
+            # if no conffile is set, then grab the default
+            if not isinstance(conffile,str):
+                conffile=os.path.join(os.environ[cls.ENVVAR],cls.DEFAULTS)
+                                      
+                
+            # load the config            
+            config=configparser.ConfigParser()
+            config.read(conffile)
+            cls._instance.conffile=conffile
 
 
-                          
+            # load each section (which is a different parameter)
+            for k in config.sections():
+                cls._instance[k]=Parameter.from_config(config[k])
 
-            # save the object
-            cls._instance=obj
 
-        # set user supplied values
+            # if confpath isn't specified, then grab it from the os
+            if 'confpath' not in cls._instance:
+                cls._instance.load_confpath(os.environ[cls.ENVVAR])
+
+                
+            # check that the required elements are there
+            for req in cls._instance.REQUIRED:
+                if req not in cls._instance:
+                    LOGGER.warning(f"Missing keyword: {req}")
+                    break
+            else:
+                # ok, this is a valid object
+                pass
+
+
+        # update any keywords
         for k,v in kwargs.items():
-            if hasattr(self,k):
-                setattr(cls._instance,k,v)
+            if k in cls._instance:
+                cls._instance[k].value=v
+                
         return cls._instance
 
 
+
+    def load_confpath(self,confpath):
+        """
+        Method to load a configuration file path
+
+        Parameters
+        ----------
+        confpath : str
+            The path of the configuration files.  
+
+        Notes
+        -----
+            Will require a `version.json` to exist in that directory.
+        """
+        
+        versfile=os.path.join(confpath,'version.json')
+        
+        if os.path.exists(versfile):
+            
+            self['confpath']=Parameter('confpath',confpath,'')
+            self.versfile=versfile
+            with open(self.versfile,'r') as fp:
+                data=json.load(fp)
+                self['confvers']=Parameter('confvers',data[0]['version'],
+                                           'config version',editable=False)
+                self['confdate']=Parameter('confdate',data[0]['date'],
+                                           'config date',editable=False)
+        else:
+            LOGGER.error(f'Invalid confpath, missing the version file.')
+
+                
+    def __getattr__(self,k):
+        """
+        Method to override the getattr to enable attribute-like access
+
+        Parameters
+        ----------
+        k : str
+            Name of the attribute
+
+        Returns
+        -------
+        v : any type
+            The value of the attribute
+        """
+        if k in self:
+            return self[k].value
+
+    def __setattr__(self,k,v):
+        """
+        Method to override the setattr to enable attribute-like access
+
+        Parameters
+        ----------
+        k : str
+            Name of the attribute
+
+        v : any type
+            The value of the attribute
+        """
+
+        if k in self:
+            if self[k].editable:
+                if k=='confpath':
+                    self.log_confpath(v)
+                else:
+                    self[k].value=v
+            else:
+                print('cannot set')            
+        else:
+            super().__setattr__(k,v)
+
+    def update_header(self,hdr):
+        """
+        Method to update a fits header
+        
+        Parameters
+        ----------
+        hdr : `astropy.io.fits.Header`
+            The fits header to update
+        """
+        
+        for k,v in self.items():
+            v.update_header(hdr)
+                
+    def write(self,filename):
+        """
+        Method to write config file to disk as a *.cfg type
+
+        Parameters
+        ----------
+        filename : str
+            The name of the config file
+        
+        Notes
+        -----
+        will check the extension is one of (cfg, cnf, conf, config)
+        
+        """
+
+        ext=os.path.splitext(filename)[-1][1:]
+        if ext not in ('cfg','cnf','conf','config'):
+            LOGGER.warning(f'Invalid extension: {ext}')
+            return
+        
+        config = configparser.ConfigParser()
+        for k,v in self.items():
+            if v.editable:
+                config[k]=dict(v)
+        with open(filename,'w') as f:
+            config.write(f)
+
+
+
     def get_reffile(self,conffile,path='',**kwargs):
+        """
+        Method to get a refernece file from the local directory tree
+        
+        Parameters
+        ----------
+        conffile : str
+            The filename of the configuration file
+
+        path : str, optional
+            The subpath within the configuration tree to find the file. 
+            default is ''
+        
+        kwargs : dict, optional
+            extra parameters passed to `glob.glob()`
+
+        Returns
+        -------
+        filename : str
+            The full path to the configuration file.  Will be `None` if the 
+            file is not found.
+        """
+
+        
         test=os.path.join(self.confpath,path,conffile)
         files=glob.glob(test,**kwargs)
 
         n=len(files)
         if n==0:
-            LOGGER.warn("no config file found")
-            return None
+            LOGGER.warning("no config file found")
         elif n==1:
             return files[0]
         else:
-            print("MULTIPLE")
+            LOGGER.warning('Multiple configuration files match criterion')
 
-
-
+                
     @property
     def h5pyargs(self):
+        """
+        Property of the HDF5 configurations
+        
+        Returns
+        -------
+        dic : dict
+           A dictionary of hte HDF5 config 
+
+        """
+
         return {'compression':self.compression,\
                 'compression_opts':self.compression_opts}
 
-    def update_header(self,hdr):
-        hdr.set('FLUXSCL',value=self.fluxscale,comment='numeric scale of flux')
-        hdr.set('FLUXUNIT',value=self.fluxunits,comment='physical units of flux')
-        hdr.set('CONFPATH',value=self.config_path,comment='path to config files')
-        hdr.set('COMPTYPE',value=self.compression,comment='type of compression to hdf5')
-        hdr.set('COMPOPTS',value=self.compression_opts,comment='options to hdf5 compression')
-        hdr.set('',value='',before='FSCALE')
-        hdr.set('',value=f'      / Config Settings',before='FSCALE')
-        hdr.set('',value='',before='FSCALE')
+            
 
     def __str__(self):
-        pass
+        """
+        Method to override printing
+        """
+        dic=self.__dict__
 
-if __name__ == '__main__':
-    x=Config()
-    print(x.fluxscale)
-    x.fluxscale=1e-16
-    y=Config(fluxscale=2)
-    print(repr(y))
-    print(x.fluxscale)
-    x.compargs['compression']=None
-    print(x.compargs)
+        width=0
+        for d in dic.keys():
+            width=max(width,len(d))
+
+        s='Base Parameters:'
+        for k,v in dic.items():
+            s+=f'\n {k:>{width}} {v}'
+
+        s+='\nConfig Parameters:'
+
+        for k,v in self.items():
+            s+=f'\n {v}'
+
+            
+        return s
+  
+            
+#if __name__=='__main__':
+#    x=Config()
+# 
+#    print(x.conffile)
+#    print(x.confpath)
+#    print(x.fluxscale)
+#    x.fluxscale=2
+#    print(x.fluxscale)

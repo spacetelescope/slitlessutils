@@ -7,16 +7,48 @@ from .hdf5table import HDF5Table
 from ..utilities import indices
 
 class OPT(HDF5Table):
+    """
+    Class for an object-profile table (OPT)
 
-    ''' class to hold an Object Profile Table (OPT) '''
+    inherits from `HDF5Table`
+
+    Notes
+    -----
+    This is used to characterize the cross dispersion profile in simple
+    extraction
     
+    The primary difference between this and `ODT` is that here the 
+    floating-point wavelengths are here, whereas it's wavelength indices
+    in `ODT`.
+
+    """
+
+    # the columns of this table
     COLUMNS=('x','y','wav','val')
 
 
-    def __init__(self,segid,dims=None,**kwargs):
+    def __init__(self,source,dims=None,**kwargs):
+        """
+        Initializer
+           
+        Parameters
+        ----------
+        source : `su.sources.Source`
+            The source represented by this ODT
+        
+        dims : tuple or None, optional
+            The dimensions of the table, passed to the `HDF5Table()`
+            See that for rules of typing.  Default is None
+
+        kwargs : dict, optional
+            additional arguments passed to `HDF5Table()`
+
+        """
+        
+
         HDF5Table.__init__(self,dims=dims,**kwargs)
         
-        self.segid=segid
+        self.segid=source.segid
         self.pdts={}
         self.pixels=[]
 
@@ -29,11 +61,25 @@ class OPT(HDF5Table):
         return str(self.segid)
 
     def append(self,pdt):
-        pixel=pdt.pixel
-        self.pdts[pixel]=pdt
-        self.pixels.append(pixel)
+        """
+        Method to append a PDT
+
+        Parameters
+        ----------
+        pdt : `su.tables.PDT`
+           A pixel-dispersion table (PDT) to include in this ODT
+
+        """
+        if pdt:
+
+            pixel=pdt.pixel
+            self.pdts[pixel]=pdt
+            self.pixels.append(pixel)
 
     def decimate(self):
+        """ 
+        Method to decimate over the PDTs
+        """
         if self.pdts:
             
             x,y=[],[]
@@ -45,7 +91,7 @@ class OPT(HDF5Table):
                 wav.extend(pdt.wavelengths())
                 val.extend(pdt['val'])
 
-
+                
 
             if len(x)>0:
                 # ok... let's just save some space
@@ -54,7 +100,7 @@ class OPT(HDF5Table):
                 # chagne datatypes
                 x=np.array(x,dtype=int)
                 y=np.array(y,dtype=int)
-                wav=np.array(wav,dtype=int)
+                wav=np.array(wav,dtype=float)
                 val=np.array(val,dtype=float)
                 
             
@@ -63,6 +109,7 @@ class OPT(HDF5Table):
                 wave,x2,y2=indices.decimate(val*wav,x,y,dims=self.dims)
                 wave/=prof
 
+                
                 
                 if np.array_equal(x1,x2) and np.array_equal(y1,y2):
                     # stuff it back into the OPT
@@ -80,6 +127,24 @@ class OPT(HDF5Table):
 
 
     def as_image(self,show=True):
+        """
+        Method to distill the OPT as an image, to see the object 
+        profile in setting up for things like Horne-like extraction
+
+        Parameters
+        ----------
+        show : bool, optional
+            Flag to show the image with matplotlib.  Default is False
+
+        Returns
+        -------
+        prof : `np.ndarray`
+            The image of the profile (a 2d array) of dtype=float
+
+        wave : `np.ndarray`
+            The image of the average wavelength (a 2d array) of dtype=float
+        """
+
         x=self.get('x')
         y=self.get('y')
         

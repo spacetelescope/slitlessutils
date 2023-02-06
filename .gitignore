@@ -3,9 +3,13 @@
 **/build
 **/OLD
 **/FOO
+todo*txt*
+slitlessutils_plans*
 **/__pycache__
-*.DS_STORE
+*.DS_Store
 test/
 *~
 *.so
 *egg-info
+*.ipy*
+*figures

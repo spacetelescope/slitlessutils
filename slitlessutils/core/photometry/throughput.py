@@ -1,4 +1,10 @@
+
+
 from astropy.io import fits
+import numpy as np
+from scipy.constants import c
+
+
 import os
 
 from .band import Band
@@ -6,17 +12,31 @@ from ...logger import LOGGER
 from ...config import Config
 
 class Throughput(Band):
+
+    
     def __init__(self,*args,**kwargs):
         Band.__init__(self,*args,**kwargs)
 
+        self.zeropoint=kwargs.get('zeropoint',25.)
+
+    @property
+    def photflam(self):
+        return self.photfnu*(c/self.photplam)*(1e8/self.photplam)*100
+        #return 10.**(-0.4*(self.zeropoint+2.408))/self.photplam**2
+
+    @property
+    def photfnu(self):
+        return 10.**(-0.4*(self.zeropoint+48.6))
 
         
     @classmethod
     def from_keys(cls,telescope,instrument,band):
-        LOGGER.info('loading throught from keys')
+        keys=(telescope,instrument,band)
+        
+        LOGGER.info(f'loading throughput from keys: {keys}')
         filename=f'{telescope}_{instrument}_{band}.fits'.lower()
         filename=Config().get_reffile(filename,path='bandpasses')
-
+        
         data,header=fits.getdata(filename,exten=1,header=True)
 
         obj=cls(data['wavelength'],data['transmission'],
@@ -27,6 +47,15 @@ class Throughput(Band):
         obj.band=band
         obj.filename=filename
 
+
+        for zlabel in ('ZEROPT','MAGZERO','ZERO','MAG0'):
+            if zlabel in header:
+                obj.zeropoint=header[zlabel]
+                break
+        else:
+            obj.zeropoint=25.0
+            LOGGER.warning(f"No zeropoint found, using {obj.zeropoint}")
+                    
         return obj
 
     @classmethod

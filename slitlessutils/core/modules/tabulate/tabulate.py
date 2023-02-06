@@ -1,33 +1,72 @@
 import numpy as np
+import os
 
-#from .polyclip import polyclip
-from ..module import Module
-from ...utilities import indices
-from ...tables import PDTFile,PDT
 from ....logger import LOGGER
-from ...data.wfss import SimulatedFile
-
+from ..module import Module
+from ...tables import PDTFile,PDT
+from ...utilities import indices,as_iterable
+from ...wfss import WFSS
 
 class Tabulate(Module):
+    """
+    Module to compute the dispersion tables
+
+    inherits from `su.core.modules.Module`
+
+    Parameters
+    ----------
+    orders : list or None, optional
+       The spectral orders to tabulate.  If `None`, then will do all orders
+       present in the configuration file.  Default is None
+
+    ttype : str, optional
+       The type of table to compute and write to disk.  Default is 'pdt'
+
+    nsub : int, optional
+       The subsampling rate.  Default is 5
+    
+    remake : bool, optional
+       Flag to force remaking of the tables
+        
+    kwargs : dict, optional
+       Optional keywords sent to parent class, see `su.core.modules.Module`
+
+    Notes
+    -----
+    If a table exists, then the code will quietly skip over it, unless 
+    `remake==True`.  Otherwise, the code will make the table.
+
+    """
+
 
     # define the pixel footprint
     DX = np.array([0,0,1,1],dtype=float)
     DY = np.array([0,1,1,0],dtype=float)
 
 
-    DESCRIPTION = 'Making Tables'
+    DESCRIPTION = 'Tabulating'
 
-    def __init__(self,ttype='pdt',nsub=5,remake=True,**kwargs):
+    def __init__(self,orders=None,ttype='pdt',nsub=5,remake=True,**kwargs):
         Module.__init__(self,self.tabulate,**kwargs)
 
-        # set some things
-        self.ttype=ttype       # which type of Table to make (PDT is normal)
-        self.nsub=nsub         # the subsampling frequency (MUST BE AN INTEGER).  Typeically 4 or 5
-        self.remake=remake     # boolean flag to overwrite the table
+        print(f"Tabulate: {remake=}")
 
-        self.pixfrac = 1.0     # the pixfrac (in a drizzle context),  DO NOT CHANGE FROM 1.0
+        
+        # which type of Table to make (PDT is normal)
+        self.ttype=ttype    
 
+        # the subsampling frequency (MUST BE AN INTEGER).  Typically 4 or 5
+        self.nsub=nsub
+        
+        # boolean flag to overwrite the table
+        self.remake=remake
 
+        # the pixfrac (in a drizzle context)
+        self.pixfrac = 1.0  # DO NOT CHANGE THIS!
+
+        self.orders=as_iterable(orders)
+        
+        
     def __str__(self):
         s=f'Tabulation Module: \n'+super().__str__()
         return s
@@ -39,11 +78,23 @@ class Tabulate(Module):
 
     @ttype.setter
     def ttype(self,ttype):
+        """
+        Property setter for the table type
+
+        Parameters
+        ----------
+        ttype : str
+            the table type.
+        
+        Notes
+        -----
+        This is done as a 'property' to do some error testing.
+
+        """
+
         ttype=ttype.lower()
         if ttype == 'pdt':
             self._tabfunc = self.make_pdts
-        elif ttype == 'rdt':
-            self._tabfunc = self.make_rdts
         else:
             LOGGER.warning(f'Table type {ttype} is invalid.')
             return
@@ -56,6 +107,21 @@ class Tabulate(Module):
 
     @nsub.setter
     def nsub(self,nsub):
+        """
+        Property setter for the subsampling rate
+        
+        Parameters
+        ----------
+        nsub : int
+            the subsampling frequency
+        
+        Notes
+        -----
+        This is done as a 'property' to do some error testing.
+
+        """
+
+        
         if not isinstance(nsub,(int,np.integer)):
             LOGGER.warning(f'Nsub should be an integer: {nsub}')
             nsub=int(nsub)
@@ -69,22 +135,43 @@ class Tabulate(Module):
 
 
 
-    def tabulate(self,data,sources,remake=None,**kwargs):
+    def tabulate(self,data,sources,**kwargs):
+        """
+        Function to perform the tabulation.
+        
+        Parameters
+        ----------
+        data : `WFSSCollection`
+           The WFSS data to tabulate
+
+        sources : `SourceCollection`
+           The sources to tabulate
+
+        kwargs : dict, optional
+           parameters passed to the table creation.  See also 
+           `su.core.tables.HDF5Table`
+
+        Returns
+        -------
+        result : str
+           The filename of the table created
+
+        """
+
+
         if self._tabfunc is None:
             LOGGER.error("No function set for tabulating")
             return
-
-        if not isinstance(remake,bool):
-            remake=self.remake
-
-        # unpack inputs
-        insconf,insdata=data
-
+        
 
         # create a wavelength grid with subsampling factor
-        wav=insconf.parameters.wavelengths(nsub=self.nsub)
-
-        with PDTFile(insdata,remake=remake,path=self.path) as h5:
+        disperser=data.disperser
+        #grating=data.grating
+        #grating=insconf.parameters
+        #wav=insconf.parameters.wavelengths(nsub=self.nsub)
+        
+        #with PDTFile(insdata,remake=remake,path=self.path) as h5:
+        with PDTFile(data,remake=self.remake,path=self.path) as h5:
             if not isinstance(h5,PDTFile):
                 return h5
             outfile=h5.filename    # this will be returned by this method
@@ -92,10 +179,15 @@ class Tabulate(Module):
 
             # parse the data type of the `insdata` to place content
             # in the attributes of the output file
-            if isinstance(insdata,SimulatedFile):
+            #if isinstance(insdata,WFSS):#SimulatedFile):
+            #    pass
+            #elif isinstance(insdata,WFSS): #ObservedFile):
+            #    pass
+            if isinstance(data,WFSS):#SimulatedFile):
                 pass
-            elif isinstance(insdata,ObservedFile):
+            elif isinstance(data,WFSS): #ObservedFile):
                 pass
+            
             else:
                 LOGGER.critical(f'Unknown image type: {type(insdata)}')
                 outfile=None
@@ -103,37 +195,49 @@ class Tabulate(Module):
 
             #okay... process the file
             if outfile:
-                for detname,detdata in insdata.items():
-                    detconf=insconf[detname]
 
+
+                
+                #for detname,detdata in insdata.items():
+                for detname,detdata in data.items():
+                    #detconf=insconf[detname]                    
+                    
                     # add a detector to the file
-                    h5.add_detector(detconf)
-
-                    # process each order
-                    for ordname,ordconf in detconf.items():
+                    #h5.add_detector(detdata.detconf)
+                    h5.add_detector(detdata.config)
+                    
+                    # process each order                    
+                    orders=self.orders if self.orders else detdata.orders
+                    for ordname in orders:
+                        #for ordname,ordconf in detdata.config.items():
+                        ordconf=detdata.config[ordname]
                         h5.add_order(ordconf)
 
+                        
                         # process each source
                         for segid,source in sources.items():
-                            tabs=self._tabfunc(source,detdata,detconf,ordname,
-                                               wav,hdf5=h5.h5order,
-                                               nsub=self.nsub,**kwargs)
+                            tabs=self._tabfunc(source,detdata,ordname,
+                                               disperser,hdf5=h5.h5order,
+                                               **kwargs)
 
         # might need/want to return tables instead of filename
         return outfile
 
 
 
-    def make_pdts(self,source,detdata,detconf,ordname,wav,hdf5=None,**kwargs):
+    def make_pdts(self,source,detdata,ordname,disperser,hdf5=None,**kwargs):
 
         # HARDCODED FOR LINEARLY SAMPLED WAVELENGTHS
         
         # get the bandwidth
+        wav=disperser.wavelengths(nsub=self.nsub)
+        
         wav0=np.amin(wav)
         wav1=np.amax(wav)
         nwav=len(wav)
         dwav=(wav1-wav0)/(nwav-1)
-
+        
+        
         # get the order property
         #ordconf=detconf[ordname]
 
@@ -144,36 +248,45 @@ class Tabulate(Module):
         pixrat=(detdata.pixelarea/source.pixelarea)/self.pixfrac
 
         # get some dimensionalities
-        dims=(detdata.hdr['NAXIS1'],detdata.hdr['NAXIS2'],nwav)
+        dims=(*detdata.naxis,nwav)
 
         # process each pixel
-        for x,y,w in source:
+        for x,y,w in source.pixels(applyltv=False,weights=True):
 
             # coordinate in the main image
-            xyd=source.image_coordinates(x,y,dtype=int)         
+            xd,yd=source.image_coordinates(x,y,dtype=int)         
             
             # make an empty table
-            pdt=PDT(*xyd,dims=dims,area=np.float32(source.area),
-                    pixfrac=self.pixfrac,wav0=np.float32(wav0),
-                    wav1=np.float32(wav1),dwav=np.float32(dwav),**kwargs)
+            #pdt=PDT(*xyd,dims=dims,
+            pdt=PDT(xd,yd,dims=dims,
+                    pixfrac=np.float32(self.pixfrac),
+                    area=np.float32(source.area),                    
+                    wav0=np.float32(wav0),
+                    wav1=np.float32(wav1),
+                    dwav=np.float32(dwav),
+                    units=disperser.units,**kwargs)
                     
+                                
             # add some things to the PDT
             #pdt.attrs['wav0']=np.float32(wav0)
             #pdt.attrs['wav1']=np.float32(wav1)
             #pdt.attrs['dwav']=np.float32(dwav)
 
+            
+
+            
             # transform the pixel position and apply footprint
-            xg,yg=source.xy2xy(x+self.DX,y+self.DY,detdata)
-
+            xg,yg=detdata.xy2xy(x+self.DX,y+self.DY,source.wcs,forward=False)
+            
             # drizzle this pixel
-            xx,yy,ll,aa=detconf.drizzle(xg,yg,wav,ordname)
-
+            xx,yy,ll,aa=detdata.config.drizzle(xg,yg,ordname,wav)
             if len(xx)>0:
+
                 # decimate this pixel.
                 # in theory, this isn't needed, but if we have really small
                 # direct image pixels, and/or small bandwidth (ie. large
                 # NSub), then this can be important.
-                aa,xx,yy,ll=indices.decimate(aa,xx,yy,ll)
+                aa,xx,yy,ll=indices.decimate(aa,xx,yy,ll,dims=dims)
 
                 # At this point, the only effect accounted for is the
                 # relative area between the grism and direct image (aa).
@@ -184,14 +297,15 @@ class Tabulate(Module):
                 pdt.extend(xx,yy,ll,aa*w*pixrat*dwav)
 
 
-            # save this PDT
-            pdts[xyd]=pdt
+                # save this PDT
+                #pdts[xyd]=pdt
+                pdts[(x,y)]=pdt
 
-            # if asked to save.  save it here
-            if hdf5 is not None:
-                try:
-                    pdt.write_hdf5(hdf5)
-                except:
-                    pass
+                # if asked to save.  save it here
+                if hdf5 is not None:
+                    try:
+                        pdt.write_hdf5(hdf5)
+                    except:
+                        pass
 
         return pdts

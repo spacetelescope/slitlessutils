@@ -1,2 +1,2 @@
-from .contam import Contamination
+from .contamination import Contamination
 from .single import Single

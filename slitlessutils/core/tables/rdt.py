@@ -5,9 +5,40 @@ from ..utilities import indices
 
 
 class RDT(HDF5Table):
-    COLUMNS=('x','y','lam','val')
+    """
+    Class to hold the region-dispersion table (RDT).  Here the word `region`
+    refers to a spectral region contained *inside* a source.  This
+    is largely for extended sources.
 
+    inherits from `HDF5Table`
+
+    """
+
+
+    # the columns for this table    
+    COLUMNS=('x','y','lam','val')
+    
     def __init__(self,source,regid,dims=None,**kwargs):
+        """
+        Initializer
+        
+        Parameters
+        ----------
+        source : `su.core.sources.Source`
+            The source to load
+
+        regid : int
+            The region ID (recalling that the region is a spectral region 
+            contained within the source). 
+
+        dims : tuple or None, optional
+            Value passed to `HDF5Table`
+
+        kwargs : dict, optional
+            Key value pairs to pass to `HDF5Table`
+        """
+
+
         HDF5Table.__init__(self,dims=dims,**kwargs)
         self.segid=source.segid
         self.regid=regid
@@ -19,14 +50,28 @@ class RDT(HDF5Table):
         return f'({self.segid},{self.regid})'
 
     def append(self,pdt):
-        ''' append a PDT into this Region Dispersion Table (RDT) '''
+        """
+        Method to append another pdt into this table
 
+        Parameters
+        ----------
+        pdt : `su.core.tables.PDT`
+            The PDT to include
+        """
+        
         pixel=pdt.pixel
         self.pdts[pixel]=pdt
         self.pixels.append(pixel)
 
     def decimate(self):
-        ''' Decimate (sum over repeated indices) this RDT '''
+        """
+        Method to decimate over the PDTs
+        
+        Notes
+        -----
+        This decimation is done in place and cannot be undone, without 
+        reloading the table.
+        """
 
         if self.pdts and self.dims:
             # extract all the values, but start with any existing data

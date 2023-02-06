@@ -32,6 +32,10 @@ class WCS(astropyWCS):
    
     
     def __init__(self,hdr):
+        print("WCS")
+        lkdjflk
+
+        
         # ok, there is this annoying situation where the SIP coefs will
         # be present, but the CTYPE does not indicate that.  Therefore,
         # astropy will issue a big warning, so I'll take control of that
@@ -393,8 +397,6 @@ if __name__=='__main__':
     a,d=wcs.xy2ad(500,500)
     print(a,d)
 
-    
-    #ads=[wcs.xy2ad(x,y) for wcs,(x,y) in it]
     with open('t.pickle','ab') as f:
         pickle.dump(wcs,f)
     with open('t.pickle','rb') as f:

@@ -2,12 +2,12 @@ import numpy as np
 
 
 class HDF5Columns(dict):
-    ''' A primative class that will old the data for a table 
+    """
+    Base class to hold the data for a given table
 
+    Only contains a dictionary for the DTYPE for the possible columns
 
-    has the numpy dtypes for each permissible column 
-
-    ''' 
+    """
 
     DTYPES={'x': np.uint16,
             'y': np.uint16,

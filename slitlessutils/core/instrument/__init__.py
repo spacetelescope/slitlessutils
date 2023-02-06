@@ -1,1 +1,0 @@
-from .XML import InstrumentConfig

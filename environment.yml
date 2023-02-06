@@ -1,0 +1,14 @@
+name: slitlessutils
+  
+channels:
+  - conda-forge
+  - defaults
+  
+dependencies:
+  - jupyter
+  - pip
+  - python==3.10
+  - pytest
+  
+  - pip:
+      - .    # install the current package

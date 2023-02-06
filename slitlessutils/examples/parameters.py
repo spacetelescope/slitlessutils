@@ -1,7 +1,6 @@
-
-# base name of products
-ROOT = 'su_example'
-
+"""
+Some global parameters to use for the direct image pixel scales
+"""
 
 # notional field parameters
 RA = 53.        # RA of center

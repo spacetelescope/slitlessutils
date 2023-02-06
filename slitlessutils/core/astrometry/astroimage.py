@@ -1,23 +1,29 @@
 import numpy as np
 from astropy.io import fits
 
-
 from .wcs import WCS
+
 from ..photometry import Throughput
 from ...logger import LOGGER
+
 class AstroImage(WCS):
+    def __init__(self,image,header,load_ancillary=False,zeropoint=None,
+                 throughput=None):
 
-
-    def __init__(self,image,header,zeropoint=None,throughput=None):
+        print("HERE")
+        lkdfj
         self.image=image
         self.header=header
         WCS.__init__(self,self.header)
 
 
         # load somethings
-        self.zeropoint=self._get_zeropoint() if zeropoint is None else zeropoint
-        self.throughput=self._get_throughput() if throughput is None else throughput
-
+        if load_ancillary:
+            self.zeropoint=self._get_zeropoint() if zeropoint is None else zeropoint
+            self.throughput=self._get_throughput() if throughput is None else throughput
+        else:
+            self.zeropoint=None
+            self.throughput=None
 
 
     def _get_zeropoint(self,default=25.0):
@@ -26,7 +32,9 @@ class AstroImage(WCS):
 
         bunit=self.header.get('BUNIT','').lower()
         if bunit=='mjy/sr':
-            self.zeropoint=-2.5*np.log10((1e6/3631.)*(np.pi/180)**2*(self.pixelscale/3600)**2)
+            zeropoint=-2.5*np.log10((1e6/3631.)*(np.pi/180)**2*np.prod(self.pixelscale/3600))
+            #(self.pixelscale/3600)**2)
+
         elif bunit in ('electrons/s','electron/s','e/s','e-/s'):
             for k in ('ABZERO','ZEROPT','MAGZERO','ZERO','ZPT'):
                 if k in self.header:
@@ -48,16 +56,17 @@ class AstroImage(WCS):
     def _get_throughput(self):
         ''' load a throughput curve '''
 
+
         if 'FILTFILE' in self.header:
             thru=Throughput.from_file(self.header['FILTFILE'])
         elif all(k in self.header for k in ('TELESCOP','INSTRUME','FILTER')):
-            thru=Throughput.from_keys(self.header['TELESCOP'],
-                                      self.header['INSTRUME'],
-                                      self.header['FILTER'])
+            thru=Throughput.from_keys(self.header['TELESCOP'].lower(),
+                                      self.header['INSTRUME'].lower(),
+                                      self.header['FILTER'].lower())
         else:
             LOGGER.warning("Unable to load any filter curve")
             thru=None
-
+            
         return thru
 
 
@@ -127,12 +136,12 @@ class AstroImage(WCS):
 
 
     def extract(self,x0,x1,y0,y1,**kwargs):
-        assert (x1>x0 and y1>y0),'Box invalid size'
+        assert (x1>x0 and y1>y0),f'Box invalid size: {x0}:{x1},{y0}:{y1}'
 
         # get a bounding box
         ny,nx=self.image.shape
-        xx0,xx1=max(x0,0),min(x1+1,nx-1)
-        yy0,yy1=max(y0,0),min(y1+1,ny-1)
+        xx0,xx1=max(x0,0),min(x1,nx-1)
+        yy0,yy1=max(y0,0),min(y1,ny-1)
 
         # cut the image out
         image=self.image[yy0:yy1,xx0:xx1]
@@ -157,7 +166,8 @@ class AstroImage(WCS):
         header.add_history(history)
 
         # package the output as the same type as the parent
-        out=type(self)(image,header,zeropoint=self.zeropoint,throughput=self.throughput)
+        out=type(self)(image,header,zeropoint=self.zeropoint,
+                       throughput=self.throughput,**kwargs)
 
         return out
 
@@ -175,3 +185,6 @@ class AstroImage(WCS):
             obj=cls.from_HDU(hdul[exten],**kwargs)
 
         return obj
+
+
+
