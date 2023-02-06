@@ -8,12 +8,12 @@ from setuptools import setup,Extension
 
 if __name__ == '__main__':
 
-    filename='latest.tar.gz'
-    url=''
-    path=''
-    r=requsts.get(url,allow_redirects=True)
-    with open(os.path.join(path,filename),'wb') as fp:
-        fp.write(r.content)
+    #filename='latest.tar.gz'
+    #url=''
+    #path=''
+    #r=requsts.get(url,allow_redirects=True)
+    #with open(os.path.join(path,filename),'wb') as fp:
+    #    fp.write(r.content)
 
     
     tokens=('slitlessutils','core','wfss','config','polyclip')
