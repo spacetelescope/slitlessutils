@@ -19,7 +19,13 @@ class Region(Module):
     orders : list or None, optional
        The spectral orders to make regions.  If `None`, then will do all 
        orders present in the configuration file.  Default is None
+       
+    nthin : int, optional
+       The thinning frequency of points to put in the ds9 region, default is 4
 
+    close_size : int, optional
+       The size of the morphological closing operator, default is 9
+       
     kwargs : dict, optional
        Optional keywords sent to parent class, see `su.core.modules.Module`
     
@@ -37,10 +43,11 @@ class Region(Module):
 
 
 
-    def __init__(self,orders=None,**kwargs):
+    def __init__(self,orders=None,nthin=4,close_size=9,**kwargs):
         Module.__init__(self,self.region,**kwargs)
         self.orders=orders
-        
+        self.close_size=close_size
+        self.nthin=nthin
 
         
     def region(self,data,sources):
@@ -71,18 +78,18 @@ class Region(Module):
         """
 
 
-
-        pad=51
-        n=9
-
-        struct=np.ones((n,n))
-
+        # an internal variable that doesn't really affect things much
+        pad=7
         
+        # a morphologoical closing operator
+        struct=np.ones((self.close_size,self.close_size),dtype=float)
+
+        # a bunch of output files        
         outfiles=[]
         
         # get wavelengths
         #wav=data.grating.wavelengths(nsub=1./2.)
-        wav=data.disperser.wavelengths(nsub=1./2.)
+        wav=data.disperser.wavelengths(nsub=2)
 
         kwargs={'width':4,'move':False,'rotate':False,'fixed':True,'edit':False}
         for detname,detdata in data.items():
@@ -99,16 +106,17 @@ class Region(Module):
                     for args in source.pixels():
                         x.append(args[0])
                         y.append(args[1])
-                    x=np.array(x)
-                    y=np.array(y)
+                    x=np.asarray(x)
+                    y=np.asarray(y)
 
                     xx,yy=detdata.xy2xy(x,y,source.wcs,forward=False)
                     
 
-                    for order in self.orders:
+                    for order in orders:
                         xg,yg=detdata.config.config.disperse(xx,yy,order,wav)
-
                         
+                        
+                                                
                         xg=xg.astype(int).flatten()
                         yg=yg.astype(int).flatten()
 
@@ -129,7 +137,6 @@ class Region(Module):
                         xg+=x0
                         yg+=y0
 
-                        
                         #idx=np.ravel_multi_index((xg,yg),dim,order='F')
                         #idx=indices.uniq(idx)
                         #xg,yg=np.unravel_index(idx,dim,order='F')
@@ -144,8 +151,10 @@ class Region(Module):
                         # get the contour
                         contours=measure.find_contours(msk.astype(int),0.1,
                                                        fully_connected='high')
-                        xc=contours[0][:,1]+x0
-                        yc=contours[0][:,0]+y0
+                        # make the contours and thin
+                        xc=contours[0][::self.nthin,1]+x0
+                        yc=contours[0][::self.nthin,0]+y0
+
                         
                         
                         # create the region

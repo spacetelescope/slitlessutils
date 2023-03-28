@@ -173,7 +173,7 @@ class RangePOM(POM):
         None
         
         """
-        super().update_header(h,used=True)
+        super().update_header(h)
 
         h.set('POMX0',value=self.x0,comment='lower-x bound of POM')
         h.set('POMX1',value=self.x1,comment='upper-x bound of POM')
@@ -399,6 +399,6 @@ def load_pom(**kwargs):
     elif 'POMX' in kwargs and 'POMY' in kwargs:
         return PolygonPOM(kwargs['POMX'],kwargs['POMY'])
     elif 'POMFILE' in kwargs:
-        return ImagePOM(kwargs['POMFILE'],threshold=kwargs.get('POMTHRESH'))
+        return ImagePOM(kwargs['POMFILE'],threshold=kwargs.get('POMTHRESH',0.))
     else:
         return UnityPOM()

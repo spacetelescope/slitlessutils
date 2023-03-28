@@ -42,7 +42,14 @@ def avefnu(sed,band):
     elif (sed.wmin > band.wmin) or (sed.wmax < band.wmax):
         LOGGER.warning(f"Bandpass {band.name} does not cover full range of sed")
     else:
+        #import matplotlib.pyplot as plt
+        #plt.plot(band.wave,band.tran*np.amax(sed.flam)/np.amax(band.tran))
+        #plt.plot(sed.lamb,sed.flam)
+        #plt.xlim(1200,2000)
+        #plt.show()
+        
         fnu=sed(band.wave,fnu=True)
+        
         ave=np.trapz(fnu*band.tran/band.freq,x=band.freq)/band.fnunorm
         
     return ave

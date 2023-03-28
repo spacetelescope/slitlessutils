@@ -26,9 +26,9 @@ class Source(list):
     
     
     
-    def __init__(self,segid,img,seg,reg,hdr,zeropoint=26.,grpid=0,
-                 local_back=True,backsize=5,nsig=(5,5),
-                 whttype='pixels',profile='gaussian'):
+    def __init__(self,img,seg,hdr,local_back=True,backsize=5,nsig=(5,5),
+                 whttype='pixels',profile='gaussian',zeropoint=26.,grpid=0,
+                 specregions=None):
         """
         Initializer
 
@@ -40,11 +40,6 @@ class Source(list):
         seg : `np.ndarray`
             A two-dimensional array from the segmentation image
         
-        reg : `np.ndarray` or None
-            If an np.array, then this is a "segmentation map" like object,
-            then these pixels get aggregated.  If None, then creates a flat 
-            region image
-
         hdr : `astropy.io.fits.Header`
             A fits header for the passed direct image
 
@@ -94,7 +89,11 @@ class Source(list):
             that will have spectral overlap in this series of WFSS images.
             see `su.core.modules.Group` for more information. Default is 0.
 
-   
+        specregions : `np.ndarray` or None, optional
+            If an np.array, then this is a "segmentation map" like object,
+            then these pixels get aggregated.
+
+
         Notes
         ----
         This is a cornerstone object to slitlessutils.
@@ -107,7 +106,7 @@ class Source(list):
         
         
         # record some things
-        self.segid=segid #hdr['SEGID']
+        self.segid=hdr['SEGID']
         self.grpid=grpid
         self.whttype=whttype
         self.backsize=backsize
@@ -127,7 +126,6 @@ class Source(list):
         y,x=np.where((img>0) & (seg==self.segid))
         self.npixels=len(x)
         if self.npixels>0:
-            
             # compute and subtract the local sky background:
             if self.local_back and self.backsize>0:
                 # get a bounding box
@@ -154,9 +152,9 @@ class Source(list):
                 self.background=ave
             else:
                 self.background=0.0
+
             img-=self.background
-            # ---------------------------------------------------------------
-            
+
             
             # process the pixels based on the whttype specified
             if self.whttype=='pixels':
@@ -176,32 +174,29 @@ class Source(list):
                 # determine the spatial profile to fit
                 self.profile=profile.lower()
                 if self.profile=='gaussian':
-                    mod=models.Gaussian2D(amplitude=amplitude,
-                                          x_mean=xc,x_stddev=a,
-                                          y_mean=yc,y_stddev=b,
-                                          theta=theta)
+                    p_init = models.Gaussian2D(amplitude=amplitude,
+                                               x_mean=xc,x_stddev=a,
+                                               y_mean=yc,y_stddev=b,
+                                               theta=theta)
                 elif self.profile=='sersic':
-                    mod=models.Sersic2D(amplitude=amplitude,
-                                        x_0=xc,y_0=yc,
-                                        n=2.5,r_eff=a,
-                                        ellip=np.sqrt(1-(b/a)**2),
-                                        theta=theta)
+                    p_init=models.Sersic2D(amplitude=amplitude,
+                                           x_0=xc,y_0=yc,
+                                           n=2.5,r_eff=a,
+                                           ellip=np.sqrt(1-(b/a)**2),
+                                           theta=theta)
 
                 else:
                     msg=f'profile {profile} is not supported'
                     raise NotImplementedError(msg)
                 
                 # fit the data and compute the model                
-                p = fitter(mod,x,y,img[y,x])
+                p = fitter(p_init,x,y,img[y,x])
                 w=p(x,y)
                 
             else:  
                 self.whttype='pixels'
                 w=np.abs(img[y,x])
-            # ---------------------------------------------------------------
 
-            
-                
             # normalize the weights
             self.norm=np.sum(w)
             w /= self.norm
@@ -215,17 +210,10 @@ class Source(list):
 
             # compute the area of the object
             self.area=self.npixels*self.pixelarea
-
-            #
-            # compute some fluxes:
-            # flux = instrumental flux (in e-)
-            # fnu  = physical flux in (erg/s/cm2/Hz)
-            # mag  = AB mag.
-            #
-            # NOTA BENE: norm and flux would be exactly the same iff
-            #            whttype=='pixels', else they'll be similar
-            #
+            
+            # compute some fluxes
             self.flux=np.sum(img[y,x])
+
             self.fnu=self.flux*10.**(-0.4*(zeropoint+48.6))
             if self.flux<0:
                 self.mag=99.
@@ -236,27 +224,10 @@ class Source(list):
             # put coordinates back on original footprint
             #x,y=self.image_coordinates(x,y,dtype=np.int)
 
-            # if the spectral region image is None, then set it flat
-            if reg is None:
-                reg=(seg==self.segid).astype(int)
 
-
-            #specdata={}
-            #for xx,yy in zip(self.x,self.y):
-            #    rr=reg[yy,xx]
-            #    if rr in specdata:
-            #        specdata[rr][0].append(xx)
-            #        specdata[rr][1].append(yy)
-            #    else:
-            #        specdata[rr]=([xx],[yy])
-
-            # parse the region image
-            ri=indices.reverse((seg==self.segid)*reg,ignore=(0,))
-            for regid,(yy,xx) in ri.items():
-                ww=img[yy,xx]/self.norm
-                reg=SpectralRegion(xx,yy,ww,self.segid,regid,ltv=self.ltv)
-                self.append(reg)
+            
                 
+
                 
             #
             # with weights process if for different segmentation regions
@@ -266,23 +237,21 @@ class Source(list):
             # Eventually have "complex" morphologies in the spectral regions
             # that can describe an arbitrary arrangement of spectral regions
             #
-            #if self.segid < 0:
-            #    # a compound source, so each pixel in a separate SpectralRegion
-            #    for i,(xx,yy,ww) in enumerate(zip(x,y,w),start=1):
-            #        reg=SpectralRegion([xx],[yy],[ww],self.segid,i,
-            #                           ltv=self.ltv)
-            #        self.append(reg)
-            #elif self.segid >0:
-            #    self.append(SpectralRegion(x,y,w,self.segid,0,ltv=self.ltv))
-            #else:
-            #    LOGGER.warning(f"Ignoring {segid=}")
+            if self.segid < 0:
+                # a compound source, so each pixel in a separate SpectralRegion
+                for i,(xx,yy,ww) in enumerate(zip(x,y,w),start=1):
+                    reg=SpectralRegion([xx],[yy],[ww],self.segid,i,ltv=self.ltv)
+                    self.append(reg)
+            elif self.segid >0:
+                self.append(SpectralRegion(x,y,w,self.segid,0,ltv=self.ltv))
+            else:
+                LOGGER.warning(f"Ignoring {segid=}")
                 
 
 
     def __str__(self):
         return super().__str__()
 
-    
 
     @property
     def lamb0(self):

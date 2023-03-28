@@ -4,15 +4,33 @@ import os
 from .flatfield import load_flatfield
 from .order import Order
 from .pom import load_pom 
-from ....logger import LOGGER
+
+
+#
+# Written for slitlessutils by R. Ryan at STScI
+#
+# v1.0 Jan 2023
+#
+#
+
+
 
 class WFSSConfig(dict):
+    """
+    Primary class to configure a WFSS.  Contains information on the 
+    trace/dispersion, flatfield, pick-off-mirror (POM), and sensitivity.
+    
+    Inherits from dict, where each keyword,value pair is a spectral order
+    name and order `slitlessutils.core.wfss.config.order.py`, respectively.    
 
-    COMMENTS=("%",'#','!',';')
-    KEYWORDS=('DISPX','DISPY','DISPL','TSTAR','SENSITIVITY')
+    """
     
 
-    def __init__(self,conffile,fwcpos=None,band=None,orders=None):
+
+    COMMENTS=('#','%','!',';','$')    # comments in the file
+
+    
+    def __init__(self,conffile,fwcpos=None,band=None):
         """
         
         Parameters
@@ -32,68 +50,62 @@ class WFSSConfig(dict):
             interpreted as blank.  Default value is None.         
 
         """
-
-
-        # set somethings about config file
-        self.confpath=os.path.dirname(conffile)
-        self.conffile=conffile
         
-        # set some defaults
+        self.confpath=os.path.dirname(conffile)
+        
+        self.conffile=conffile
+
         self.ffname=None
         self.set_rotation(0.)
         self.set_shift(0.,0.)
-       
-        # read the data
-        self.data=self.read_asciifile(self.conffile)
         
+        pomdata={}
+        self.data=[]
+
         
-        # now parse the data
+        with open(self.conffile,'r') as fp:
+            for line in fp:
+                line=line.strip()
+                self.data.append(line)
+                tokens=line.split()
+                if tokens and tokens[0][0] not in self.COMMENTS:
+                    key=tokens.pop(0)
 
-        # if there is an angle for the Filter Wheel
-        if self.data.get("FWCPOS_REF"):
-            self.set_fwcpos(fwcpos)
+                    value=list(map(self.retype,tokens))
 
-        # check for wedges in the filters
-        if self.data.get(f'WEDGE_{band}'):
-            self.set_shift(*self.data[f'WEDGE_{band}'])
+                    nval=len(value)
+                    if nval==0:
+                        order=key.split('_')[1]
+                        self[order]=Order(order)
+                    else:
+                        if nval==1:
+                            value=value[0]
+                        else:
+                            value=np.array(value)
 
-        # look for a flatfield
-        if self.data.get('FFNAME'):
-            self.ffname=self.data['FFNAME']
+                        # chekc the key for being a valid order info
+                        if key == 'FWCPOS_REF' and fwcpos is not None:
+                            self.set_rotation(np.radians(value-fwcpos))
+                        elif key==f'WEDGE_{band}'.upper() and nval==2:
+                            self.set_shift(value[0],value[1])
+                        elif key=='FFNAME':
+                            self.ffname=value
+                        elif key=='XRANGE':
+                            pomdata[key]=value
+                        elif key=='YRANGE':
+                            pomdata[key]=value
+                        elif key=="POMX":
+                            pomdata[key]=value
+                        elif key=='POMY':
+                            pomdata[key]=value
+                        elif key=='POMFILE':
+                            pomdata[key]=value                            
+                        else:
+                            self._set_order_data(key,value)
 
-        # get pick-off mirror (POM) size
-        self.pom=load_pom(**self.data)
-            
-        # load the orders
-        for order,data in self.data.items():
-            if isinstance(data,dict):
-                if (isinstance(orders,(tuple,list)) and order in orders) or \
-                   (not orders):
 
-                    self[order]=Order(self.data,order)
-
-        # some error checking
-        if len(self)==0:
-            LOGGER.warning('No spectral orders are loaded.')
-        
-
-    def set_fwcpos(self,fwcpos):
-        """
-        Method to set a filter wheel rotation
-        
-        Parameters
-        ----------
-        fwcpos : float
-            Filter Wheel position in deg
-
-        Returns
-        -------
-        None
-        """
-        self.set_rotation(fwcpos-self.data['FWCPOS_REF'])
-                
-
-                
+        # precisely which type of pom do we have?
+        self.pom=load_pom(**pomdata)
 
     def set_rotation(self,theta):
         """
@@ -102,13 +114,15 @@ class WFSSConfig(dict):
         Parameters
         ----------
         theta : float
-            Rotation angle in degrees
+            Rotation angle in radians
 
         Returns
         -------
         None
-        """        
-        self.theta=np.radians(theta)
+        """
+
+        
+        self.theta=theta
         self.cos=np.cos(theta)
         self.sin=np.sin(theta)
 
@@ -119,13 +133,13 @@ class WFSSConfig(dict):
         Parameters
         ----------
         theta : float
-            Rotation angle in degrees
+            Rotation angle in radians
 
         Returns
         -------
         None
         """
-        self.set_rotation(self.theta+np.radians(dtheta))
+        self.set_rotation(self.theta+dtheta)        
         
     def set_shift(self,dx,dy):
         """
@@ -142,9 +156,9 @@ class WFSSConfig(dict):
         Returns
         -------
         None
-        """
-        self.xshift=dx
-        self.yshift=dy
+        """        
+        self.dx=dx
+        self.dy=dy
 
     def add_shift(self,dx,dy):
         """
@@ -163,8 +177,8 @@ class WFSSConfig(dict):
         None
         """        
 
-        self.xshift+=dx
-        self.yshift+=dy
+        self.dx+=dx
+        self.dy+=dy
     
         
     def load_flatfield(self,unity=False):
@@ -256,11 +270,10 @@ class WFSSConfig(dict):
         `np.ndarray` (and of the same shape, but dtype is not relevant).
         """
 
-          
         dx,dy=self[order].deltas(x0,y0,wav)
-                
-        x=x0+self.xshift+self.cos*dx+self.sin*dy
-        y=y0+self.yshift-self.sin*dx+self.cos*dy
+
+        x=self.cos*dx-self.sin*dy+self.dx+x0
+        y=self.sin*dx+self.cos*dy+self.dy+y0
 
         return x,y
 
@@ -292,56 +305,70 @@ class WFSSConfig(dict):
         
         return self[order].sensitivity(wav,**kwargs)
 
+    def _set_order_data(self,key,value):
+        """
+        Helper function in assigning a keyword/value pair to the self.
+
+        This likely should not be used from the outside.
+
+        Parameters
+        ----------
+        key : str
+            The keyword from the grismconf file.
+        
+        value : float, int, `np.ndarray`, or str
+            The value from the grismconf file.
+        
+        Returns
+        -------
+        None
+        """
+        
+
+        tokens=key.split('_')
+        n=len(tokens)
+        if n==3:
+            a=tokens[0] in ('DISPX','DISPY','DISPL')
+            b=tokens[1] in self
+            c=tokens[2].isdigit()
+            if a and b and c:
+                getattr(self[tokens[1]],tokens[0].lower()).append(value)
+        elif n==2:
+            if tokens[0]=='SENSITIVITY' and tokens[1] in self:
+                sensfile=os.path.join(self.confpath,value)
+                self[tokens[1]].load_sensitivity(sensfile)
+            
+    @staticmethod
+    def retype(datum):
+        """
+        Static Method to recast a scalar string into either int or 
+        float as possible.
+
+        If datum can be an int, then return it. If it can't then try 
+        typing it as a float.  If still can't be typed as a float, then
+        return the input data.
+        
+        
+        Parameters
+        ----------
+        datum : str
+            Input datum to retype.  Must be a single value.
+
+        Returns
+        -------
+        datum : int or float or str
+            Output retyped datum
+        """
+        
+        try:
+            datum=int(datum)
+        except ValueError:
+            try:
+                datum=float(datum)
+            except ValueError:
+                pass
+        return datum
 
                 
-    @staticmethod
-    def read_asciifile(conffile):
-        data={}
-        with open(conffile,'r') as fp:
-            for line in fp:
-                line=line.strip()
-                tokens=line.split()
-                if tokens and tokens[0][0] not in WFSSConfig.COMMENTS:
-                    key=tokens.pop(0)
-                    n=len(tokens)
-                    if n==0:
-                        order=key.split('_')[1]
-                        data[order]={}
-                    else:
-                        values=[]
-                        for token in tokens:
-                            try:
-                                value=int(token)
-                            except ValueError:
-                                try:
-                                    value=float(token)
-                                except ValueError:
-                                    value=token
-                            values.append(value)
-                        if len(values)==1:
-                            if isinstance(values[0],str):
-                                values=values[0]
-                            else:
-                                values=np.asarray(values)
-                        else:
-                            values=np.asarray(values)
-                        
-                        
-                        k=key.split('_')
-                        if k[0] in WFSSConfig.KEYWORDS and k[1] in data:
-                            if key.startswith('SENSITIVITY'):
-                                confpath=os.path.dirname(conffile)
-                                newkey='SENSITIVITY'
-                                values=os.path.join(confpath,values)
-                            else:                            
-                                order=k[1]
-                                k.remove(order)
-                                newkey='_'.join(k)
-                                
-                            data[order][newkey]=values
-                        elif key.startswith('WEDGE') and len(values)==2:
-                            data[key]=tuple(values)
-                        else:
-                            data[key]=values
-
-        return data
+if __name__=='__main__':
+    x=GrismConfig('/Users/rryan/slitlessutils_config/instruments/WFC3IR/g102.conf')

@@ -156,6 +156,7 @@ class Simulate(Module):
                 for ordname in orders:
                     
                     ordconf=detdata.config[ordname]
+                    
                     h5.load_order(ordname)
 
                     # process each source
@@ -185,7 +186,7 @@ class Simulate(Module):
                                     yg=pdt.get('y')
                                     val=pdt.get('val')
                                     wav=pdt.wavelengths()
-
+                                    
                                     # need to apply a few things:
                                     # 1) sensitivity curve    (sens)
                                     # 2) flat field           (flat)

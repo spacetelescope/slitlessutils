@@ -162,11 +162,11 @@ EXAMPLE:
 #############################################################################*/
 /*    $Id$*/
 
-#include <stdlib.h>
+ah, I #include <stdlib.h>
 #include <stdio.h>
-#include "polyclip.h"     /* Added by R RYAN */
-  
-/* COMMENTED OUT AND MOVED TO A NEW FILE: `include/polyclip.h` BY R RYAN
+#include "polyclip.h"
+
+/* COMMENTED OUT AND MOVED TO *.h FILE BY R RYAN
 int  polyclip(float *,float *, int, int, int, float *, float *);
 void  polyclip_shclip(float, float, int, int, int);
 void polyclip_shclose(int, int, int);
@@ -176,7 +176,6 @@ float polyclip_area(float *px,float *py, int n);
 char polyclip_test();
 */
 
-  
 /* Return a unique version number to test compilation success */
 char polyclip_test(void) {
   return 44;

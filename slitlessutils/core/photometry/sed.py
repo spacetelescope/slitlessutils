@@ -162,6 +162,7 @@ class SED:
         else:
             num=flux
 
+            
         self *= (num/den)
 
      
@@ -286,7 +287,7 @@ class SED:
         sed=SED()
         sed.count=self.count
         sed._data=self._data.copy()
-                
+        
         sed['flam']*=a
         sed['func']*=a
         sed['cont']*=a
@@ -324,6 +325,9 @@ class SED:
            A scaled version of the self spectrum
 
         """
+        if np.isinf(a):
+            raise ValueError("Cannot multiply by infinity")
+        
         self['flam']*=a
         self['func']*=a
         self['cont']*=a
@@ -502,13 +506,24 @@ class SED:
         if not self:
             return np.zeros_like(wave,dtype=float)
         
-        
+
         g=np.where(np.isfinite(self.flam))[0]
-        flux=np.interp(wave,self.lamb[g],self.flam[g],**kwargs,
-                       left=self.flam[g[0]],right=self.flam[g[-1]])
+        lamb=self.lamb[g]
+        flam=self.flam[g]
+        flux=np.interp(wave,lamb,flam,**kwargs,left=flam[0],right=flam[-1])
+
+        
+        
+        #flux=np.interp(wave,self.lamb[g],self.flam[g],**kwargs,
+        #               left=self.flam[g[0]],right=self.flam[g[-1]])
+        
+
+
+        
         if fnu:
             flux*=((wave/c)*(wave/1e10))
 
+            
         return flux
 
 

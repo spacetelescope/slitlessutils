@@ -257,7 +257,6 @@ class Tabulate(Module):
             xd,yd=source.image_coordinates(x,y,dtype=int)         
             
             # make an empty table
-            #pdt=PDT(*xyd,dims=dims,
             pdt=PDT(xd,yd,dims=dims,
                     pixfrac=np.float32(self.pixfrac),
                     area=np.float32(source.area),                    
@@ -266,15 +265,6 @@ class Tabulate(Module):
                     dwav=np.float32(dwav),
                     units=disperser.units,**kwargs)
                     
-                                
-            # add some things to the PDT
-            #pdt.attrs['wav0']=np.float32(wav0)
-            #pdt.attrs['wav1']=np.float32(wav1)
-            #pdt.attrs['dwav']=np.float32(dwav)
-
-            
-
-            
             # transform the pixel position and apply footprint
             xg,yg=detdata.xy2xy(x+self.DX,y+self.DY,source.wcs,forward=False)
             

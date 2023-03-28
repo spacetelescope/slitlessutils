@@ -22,14 +22,26 @@ BLOCKING=''                 # name of the blocking filter
 WRANGE=(5500.,9500.)        # wavelength range to inspect
 FILTER='F775W'              # name of the filter for the direct image
 SUFFIX = 'flc'              # type of suffix
+NCPU=1                      # number of CPUs to use
+
+
+DETECTOR='SBC'
+DISPERSER='P130L'
+WRANGE=(1150.,1900.)
+FILTER='F125LP'
+SUFFIX='flt'
+
+
+
+
 
 
 SPECCAT='pickles'
 
 # properties of the sources.  The entries are: SEGID:(x,y,ABmag,sedfile)
-SOURCES={1:(500,500,19.0,'pickles_uk_21.fits'),
-         2:(485,480,19.5,'pickles_uk_31.fits'),
-         3:(420,550,20.0,'pickles_uk_41.fits')}
+SOURCES={1:(500,500,19.0,'pickles_uk_15.fits'),
+         2:(485,480,19.5,'pickles_uk_20.fits'),
+         3:(420,550,20.0,'pickles_uk_25.fits')}
 PSFSIG=1.5          # stdev of the PSF in pixels
 APERRAD=0.3         # radius in arcsec     
 SEDPATH='starfield_input'
@@ -187,11 +199,11 @@ def simulate_grisms():
 
     
     # project the sources onto the grism images
-    tab=su.modules.Tabulate()
+    tab=su.modules.Tabulate(ncpu=NCPU)
     pdtfiles=tab(data,sources)
 
     # use the projection tables and the SEDs to simulate grism images
-    sim=su.modules.Simulate()
+    sim=su.modules.Simulate(ncpu=NCPU)
     imgfiles=sim(data,sources)
 
     return imgfiles
@@ -221,7 +233,7 @@ def extract_single():
 
     
     # run the single-file extraction
-    ext = su.modules.Single('+1',root=ROOT)
+    ext = su.modules.Single('+1',root=ROOT,ncpu=NCPU)
     res = ext(data,sources)
     return res
 
@@ -283,7 +295,7 @@ def extract_group():
     
 
     # run the grouping algorithms
-    grp=su.modules.Group(orders=('+1',))
+    grp=su.modules.Group(orders=('+1',),ncpu=NCPU)
     groups=grp(data,sources)
 
     # pass the groups to the multi-extract
@@ -291,7 +303,7 @@ def extract_group():
     res = ext(data,sources,root=ROOT+'_group',groups=groups)
 
 
-def region():
+def regions():
     """
     Method to demonstrate the region-creation tool
 
@@ -314,7 +326,7 @@ def region():
     sources=su.sources.SourceCollection(f'{ROOT}_seg.fits',
                                         f'{ROOT}_sci.fits')
 
-    reg=su.modules.Region()
+    reg=su.modules.Region(ncpu=1)
     res=reg(data,sources)
 
     
@@ -349,13 +361,14 @@ def compare(nsig=1.):
         f/=1e-17
 
         g=np.where((WRANGE[0] <= l) & ( l <= WRANGE[1]))
+
         ylim=(np.amin(f[g])*0.9,np.amax(f[g])*1.1)
         ax.set_ylim(*ylim)
         ax.set_xlim(*WRANGE)
         model=ax.plot(l,f,label='input spectrum',color='black')
+    
+    
         
-
-
 
     files={'single-exposure':(f'{ROOT}_x1d.fits','green'),
            'multi-exposure':(f'{ROOT}_multi_x1d.fits','blue'),
@@ -373,12 +386,15 @@ def compare(nsig=1.):
                     if s in hdul:
                         hdu=hdul[s]
 
+
+                        
+                        
                         lo=hdu.data['flam']-nsig*hdu.data['func']
                         hi=hdu.data['flam']+nsig*hdu.data['func']
-                        
-                        patch=ax.fill_between(hdu.data['lamb'],lo,hi,
+                       
+                        patch=ax.fill_between(hdu.data['lamb'],lo/10000,hi/10000,
                                               color=c,alpha=0.2)
-                        meas=ax.plot(hdu.data['lamb'],hdu.data['flam'],color=c)
+                        meas=ax.plot(hdu.data['lamb'],hdu.data['flam']/10000,color=c)
 
                         if first:
                             artists.append((patch,meas[0]))

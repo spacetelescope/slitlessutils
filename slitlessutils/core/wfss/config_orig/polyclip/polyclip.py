@@ -3,11 +3,7 @@ import numpy as np
 from . import cpolyclip
 
 
-
-
-
-
-# NEVER CHANGE THESE WITHOUT ADDRESSING DATATYPES INSIDE THE C CODE
+# NEVER CHANGE THESE
 INT=np.int32
 FLT=np.float32
 
@@ -49,6 +45,7 @@ def multi(x,y,nxy,axis=1):
     Notes
     -----
     This is a Python driver to call JD Smith's polyclip.c code.
+
 
     """
 
@@ -98,13 +95,7 @@ def multi(x,y,nxy,axis=1):
     areas=areas[:nclip]
     xx=xx[:nclip]
     yy=yy[:nclip]
-
-
-    # make the polyinds a python slice object
-    slices=[slice(polyinds[i],polyinds[i+1],1) for i in range(npoly)]
- 
-    
-    return xx,yy,areas,slices
+    return xx,yy,areas,polyinds
 
 
 
@@ -180,11 +171,13 @@ def single(x,y,nxy):
     xx=inds[:nclip,0]
     yy=inds[:nclip,1]
     areas=areas[:nclip]
-
-    # return slices
-    slices=[slice(0,len(xx),1)]
-
-    return xx,yy,areas,slices
+    
+    return xx,yy,areas
 
 
-   
+
+
+#def polyclip(x,y,nx,ny,**kwargs):
+#    print('inside polyclip')
+
+    
