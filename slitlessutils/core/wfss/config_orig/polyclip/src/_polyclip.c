@@ -4,30 +4,7 @@
 #include <numpy/arrayobject.h>
 #include "polyclip.h"
 
-
-
-/* 
-NAME: 
-  _POLYCLIP
-
-DESCRIPTION:
-  Supplies python and numpy interfaces to the functions in the `polyclip.c`
-  file.
-
-AUTHOR:
-  Russell Ryan (STScI)
-
-
-*/
-
-
-
-
-
 static PyObject *_multi(PyObject *self,PyObject *args){
-  /* Function to link to the polyclip_multi function */
-
-  
 
   /* Create objects from the inputs */
   PyObject *lobj,*robj,*bobj,*tobj,*pxobj,*pyobj;
@@ -94,8 +71,6 @@ static PyObject *_multi(PyObject *self,PyObject *args){
 
 
 static PyObject *_single(PyObject *self,PyObject *args){
-  /* Function to link to the polyclip_single function */
-
   /* Create objects from the inputs */
   PyObject *lobj,*robj,*bobj,*tobj,*nvertsobj;
   PyObject *pxobj,*pyobj,*px_outobj,*py_outobj,*areasobj;
@@ -161,6 +136,7 @@ static PyObject *_single(PyObject *self,PyObject *args){
   /* call function */
   int n=nclip_poly[0];
   polyclip_single(l[0],r[0],b[0],t[0],px,py,nverts[0],inds,&n,areas,px_out,py_out,ri_out);
+  //printf("%i\n",inds[0]);
   nclip_poly[0]=n;
   
   /* Do something interesting here. */
@@ -170,8 +146,7 @@ static PyObject *_single(PyObject *self,PyObject *args){
 
 
 
-/* Collection of function names */
-static PyMethodDef module_methods[]={		     				     
+static PyMethodDef module_methods[]={
   { "multi", (PyCFunction)_multi, METH_NOARGS,NULL },
   { "multi", _multi, METH_VARARGS, "A python driver to call polyclip_multi.\nA function written by J.D. Smith\n"},
   { "single", (PyCFunction)_single, METH_NOARGS,NULL },
@@ -182,7 +157,7 @@ static PyMethodDef module_methods[]={
 
 
 
-/* Function definition to the python code */
+  
 static struct PyModuleDef _CPolyClip =
 {
     PyModuleDef_HEAD_INIT,
@@ -192,8 +167,6 @@ static struct PyModuleDef _CPolyClip =
     module_methods
 };
 
-
-/* Function to initialize python object */
 PyMODINIT_FUNC PyInit_cpolyclip(void)
 {
   import_array();

@@ -151,6 +151,168 @@ class SIAF:
 
 
 
+        
+    
+#@dataclass
+#class Grating:
+#    """
+#    Class to contain information on the spectral grating
+#
+#    This will assume a linear dispersion.
+#
+#    """
+#
+#    grating: str
+#    blocking: str
+#    wave0: float
+#    wave1: float
+#    dwave: float
+#    units: str
+#    gtype: str
+#
+#    def __post_init__(self):
+#        """
+#        Method to check a few things
+#
+#        Should never be directly called
+#        """
+#
+#        assert (self.wave1>self.wave0)
+#        assert (self.dwave>0)
+#
+#            
+#    def __len__(self):
+#        """ 
+#        Method to overload the len() function
+#        
+#        Returns
+#        -------
+#        nwav : int
+#            number of wavelength elements
+#        """
+#
+#        nwav=int(np.ceil((self.wave1-self.wave0)/self.dwave)) + 1
+#        return nwav
+#
+#    @property
+#    def trimmed_grating(self):
+#        """
+#        Method to get a 'trimmed name' 
+#
+#        Returns
+#        -------
+#        name : str
+#            The trimmed name    
+#        """
+#        
+#        if self.grating[-1].isalpha():
+#            return self.grating[:-1]
+#        else:
+#            return self.grating
+#        
+#
+#    
+#    def limits(self,nsub=1):
+#        """
+#        Method to compute the wavelength limits
+#        
+#        Parameters
+#        ----------
+#        nsub : int, optional
+#            The subsampling frequency.  Default is 1.
+#
+#        Returns
+#        -------
+#        lim : `np.ndarray`
+#            A float array that gives the edges of the bins        
+#        """
+#        dw2=self.dwave/2.
+#        dwn=self.dwave/float(nsub)
+#    
+#        lim=np.arange(self.wave0-dw2,self.wave1+dw2+dwn,dwn)
+#        
+#        #lim=np.arange(self.wave0-self.dwave/2,
+#        #              self.wave1+self.dwave*(2+nsub)/(2*nsub),
+#        #              self.dwave/nsub)
+#        return lim
+#    
+#    def wavelengths(self,nsub=1):
+#        """
+#        Method to compute the center of the wavelength bins
+#        
+#        Parameters
+#        ----------
+#        nsub : int, optional
+#            The subsampling frequency.  Default is 1.
+#
+#        Returns
+#        -------
+#        wav : `np.ndarray`
+#            The center of the wavelengths bins
+#        """
+#        
+#        wav=np.arange(self.wave0,self.wave1+self.dwave/nsub,
+#                      self.dwave/nsub,dtype=float)
+#        return wav
+#
+#    def indices(self,wav):
+#        """
+#        Method to convert from floating-point wavelengths to indices
+#        
+#        Parameters
+#        ----------
+#        wav : float, int, `np.ndarray`
+#            The wavelengths to compute
+#
+#        Returns
+#        -------
+#        ind : int, `np.ndarray`
+#            The indices (will be integer dtype)
+#        """
+#
+#        ind=np.floor((wav-self.wave0)/self.dwave).astype(int)
+#        return ind
+#
+#    
+#    def update_header(self,hdr):
+#        """
+#        Method to update a fits header
+#    
+#        Parameters
+#        ----------
+#        hdr : `astropy.io.fits.Header`
+#            The fits header to update
+#        """
+#        hdr.set('wave0',value=self.wave0,comment=f'Initial wavelength')
+#        hdr.set('wave1',value=self.wave1,comment=f'Final wavelength')
+#        hdr.set('dwave',value=self.dwave,comment=f'Sampling wavelength')
+#        hdr.set('wunit',value=self.units,comment='units on wavelength')
+#        #hdr.set('grating',value=self.grating,comment='Grating name')
+#        #hdr.set('blocking',value=blocking,comment='Blocking filter name')
+#
+#        headers.add_stanza(hdr,'Wavelength Parameters',before='wave0')
+#
+#        
+#    def __call__(self,i,nsub=1):
+#        """
+#        Method to compute the wavelength
+#        
+#        Parameters
+#        ----------
+#        i : int or `np.ndarray`
+#            The indices to compute wavelengths from
+#
+#        nsub : int, optional
+#            Subsampling frequency.  Default is 1
+#
+#        Returns
+#        -------
+#        wav : float `np.ndarray`
+#            The wavelength
+#        """
+#        wav=self.wave0+i*self.dwav/nsub
+#        return wav
+
 
     
 @dataclass
@@ -435,7 +597,11 @@ class DetectorConfig:
             
         
         conffile=data['blockers'][disperser.blocking]['config'][disperser.name]
-        conffile=os.path.join(Config().confpath,'instruments',path,conffile)
+        conffile=os.path.sep+os.path.join(Config().confpath,'instruments',
+                                          path,conffile)
+
+                                          #data['path'],conffile)
+        
         self.config=WFSSConfig(conffile,**kwargs)
 
 
@@ -583,40 +749,25 @@ class DetectorConfig:
         xg=np.clip(xg,0,self.naxis[0])
         yg=np.clip(yg,0,self.naxis[1])
 
+        
         # clip against the pixel grid
-        x,y,area,slices=polyclip.multi(xg,yg,self.naxis)
+        x,y,area,indices=polyclip.multi(xg,yg,self.naxis)
 
-        # make wavelength indices
-        lam=np.empty_like(x,dtype=np.uint16)
-        for i,s in enumerate(slices):
-            lam[s]=i
+        # the type of the wavelength
+        lamtype=np.uint16
+
         
-        
-
-        ## clip against the pixel grid
-        #x,y,area,indices=polyclip.multi(xg,yg,self.naxis)
-        #
-        ## create wavelength indices        
-        #lam=np.zeros_like(x,dtype=np.uint16)
-        #
-        ## decompose as wavelength indices
-        #if x.any():
-        #    pi0=indices[:-1]
-        #    pi1=indices[+1:]
-        #    gi=np.where(i1 != i0)[0]
-        #    for g,i0,i1 in zip(gi,pi0,pi1):
-        #        lam[i0:i1]=g
-
-        #n=len(x)
-        #if n:
-        #    i0=indices[0:-1]
-        #    i1=indices[1:]
-        #    gg=np.where(i1 != i0)[0]
-        #    lam=np.empty(n,dtype=lamtype)
-        #    for g,a,b in zip(gg,i0[gg],i1[gg]):
-        #        lam[a:b]=g
-        #else:
-        #    lam=np.empty(shape=(0,),dtype=lamtype)
+        # decompose as wavelength indices
+        n=len(x)
+        if n:
+            i0=indices[0:-1]
+            i1=indices[1:]
+            gg=np.where(i1 != i0)[0]
+            lam=np.empty(n,dtype=lamtype)
+            for g,a,b in zip(gg,i0[gg],i1[gg]):
+                lam[a:b]=g
+        else:
+            lam=np.empty(shape=(0,),dtype=lamtype)
 
         return x,y,lam,area
 
@@ -675,7 +826,7 @@ class InstrumentConfig(dict):
         self.bunit=data['bunit']
         self.suffix=data['suffix']
 
-        self.backgrounds=data.get('background')
+        self.backgrounds=data['background']
         
         self.path=data['path']
         self.header=data.get('header',{})

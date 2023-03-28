@@ -392,7 +392,6 @@ class Single(Module):
                             flat=flatfield(xx,yy,ww)
                             area=detdata.relative_pixelarea(xx,yy)
 
-
                             # aggregate factors 
                             den=vv*sens*flat*area*fluxscale
                             g=np.where((den > 0))[0]

@@ -3,6 +3,38 @@ from astropy.io import fits
 
 from ...utilities import headers
 
+def recast(func):
+    """
+    Custom decorator function to facilitate numpy typing
+    
+    Parameters
+    ----------
+    func : callable
+        The function to call
+    
+    Returns
+    -------
+    inner : callable
+        The decorated function
+    """
+
+    
+    def _inner(self,x,y):
+        
+        x=np.asarray([x]) if np.isscalar(x) else np.asarray(x)
+        y=np.asarray([y]) if np.isscalar(y) else np.asarray(y)
+
+        #x=np.asarray([x]) if np.isscalar(x) else x if isinstance(x,np.ndarray) else np.asarray(x)
+        #y=np.asarray([y]) if np.isscalar(y) else y if isinstance(y,np.ndarray) else np.asarray(y)
+
+        p=func(self,x,y)
+        if np.size(p,axis=None)==1:
+            p=p.item()
+        else:
+            p=np.squeeze(p)
+                
+        return p
+    return _inner
 
 
 class POM:
@@ -13,82 +45,19 @@ class POM:
     detector.
     """
 
-    def __init__(self,x0,x1,y0,y1):
-        """
-        The class initializer
-        
-        Parameters
-        ----------
-        x0 : float or int
-           The minimum x-coordinate.
-
-        x1 : float or int
-           The maximum x-coordinate
-
-        y0 : float or int
-           The minimum y-coordinate.
-
-        y1 : float or int
-           The maximum y-coordinate
-        """
-
-        self.x0=x0
-        self.y0=y0
-        self.x1=x1
-        self.y1=y1
-
-
-    def __call__(self,x,y):
-        """
-        Call the POM to test if pixel is in range
-
-        Parameters
-        ----------
-        x : float, int, or `np.ndarray`
-            The x-coordinate in the detector units
-
-        y : float, int, or `np.ndarray`
-            The y-coordinate in the detector units
-
-        Returns
-        -------
-        p : bool or `np.ndarray`
-            Returns `True` if the pixel is in range and `False` if not
-        
-        Notes
-        -----
-        The input coordinates `x` and `y` must have the same shape, 
-        and the returned `p` values will be same shape
-        """
-
-        
-        #return self.x0<x<self.x1 and self.y0<y<self.y1
-        return (self.x0<x) & (x<self.x1) & (self.y0<y) & (y<self.y1)
-        
-    def update_header(self,h,used=False):
+    def update_header(self,h):
         """
         Method to update a fits header
-        
+
         Parameters
         ----------
         h : `astropy.io.fits.Header`
-           Fits header to update
-
-        used : bool, optional
-           Flag that a POM was used. Default is False
-
+           The fits header to update
         """
-        
-        h['POM']=(False,'Was POM used?')
-        h.set('POMTYPE',value=type(self).__name__,comment='Type of POM',
-              after='POM')
-        h['POMX0']=(self.x0,'lower-bound of x')
-        h['POMY0']=(self.y0,'lower-bound of y')
-        h['POMX1']=(self.x1,'upper-bound of x')
-        h['POMY1']=(self.y1,'upper-bound of y')
-        
-        headers.add_stanza(h,'POM Settings',before='POM')
-        
+        h.set('POM',value=True,comment='Was a POM used?')
+        h.set('POMTYPE',value=self.__class__.__name__,comment='POM Type')
+        headers.add_stanza(h,'POM Information',after='POM')
+
 
 
 class UnityPOM(POM):
@@ -130,9 +99,9 @@ class UnityPOM(POM):
         h : `astropy.io.fits.Header`
            The fits header to update
         """
-        super().update_header(h,used=True)
+        super().update_header(h)
 
-        
+
 class RangePOM(POM):
     """
     Class for implementing a simple rectangular POM
@@ -153,9 +122,42 @@ class RangePOM(POM):
 
         """
 
-        
-        POM.__init__(self,xr[0],xr[1],yr[0],yr[1])
+        assert len(xr)==2,'XR requires two-element array'
+        assert len(yr)==2,'YR requires two-element array'
 
+        self.x0=min(*xr)
+        self.x1=max(*xr)
+        self.y0=min(*yr)
+        self.y1=max(*yr)
+
+        
+    @recast
+    def __call__(self,x,y):
+        """
+        Call the POM to test if pixel is in range
+
+        Parameters
+        ----------
+        x : float, int, or `np.ndarray`
+            The x-coordinate in the detector units
+
+        y : float, int, or `np.ndarray`
+            The y-coordinate in the detector units
+
+        Returns
+        -------
+        p : bool or `np.ndarray`
+            Returns `True` if the pixel is in range and `False` if not
+        
+        Notes
+        -----
+        The input coordinates `x` and `y` must have the same shape, 
+        and the returned `p` values will be same shape
+        """
+        
+        return (self.x0<x) & (x<self.x1) & (self.y0<y) & (y<self.y1)
+
+        
 
     def update_header(self,h):
         """
@@ -173,8 +175,13 @@ class RangePOM(POM):
         """
         super().update_header(h,used=True)
 
-        
-class PolygonPOM(POM):
+        h.set('POMX0',value=self.x0,comment='lower-x bound of POM')
+        h.set('POMX1',value=self.x1,comment='upper-x bound of POM')
+        h.set('POMY0',value=self.y0,comment='lower-y bound of POM')
+        h.set('POMY1',value=self.y1,comment='upper-xybound of POM')
+
+
+class PolygonPOM(RangePOM):
     """
     Class to implement a polygon POM.  
 
@@ -192,17 +199,22 @@ class PolygonPOM(POM):
         py : list, tuple, or `np.ndarray`
             An interable of the polygon y-coordinates
         """
-        raise NotImplementedError('The __call__ method is not ready')
-        
-        x0,x1=np.amin(px),np.amax(px)
-        y0,y1=np.amin(py),np.amax(py)
-        POM.__init__(self,x0,x1,y0,y1)
+        assert (len(px)>=3),'Must have a x-polygon, which requires >=3 points'
+        assert (len(py)>=3),'Must have a y-polygon, which requires >=3 points'
 
+        xr=(np.amin(px),np.amax(px))
+        yr=(np.amin(py),np.amax(py))
+        RangePOM.__init__(self,xr,yr)
+
+        # gotta have this
         self.px1=np.array(px,dtype=float)
         self.py1=np.array(py,dtype=float)
+
+        # this makes it faster
         self.px2=np.roll(self.px1,-1)
         self.py2=np.roll(self.py1,-1)
 
+    @recast
     def __call__(self,x,y):
         """
         Call the POM to test if pixel is in range
@@ -225,24 +237,32 @@ class PolygonPOM(POM):
         The input coordinates `x` and `y` must have the same shape, 
         and the returned `p` values will be same shape
         """
+
+
+        p=np.zeros_like(x,dtype=bool)
+
+        g=np.where(super().__call__(x,y))[0]
+        if len(g)>0:
+            
+            dx1=self.px1-x[g,np.newaxis]
+            dy1=self.py1-y[g,np.newaxis]
+
+            dx2=self.px2-x[g,np.newaxis]
+            dy2=self.py2-y[g,np.newaxis]
+            
+
+            ang=np.arctan2(dx1*dy2-dy1*dx2,
+                           dx1*dx2+dy1*dy2)
+
+            tot=np.abs(np.sum(ang,axis=1))
+
+            p[g]=(tot>np.pi)
+            
+
         
-        if super().__call__(x,y):
-
-            x1=self.px1-x
-            y1=self.py1-y
-            x2=self.px2-x
-            y2=self.py2-y
-
-            dp=x1*x2+y1*y2
-            cp=x1*y2-y1*x2
-            ang=np.arctan2(cp,dp)
-
-            tot=np.sum(ang)
-
-            return np.abs(tot)>np.pi
-        else:
-            return np.zeros_like(x,dtype=bool)
-
+        return p
+        
+        
     def update_header(self,h):
         """
         Method to update a fits header
@@ -257,16 +277,17 @@ class PolygonPOM(POM):
         None
         
         """
-        super().update_header(h,used=True)
-        h['POMX']=(','.join(str(x) for x in self.px1),'x-coordinates of polygon')
-        h['POMY']=(','.join(str(y) for y in self.py1),'y-coordinates of polygon')
+        super().update_header(h)
+        h.set('POMX',value=pomx,comment='x-coordinates of polygon')
+        h.set('POMY',value=pomy,comment='y-coordinates of polygon')
         
-class ImagePOM(POM):
+        
+class ImagePOM(RangePOM):
     """
     Class to implement an image POM (used by JWST)
     """
 
-    def __init__(self,filename,**kwargs):
+    def __init__(self,filename,threshold=None,**kwargs):
         """
         Method to initialize the Image POM
         
@@ -279,12 +300,15 @@ class ImagePOM(POM):
             Optional keywords passed to `astropy.io.fits.getdata()`
 
         """
-        raise NotImplementedError("Image POM are not ready")
         self.filename=filename
         self.data=fits.getdata(self.filename,**kwargs)
         ny,nx=self.data.shape
-        POM.__init__(self,0,nx,0,ny)
+        RangePOM.__init__(self,(0,nx-1),(0,ny-1))
 
+        self.threshold=threshold
+        
+
+    @recast
     def __call__(self,x,y):
         """
         Call the POM to test if pixel is in range
@@ -307,7 +331,27 @@ class ImagePOM(POM):
         The input coordinates `x` and `y` must have the same shape, 
         and the returned `p` values will be same shape
         """
-        raise NotImplementedError("__call__ not ready")
+        #raise NotImplementedError('ImagePOM not finished')
+
+        
+        #https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.RectBivariateSpline.html#scipy.interpolate.RectBivariateSpline
+        
+        p=np.zeros_like(x,dtype=float)
+
+        g=np.where(super().__call__(x,y))[0]
+
+        if len(g)>0:
+            p[g]=self.data[y[g].astype(int),x[g].astype(int)]
+
+        if self.threshold:
+            p>=self.threshold
+
+            
+        return p
+        
+
+
+        
 
     def update_header(self,h):
         """
@@ -318,13 +362,15 @@ class ImagePOM(POM):
         h : `astropy.io.fits.Header`
            The fits header to update
         
-        Returns
-        -------
-        None
         """
-        super().update_header(h,used=True)
-        h['POMFILE']=(self.filename,'filename of the POM')
-        
+        super().update_header(h)
+        hdr.set('POMFILE',value=self.filename,comment='filename of the POM')
+        hdr.set('POMTHR',value=self.threshold,comment='threshold for valid')
+        hdr.set('POMNX',value=self.x1+1,comment='size in x')
+        hdr.set('POMNY',value=self.y1+1,comment='size in y')
+
+
+
 def load_pom(**kwargs):
     """
     A helper function to load a POM
@@ -353,17 +399,6 @@ def load_pom(**kwargs):
     elif 'POMX' in kwargs and 'POMY' in kwargs:
         return PolygonPOM(kwargs['POMX'],kwargs['POMY'])
     elif 'POMFILE' in kwargs:
-        return ImagePOM(kwargs['POMFILE'])
+        return ImagePOM(kwargs['POMFILE'],threshold=kwargs.get('POMTHRESH'))
     else:
         return UnityPOM()
-
-        
-
-
-        
-if __name__=='__main__':
-    x=POM.from_ranges([1.,2],[1,2])
-    print(x(1.5,1.5))
-
-    y=UnityPOM()
-    print(y(2,3))

@@ -1,0 +1,11 @@
+# Preprocessing Steps
+There are a few pre-processing steps that often have to be carried out before analysis can begin.  These steps are generally commutative, and may be necessary pending analysis.
+
+1.  **astrometry** when collecing WFSS data, one must take a direct image(s) through a broadband filter to establish the astrometric reference.  In general, the WCS in any image is slightly incorrect, and the direct image is used to find these tweaks, which are then blindly applied to the companion WFSS image(s).  At some point, the WCS in the direct images was tweaked to match Gaia, however the companion WFSS image(s) were unaffected --- and we require that they are in sync.   Therefore we must either downgrade the WCS in the direct images or upgrade the WCS in the WFSS images.  Here we assume the latter, and compute the affine transformation between the Gaia and pre-Gaia WCS.  This transformation is then applied to the WFSS image
+2.  **background** The background in a WFSS image is a complex interplay beteen the sky spectrum, properties of the detector (flatfield, sensitivity curve, extent of the pick-off mirror), and attitude and ephemeris of the spacecraft (e.g. time of year, ecliptic pointing, sun position, etc.).  This is best addressed using a "master sky" image, which is a static image that is scaled up/down to match the sky pixels in a WFSS image.  For the optical/UV detectors, this is a fairly mature process, but for WFC3IR this can be quite complex --- and this is the method presented here.  For WFC3IR, this process needs to be done read-by-read as sky varies on comparable timescales --- please see [wfc3\_back\_sub](https://github.com/NorPirzkal/WFC3_Back_Sub)
+3.  **crrej** the CCDs will be littered with a large number of small, sharp features from high-energy astrophysical particles.  In general, these sources are just nuissances, they must be flagged, and there are two options:
+   - Laplace edge detection (**laplace.py**): this utlizes the fact that cosmic-ray events produce sharp features and are undispersed.  Therefore, their second derivatives will be uncharacteristically large, and can be used to flag sources.  
+   
+   - astrodrizzle comparison ```raise NotImplementedError('currently working on this')```
+ 
+

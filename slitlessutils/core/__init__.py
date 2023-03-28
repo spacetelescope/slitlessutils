@@ -1,4 +1,4 @@
-from . import astrometry
+#from . import astrometry
 from . import modules
 from . import photometry
 from . import preprocess

@@ -192,7 +192,6 @@ class WFSSDetector:
         Returns
         -------
         None
-        
         """
                 
         # orientat = PA_APER for JWST
@@ -217,6 +216,40 @@ class WFSSDetector:
         """
         self.wcs=wcs.copy()
 
+    def get_orientat(self):
+        """
+        A method to retrieve the orientat at the CRPIX from the CD matrix
+
+        Parameters
+        ---------
+        None.
+
+        Returns
+        -------
+        orientat : float
+            The position angle in deg
+            
+        
+        | a  0| |-c  s| = |-ac  as|
+        | 0  b| | s  c|   | bs  bc| 
+
+
+        | a  S| | c  -s| = | ac+Ss  -as+Sc|
+        | 0  b| | s   c|   | bs      bc| 
+
+        |1  x| |1  0| = | 1+xy    x|
+        |0  1| |y  1|   |   y     1|
+
+
+
+        """
+        raise NotImplementedError()
+
+
+        
+
+
+        
 
     def make_header(self,imtype):
         """

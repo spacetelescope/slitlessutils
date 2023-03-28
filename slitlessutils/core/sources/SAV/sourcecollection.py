@@ -31,8 +31,7 @@ class SourceCollection(dict):
 
     # the default zeropoint
     DEFZERO=26.
-
-        
+    
 
     def __init__(self,segfile,detfile,maglim=np.inf,minpix=0,preprocessor=None,
                  zeropoint=None,throughput=None,sedfile=None,
@@ -119,7 +118,7 @@ class SourceCollection(dict):
         fitsargs={'mode':'readonly','ignore_missing_simple':True}
         with fits.open(self.segfile,**fitsargs) as hdus,\
              fits.open(self.detfile,**fitsargs) as hdud:
-
+            #sedcontext as sedlib,warnings.catch_warnings():
 
             # hide warnings that are an issue for JWST
             warnings.simplefilter("ignore",FITSFixedWarning)
@@ -195,19 +194,6 @@ class SourceCollection(dict):
         # just some numbers for easy access later
         ny,nx=img.shape
 
-
-       
-        
-        # what is datatype of segmentation image.
-        # int are treated as normal segmaps
-        # flt are treated as complex sources
-        isfloat=issubclass(seg.dtype.type,np.floating)
-        if isfloat:
-            seg,reg=np.divmod(seg,1)
-            seg=seg.astype(int)
-            reg=np.floor(reg*self.MAXSPECREG).astype(int)
-
-        
         # find pixels for each object
         ri=indices.reverse(seg,ignore=(0,))
         for segid,(y,x) in ri.items():
@@ -229,21 +215,17 @@ class SourceCollection(dict):
             subhdr['CRPIX2']-=y0
             subhdr['LTV1']=hdr.get("LTV1",0.)-x0
             subhdr['LTV2']=hdr.get("LTV2",0.)-y0
+            subhdr['SEGID']=segid
 
 
-            # make a region id
-            if segid < 0:
-                # make checkerboard reg
-                subreg=np.zeros_like(subseg,dtype=int)
-                gy,gx=np.where(subseg==segid)
-                subreg[gy,gx]=np.arange(1,len(gx)+1,dtype=int)
-            elif isfloat:
-                # use existing reg
-                subreg=reg[y0:y1,x0:x1]
-            else:
-                subreg=(subseg==segid).astype(int)
-            self.addSource(segid,subimg,subseg,subreg,subhdr)
-                        
+            # blot out all segid but relevant
+
+
+
+
+            
+            self.addSource(subimg,subseg,subhdr)
+
 
     def _load_mef(self,hdus,hdui,**kwargs):
         """
@@ -278,15 +260,12 @@ class SourceCollection(dict):
 
 
 
-    def addSource(self,segid,img,seg,reg,hdr):
+    def addSource(self,img,seg,hdr):
         """
         Method to introduce a new source to the collection
 
         Parameters
         ----------
-        segid : int
-            The object ID number
-
         img : `np.ndarray`
             The direct image
 
@@ -300,8 +279,7 @@ class SourceCollection(dict):
         if callable(self.preprocessor):
             img,seg,hdr=self.preprocessor(img,seg,hdr)
 
-             
-        source=Source(segid,img,seg,reg,hdr,zeropoint=self.zeropoint)
+        source=Source(img,seg,hdr,zeropoint=self.zeropoint)
         if source and source.mag < self.maglim and source.npixels>self.minpix:
 
             
