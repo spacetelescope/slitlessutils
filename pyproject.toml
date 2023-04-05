@@ -20,6 +20,7 @@ classifiers = [
 dependencies = [
     "astropy>=5.0.4",
     "astroquery",
+    "drizzlepac",
     "h5py>=3.6.0",
     "networkx>=2.6.3",
     "numpy>=1.22.3",
