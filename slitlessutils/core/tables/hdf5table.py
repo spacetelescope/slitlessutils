@@ -17,16 +17,16 @@ class HDF5Table(HDF5Columns):
 
     inherits from `HDF5Columns`
     """
-    
+
     # a lookup table for the colors of the ds9 regions
-    COLORS={'0':'white','+1':'#1f77b4','+2':'#ff7f0e','+3':'#2ca02c',
-            '+4':'#d62728','+5':'#9467bd','+6':'#8c564b','+7':'#e377c2',
-            '+8':'#7f7f7f','+9':'#bcbd22','+10':'#17becf','-1':'#aec7e8',
-            '-2':'#ffbb78','-3':'#98df8a','-4':'#ff9896','-5':'#c5b0d5',
-            '-6':'#c49c94','-7':'#f7b6d2','-8':'#c7c7c7','-9':'#dbdb8d',
-            '-10':'#9edae5'}    
-        
-    def __init__(self,dims=None,**kwargs):
+    COLORS = {'0': 'white', '+1': '#1f77b4', '+2': '#ff7f0e', '+3': '#2ca02c',
+              '+4': '#d62728', '+5': '#9467bd', '+6': '#8c564b', '+7': '#e377c2',
+              '+8': '#7f7f7f', '+9': '#bcbd22', '+10': '#17becf', '-1': '#aec7e8',
+              '-2': '#ffbb78', '-3': '#98df8a', '-4': '#ff9896', '-5': '#c5b0d5',
+              '-6': '#c49c94', '-7': '#f7b6d2', '-8': '#c7c7c7', '-9': '#dbdb8d',
+              '-10': '#9edae5'}
+
+    def __init__(self, dims=None, **kwargs):
         """
         Initializer
 
@@ -40,21 +40,19 @@ class HDF5Table(HDF5Columns):
 
         """
 
+        self.dims = dims
+        self.attrs = {k: v for k, v in kwargs.items()}
 
-        self.dims=dims
-        self.attrs={k:v for k,v in kwargs.items()}
+        self.compargs = Config().h5pyargs
 
-
-        self.compargs=Config().h5pyargs
-        
         for column in self.COLUMNS:
-            self[column]=list()
+            self[column] = list()
 
         if self.dims:
             # this presumes that the dimensions are in the same order as
             # COLUMNS.  This would break if COLUMNS variable is reordered
-            for name,dim in zip(self.COLUMNS,self.dims):
-                self.attrs[f'n{name}']=self.DTYPES[name](dim)
+            for name, dim in zip(self.COLUMNS, self.dims):
+                self.attrs[f'n{name}'] = self.DTYPES[name](dim)
 
     def __str__(self):
         return f'{self.__class__.__name__} for {self.name}'
@@ -62,43 +60,39 @@ class HDF5Table(HDF5Columns):
     def __len__(self):
         return len(self[self.COLUMNS[0]])
 
-    def __setitem__(self,k,v):
-        super().__setitem__(k,list(v))
+    def __setitem__(self, k, v):
+        super().__setitem__(k, list(v))
 
-
-    def __mul__(self,a):
-        self['val']=self.get('val')*a
+    def __mul__(self, a):
+        self['val'] = self.get('val')*a
         return self
 
-    def __rmul__(self,a):
+    def __rmul__(self, a):
         return self.__mul__(a)
 
-    def __imul__(self,a):
+    def __imul__(self, a):
         return self.__mul__(a)
 
-    def __itruediv__(self,a):
-        self['val']=self.get('val')/a
+    def __itruediv__(self, a):
+        self['val'] = self.get('val')/a
         return self
 
     def __iter__(self):
         yield from zip(*self.values())
 
-
-
     @property
     def columns(self):
         """
         Property to get the column names as a tuple
-        """        
+        """
         return tuple(self.keys())
 
     @property
     def ncolumns(self):
         """
         Property to get the number of columns as an int
-        """        
+        """
         return len(self.keys())
-
 
     def clear(self):
         """
@@ -107,19 +101,19 @@ class HDF5Table(HDF5Columns):
         for v in self.values():
             v.clear()
 
-    def extend(self,*args):
+    def extend(self, *args):
         """
         Method to add new data to the table
-        
+
         Parameters
         args : tuple
-            this is all the columns, so should have the same number of 
+            this is all the columns, so should have the same number of
             elements as the table has columns
         """
-        for column,arg in zip(self.columns,args):
+        for column, arg in zip(self.columns, args):
             self[column].extend(arg)
 
-    def get(self,col,dtype=None):
+    def get(self, col, dtype=None):
         """
         Method to get a column data
 
@@ -127,7 +121,7 @@ class HDF5Table(HDF5Columns):
         ----------
         col : str
             The name of the column to get
-        
+
         dtype : type or None
             Explicitly recast the output array.  If set to `None`, then
             use the default dtype in `HDF5Column`
@@ -144,13 +138,13 @@ class HDF5Table(HDF5Columns):
         """
 
         if dtype is None:
-            dtype=self.DTYPES[col]
-        dat=np.array(self[col],dtype=dtype)
+            dtype = self.DTYPES[col]
+        dat = np.array(self[col], dtype=dtype)
         return dat
 
-    def wavelengths(self,lam=None):
+    def wavelengths(self, lam=None):
         """
-        Method to decode the wavelengths from the metadata in the 
+        Method to decode the wavelengths from the metadata in the
         `HDF5File` into floating-point (useful) wavelengths.
 
         Currently, this assumes a linear dispersion.
@@ -158,9 +152,9 @@ class HDF5Table(HDF5Columns):
         Parameters
         ----------
         lam : int or None, optional
-           The wavelength indices.  If None, then use the values 
+           The wavelength indices.  If None, then use the values
            in the table.
-        
+
         Returns
         -------
         wav : `np.ndarray` dtype=float
@@ -168,18 +162,16 @@ class HDF5Table(HDF5Columns):
         """
 
         if 'wav0' in self.attrs and 'dwav' in self.attrs:
-            wav0=self.attrs['wav0']
-            dwav=self.attrs['dwav']
+            wav0 = self.attrs['wav0']
+            dwav = self.attrs['dwav']
 
             if lam is None:
-                lam=self.get('lam')
+                lam = self.get('lam')
 
-            wav=wav0+lam*dwav
+            wav = wav0+lam*dwav
             return wav
 
-
-        
-    #def compute_xyg(self):
+    # def compute_xyg(self):
     #    LOGGER.debug('make this use utilities')
     #
     #    xyg=np.ravel_multi_index((self.get('x'),self.get('y')),
@@ -190,15 +182,15 @@ class HDF5Table(HDF5Columns):
     def as_pandas(self):
         """
         Method to dump this table as a pandas Dataframe
-        
+
         Returns
         -------
         data : `pandas.DataFrame`
             The output data frame
-        """        
+        """
 
-        data={column: self.get(column) for column in self.COLUMNS}
-        data=pd.DataFrame(data=data)
+        data = {column: self.get(column) for column in self.COLUMNS}
+        data = pd.DataFrame(data=data)
         return data
 
     def as_array(self):
@@ -210,110 +202,107 @@ class HDF5Table(HDF5Columns):
         data : `np.ndarray`
             A structured array of the table
         """
-        
+
         # get the right dtypes
-        dtype=[(column,self.DTYPES[column]) for column in self.COLUMNS]
+        dtype = [(column, self.DTYPES[column]) for column in self.COLUMNS]
 
         # create an array
-        data=np.empty((len(self),),dtype=dtype)
+        data = np.empty((len(self),), dtype=dtype)
 
         # fill the array
         for column in self.COLUMNS:
-            data[column]=self.get(column)
+            data[column] = self.get(column)
         return data
 
-    def bounding_box(self,dx=(0,0),dy=(0,0)):
+    def bounding_box(self, dx=(0, 0), dy=(0, 0)):
         """
         Method to compute the bounding box from this table
-        
+
         Parameters
         ----------
         dx : 2-tuple of integers, optional
-            Extra padding to include in the bounding box of the form 
+            Extra padding to include in the bounding box of the form
             (left,right) padding.  Default is (0,0)
 
         dy : 2-tuple of integers, optional
-            Extra padding to include in the bounding box of the form 
+            Extra padding to include in the bounding box of the form
             (below,above) padding.  Default is (0,0)
 
         Returns
         -------
         x0 : int
-            lower x-value        
+            lower x-value
 
         x1 : int
-            upper x-value        
+            upper x-value
 
         y0 : int
-            lower y-value        
+            lower y-value
 
         y1 : int
-            upper y-value        
+            upper y-value
         """
 
         if 'x' in self and 'y' in self:
-            x=self.get('x')
-            x0=np.amin(x)-dx[0]
-            x1=np.amax(x)+dx[1]
+            x = self.get('x')
+            x0 = np.amin(x)-dx[0]
+            x1 = np.amax(x)+dx[1]
             if 'nx' in self.attrs:
-                x0=np.ceil(max(x0,0))
-                x1=np.floor(min(x1,self.attrs['nx']))
-            x0,x1=int(x0),int(x1)
-            
-                
-            y=self.get('y')
-            y0=np.amin(y)-dy[0]
-            y1=np.amax(y)+dy[1]
+                x0 = np.ceil(max(x0, 0))
+                x1 = np.floor(min(x1, self.attrs['nx']))
+            x0, x1 = int(x0), int(x1)
+
+            y = self.get('y')
+            y0 = np.amin(y)-dy[0]
+            y1 = np.amax(y)+dy[1]
             if 'ny' in self.attrs:
-                y0=np.ceil(max(y0,0))
-                y1=np.floor(min(y1,self.attrs['ny']))
-            y0,y1=int(y0),int(y1)
-            
+                y0 = np.ceil(max(y0, 0))
+                y1 = np.floor(min(y1, self.attrs['ny']))
+            y0, y1 = int(y0), int(y1)
+
         else:
-            x0=x1=y0=y1=None
+            x0 = x1 = y0 = y1 = None
 
-        return x0,x1,y0,y1
+        return x0, x1, y0, y1
 
-
-    def select(self,g):
+    def select(self, g):
         """
         Method to subselect particular rows of the table
-        
+
         Parameters
         ----------
         g : `np.ndarray`
            The indices (or rows) to select
-        
+
         Notes
         -----
         The table selection is done in place and cannot be undone without
         re-reading the table from the file.
         """
-        
-        for k in self.columns:
-            self[k]=self.get(k)[g]
 
-    def threshold(self,a):
+        for k in self.columns:
+            self[k] = self.get(k)[g]
+
+    def threshold(self, a):
         """
-        Method to subselect rows of the table based on a threshold on 
+        Method to subselect rows of the table based on a threshold on
         the table's value
-        
+
         Parameters
         ----------
         a : int or float
             The value to select against
         """
-    
-        g=self.get('val')>=a
+
+        g = self.get('val') >= a
         self.select(g)
 
-
-    def compute_vertices(self,level=0.5,pad=3):
+    def compute_vertices(self, level=0.5, pad=3):
         """
         Method to compute the vertices that will outline the (x,y) pixels
-        
+
         This uses `skimage.measure.find_contours()` on a boolean image
-        (one if the pixel is inside the table, zero if it is outside). 
+        (one if the pixel is inside the table, zero if it is outside).
 
 
         Parameters
@@ -322,7 +311,7 @@ class HDF5Table(HDF5Columns):
             The threshold to make the contours.  Default is 0.5
 
         pad : int, optional
-            The additional padding when extracting coordinates and to 
+            The additional padding when extracting coordinates and to
             improve the binning.  Default is 3
 
         Returns
@@ -334,73 +323,64 @@ class HDF5Table(HDF5Columns):
             The y-coordinates of the polygon
         """
 
-        if ('x' in self.COLUMNS) and ('y' in self.COLUMNS) and len(self)>0:
+        if ('x' in self.COLUMNS) and ('y' in self.COLUMNS) and len(self) > 0:
 
+            x = self.get('x')
+            y = self.get('y')
 
-            x=self.get('x')
-            y=self.get('y')
+            y0, y1 = np.amin(y), np.amax(y)
+            x0, x1 = np.amin(x), np.amax(x)
 
-            
-            y0,y1=np.amin(y),np.amax(y)
-            x0,x1=np.amin(x),np.amax(x)
-            
-            msk=np.zeros((y1-y0+2*pad+1,x1-x0+2*pad+1),dtype=bool)#np.uint8)
-            msk[y-y0+pad,x-x0+pad]=1
-            
+            msk = np.zeros((y1-y0+2*pad+1, x1-x0+2*pad+1), dtype=bool)  # np.uint8)
+            msk[y-y0+pad, x-x0+pad] = 1
+
             # contour the image
-            contours = measure.find_contours(msk,level=level)
-            
+            contours = measure.find_contours(msk, level=level)
+
             # reset the contours
-            py=contours[0][:,0]+y0-pad
-            px=contours[0][:,1]+x0-pad
+            py = contours[0][:, 0]+y0-pad
+            px = contours[0][:, 1]+x0-pad
 
         else:
-            px,py=np.array([]),np.array([])
+            px, py = np.array([]), np.array([])
 
-        return px,py
+        return px, py
 
-            
-            
-            
-
-    def shapelyPolygon(self,**kwargs):
+    def shapelyPolygon(self, **kwargs):
         """
-        Method to distill this table as a Shapely `Polygon` object  
-        
+        Method to distill this table as a Shapely `Polygon` object
+
         See also `shapely.geometry.Polygon()`
-       
+
         Parameters
         ----------
         kwargs : dict, optional
            Keywords to pass to `HDF5Table().compute_vertices()`
-        
+
         Returns
         -------
         poly : `shapely.geometry.Polygon`
             The shapely polygon
         """
-    
-    
+
         if ('x' in self.COLUMNS) and ('y' in self.COLUMNS):
-            px,py=self.compute_vertices(**kwargs)
-            poly=geometry.Polygon(list(zip(px,py)))
+            px, py = self.compute_vertices(**kwargs)
+            poly = geometry.Polygon(list(zip(px, py)))
             return poly
 
-    
-
-    def ds9region(self,order=None,mask=False,size=12,width=3,**kwargs):
+    def ds9region(self, order=None, mask=False, size=12, width=3, **kwargs):
         """
         Method to distill this table as a string of ds9 region information
-        
+
 
         Parameters
         ----------
         order : str or None, optional
-           The spectral order for which this is associated, which is only 
-           used to set the color of the ds9 region.  If None, then 
-           a default color of 'black' is used.  If a valid string, 
+           The spectral order for which this is associated, which is only
+           used to set the color of the ds9 region.  If None, then
+           a default color of 'black' is used.  If a valid string,
            then the colors come from the class variable `COLORS`
-           Default is None.   
+           Default is None.
 
         mask : bool, optional
            A flag that the ds9 region should be interpred as a mask.
@@ -414,59 +394,50 @@ class HDF5Table(HDF5Columns):
 
         kwargs : dict, optional
            optional keywords sent to `compute_vertices()`
-        
+
         Returns
         -------
         reg : str
            A string that contains the ds9 region
 
         """
-          
-           
-
 
         if ('x' in self.COLUMNS) and ('y' in self.COLUMNS):
-            
-            px,py=self.compute_vertices(**kwargs)
-            
-            #coord=','.join('{},{}'.format(*xy) for xy in zip(cx,cy))
-            coord=','.join(f'{x},{y}' for x,y in zip(px,py))
-            font=f'helvetica {int(size)} bold'
 
+            px, py = self.compute_vertices(**kwargs)
 
-            color=self.COLORS.get(order,'black')
+            # coord=','.join('{},{}'.format(*xy) for xy in zip(cx,cy))
+            coord = ','.join(f'{x},{y}' for x, y in zip(px, py))
+            font = f'helvetica {int(size)} bold'
 
-            msk='-' if mask else ''
-                    
+            color = self.COLORS.get(order, 'black')
 
-            
-            reg=f'{msk}polygon({coord}) # color={color} '+\
-                f'text={{{self.name}}} edit=0 move=0 rotate=0 fixed=1 '+\
+            msk = '-' if mask else ''
+
+            reg = f'{msk}polygon({coord}) # color={color} ' +\
+                f'text={{{self.name}}} edit=0 move=0 rotate=0 fixed=1 ' +\
                 f'font="{font}" width={int(width)}'
 
-            #if family not in ('helvitica','times','courier'):
+            # if family not in ('helvitica','times','courier'):
             #    family='helvetica'
-            #font=f'{family} {int(size)}'
+            # font=f'{family} {int(size)}'
 
-            #if bold:
+            # if bold:
             #    font+=' bold'
-            #if italic:
+            # if italic:
             #    font+= 'italic'
-            
-            #reg=f'{int(mask)}polygon({coord}) # color={color} '+\
+
+            # reg=f'{int(mask)}polygon({coord}) # color={color} '+\
             #    f'text={{{self.name}}} edit={int(edit)} move={int(move)} '+\
             #    f'rotate={int(rotate)} width={int(width)} font="{font}" '+\
             #    f'fixed={int(fixed)}'
 
-
         else:
             LOGGER.error('Cannot make region, table does not "x" and "y"')
-            
+
         return reg
 
-
-
-    def write_hdf5(self,h5):        
+    def write_hdf5(self, h5):
         """
         Method to write this table to an HDF5 object
 
@@ -476,7 +447,6 @@ class HDF5Table(HDF5Columns):
            The HDF object to write to.
         """
 
-
-        hd=h5.create_dataset(self.name,data=self.as_array(),**self.compargs)
-        for k,v in self.attrs.items():
-            attributes.write(hd,k,v)
+        hd = h5.create_dataset(self.name, data=self.as_array(), **self.compargs)
+        for k, v in self.attrs.items():
+            attributes.write(hd, k, v)

@@ -1,4 +1,4 @@
-from astropy.wcs import WCS,Sip,utils as wcsutils,FITSFixedWarning
+from astropy.wcs import WCS, Sip, utils as wcsutils, FITSFixedWarning
 from astropy.io import fits
 import numpy as np
 import os
@@ -15,8 +15,7 @@ class WFSSDetector:
 
     """
 
-    
-    def __init__(self,filename,detconf,bunit='e-/s'):
+    def __init__(self, filename, detconf, bunit='e-/s'):
         """
         Initializer method
 
@@ -24,39 +23,37 @@ class WFSSDetector:
         ----------
         filename : str
             full path to a valid fits file that contains this data
-        
-        detconf : 
-        
+
+        detconf :
+
 
         bunit : str, optional
             the BUNIT of the data.  Default is 'e-/s'
 
         """
-        
-        # save the filename
-        self.filename=filename
 
+        # save the filename
+        self.filename = filename
 
         # create an empty WCS to get started
-        self.wcs=WCS(relax=True)
-        self.wcs._naxis=list(detconf.naxis)  # NB: MUST BE A LIST!
+        self.wcs = WCS(relax=True)
+        self.wcs._naxis = list(detconf.naxis)  # NB: MUST BE A LIST!
 
         # do we add SIP?
         if detconf.sip:
-            self.wcs.wcs.ctype=['RA---TAN-SIP','DEC--TAN-SIP']
-            self.wcs.sip=Sip(*detconf.sip)
+            self.wcs.wcs.ctype = ['RA---TAN-SIP', 'DEC--TAN-SIP']
+            self.wcs.sip = Sip(*detconf.sip)
         else:
-            self.wcs.wcs.ctype=['RA---TAN','DEC--TAN']
+            self.wcs.wcs.ctype = ['RA---TAN', 'DEC--TAN']
 
         # record the CRPIX & CDELT
-        self.wcs.wcs.crpix=detconf.crpix
-        self.wcs.wcs.cdelt=detconf.scale/3600.
+        self.wcs.wcs.crpix = detconf.crpix
+        self.wcs.wcs.cdelt = detconf.scale/3600.
 
         # save the config object
-        self.config=detconf
-        self.bunit=bunit
+        self.config = detconf
+        self.bunit = bunit
 
-        
     def __str__(self):
         return self.name
 
@@ -83,28 +80,27 @@ class WFSSDetector:
     @property
     def name(self):
         return self.config.name
-    
-    
+
     def npixels(self):
         """
         Method to return the number of pixels in this detector
-        
+
         Returns
         -------
         npix : str
            number of pixels
         """
-        npix=self.wcs._naxis[0]*self.wcs._naxis[1]
+        npix = self.wcs._naxis[0]*self.wcs._naxis[1]
         return npix
-    
-    def relative_pixelarea(self,x,y):
+
+    def relative_pixelarea(self, x, y):
         """
-        Method to compute the pixel area relative to the pixel area 
+        Method to compute the pixel area relative to the pixel area
         at the CRPIX.  This is equivalent to the pixel-area map (PAM)
 
-        Computes the Jacobian of the distortion solution on the fly, therefore 
-        if no distortion is present, then returns all unity. 
-    
+        Computes the Jacobian of the distortion solution on the fly, therefore
+        if no distortion is present, then returns all unity.
+
 
         Parameters
         ----------
@@ -113,61 +109,55 @@ class WFSSDetector:
 
         y : float, int, or `np.ndarray`
             the y-coordinates in the detector frame to compute
-        
+
         Returns
         -------
-        area : float or `np.ndarray`  
-            the relative pixel area --- if an `np.ndarray`, then the 
+        area : float or `np.ndarray`
+            the relative pixel area --- if an `np.ndarray`, then the
             dtype will be `float`
 
         Notes
         -----
-        The input coordiantes (x,y) must have the same shape, but their 
-        dtype does not matter.  
+        The input coordiantes (x,y) must have the same shape, but their
+        dtype does not matter.
 
         """
 
         if self.wcs.sip:
             # if SIP is present, then compute the Jacobian
-            dx=x-(self.wcs.wcs.crpix[0]-1)
-            dy=y-(self.wcs.wcs.crpix[1]-1)
+            dx = x-(self.wcs.wcs.crpix[0]-1)
+            dy = y-(self.wcs.wcs.crpix[1]-1)
 
             # Uggh...computing these derivatives is ugly, because
             # things are stored as 2d matrices.
-            
 
-            
-            # compute the derivatives w.r.t. the A         
-            dadx=np.ones_like(dx,dtype=float)
-            dady=np.zeros_like(dx,dtype=float)
-            for i,j in zip(*np.where(self.wcs.sip.a !=0)):
-                if i>0:
-                    dadx+=self.wcs.sip.a[i,j]*i*dx**(i-1)*dy**j
-                if j>0:
-                    dady+=self.wcs.sip.a[i,j]*j*dx**i*dy**(j-1)
+            # compute the derivatives w.r.t. the A
+            dadx = np.ones_like(dx, dtype=float)
+            dady = np.zeros_like(dx, dtype=float)
+            for i, j in zip(*np.where(self.wcs.sip.a != 0)):
+                if i > 0:
+                    dadx += self.wcs.sip.a[i, j]*i*dx**(i-1)*dy**j
+                if j > 0:
+                    dady += self.wcs.sip.a[i, j]*j*dx**i*dy**(j-1)
 
-                    
-            # compute the derivatives w.r.t. the B                    
-            dbdx=np.zeros_like(dx,dtype=float)
-            dbdy=np.ones_like(dx,dtype=float)
-            for i,j in zip(*np.where(self.wcs.sip.b !=0)):
-                if i>0:
-                    dbdx+=self.wcs.sip.b[i,j]*i*dx**(i-1)*dy**j
-                if j>0:
-                    dbdy+=self.wcs.sip.b[i,j]*j*dx**i*dy**(j-1)
-    
+            # compute the derivatives w.r.t. the B
+            dbdx = np.zeros_like(dx, dtype=float)
+            dbdy = np.ones_like(dx, dtype=float)
+            for i, j in zip(*np.where(self.wcs.sip.b != 0)):
+                if i > 0:
+                    dbdx += self.wcs.sip.b[i, j]*i*dx**(i-1)*dy**j
+                if j > 0:
+                    dbdy += self.wcs.sip.b[i, j]*j*dx**i*dy**(j-1)
+
             # compute the jacobian:
             area = np.abs(dadx * dbdy - dady * dbdx)
         else:
-            # if no distorion, then return all unity            
-            area=np.ones_like(x,dtype=float)
+            # if no distorion, then return all unity
+            area = np.ones_like(x, dtype=float)
 
-            
         return area
-        
-    
 
-    def set_pointing(self,ra,dec,orientat,refsiaf):
+    def set_pointing(self, ra, dec, orientat, refsiaf):
         """
         Method to set the pointing to the WCS structure.
 
@@ -177,7 +167,7 @@ class WFSSDetector:
         ----------
         ra : float or int
             The RA for this detector (will become the CRVAL1)
-        
+
         dec : float or int
             The Dec for this detector (will become the CRVAL2)
 
@@ -186,26 +176,24 @@ class WFSSDetector:
 
         refsiaf : `su.core.wfss.config.SIAF`
             The SIAF data that describes the overall instrumental pointing.
-            Used to find the offset from the instrument pointing to this 
+            Used to find the offset from the instrument pointing to this
             detector's pointing.
 
         Returns
         -------
         None
         """
-                
+
         # orientat = PA_APER for JWST
-        pa=np.radians(orientat)
-        cs=np.cos(pa)
-        sn=np.sin(pa)
+        pa = np.radians(orientat)
+        cs = np.cos(pa)
+        sn = np.sin(pa)
 
-        self.wcs.wcs.pc=[[-cs,sn],[sn,cs]]
-        self.wcs.wcs.crval=self.config.siaf.compute_crvals(ra,dec,orientat,
-                                                           refsiaf)
+        self.wcs.wcs.pc = [[-cs, sn], [sn, cs]]
+        self.wcs.wcs.crval = self.config.siaf.compute_crvals(ra, dec, orientat,
+                                                             refsiaf)
 
-        
-
-    def set_wcs(self,wcs):
+    def set_wcs(self, wcs):
         """
         A method to set the WCS
 
@@ -214,7 +202,7 @@ class WFSSDetector:
         wcs : `astropy.wcs.WCS`
             the WCS to set to this detector
         """
-        self.wcs=wcs.copy()
+        self.wcs = wcs.copy()
 
     def get_orientat(self):
         """
@@ -228,14 +216,14 @@ class WFSSDetector:
         -------
         orientat : float
             The position angle in deg
-            
-        
+
+
         | a  0| |-c  s| = |-ac  as|
-        | 0  b| | s  c|   | bs  bc| 
+        | 0  b| | s  c|   | bs  bc|
 
 
         | a  S| | c  -s| = | ac+Ss  -as+Sc|
-        | 0  b| | s   c|   | bs      bc| 
+        | 0  b| | s   c|   | bs      bc|
 
         |1  x| |1  0| = | 1+xy    x|
         |0  1| |y  1|   |   y     1|
@@ -245,13 +233,7 @@ class WFSSDetector:
         """
         raise NotImplementedError()
 
-
-        
-
-
-        
-
-    def make_header(self,imtype):
+    def make_header(self, imtype):
         """
         Method to make a fits header
 
@@ -264,25 +246,24 @@ class WFSSDetector:
         -------
         h : `astropy.io.fits.Header`
             The fits header
-        
+
         """
 
-        
         if imtype in self.extensions:
-        
-            h=self.wcs.to_header(relax=True)
-            for k,v in self.config.header.items():
-                h[k]=tuple(v)
+
+            h = self.wcs.to_header(relax=True)
+            for k, v in self.config.header.items():
+                h[k] = tuple(v)
             self.extensions[imtype].update_header(h)
             self.config.config.pom.update_header(h)
         else:
-            h=fits.Header()
-            
+            h = fits.Header()
+
         return h
-        
-    def make_HDUs(self,sci,addnoise=True):
+
+    def make_HDUs(self, sci, addnoise=True):
         """
-        Method to create header-data units (HDUs) for the science, 
+        Method to create header-data units (HDUs) for the science,
         uncertainty, and data-quality.
 
         Parameters
@@ -296,8 +277,8 @@ class WFSSDetector:
         Returns
         -------
         scihdu : `astropy.io.fits.ImageHDU`
-            The HDU containing the science image and header.  If 
-            addnoise==False, then this is effectively the same as the 
+            The HDU containing the science image and header.  If
+            addnoise==False, then this is effectively the same as the
             input with units changed based on BUNIT.
 
         unchdu : `astropy.io.fits.ImageHDU`
@@ -307,48 +288,46 @@ class WFSSDetector:
             The HDU containing the data-quality image and header
 
         """
-        
-        hsci=self.make_header('science')
-        hunc=self.make_header('uncertainty')
-        hdqa=self.make_header('dataquality')
 
+        hsci = self.make_header('science')
+        hunc = self.make_header('uncertainty')
+        hdqa = self.make_header('dataquality')
 
         if addnoise:
-            sci,unc=self.config.noise(sci)
+            sci, unc = self.config.noise(sci)
             self.config.noise.update_header(hsci)
-        
+
         else:
-            unc=np.ones_like(sci)
+            unc = np.ones_like(sci)
 
         # change the units to match BUNIT
-        hsci['BUNIT']=(self.bunit,'brightness unit')
-        hunc['BUNIT']=(self.bunit,'brightness unit')
-        hdqa['BUNIT']=('UNITLESS','brightness unit')
-        if self.bunit.lower() in ('electron','electrons','e','e-'):
-            sci*=self.config.noise.time
-            unc*=self.config.noise.time
+        hsci['BUNIT'] = (self.bunit, 'brightness unit')
+        hunc['BUNIT'] = (self.bunit, 'brightness unit')
+        hdqa['BUNIT'] = ('UNITLESS', 'brightness unit')
+        if self.bunit.lower() in ('electron', 'electrons', 'e', 'e-'):
+            sci *= self.config.noise.time
+            unc *= self.config.noise.time
 
+        scihdu = fits.ImageHDU(data=self.extensions['science'].retype(sci),
+                               header=hsci)
+        unchdu = fits.ImageHDU(data=self.extensions['uncertainty'].retype(unc),
+                               header=hunc)
+        dqahdu = fits.ImageHDU(
+            data=np.zeros_like(
+                sci,
+                dtype=self.extensions['dataquality'].dtype),
+            header=hdqa)
 
-        scihdu=fits.ImageHDU(data=self.extensions['science'].retype(sci),
-                             header=hsci)
-        unchdu=fits.ImageHDU(data=self.extensions['uncertainty'].retype(unc),
-                             header=hunc)
-        dqahdu=fits.ImageHDU(data=np.zeros_like(sci,dtype=self.extensions['dataquality'].dtype),header=hdqa)
+        return scihdu, unchdu, dqahdu
 
-        return scihdu,unchdu,dqahdu
-
-
-    
-
-    
-    def readfits(self,imtype,header=False):
+    def readfits(self, imtype, header=False):
         """
         Method to read and return data from a fits file
-        
+
         Parameters
         ----------
         imtype : str
-             The type of the image to read: 'science', 'uncertainty' or 
+             The type of the image to read: 'science', 'uncertainty' or
              'dataquality'
 
         header : bool, optional
@@ -361,45 +340,45 @@ class WFSSDetector:
 
         hdr : `astropy.io.fits.Header`, optional
              The fits header.  Default is to not return the header
-        
+
         """
-        
+
         if imtype in self.extensions:
-            return self.extensions[imtype].readfits(self.filename,header=header)
-        
-            #args=self.extensions[imtype].readfits(self.filename,header=header)
+            return self.extensions[imtype].readfits(self.filename, header=header)
+
+            # args=self.extensions[imtype].readfits(self.filename,header=header)
             #
-            #if header:
+            # if header:
             #    if self.bunit in ('electrons','e','e-','electron'):
             #        return args[0]/self.config.noise.time,args[1]
             #    else:
             #        return args
-            #else:
+            # else:
             #    if self.bunit in ('electrons','e','e-','electron'):
             #        return args/self.config.noise.time,args[1]
             #    else:
             #        return args
-        elif imtype=='flatfield':
-            return fits.getdata(self.flatfield,header=header)
+        elif imtype == 'flatfield':
+            return fits.getdata(self.flatfield, header=header)
         else:
             pass
 
     def primaryheader(self):
         """
         Method to read the primary header
-        
+
         Returns
         -------
         phdr : `astropy.io.fits.Header`
             The primary header.
-        """        
-        phdr=fits.getheader(self.filename,0)
+        """
+        phdr = fits.getheader(self.filename, 0)
         return phdr
-        
-    def headfits(self,imtype):
+
+    def headfits(self, imtype):
         """
         Method to read a fits header from a file
-        
+
         Parameters
         ----------
         imtype : str
@@ -411,13 +390,12 @@ class WFSSDetector:
             The fits header
         """
         if imtype in self.extensions:
-            h=self.extensions[imtype].headfits(self.filename)
+            h = self.extensions[imtype].headfits(self.filename)
         else:
-            h=fits.Header()
+            h = fits.Header()
         return h
 
-            
-    def xy2xy(self,x,y,wcs,forward=True):
+    def xy2xy(self, x, y, wcs, forward=True):
         """
         Method to transform (x,y) pairs from one WCS frame to a different
         WCS frame
@@ -425,18 +403,18 @@ class WFSSDetector:
         Parameters
         ----------
         x : int, float, `np.ndarray`
-           The x-coordinates 
+           The x-coordinates
 
         y : int, float, `np.ndarray`
-           The y-coordinates 
-        
+           The y-coordinates
+
         wcs : astropy.wcs.WCS
            The other WCS to transform to
 
         forward : bool, optional
-           A flag controlling the direction of the transform.  
+           A flag controlling the direction of the transform.
 
-           -> If True, then transform *FROM* this image *TO* this WCS.  
+           -> If True, then transform *FROM* this image *TO* this WCS.
            -> If False, then transfrom *TO* this image *FROM* this WCS
 
         Returns
@@ -446,7 +424,7 @@ class WFSSDetector:
 
         Y : float, `np.ndarray`
            the transformed y-coordinates
-        
+
         Notes
         -----
         The input `x` and `y` variables must have the same shape, and then
@@ -454,12 +432,12 @@ class WFSSDetector:
         """
 
         if forward:
-            X,Y=wcs.all_world2pix(*self.wcs.all_pix2world(x,y,0),0)
+            X, Y = wcs.all_world2pix(*self.wcs.all_pix2world(x, y, 0), 0)
         else:
-            X,Y=self.wcs.all_world2pix(*wcs.all_pix2world(x,y,0),0)
-        return X,Y
+            X, Y = self.wcs.all_world2pix(*wcs.all_pix2world(x, y, 0), 0)
+        return X, Y
 
-    def ad2xy(self,a,d):
+    def ad2xy(self, a, d):
         """
         Method to transform (RA,Dec) pairs to (x,y) pairs.
 
@@ -474,32 +452,32 @@ class WFSSDetector:
         Returns
         -------
         x : float, `np.ndarray`
-           The x-coordinates 
+           The x-coordinates
 
         y : float, `np.ndarray`
-           The y-coordinates 
-        
-        
+           The y-coordinates
+
+
         Notes
         -----
-        The input `a` and `d` variables must have the same shape, and the 
+        The input `a` and `d` variables must have the same shape, and the
         output `x` and `y` will have that shape.
         """
-        x,y=self.wcs.all_world2pix(a,d,0)
-        return x,y
+        x, y = self.wcs.all_world2pix(a, d, 0)
+        return x, y
 
-    def xy2ad(self,x,y):
+    def xy2ad(self, x, y):
         """
         Method to transform (x,y) pairs to (RA,Dec) pairs.
 
         Parameters
         ----------
         x : int, float, `np.ndarray`
-           The x-coordinates 
+           The x-coordinates
 
         y : int, float, `np.ndarray`
-           The y-coordinates 
-        
+           The y-coordinates
+
         Returns
         -------
         a : float, `np.ndarray`
@@ -507,69 +485,64 @@ class WFSSDetector:
 
         d : float, `np.ndarray`
            The Dec coordinates
-        
+
         Notes
         -----
-        The input `x` and `y` variables must have the same shape, and the 
+        The input `x` and `y` variables must have the same shape, and the
         output `a` and `d` will have that shape.
         """
-        a,d=self.wcs.all_pix2world(x,y,0)
-        return a,d
-    
-            
+        a, d = self.wcs.all_pix2world(x, y, 0)
+        return a, d
 
 
-   
 class WFSS(dict):
     """
     Class to contain all the information for a single WFSS file
-    
+
     inherits from dict.  The keyword,value pairs are for each detector will
     be detectorname,`WFSSDetector` respectively.
     """
-    
-    def __init__(self,filename,filetype,insconf):
+
+    def __init__(self, filename, filetype, insconf):
         """
         Initializer
-        
+
         Parameters
         ----------
         filename : str
             The name of the input file (full path)
-        
+
         filetype : str
             The type of the file ('observed' or 'simulated')
-        
+
         insconf : `slitlessutils.core.wfss.config.InstrumentConfig`
             The instrument configuration object
 
         """
-        
-        self.filename=filename
-        self.filetype=filetype
-        self.config=insconf
-        
-        for detname,detconf in self.config.items():
-            self[detname]=WFSSDetector(self.filename,detconf,
-                                       bunit=insconf.bunit)
 
-            
+        self.filename = filename
+        self.filetype = filetype
+        self.config = insconf
+
+        for detname, detconf in self.config.items():
+            self[detname] = WFSSDetector(self.filename, detconf,
+                                         bunit=insconf.bunit)
+
     def __str__(self):
-        s=[f' WFSS file: {self.filename}',
-           #f' \033[39;4;1mWFSS file: {self.filename}\033[00m',
-           f' file type: {self.filetype}',
-           f' telescope: {self.telescope}',
-           f'instrument: {self.instrument}',
-           f' disperser: {self.disperser.name}',
-           f'  blocking: {self.disperser.blocking}']
-        
-        
+        s = [f' WFSS file: {self.filename}',
+             # f' \033[39;4;1mWFSS file: {self.filename}\033[00m',
+             f' file type: {self.filetype}',
+             f' telescope: {self.telescope}',
+             f'instrument: {self.instrument}',
+             f' disperser: {self.disperser.name}',
+             f'  blocking: {self.disperser.blocking}']
+
         return '\n'.join(s)
 
     def extensions(self):
         """
         An iterator to loop over the detectors and all possible extensions
-        
+
         Returns
         -------
         detname : str
@@ -581,16 +554,15 @@ class WFSS(dict):
         extdata : `np.ndarray`
             The data from this extension/detector
         """
-        
-        for detname,detdata in self.items():
-            for extname,extdata in detdata.config.extensions.items():
-                yield (detname,extname),extdata
 
-    
+        for detname, detdata in self.items():
+            for extname, extdata in detdata.config.extensions.items():
+                yield (detname, extname), extdata
+
     @property
     def dataset(self):
-        filename=os.path.basename(self.filename)
-        tokens=filename.split(f'_{self.config.suffix}')
+        filename = os.path.basename(self.filename)
+        tokens = filename.split(f'_{self.config.suffix}')
         return tokens[0]
 
     @property
@@ -604,7 +576,7 @@ class WFSS(dict):
     @property
     def disperser(self):
         return self.config.disperser
-    
+
     @property
     def blocking(self):
         return self.config.disperser.blocking
@@ -612,10 +584,9 @@ class WFSS(dict):
     @property
     def siaf(self):
         return self.config.siaf
-    
-    
+
     @classmethod
-    def simulated(cls,telescope,instrument,dataset,ra,dec,orientat,disperser,
+    def simulated(cls, telescope, instrument, dataset, ra, dec, orientat, disperser,
                   **kwargs):
         """
         Classmethod to load simulated WFSS data
@@ -624,7 +595,7 @@ class WFSS(dict):
         ----------
         telescope : str
             The name of the telescope
-        
+
         instrument : str
             The name of the instrument
 
@@ -639,14 +610,14 @@ class WFSS(dict):
 
         orientat : float
             The rotation of the field in deg.  Angle is measured East of North
-        
+
         disperser : str
             The name of the dispersive element
 
         kwargs : dict, optional
-             Optional keywords that are pssed to 
-             `slitlessutils.core.wfss.config.InstrumentConfig`.  A key 
-             variable one might add is `blocking=<str>` to enable 
+             Optional keywords that are pssed to
+             `slitlessutils.core.wfss.config.InstrumentConfig`.  A key
+             variable one might add is `blocking=<str>` to enable
              blocking filters (a la JWST)
 
         Returns
@@ -655,23 +626,20 @@ class WFSS(dict):
              The WFSS data structure
 
         """
-        
 
-
-        insconf=InstrumentConfig(telescope,instrument,disperser,**kwargs)
-        obj=cls(insconf.make_filename(dataset),'simulated',insconf)     
-
+        insconf = InstrumentConfig(telescope, instrument, disperser, **kwargs)
+        obj = cls(insconf.make_filename(dataset), 'simulated', insconf)
 
         # compute somethings
-        obj.pa_v3=insconf.siaf.compute_pav3(orientat)    # PA_V3
+        obj.pa_v3 = insconf.siaf.compute_pav3(orientat)    # PA_V3
 
-        for detname,detdata in obj.items():
-            detdata.set_pointing(ra,dec,orientat,insconf.siaf)
-            
+        for detname, detdata in obj.items():
+            detdata.set_pointing(ra, dec, orientat, insconf.siaf)
+
         return obj
-            
+
     @classmethod
-    def observed(cls,filename,**kwargs):
+    def observed(cls, filename, **kwargs):
         """
         Classmethod to load observed WFSS data
 
@@ -681,7 +649,7 @@ class WFSS(dict):
             The fullpath to the fits file
 
         kwargs : dict, optional
-            keywords passed to 
+            keywords passed to
             `slitlessutils.core.wfss.config.InstrumentConfig`.
 
         Returns
@@ -689,25 +657,24 @@ class WFSS(dict):
         obj : `WFSS`
             The WFSS object
         """
-        
-        insconf=InstrumentConfig.from_fitsfile(filename,**kwargs)
 
-        obj=cls(filename,'observed',insconf)
+        insconf = InstrumentConfig.from_fitsfile(filename, **kwargs)
 
-        with fits.open(filename,mode='readonly') as hdul:
+        obj = cls(filename, 'observed', insconf)
+
+        with fits.open(filename, mode='readonly') as hdul:
             for det in obj.values():
                 with warnings.catch_warnings():
-                    warnings.filterwarnings("ignore",'FITSFixedWarning')
-                    wcs=WCS(det.headfits('science'),hdul,relax=True)
-                    
+                    warnings.filterwarnings("ignore", 'FITSFixedWarning')
+                    wcs = WCS(det.headfits('science'), hdul, relax=True)
+
                 det.set_wcs(wcs)
 
         return obj
 
 
-if __name__=='__main__':
-    data=WFSS.observed('/Users/rryan/icoi3qcdq_flt.fits')
-    #data=WFSS.observed('/Users/rryan/ACS/WFC/HST/15401/JDQL01JPQ/jdql01jpq_flc.fits')
+if __name__ == '__main__':
+    data = WFSS.observed('/Users/rryan/icoi3qcdq_flt.fits')
+    # data=WFSS.observed('/Users/rryan/ACS/WFC/HST/15401/JDQL01JPQ/jdql01jpq_flc.fits')
 
     print(data)
-        

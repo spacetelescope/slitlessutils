@@ -9,14 +9,13 @@ from .core.utilities import headers
 
 
 # file suffixes.  Probably shouldn't ever change these, but here they are:
-SUFFIXES={'1d spectra':'x1d',
-          '2d spectra':'x2d',
-          '3d spectra':'x3d',
-          'L-curve':'lcv',
-          'group':'grp',
-          'matrix':'mat',
-          'wfssimage':'flt'}
-
+SUFFIXES = {'1d spectra': 'x1d',
+            '2d spectra': 'x2d',
+            '3d spectra': 'x3d',
+            'L-curve': 'lcv',
+            'group': 'grp',
+            'matrix': 'mat',
+            'wfssimage': 'flt'}
 
 
 class Parameter:
@@ -31,23 +30,23 @@ class Parameter:
 
     value : any type (must implement str())
         The keyword value
-    
+
     comment : str
         The fits header comment card
 
     editable : bool, optional
         Flag that this parameter can be editted
-    
+
     """
-    
-    def __init__(self,keyword,value,comment,editable=True):
-        self.keyword=keyword
-        self.value=value
-        self.comment=comment
-        self.editable=editable
+
+    def __init__(self, keyword, value, comment, editable=True):
+        self.keyword = keyword
+        self.value = value
+        self.comment = comment
+        self.editable = editable
 
     @classmethod
-    def from_config(cls,p):
+    def from_config(cls, p):
         """
         Classmethod to load config parameter from a config file
 
@@ -63,42 +62,41 @@ class Parameter:
         """
 
         try:
-            value=int(p['value'])
-        except:
+            value = int(p['value'])
+        except BaseException:
             try:
-                value=float(p['value'])
-            except:
-                value=p['value']
+                value = float(p['value'])
+            except BaseException:
+                value = p['value']
 
-        obj=cls(p['keyword'],value,p['comment'])
+        obj = cls(p['keyword'], value, p['comment'])
 
         return obj
-    
+
     def __iter__(self):
         """
         Method to implement an iter (so can be cast as a `dict`)
         """
-        yield ('value',self.value)
-        yield ('keyword',self.keyword)
-        yield ('comment',self.comment)
+        yield ('value', self.value)
+        yield ('keyword', self.keyword)
+        yield ('comment', self.comment)
 
-    def update_header(self,hdr):
+    def update_header(self, hdr):
         """
         Method to update an `astropy.io.fits.Header`
-        
+
         Parameters
         ----------
         hdr : `astropy.io.fits.Header`
             The fits header to update
-        
+
         """
-        hdr.set(self.keyword,value=str(self.value),comment=self.comment)
+        hdr.set(self.keyword, value=str(self.value), comment=self.comment)
 
     def __str__(self):
         return f'{self.keyword:8} {self.value}'
 
-        
-    
+
 class Config(dict):
     """
     A singleton class to hold and establish the global configuration
@@ -107,49 +105,44 @@ class Config(dict):
     ----------
     kwargs : dict, optional
        A dictinary of keyword/value pairs to override default values.
-    
+
     """
-    
 
     # a list of required keywords:
-    REQUIRED = ('fluxscale','fluxunits','compression','compression_opts')
+    REQUIRED = ('fluxscale', 'fluxunits', 'compression', 'compression_opts')
 
     # the default config filename:
     DEFAULTS = 'defaults.cfg'
 
     # name of the environment variable
-    ENVVAR = 'slitlessutils_config' 
+    ENVVAR = 'slitlessutils_config'
 
-
-    # enable the singleton 
+    # enable the singleton
     _instance = None
-    def __new__(cls,conffile=None,**kwargs):
+
+    def __new__(cls, conffile=None, **kwargs):
         if not cls._instance:
 
             # make a new config object
-            cls._instance=super().__new__(cls)
+            cls._instance = super().__new__(cls)
 
             # if no conffile is set, then grab the default
-            if not isinstance(conffile,str):
-                conffile=os.path.join(os.environ[cls.ENVVAR],cls.DEFAULTS)
-                                      
-                
-            # load the config            
-            config=configparser.ConfigParser()
-            config.read(conffile)
-            cls._instance.conffile=conffile
+            if not isinstance(conffile, str):
+                conffile = os.path.join(os.environ[cls.ENVVAR], cls.DEFAULTS)
 
+            # load the config
+            config = configparser.ConfigParser()
+            config.read(conffile)
+            cls._instance.conffile = conffile
 
             # load each section (which is a different parameter)
             for k in config.sections():
-                cls._instance[k]=Parameter.from_config(config[k])
-
+                cls._instance[k] = Parameter.from_config(config[k])
 
             # if confpath isn't specified, then grab it from the os
             if 'confpath' not in cls._instance:
                 cls._instance.load_confpath(os.environ[cls.ENVVAR])
 
-                
             # check that the required elements are there
             for req in cls._instance.REQUIRED:
                 if req not in cls._instance:
@@ -159,47 +152,43 @@ class Config(dict):
                 # ok, this is a valid object
                 pass
 
-
         # update any keywords
-        for k,v in kwargs.items():
+        for k, v in kwargs.items():
             if k in cls._instance:
-                cls._instance[k].value=v
-                
+                cls._instance[k].value = v
+
         return cls._instance
 
-
-
-    def load_confpath(self,confpath):
+    def load_confpath(self, confpath):
         """
         Method to load a configuration file path
 
         Parameters
         ----------
         confpath : str
-            The path of the configuration files.  
+            The path of the configuration files.
 
         Notes
         -----
             Will require a `version.json` to exist in that directory.
         """
-        
-        versfile=os.path.join(confpath,'version.json')
-        
+
+        versfile = os.path.join(confpath, 'version.json')
+
         if os.path.exists(versfile):
-            
-            self['confpath']=Parameter('confpath',confpath,'')
-            self.versfile=versfile
-            with open(self.versfile,'r') as fp:
-                data=json.load(fp)
-                self['confvers']=Parameter('confvers',data[0]['version'],
-                                           'config version',editable=False)
-                self['confdate']=Parameter('confdate',data[0]['date'],
-                                           'config date',editable=False)
+
+            self['confpath'] = Parameter('confpath', confpath, '')
+            self.versfile = versfile
+            with open(self.versfile, 'r') as fp:
+                data = json.load(fp)
+                self['confvers'] = Parameter('confvers', data[0]['version'],
+                                             'config version', editable=False)
+                self['confdate'] = Parameter('confdate', data[0]['date'],
+                                             'config date', editable=False)
         else:
             LOGGER.error(f'Invalid confpath, missing the version file.')
 
-                
-    def __getattr__(self,k):
+    def __getattr__(self, k):
         """
         Method to override the getattr to enable attribute-like access
 
@@ -216,7 +205,7 @@ class Config(dict):
         if k in self:
             return self[k].value
 
-    def __setattr__(self,k,v):
+    def __setattr__(self, k, v):
         """
         Method to override the setattr to enable attribute-like access
 
@@ -231,29 +220,29 @@ class Config(dict):
 
         if k in self:
             if self[k].editable:
-                if k=='confpath':
+                if k == 'confpath':
                     self.log_confpath(v)
                 else:
-                    self[k].value=v
+                    self[k].value = v
             else:
-                print('cannot set')            
+                print('cannot set')
         else:
-            super().__setattr__(k,v)
+            super().__setattr__(k, v)
 
-    def update_header(self,hdr):
+    def update_header(self, hdr):
         """
         Method to update a fits header
-        
+
         Parameters
         ----------
         hdr : `astropy.io.fits.Header`
             The fits header to update
         """
-        
-        for k,v in self.items():
+
+        for k, v in self.items():
             v.update_header(hdr)
-                
-    def write(self,filename):
+
+    def write(self, filename):
         """
         Method to write config file to disk as a *.cfg type
 
@@ -261,106 +250,99 @@ class Config(dict):
         ----------
         filename : str
             The name of the config file
-        
+
         Notes
         -----
         will check the extension is one of (cfg, cnf, conf, config)
-        
+
         """
 
-        ext=os.path.splitext(filename)[-1][1:]
-        if ext not in ('cfg','cnf','conf','config'):
+        ext = os.path.splitext(filename)[-1][1:]
+        if ext not in ('cfg', 'cnf', 'conf', 'config'):
             LOGGER.warning(f'Invalid extension: {ext}')
             return
-        
+
         config = configparser.ConfigParser()
-        for k,v in self.items():
+        for k, v in self.items():
             if v.editable:
-                config[k]=dict(v)
-        with open(filename,'w') as f:
+                config[k] = dict(v)
+        with open(filename, 'w') as f:
             config.write(f)
 
-
-
-    def get_reffile(self,conffile,path='',**kwargs):
+    def get_reffile(self, conffile, path='', **kwargs):
         """
         Method to get a refernece file from the local directory tree
-        
+
         Parameters
         ----------
         conffile : str
             The filename of the configuration file
 
         path : str, optional
-            The subpath within the configuration tree to find the file. 
+            The subpath within the configuration tree to find the file.
             default is ''
-        
+
         kwargs : dict, optional
             extra parameters passed to `glob.glob()`
 
         Returns
         -------
         filename : str
-            The full path to the configuration file.  Will be `None` if the 
+            The full path to the configuration file.  Will be `None` if the
             file is not found.
         """
 
-        
-        test=os.path.join(self.confpath,path,conffile)
-        files=glob.glob(test,**kwargs)
+        test = os.path.join(self.confpath, path, conffile)
+        files = glob.glob(test, **kwargs)
 
-        n=len(files)
-        if n==0:
+        n = len(files)
+        if n == 0:
             LOGGER.warning("no config file found")
-        elif n==1:
+        elif n == 1:
             return files[0]
         else:
             LOGGER.warning('Multiple configuration files match criterion')
 
-                
     @property
     def h5pyargs(self):
         """
         Property of the HDF5 configurations
-        
+
         Returns
         -------
         dic : dict
-           A dictionary of hte HDF5 config 
+           A dictionary of hte HDF5 config
 
         """
 
-        return {'compression':self.compression,\
-                'compression_opts':self.compression_opts}
-
-            
+        return {'compression': self.compression,
+                'compression_opts': self.compression_opts}
 
     def __str__(self):
         """
         Method to override printing
         """
-        dic=self.__dict__
+        dic = self.__dict__
 
-        width=0
+        width = 0
         for d in dic.keys():
-            width=max(width,len(d))
+            width = max(width, len(d))
 
-        s='Base Parameters:'
-        for k,v in dic.items():
-            s+=f'\n {k:>{width}} {v}'
+        s = 'Base Parameters:'
+        for k, v in dic.items():
+            s += f'\n {k:>{width}} {v}'
 
-        s+='\nConfig Parameters:'
+        s += '\nConfig Parameters:'
 
-        for k,v in self.items():
-            s+=f'\n {v}'
+        for k, v in self.items():
+            s += f'\n {v}'
 
-            
         return s
-  
-            
-#if __name__=='__main__':
+
+
+# if __name__=='__main__':
 #    x=Config()
-# 
+#
 #    print(x.conffile)
 #    print(x.confpath)
 #    print(x.fluxscale)

@@ -9,11 +9,10 @@ class HDF5Columns(dict):
 
     """
 
-    DTYPES={'x': np.uint16,
-            'y': np.uint16,
-            'lam': np.uint16,
-            'wav': np.float32,
-            'xyg': np.uint64,
-            'xyl': np.uint64,
-            'val': np.float64}
- 
+    DTYPES = {'x': np.uint16,
+              'y': np.uint16,
+              'lam': np.uint16,
+              'wav': np.float32,
+              'xyg': np.uint64,
+              'xyl': np.uint64,
+              'val': np.float64}

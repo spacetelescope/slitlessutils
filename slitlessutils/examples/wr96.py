@@ -1,6 +1,7 @@
 from astropy.io import fits
 from astropy.wcs import WCS
 from astroquery.mast import MastMissions,Observations
+from drizzlepac import astrodrizzle
 from scipy.ndimage import gaussian_filter1d
 
 import matplotlib.pyplot as plt
@@ -71,10 +72,6 @@ def preprocess_grism():
         su.core.preprocess.astrometry.syncwcs(imgfile,grismfile,inplace=True)
 
 def preprocess_direct():
-    from drizzlepac import astrodrizzle
-    
-
-    
     files=[]
     for imgdset in DATASETS[FILTER]:
         imgfile=f'{imgdset}_{SUFFIX}.fits'
