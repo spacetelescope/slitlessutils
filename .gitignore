@@ -13,3 +13,5 @@ test/
 *egg-info
 *.ipy*
 *figures
+
+env*/

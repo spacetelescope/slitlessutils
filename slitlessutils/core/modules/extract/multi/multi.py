@@ -3,8 +3,7 @@ from astropy.io import fits
 from matplotlib.backends.backend_pdf import PdfPages
 import numpy as np
 
-import os
-import pwd
+import getpass
 
 
 from .....config import Config,SUFFIXES
@@ -143,7 +142,7 @@ class Multi(Module):
             # add some info to the PDF
             d=pdf.infodict()
             d['Title']='L-Curve Results'
-            d['Author']=pwd.getpwuid(os.getuid()).pw_gecos
+            d['Author']=getpass.getuser()
             d['Subject']=f'L-Curve results for grouped data from {__code__}'
             d['Keywords']=f'{__code__} WFSS L-curve groups'
             d['Producer']=__code__
