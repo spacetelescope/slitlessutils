@@ -26,18 +26,14 @@ Installing ``slitlessutils``
 There are several ways to install ``slitlessutils``:
 
 
-* **Install from PyPI:** ``slitlessutils`` is distributed through PyPI. To
-  install the latest release of ``slitlessutils``:
+* **Install from GitHub:** to install the latest development version:
 
   .. code-block:: bash
-		  
-     pip install slitlessutils
 
-  This is the simplest way to install ``slitlessutils``.
+    pip install git+https://github.com/spacetelescope/slitlessutils.git
 
-     
   
-* **Clone from GitHub:** the bleeding-edge version can be cloned directly
+* **Clone from GitHub:** the development version can also cloned directly
   from GitHub:
 
   .. code-block:: bash
