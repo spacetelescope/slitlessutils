@@ -33,7 +33,7 @@ There are several ways to install ``slitlessutils``:
     pip install git+https://github.com/spacetelescope/slitlessutils.git
 
   
-* **Clone from GitHub:** the development version can also cloned directly
+* **Clone from GitHub:** the development version can also be cloned directly
   from GitHub:
 
   .. code-block:: bash
