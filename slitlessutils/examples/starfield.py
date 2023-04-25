@@ -43,12 +43,12 @@ SOURCES={1:(500,500,19.0,'pickles_uk_15.fits'),
          2:(485,480,19.5,'pickles_uk_20.fits'),
          3:(420,550,20.0,'pickles_uk_25.fits')}
 PSFSIG=1.5          # stdev of the PSF in pixels
-APERRAD=0.3         # radius in arcsec     
+APERRAD=0.3         # radius in arcsec
 SEDPATH='starfield_input'
 
 
 """
-A set of routines to demonstrate the creation and analysis of WFSS for a 
+A set of routines to demonstrate the creation and analysis of WFSS for a
 simple scene of point sources, each having a unique spectrum and normalization.
 
 
@@ -63,19 +63,19 @@ def make_scene():
 
     Notes
     -----
-    1) This is to make direct image and segmentation map, as such, this is 
-       not likely needed to demonstrate slitlessutils, since these would 
-       likely be synthesized by other means (such as astrodrizzle, source 
-       extractor, and/or photutils).  Therefore, this is just to simulate 
+    1) This is to make direct image and segmentation map, as such, this is
+       not likely needed to demonstrate slitlessutils, since these would
+       likely be synthesized by other means (such as astrodrizzle, source
+       extractor, and/or photutils).  Therefore, this is just to simulate
        those products.
 
-    2) Assumes a Gaussian for the point-source function (PSF).  This is not 
+    2) Assumes a Gaussian for the point-source function (PSF).  This is not
        a critical assumption, but rather one done for simplicity.
 
     3) Writes all products to disk.
 
     """
-            
+
     # create something to store the SEDs that will be used for the simulation
     hdul=fits.HDUList()
 
@@ -90,22 +90,22 @@ def make_scene():
 
     # read the filter curve
     band=su.photometry.Throughput.from_keys(TELESCOPE,INSTRUMENT,FILTER)
-    
+
     # populate the image for each source
     for segid,(x,y,m,f) in SOURCES.items():
 
         # download the file from CDBS
         localfile=su.photometry.SED.get_from_CDBS(SPECCAT,f)
 
-        
+
         # put the spectrum in the fits file
         hdr=fits.Header()
         hdr['EXTNAME']=(str(segid),'segmentation ID')
         hdr['EXTVER']=(0,'spectral region')
         hdr['FILENAME']=f
         hdul.append(fits.BinTableHDU(header=hdr))
-        
-                
+
+
         # problem here.  Astropy uses "amplitude" as the overall
         # normalization of the spatial profile, even though what we want
         # is the total flux to be specified.  Of course for some analytic
@@ -119,21 +119,21 @@ def make_scene():
         func.y_mean=y
         func.amplitude=1.  # set the amplitude to 1, renormalize later
         dim=func(xim,yim)
-        
+
         # get the expected total flux given the requested AB mag
         ftot=10.**(-0.4*(m-band.zeropoint))
 
         # scale the delta image and add into the image
         img+=(dim*(ftot/np.sum(dim)))
-        
+
 
         # compute the aperture flux
         rim=np.hypot(xim-x,yim-y)
         g=np.where(rim < APERRAD/PIXSCL)
         seg[g]=segid
-        
-        
-        
+
+
+
     # make header for the direct and segmentation image
     w=WCS(naxis=2)
     w.wcs.crpix=[NPIX/2.,NPIX/2.]
@@ -147,12 +147,12 @@ def make_scene():
     h['INSTRUME']=INSTRUMENT
     h['FILTER']=FILTER
     h['ZERO']=band.zeropoint
-    
+
     # write the images to disk
     fits.writeto(f'{ROOT}_seg.fits',seg,header=h,overwrite=True)
     fits.writeto(f'{ROOT}_sci.fits',img,header=h,overwrite=True)
     hdul.writeto(f'{ROOT}_seds.fits',overwrite=True)
-    
+
 
 
 def simulate_grisms():
@@ -161,14 +161,14 @@ def simulate_grisms():
 
     Notes
     -----
-    1) This is the primary demonstration of how to simulate grism image(s).   
-    
-    2) The notional observational setup will be specified in a csv file. 
-       The one needed here is made here, but shows how one can make their 
+    1) This is the primary demonstration of how to simulate grism image(s).
+
+    2) The notional observational setup will be specified in a csv file.
+       The one needed here is made here, but shows how one can make their
        own for some other purpose.
-    
+
     3) All products are written to disk.
-    
+
     """
 
 
@@ -186,18 +186,18 @@ def simulate_grisms():
                            TELESCOPE,INSTRUMENT+DETECTOR,DISPERSER,BLOCKING))
             print(line,file=fp)
 
-    
+
     # load the grism images
     data=su.wfss.WFSSCollection.from_wcsfile(f'{ROOT}_wcs.csv')
-    
+
     # load the sources
     sources=su.sources.SourceCollection(f'{ROOT}_seg.fits',f'{ROOT}_sci.fits',
                                         sedfile=f'{ROOT}_seds.fits')
-    
+
     # save the normalized SEDs
     sources.write_seds(path=SEDPATH)
 
-    
+
     # project the sources onto the grism images
     tab=su.modules.Tabulate(ncpu=NCPU)
     pdtfiles=tab(data,sources)
@@ -209,7 +209,7 @@ def simulate_grisms():
     return imgfiles
 
 
-    
+
 def extract_single():
     """
     Method to demonstrate single-exposure spectral extraction
@@ -219,7 +219,7 @@ def extract_single():
     1) Normally, one would need to "tabulate" the images before extracting,
        but this should've been done after the simulations.  If this needs
        to be done, then see `simulate_grisms()` for an example.
-    
+
     2) Will write a file to disk with name: {ROOT}_x1d.fits
 
     """
@@ -231,7 +231,7 @@ def extract_single():
     sources=su.sources.SourceCollection(f'{ROOT}_seg.fits',
                                         f'{ROOT}_sci.fits')
 
-    
+
     # run the single-file extraction
     ext = su.modules.Single('+1',root=ROOT,ncpu=NCPU)
     res = ext(data,sources)
@@ -247,19 +247,19 @@ def extract_multi():
     1) Normally, one would need to "tabulate" the images before extracting,
        but this should've been done after the simulations.  If this needs
        to be done, then see `simulate_grisms()` for an example.
-    
+
     2) Will write a file to disk with name: {ROOT}_multi_x1d.fits
 
     """
 
-    
+
     # load the grism images
     data=su.wfss.data.WFSSCollection.from_glob(f'*{ROOT}_{SUFFIX}.fits.gz')
 
     # load the sources into SU
     sources=su.sources.SourceCollection(f'{ROOT}_seg.fits',
                                         f'{ROOT}_sci.fits')
-    
+
 
     # run the multi-orient extraction
     ext = su.modules.Multi('+1',(-3.,1.,0.1),algorithm='grid')
@@ -270,7 +270,7 @@ def extract_multi():
 
 def extract_group():
     """
-    Method to demonstrate grouping methods used in the mult-exposure 
+    Method to demonstrate grouping methods used in the mult-exposure
     extraction
 
     Notes
@@ -278,12 +278,12 @@ def extract_group():
     1) Normally, one would need to "tabulate" the images before extracting,
        but this should've been done after the simulations.  If this needs
        to be done, then see `simulate_grisms()` for an example.
-    
+
     2) Will write a file to disk with name: {ROOT}_group_x1d.fits
-    
-    3) This method is largely the same as `extract_multi()` with some 
+
+    3) This method is largely the same as `extract_multi()` with some
        additional bits for the grouping
-    
+
     """
 
     # load the grism images
@@ -292,7 +292,7 @@ def extract_group():
     # load the sources into SU
     sources=su.sources.SourceCollection(f'{ROOT}_seg.fits',
                                         f'{ROOT}_sci.fits')
-    
+
 
     # run the grouping algorithms
     grp=su.modules.Group(orders=('+1',),ncpu=NCPU)
@@ -312,16 +312,16 @@ def regions():
     1) Normally, one would need to "tabulate" the images before extracting,
        but this should've been done after the simulations.  If this needs
        to be done, then see `simulate_grisms()` for an example.
-    
-    2) Will write one file for each dataset and detector, they will be 
+
+    2) Will write one file for each dataset and detector, they will be
        named: '{dataset}_{detector}.reg'
-        
+
     """
-    
-        
+
+
     # load data into SU
     data=su.wfss.data.WFSSCollection.from_glob(f'*{ROOT}_{SUFFIX}.fits.gz')
-    
+
     # load the sources into SU
     sources=su.sources.SourceCollection(f'{ROOT}_seg.fits',
                                         f'{ROOT}_sci.fits')
@@ -329,12 +329,12 @@ def regions():
     reg=su.modules.Region(ncpu=1)
     res=reg(data,sources)
 
-    
-    
 
 
-    
-    
+
+
+
+
 def compare(nsig=1.):
     """
     Method to compare the inputs to the outputs
@@ -352,11 +352,11 @@ def compare(nsig=1.):
     fig,axes=plt.subplots(n,1,figsize=(m,m*aspect),sharex=True)
 
 
-    
+
     regid=0
     for ax,(segid,(x,y,mag,sedfile)) in zip(axes,SOURCES.items()):
-          
-        filename=os.path.join(SEDPATH,f'{segid}_{regid}.sed')
+
+        filename=os.path.join(SEDPATH,f'segid_{segid}_{regid}.sed')
         l,f=np.loadtxt(filename,usecols=(0,1),unpack=True)
         f/=1e-17
 
@@ -366,9 +366,9 @@ def compare(nsig=1.):
         ax.set_ylim(*ylim)
         ax.set_xlim(*WRANGE)
         model=ax.plot(l,f,label='input spectrum',color='black')
-    
-    
-        
+
+
+
 
     files={'single-exposure':(f'{ROOT}_x1d.fits','green'),
            'multi-exposure':(f'{ROOT}_multi_x1d.fits','blue'),
@@ -380,18 +380,18 @@ def compare(nsig=1.):
         if os.path.exists(f):
 
             first=True     # flag to append plots
-            with fits.open(f,mode='readonly') as hdul:                
+            with fits.open(f,mode='readonly') as hdul:
                 for ax,(segid,(x,y,mag,sedfile)) in zip(axes,SOURCES.items()):
                     s=str(segid)
                     if s in hdul:
                         hdu=hdul[s]
 
 
-                        
-                        
+
+
                         lo=hdu.data['flam']-nsig*hdu.data['func']
                         hi=hdu.data['flam']+nsig*hdu.data['func']
-                       
+
                         patch=ax.fill_between(hdu.data['lamb'],lo/10000,hi/10000,
                                               color=c,alpha=0.2)
                         meas=ax.plot(hdu.data['lamb'],hdu.data['flam']/10000,color=c)
@@ -400,7 +400,7 @@ def compare(nsig=1.):
                             artists.append((patch,meas[0]))
                             labels.append(label)
                             first=False
-                            
+
     axes[0].legend(artists,labels)
     axes[n//2].set_ylabel('$f_{\lambda}$ (10$^{-17}$ erg s$^{-1}$ cm$^{-2}$ $\mathrm{\AA}^{-1}$)')
     axes[-1].set_xlabel('wavelength ($\mathrm{\AA}$)')
@@ -411,7 +411,7 @@ def compare(nsig=1.):
     plt.show()
 
 
-    
+
 
 def run_all():
     """
@@ -425,7 +425,7 @@ def run_all():
        extract_group()
 
     """
-    
+
     make_scene()
 
     simulate_grisms()
