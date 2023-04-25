@@ -692,7 +692,7 @@ class InstrumentConfig(dict):
                 kwargs['fwcpos'] = h0['FWCPOS']
             else:
                 raise NotImplementedError(f"Unsupported: {tel = } {ins = }")
-            
+
             insconf = cls(tel, ins, disperser, **kwargs)
 
             # update some things because subarrays
@@ -712,6 +712,7 @@ class InstrumentConfig(dict):
                 if insconf[detname].crpix[1] != h['CRPIX2']:
                     insconf[detname].crpix[1] = h['CRPIX2']
                     insconf.subarray = True
+
 
         return insconf
 
