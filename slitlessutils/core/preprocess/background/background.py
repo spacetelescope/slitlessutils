@@ -2,7 +2,6 @@ from astropy import convolution
 from astropy.io import fits
 from astropy.modeling import fitting,models
 from astropy.stats import sigma_clip,sigma_clipped_stats
-from contextlib import nullcontext
 import numpy as np
 import os
 from scipy.signal import savgol_filter
@@ -31,10 +30,7 @@ def background_processing(mastersky=False):
     
     def background(func):
         def wrapper(self,filename,newfile=None,inplace=False,**kwargs):
-            
 
-
-            
             # a flag on how to read the image
             if inplace:
                 mode='update'
@@ -377,7 +373,7 @@ class Background:
 
         return out,np.logical_not(sky)
 
-         
+
     
 
     @background_processing(mastersky=False)
@@ -521,7 +517,7 @@ class Background:
         hdr.set('MINPIX',value=self.minpix,
                 comment='minimum number of pixels to be source')
         hdr.set('MAXITER',value=self.maxiter,
-                comment='Maximum number of iterations for source flagging')
+                comment='Max iterations for source flagging')
         headers.add_stanza(hdr,'Background Subtraction',before='SKYNSIG')
         
 if __name__=='__main__':
