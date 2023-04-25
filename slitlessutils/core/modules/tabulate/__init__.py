@@ -1,2 +1,2 @@
-#from . import polyclip
+# from . import polyclip
 from .tabulate import Tabulate

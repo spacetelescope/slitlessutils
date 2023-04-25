@@ -11,51 +11,44 @@ from ...utilities import headers
 from ...wfss import WFSS
 
 
-def cartesian(sci,src,root,dispaxis=0,inplace=True):
-    #if isinstance(data,str):
+def cartesian(sci, src, root, dispaxis=0, inplace=True):
+    # if isinstance(data,str):
     #    data=WFSS.observed(data)
-    #    
-    ## how to open the fits files    
-    #if inplace:
+    #
+    # how to open the fits files
+    # if inplace:
     #    mode='update'
-    #else:
+    # else:
     #    mode='readonly'
 
-    if dispaxis==0:
-        sci=np.swapaxes(sci,0,1)
-        src=np.swapaxes(src,0,1)
-    elif dispaxis==1:
+    if dispaxis == 0:
+        sci = np.swapaxes(sci, 0, 1)
+        src = np.swapaxes(src, 0, 1)
+    elif dispaxis == 1:
         pass
-        
-    ndisp,ncross=sci.shape
-    disp=np.arange(ndisp,dtype=int)
-    vals=np.zeros(ndisp,dtype=float)
-    stds=np.zeros(ndisp,dtype=float)
+
+    ndisp, ncross = sci.shape
+    disp = np.arange(ndisp, dtype=int)
+    vals = np.zeros(ndisp, dtype=float)
+    stds = np.zeros(ndisp, dtype=float)
     for i in range(ndisp):
-        a,m,s=sigma_clipped_stats(sci[i,:],mask=src[i,:])
-        vals[i]=m
-        stds[i]=s
+        a, m, s = sigma_clipped_stats(sci[i, :], mask=src[i, :])
+        vals[i] = m
+        stds[i] = s
 
-    
+    smooth = savgol_filter(vals, 33, 3, deriv=0, mode='constant', cval=0.)
 
-        
-    smooth=savgol_filter(vals,33,3,deriv=0,mode='constant',cval=0.)
+    sky = np.tile(smooth, (ncross, 1))
 
-
-    sky=np.tile(smooth,(ncross,1))
-
-    
-    if dispaxis==0:
+    if dispaxis == 0:
         pass
-    elif dispaxis==1:
-        sky=np.swapaxes(sky,0,1)        
+    elif dispaxis == 1:
+        sky = np.swapaxes(sky, 0, 1)
 
-
-    print(sky.shape,sci.shape)
-    fits.writeto(f'{root}.fits',sky,overwrite=True)
-    #x=np.arange(ndisp)
-    #plt.errorbar(x,vals,stds)
-    #plt.plot(x,smooth,color='red')
-    #plt.scatter(x,vals)
-    #plt.show()
-
+    print(sky.shape, sci.shape)
+    fits.writeto(f'{root}.fits', sky, overwrite=True)
+    # x=np.arange(ndisp)
+    # plt.errorbar(x,vals,stds)
+    # plt.plot(x,smooth,color='red')
+    # plt.scatter(x,vals)
+    # plt.show()

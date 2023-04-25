@@ -1,17 +1,16 @@
 import numpy as np
 
 """
-A set of methods to work with indices, which are `np.ndarray`s of 
+A set of methods to work with indices, which are `np.ndarray`s of
 integer-like data.
 
 """
 
 
-
 def compress(indices):
     """
-    Method to compress an integer index to the lowest possible set of 
-    integers.  
+    Method to compress an integer index to the lowest possible set of
+    integers.
 
     Parameters
     ----------
@@ -25,7 +24,7 @@ def compress(indices):
        array.  This will always have dtype=int. See examples below
 
     uniqind : `np.ndarray`
-       The unique possible values of the input array.  This will have the 
+       The unique possible values of the input array.  This will have the
        same dtype as the input `indices`.  See examples below
 
     Examples
@@ -44,10 +43,9 @@ def compress(indices):
 
     """
 
-    unique_indices=np.unique(indices)
-    compressed_indices=np.digitize(indices,unique_indices)-1
-    return compressed_indices,unique_indices
-
+    unique_indices = np.unique(indices)
+    compressed_indices = np.digitize(indices, unique_indices)-1
+    return compressed_indices, unique_indices
 
 
 def uniq(indices):
@@ -58,12 +56,12 @@ def uniq(indices):
     ----------
     indices : `np.ndarray`
         indices to find unique values of
-    
+
     Returns
     -------
     uniqind : `np.ndarray`
         the unique indices
-    
+
     Notes
     -----
     The order of the indices is preserved
@@ -80,12 +78,11 @@ def uniq(indices):
     """
 
     idx = np.unique(indices, return_index=True)[1]
-    unique_indices=indices[np.sort(idx)]
+    unique_indices = indices[np.sort(idx)]
     return unique_indices
 
 
-
-def reverse(ints,ignore=()):
+def reverse(ints, ignore=()):
     """
     Method to obtain the reverse indices
 
@@ -93,7 +90,7 @@ def reverse(ints,ignore=()):
     ----------
     ints : `np.ndarray`
        the integers to find the reverse of
-    
+
     ignore : tuple
        A set of indices to ignore when computing reverse
 
@@ -119,33 +116,34 @@ def reverse(ints,ignore=()):
     9 (array([4]),)
     10 (array([6]),)
     100 (array([7]),)
-  
-    Notice here, that the first column are the unique values of `x`, 
+
+    Notice here, that the first column are the unique values of `x`,
     whereas the second column are the indices of `x` that have the
-    first column as a value.  These are tuples of arrays, as `x` may be a 
+    first column as a value.  These are tuples of arrays, as `x` may be a
     multi-dimensional array.  If one computed the length of the second
     column, then this would be effectively be a histogram (or the same
     as what is returned by `np.bincount()`)
 
     """
 
-    uniq,ind,cnt=np.unique(ints,return_inverse=True,return_counts=True)
-    rev=np.split(np.argsort(ind),np.cumsum(cnt[:-1]))
+    uniq, ind, cnt = np.unique(ints, return_inverse=True, return_counts=True)
+    rev = np.split(np.argsort(ind), np.cumsum(cnt[:-1]))
 
     # changed to this so ints can be a list
-    ri={u:np.unravel_index(r,np.shape(ints)) for u,r in zip(uniq,rev) if u not in ignore}
+    ri = {u: np.unravel_index(r, np.shape(ints)) for u, r in zip(uniq, rev) if u not in ignore}
 
     return ri
 
-def decimate(val,*indices,dims=None,unravel=True,return_factor=False):
+
+def decimate(val, *indices, dims=None, unravel=True, return_factor=False):
     """
-    Method to decimate a vector over the repeated indices, where 
-    'decimation' is defined as summing the values if they have the 
+    Method to decimate a vector over the repeated indices, where
+    'decimation' is defined as summing the values if they have the
     same indices.
-    
+
     Parameters
     ----------
-    val : `np.ndarray` 
+    val : `np.ndarray`
         The values to decimate.  May be of any datatype.
 
     indices : tuple
@@ -153,17 +151,17 @@ def decimate(val,*indices,dims=None,unravel=True,return_factor=False):
         integer dtype.
 
     dims : tuple, list, `np.ndarray` or None, optional
-        The maximum possible value of all the input indices.  If this is 
-        `None`, then the *1+np.amax()* value of each of the `indices` tuple 
+        The maximum possible value of all the input indices.  If this is
+        `None`, then the *1+np.amax()* value of each of the `indices` tuple
         is computed.  If this is an iterable type (tuple, list, `np.ndarray`)
         then it should have the same length as `*indices`.  Default is `None`.
 
     unravel : bool, optional
-        Flag to unravel the output indices such that they match the 
+        Flag to unravel the output indices such that they match the
         dimensionality of the input indices.  Internally, the multi-
-        dimensional indices are grouped into a single one-dimensional 
-        index, which is used for all calculations.  For this reason, the 
-        dims must be used.  If unravel=False, then the internally-used 
+        dimensional indices are grouped into a single one-dimensional
+        index, which is used for all calculations.  For this reason, the
+        dims must be used.  If unravel=False, then the internally-used
         one-dimensional index is returned, otherwise, the decimated
         multi-dimensional indices are returned.  Default is True
 
@@ -177,18 +175,18 @@ def decimate(val,*indices,dims=None,unravel=True,return_factor=False):
         The decimated array.  Will be same dtype as `val`.
 
     outind : tuple
-        The decimated indices. Will be the same length as `*indices` and 
-        each entry will be of same dtype as `*indices`.  
+        The decimated indices. Will be the same length as `*indices` and
+        each entry will be of same dtype as `*indices`.
 
     factor : float
-        The compression factor: the ratio of the sizes of the decimated 
-        arrays to the input arrays.  This is only computed and returned if 
+        The compression factor: the ratio of the sizes of the decimated
+        arrays to the input arrays.  This is only computed and returned if
         `return_factor = True`
 
     Examples
     --------
-    We will create a dataset of (x,y,l) triplets, with some duplicates, and 
-    an array of values v, which will be decimated.  
+    We will create a dataset of (x,y,l) triplets, with some duplicates, and
+    an array of values v, which will be decimated.
 
     >>> import numpy as np
     >>> x=np.array([1,1,2,2,3,3,1,1,3,3,4],dtype=np.uint16)
@@ -196,11 +194,11 @@ def decimate(val,*indices,dims=None,unravel=True,return_factor=False):
     >>> l=np.array([1,2,2,2,3,2,1,1,3,3,6],dtype=np.uint16)
     >>> v=np.array([2,4,6,8,7,5,3,1,8,6,4],dtype=np.float64)
 
-    Notice here that the triplets (x,y,l)=(2,2,2) and (1,1,1) appear 
-    two and three times, respectively.  Therefore, the decimated 
-    values should have those triplets appearing only once, but have their 
+    Notice here that the triplets (x,y,l)=(2,2,2) and (1,1,1) appear
+    two and three times, respectively.  Therefore, the decimated
+    values should have those triplets appearing only once, but have their
     values of (6,8) and (2,3,1) summed (ie. 14 and 6), respectively.
-    Whereas all triplets that appear a single time will be just their 
+    Whereas all triplets that appear a single time will be just their
     given value:
 
     >>> vv,xx,yy,ll = indices.decimate(v,x,y,l)
@@ -211,10 +209,10 @@ def decimate(val,*indices,dims=None,unravel=True,return_factor=False):
     array([1, 2, 2, 2, 3, 3, 3, 6], dtype=uint16)
 
     Furthermore, it is important to notice, we did not specify the dimensions
-    of any of the integer axes, and so the `decimate()` computed them 
-    as the *one plus max* of each dimension: so dim=(5,6,7).  But we could 
-    set them if the values are known (for example, if x,y represent 
-    pixel coordinates in a WFSS image, then they'd be shape of the image).  
+    of any of the integer axes, and so the `decimate()` computed them
+    as the *one plus max* of each dimension: so dim=(5,6,7).  But we could
+    set them if the values are known (for example, if x,y represent
+    pixel coordinates in a WFSS image, then they'd be shape of the image).
     Importantly, if one dimension is set, then *ALL* dimensions must be set
 
     >>> vv,xx,yy,ll = indices.decimate(v,x,y,l,dims=(5,6,7))
@@ -233,119 +231,89 @@ def decimate(val,*indices,dims=None,unravel=True,return_factor=False):
 
     Notes
     -----
-    This is a fundamental piece to the creation of matrices for linear 
+    This is a fundamental piece to the creation of matrices for linear
     extraction techniques.  Please see for more details on the need
     for this function.
-    
+
     """
 
-
     # number of dimensions
-    ndim=len(indices)
+    ndim = len(indices)
 
     # we need to convert a tuple into a one-dimensional.
     # could be done by hand (see snippet below) or with ravelling
     # If we don't pass dimensions, then grab that from the max value
     # of the dimension.  Passing dimensions will be faster.
     if dims is None:
-        dims=[np.amax(index)+1 for index in indices]
-    idx=np.ravel_multi_index(indices,dims,order='F')
+        dims = [np.amax(index)+1 for index in indices]
+    idx = np.ravel_multi_index(indices, dims, order='F')
 
     # find the unique indices and unique inverses
-    out,uind,cinv=np.unique(idx,return_index=True,return_inverse=True)
+    out, uind, cinv = np.unique(idx, return_index=True, return_inverse=True)
 
     # sum the values over the compressed index
-    vv=np.bincount(cinv,weights=val)
+    vv = np.bincount(cinv, weights=val)
 
-  
-    
     # get the unique indices as another tuple of arrays
     if unravel:
-        out=tuple(index[uind] for index in indices)
-        ret=(vv,*out)
+        out = tuple(index[uind] for index in indices)
+        ret = (vv, *out)
     else:
-        ret=(vv,out,dims)
-
+        ret = (vv, out, dims)
 
     if return_factor:
-        factor=float(len(val))/float(len(vv))
-        ret+=(factor,)
+        factor = float(len(val))/float(len(vv))
+        ret += (factor,)
     return ret
 
-        
 
+if __name__ == '__main__':
 
+    x = np.array([0, 0, 1, 1, 1, 2, 3, 3])
+    y = np.array([1, 1, 0, 3, 2, 2, 3, 4])
+    l = np.array([0, 0, 1, 1, 6, 6, 3, 4])
+    ri = reverse(l)
 
-
-if __name__=='__main__':
-
-    x=np.array([0,0,1,1,1,2,3,3])
-    y=np.array([1,1,0,3,2,2,3,4])
-    l=np.array([0,0,1,1,6,6,3,4])
-    ri=reverse(l)
-
-    for ll,g in ri.items():
-        print(x[g].shape,x[g[0]].shape)
+    for ll, g in ri.items():
+        print(x[g].shape, x[g[0]].shape)
     lkdjf
 
-
-
-    i=np.array([[1,1,1,1,2],
-                [2,2,4,4,9],
-                [9,8,2,3,1]],dtype=int)
-    ri=reverse(i)
-
+    i = np.array([[1, 1, 1, 1, 2],
+                  [2, 2, 4, 4, 9],
+                  [9, 8, 2, 3, 1]], dtype=int)
+    ri = reverse(i)
 
     print(ri)
 
     lkdjf
 
-    x=np.array([1,1,2,2,2,2,3],dtype=np.uint16)
-    y=np.array([1,1,2,2,2,2,3],dtype=np.uint16)
-    l=np.array([1,1,2,2,2,2,3],dtype=np.uint16)
-    v=np.array([1,1,2,2,2,2,3],dtype=np.float64)
+    x = np.array([1, 1, 2, 2, 2, 2, 3], dtype=np.uint16)
+    y = np.array([1, 1, 2, 2, 2, 2, 3], dtype=np.uint16)
+    l = np.array([1, 1, 2, 2, 2, 2, 3], dtype=np.uint16)
+    v = np.array([1, 1, 2, 2, 2, 2, 3], dtype=np.float64)
 
+    # x=np.array([],dtype=np.uint16)
+    # y=np.array([],dtype=np.uint16)
+    # l=np.array([],dtype=np.uint16)
+    # v=np.array([],dtype=np.uint16)
+    dims = (10, 10, 10)
+    vv, xx, yy, ll = decimate(v, x, y, l, dims=dims)
+    # print(vv,xx,yy,ll)
 
-    #x=np.array([],dtype=np.uint16)
-    #y=np.array([],dtype=np.uint16)
-    #l=np.array([],dtype=np.uint16)
-    #v=np.array([],dtype=np.uint16)
-    dims=(10,10,10)
-    vv,xx,yy,ll=decimate(v,x,y,l,dims=dims)
-    #print(vv,xx,yy,ll)
+    vv, xx = decimate(v, x)
+    print(vv, xx)
+    print(v, x)
 
-    vv,xx=decimate(v,x)
-    print(vv,xx)
-    print(v,x)
-
-
-    segids=[[1,1,1,1,1],
-            [2,2,0,0,5],
-            [2,2,0,0,4]]
-    ri=reverse(segids)
+    segids = [[1, 1, 1, 1, 1],
+              [2, 2, 0, 0, 5],
+              [2, 2, 0, 0, 4]]
+    ri = reverse(segids)
     print(ri)
-
 
     ldj
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#if __name__=='__main__':
+# if __name__=='__main__':
 #    print('hi')
 #
 ###

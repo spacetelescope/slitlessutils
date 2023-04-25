@@ -4,14 +4,11 @@ from astropy.io import fits
 import numpy as np
 
 
-from ....info import __code__,__version__
+from ....info import __code__, __version__
 from ....logger import LOGGER
 from ..module import Module
-from ...tables import PDTFile,PDT
-from ...utilities import indices,headers,gzip,as_iterable
-
-
-
+from ...tables import PDTFile, PDT
+from ...utilities import indices, headers, gzip, as_iterable
 
 
 class Simulate(Module):
@@ -27,7 +24,7 @@ class Simulate(Module):
        of the orders in the configuration will be used.  Default is None
 
     addnoise : bool, optional
-       Flag to add photometric noise to image.  See the dataclass: 
+       Flag to add photometric noise to image.  See the dataclass:
        `su.core.wfss.config.instrumentconfig.Noise` for more information.
        Default is True
 
@@ -44,23 +41,22 @@ class Simulate(Module):
 
     DESCRIPTION = 'Simulating'
 
-    def __init__(self,orders=None,addnoise=True,gzip=True,overwrite=True,
+    def __init__(self, orders=None, addnoise=True, gzip=True, overwrite=True,
                  **kwargs):
 
-        Module.__init__(self,self.simulate,**kwargs)
-
+        Module.__init__(self, self.simulate, **kwargs)
 
         # save some things
-        self.gzip=gzip
-        self.overwrite=overwrite
-        self.addnoise=addnoise
-        self.orders=orders
+        self.gzip = gzip
+        self.overwrite = overwrite
+        self.addnoise = addnoise
+        self.orders = orders
 
     def __str__(self):
-        s=f'Simulation Module: \n'+super().__str__()
+        s = f'Simulation Module: \n'+super().__str__()
         return s
 
-    def simulate(self,data,sources,**kwargs):
+    def simulate(self, data, sources, **kwargs):
         """
         Method to do the simulation
 
@@ -82,146 +78,134 @@ class Simulate(Module):
 
         """
 
-
-        
-        
-
         if sources.sedfile is None:
             LOGGER.critical("No SEDFile found.")
             return
 
         # grab the time
-        t0=datetime.now()
+        t0 = datetime.now()
 
         # grab the inputs
-        #insconf,insdata = data
+        # insconf,insdata = data
 
         # open the table for reading
-        with PDTFile(data,path=self.path,mode='r') as h5:
+        with PDTFile(data, path=self.path, mode='r') as h5:
 
             # start a fits file
-            hdul=fits.HDUList()
+            hdul = fits.HDUList()
 
             # make a primary header
-            phdu=fits.PrimaryHDU(header=data.config.make_header())
+            phdu = fits.PrimaryHDU(header=data.config.make_header())
 
             # update the primary header with some useful things
             super().update_header(phdu.header)
 
             # put the PA_V3 in the header
-            if hasattr(data,'pa_v3'):
-                phdu.header.set('PA_V3',value=data.pa_v3,
+            if hasattr(data, 'pa_v3'):
+                phdu.header.set('PA_V3', value=data.pa_v3,
                                 comment='position angle of V3-axis (deg)')
-                headers.add_stanza(phdu.header,'POINTING INFORMATION',
+                headers.add_stanza(phdu.header, 'POINTING INFORMATION',
                                    before='PA_V3')
-                
+
             # put the wavelengths in the header
-            #insconf.parameters.update_header(phdu.header)
-            #data.grating.update_header(phdu.header)
-            #data.disperser.update_header(phdu.header)
+            # insconf.parameters.update_header(phdu.header)
+            # data.grating.update_header(phdu.header)
+            # data.disperser.update_header(phdu.header)
 
-
-            
             # put the orders in the header
-            #orders=self.orders if self.orders else data.orders
-            #phdu.header['NORDER']=(len(orders),'Number of orders in the image')
-            #phdu.header['ORDERS']=(','.join(orders),'Order names')
-            #headers.add_stanza(phdu.header,'Orders Information',
-            #before='NORDER')
-
+            # orders=self.orders if self.orders else data.orders
+            # phdu.header['NORDER']=(len(orders),'Number of orders in the image')
+            # phdu.header['ORDERS']=(','.join(orders),'Order names')
+            # headers.add_stanza(phdu.header,'Orders Information',
+            # before='NORDER')
 
             # update for the reference SIAF Information
-            #data.siaf.update_header(phdu.header)
-            #insconf.refsiaf.update_header(phdu.header)
+            # data.siaf.update_header(phdu.header)
+            # insconf.refsiaf.update_header(phdu.header)
 
             # process each detector
-            for detname,detdata in data.items():
+            for detname, detdata in data.items():
 
                 # load a detector
-                #detconf=detdata.config
-                #detconf=insconf[detname]
+                # detconf=detdata.config
+                # detconf=insconf[detname]
                 h5.load_detector(detname)
 
                 # create an empty Image
-                dtype=detdata.extensions['science'].dtype
-                sci=np.zeros(detdata.shape,dtype=dtype)
+                dtype = detdata.extensions['science'].dtype
+                sci = np.zeros(detdata.shape, dtype=dtype)
 
-
-                
                 # load a flatfield
                 flatfield = detdata.config.load_flatfield(**kwargs)
 
                 # process each order in question
-                orders=self.orders if self.orders else detdata.orders
+                orders = self.orders if self.orders else detdata.orders
                 for ordname in orders:
-                    
-                    ordconf=detdata.config[ordname]
-                    
+
+                    ordconf = detdata.config[ordname]
+
                     h5.load_order(ordname)
 
                     # process each source
-                    for segid,source in sources.items():
+                    for segid, source in sources.items():
 
                         # process each region within a source
-                        for regid,region in source.items():
+                        for regid, region in source.items():
 
                             # process each pixel for each region
-                            for x,y in region.pixels():
+                            for x, y in region.pixels():
                                 # NB: the previous two forloops could be
                                 #     condensed into a single for-loop if
                                 #     we only consider Singleton Sources
                                 #     or fully decomposed sources.  Therefore,
                                 #     this might be slow and there may be room
                                 #     for improvement here.
-                                
 
                                 # convert to image coordinates and load PDT
-                                xd,yd=source.image_coordinates(x,y,dtype=int)
-                                
+                                xd, yd = source.image_coordinates(x, y, dtype=int)
+
                                 # convert to image coordinates and load PDT
-                                pdt=h5.load_pdt(xd,yd)
+                                pdt = h5.load_pdt(xd, yd)
                                 if pdt:
                                     # extract the data
-                                    xg=pdt.get('x')
-                                    yg=pdt.get('y')
-                                    val=pdt.get('val')
-                                    wav=pdt.wavelengths()
-                                    
+                                    xg = pdt.get('x')
+                                    yg = pdt.get('y')
+                                    val = pdt.get('val')
+                                    wav = pdt.wavelengths()
+
                                     # need to apply a few things:
                                     # 1) sensitivity curve    (sens)
                                     # 2) flat field           (flat)
                                     # 3) relative pixel areas (area)
                                     # 4) source spectra       (flam)
-                                    sens=ordconf.sensitivity(wav)
-                                    flat=flatfield(xg,yg,wav)
-                                    #area=detdata.relative_pixelarea(xg,yg)
-                                    flam=region.sed(wav,fnu=False)
-                                                                        
+                                    sens = ordconf.sensitivity(wav)
+                                    flat = flatfield(xg, yg, wav)
+                                    # area=detdata.relative_pixelarea(xg,yg)
+                                    flam = region.sed(wav, fnu=False)
+
                                     # apply the corrections to the weights
-                                    #val *= (sens*flat*area*flam)
+                                    # val *= (sens*flat*area*flam)
                                     val *= (sens*flat*flam)
-                                    
+
                                     # sum over wavelengths
-                                    vv,yy,xx=indices.decimate(val,yg,xg,
-                                        dims=detdata.shape)
+                                    vv, yy, xx = indices.decimate(val, yg, xg,
+                                                                  dims=detdata.shape)
 
-                                    
                                     # apply pixel areas
-                                    vv*=detdata.relative_pixelarea(xx,yy)
-                                    
-                                    # now sum into the image
-                                    sci[yy,xx] += vv
+                                    vv *= detdata.relative_pixelarea(xx, yy)
 
-                                    
+                                    # now sum into the image
+                                    sci[yy, xx] += vv
+
                 # Here we have a *NOISELESS* science image in e/s, so need to:
                 # 1) create an uncertainty image
                 # 2) create a data-quality image
                 # 3) create/update all headers.
                 # the function make_HDUs takes the noiseless sci, creates
                 # all ancillary data, packages into HDUs, and adds noise
-                #hdus= detdata.make_HDUs(sci,self.noisepars)
-                hdus= detdata.make_HDUs(sci,addnoise=self.addnoise)
-                
+                # hdus= detdata.make_HDUs(sci,self.noisepars)
+                hdus = detdata.make_HDUs(sci, addnoise=self.addnoise)
+
                 # put the HDUs into the list, but first update some header info
                 for hdu in hdus:
 
@@ -229,36 +213,33 @@ class Simulate(Module):
                     detdata.config.siaf.update_header(hdu.header)
 
                     # put the flatfield info in the headers
-                    if hdu.header.get('EXTNAME','')=='SCI':
+                    if hdu.header.get('EXTNAME', '') == 'SCI':
                         flatfield.update_header(hdu.header)
 
                     # append the HDU
                     hdul.append(hdu)
 
-
         # record the end time
-        t1=datetime.now()
-        dt=t1-t0
-
-
+        t1 = datetime.now()
+        dt = t1-t0
 
         # put some times into the header
-        phdu.header.set('ORIGIN',value=f'{__code__} v{__version__}',
+        phdu.header.set('ORIGIN', value=f'{__code__} v{__version__}',
                         after='NAXIS')
-        phdu.header.set('DATE',value=t1.strftime('%Y-%m-%d'),after='ORIGIN',
+        phdu.header.set('DATE', value=t1.strftime('%Y-%m-%d'), after='ORIGIN',
                         comment='date this file was written (yyyy-mm-dd)')
-        phdu.header.set('RUNTIME',value=dt.total_seconds(),after='DATE',
+        phdu.header.set('RUNTIME', value=dt.total_seconds(), after='DATE',
                         comment='run time of this file in s')
 
         # put the primary header in the HDUL
-        hdul.insert(0,phdu)
-        
+        hdul.insert(0, phdu)
+
         # write the file to disk
-        filename=data.filename
-        hdul.writeto(filename,overwrite=self.overwrite)
+        filename = data.filename
+        hdul.writeto(filename, overwrite=self.overwrite)
 
         # do we gzip the file?
         if self.gzip:
-            filename=gzip.gzip(filename)
+            filename = gzip.gzip(filename)
 
         return filename

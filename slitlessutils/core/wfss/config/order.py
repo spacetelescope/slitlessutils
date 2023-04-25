@@ -1,29 +1,28 @@
 import numpy as np
 
-from .parametricpolynomial import StandardPolynomial,ReciprocalPolynomial
+from .parametricpolynomial import StandardPolynomial, ReciprocalPolynomial
 from .spatialpolynomial import SpatialPolynomial
 from .sensitivity import Sensitivity
 
+
 class Order:
 
-    def __init__(self,data,order):
-        self.order=order
-        self.disptype=data.get('TYPE','grism').lower()
-        if self.disptype=='grism':
-            self.displ=StandardPolynomial()
-        elif self.disptype=='prism':
-            self.displ=ReciprocalPolynomial()
+    def __init__(self, data, order):
+        self.order = order
+        self.disptype = data.get('TYPE', 'grism').lower()
+        if self.disptype == 'grism':
+            self.displ = StandardPolynomial()
+        elif self.disptype == 'prism':
+            self.displ = ReciprocalPolynomial()
         else:
-            msg=f'disptype is invalid ({self.disptype})'
+            msg = f'disptype is invalid ({self.disptype})'
             raise ValueError(msg)
 
-        
-        self.dispx=StandardPolynomial()
-        self.dispy=StandardPolynomial()
+        self.dispx = StandardPolynomial()
+        self.dispy = StandardPolynomial()
 
-        
-        #print("WORRY ABOUT ORDER OF COEFS")
-        for k,v in data[order].items():
+        # print("WORRY ABOUT ORDER OF COEFS")
+        for k, v in data[order].items():
             if k.startswith('DISPX'):
                 self.dispx.append(v)
             elif k.startswith('DISPY'):
@@ -31,15 +30,13 @@ class Order:
             elif k.startswith('DISPL'):
                 self.displ.append(v)
             elif k.startswith('TSTAR'):
-                self.displ.tstar=SpatialPolynomial(v)
+                self.displ.tstar = SpatialPolynomial(v)
             elif k.startswith('SENSITIVITY'):
                 self.load_sensitivity(v)
             else:
                 pass
 
-
-        
-    def load_sensitivity(self,sensfile,**kwargs):
+    def load_sensitivity(self, sensfile, **kwargs):
         """
         Method to load the sensitivity curve from a filename.
 
@@ -48,25 +45,24 @@ class Order:
         sensfile : str
             Full path to the sensitivity file.
 
-        kwargs : dict, optional 
+        kwargs : dict, optional
             keywords that get passed to the `Sensitivity` curve object.
         """
-        self.sensitivity=Sensitivity(sensfile,**kwargs)
+        self.sensitivity = Sensitivity(sensfile, **kwargs)
 
-        
-    def dispersion(self,x0,y0,wavelength=None):
+    def dispersion(self, x0, y0, wavelength=None):
         """
         Method to compute the dispersion in A/pix at some undispersed
-        position and wavelength.  This is given by the derivative of the 
-        wavelength solution as a function of position along the spectral 
+        position and wavelength.  This is given by the derivative of the
+        wavelength solution as a function of position along the spectral
         trace.
 
         .. math::
-           \frac{d\lambda}{dr} = \frac{d\lambda/dt}{\sqrt{(dx/dt)^2 + (dy/dt)^2}}
+           \frac{d\\lambda}{dr} = \frac{d\\lambda/dt}{\\sqrt{(dx/dt)^2 + (dy/dt)^2}}
         where :math:`t` is parametric value given by:
         .. math::
-           t = DISPL^{-1}(\lambda)
-        
+           t = DISPL^{-1}(\\lambda)
+
         and :math:`DISPL` comes from the grismconf file.
 
         Parameters
@@ -78,9 +74,9 @@ class Order:
            The undispersed y-coordinate
 
         wavelength : int, float, or None, optional
-           The wavelength (in A) to compute the dispersion.  If set to 
+           The wavelength (in A) to compute the dispersion.  If set to
            `None`, then the bandpass-averaged wavelength is used.
-        
+
         Returns
         -------
         dldr : float
@@ -88,10 +84,9 @@ class Order:
 
         """
 
-
         # default wavelength to the average value over the sensitivity
         if wavelength is None:
-            wavelength=self.sens.wave_ave
+            wavelength = self.sens.wave_ave
 
         # compute the dispersion using:
         # t = h^-1(lambda)
@@ -103,101 +98,93 @@ class Order:
         # dl/dr = l'(t)/r'(t)
 
         # invert the DISPL function
-        t=self.displ.invert(x0,y0,wavelength)
+        t = self.displ.invert(x0, y0, wavelength)
 
         # evaluate the derivatives (w.r.t. to t) of the DISPX,
         # DISPY, and DISPL functions, which came from grism conf
-        dxdt=self.dispx.deriv(x0,y0,t)
-        dydt=self.dispy.deriv(x0,y0,t)
-        dldt=self.displ.deriv(x0,y0,t)
+        dxdt = self.dispx.deriv(x0, y0, t)
+        dydt = self.dispy.deriv(x0, y0, t)
+        dldt = self.displ.deriv(x0, y0, t)
 
         # return the dispersion
-        dldr=dldt/np.sqrt(dxdt*dxdt+dydt*dydt)
+        dldr = dldt/np.sqrt(dxdt*dxdt+dydt*dydt)
         return dldr
-            
-    def deltas(self,x0,y0,wav):
-       """
-        Method to compute the offsets  with respect to the undispersed 
-        position.  NOTE: the final WFSS position would be given by 
-        adding back the undispersed positions.
 
-        Parameters
-        ----------
-        x0 : float, `np.ndarray`, or int
-           The undispersed x-position.
-        
-        y0 : float, `np.ndarray`, or int
-           The undispersed y-position.
-        
-        wav : `np.ndarray`
-           The wavelength (in A).
-
-        Returns
-        -------
-        dx : float or `np.ndarray`
-           The x-coordinate along the trace with respect to the undispersed 
-           position.
-
-        dy : float or `np.ndarray`
-           The y-coordinate along the trace with respect to the undispersed 
-           position.
-
-        Notes
-        -----
-        The undispersed positions (`x0` and `y0`) must be of the same 
-        shape, hence either both scalars or `np.ndarray`s with the same 
-        shape.  The dtype of the variables does not matter.  If these 
-        variables are arrays, then the output will be a two-dimensional 
-        array of shape (len(wav),len(x0)).  If they are scalars, then
-        the output will be a one-dimensional array with shape (len(wav),).
-
+    def deltas(self, x0, y0, wav):
         """
+         Method to compute the offsets  with respect to the undispersed
+         position.  NOTE: the final WFSS position would be given by
+         adding back the undispersed positions.
 
-       if np.isscalar(x0) or np.isscalar(wav):      
-           t=self.displ.invert(x0,y0,wav)
-           dx=self.dispx.evaluate(x0,y0,t)
-           dy=self.dispy.evaluate(x0,y0,t)
+         Parameters
+         ----------
+         x0 : float, `np.ndarray`, or int
+            The undispersed x-position.
 
-       else:
-           shape=(len(wav),len(x0))
-           dx=np.empty(shape=shape,dtype=float)
-           dy=np.empty(shape=shape,dtype=float)
-           for i,(_x,_y) in enumerate(zip(x0,y0)):
-               t=self.displ.invert(_x,_y,wav)
-               dx[:,i]=self.dispx.evaluate(_x,_y,t)
-               dy[:,i]=self.dispy.evaluate(_x,_y,t)
+         y0 : float, `np.ndarray`, or int
+            The undispersed y-position.
 
-               w=self.displ.evaluate(_x,_y,t)
-               if not np.allclose(w,wav):
-                   print(wav,w)
-                   import pdb
-                   pdb.set_trace()
-               
-        
-       return dx,dy
+         wav : `np.ndarray`
+            The wavelength (in A).
+
+         Returns
+         -------
+         dx : float or `np.ndarray`
+            The x-coordinate along the trace with respect to the undispersed
+            position.
+
+         dy : float or `np.ndarray`
+            The y-coordinate along the trace with respect to the undispersed
+            position.
+
+         Notes
+         -----
+         The undispersed positions (`x0` and `y0`) must be of the same
+         shape, hence either both scalars or `np.ndarray`s with the same
+         shape.  The dtype of the variables does not matter.  If these
+         variables are arrays, then the output will be a two-dimensional
+         array of shape (len(wav),len(x0)).  If they are scalars, then
+         the output will be a one-dimensional array with shape (len(wav),).
+
+         """
+
+        if np.isscalar(x0) or np.isscalar(wav):
+            t = self.displ.invert(x0, y0, wav)
+            dx = self.dispx.evaluate(x0, y0, t)
+            dy = self.dispy.evaluate(x0, y0, t)
+
+        else:
+            shape = (len(wav), len(x0))
+            dx = np.empty(shape=shape, dtype=float)
+            dy = np.empty(shape=shape, dtype=float)
+            for i, (_x, _y) in enumerate(zip(x0, y0)):
+                t = self.displ.invert(_x, _y, wav)
+                dx[:, i] = self.dispx.evaluate(_x, _y, t)
+                dy[:, i] = self.dispy.evaluate(_x, _y, t)
+
+                w = self.displ.evaluate(_x, _y, t)
+                if not np.allclose(w, wav):
+                    print(wav, w)
+                    import pdb
+                    pdb.set_trace()
+
+        return dx, dy
 
     @property
     def name(self):
         """
         The name of the order
         """
-        
+
         return str(self.order)
 
-
-    
-
-
-
-    
-
     @classmethod
-    def from_asciifile(cls,filename,order):
-        data=WFSSConfig.read_asciifile(filename)
-        obj=cls(data,order)
+    def from_asciifile(cls, filename, order):
+        data = WFSSConfig.read_asciifile(filename)
+        obj = cls(data, order)
         return obj
-        
 
-if __name__=='__main__':
-    x=Order(1,2)
+
+if __name__ == '__main__':
+    x = Order(1, 2)
     print(x)
