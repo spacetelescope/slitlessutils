@@ -225,7 +225,7 @@ class Config(dict):
                 else:
                     self[k].value = v
             else:
-                print('cannot set')
+                LOGGER.error(f"Cannot set {k}={v}")
         else:
             super().__setattr__(k, v)
 
