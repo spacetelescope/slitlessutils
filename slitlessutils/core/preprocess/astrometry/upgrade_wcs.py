@@ -6,10 +6,10 @@ from ....logger import LOGGER
 from ...utilities import headers
 from ...wfss import WFSS
 
-
-def syncwcs(imgfile, wfssfile, key='A', newfile=None, inplace=False):
+def upgrade_wcs(imgfile,wfssfile,key='A',newfile=None,inplace=False):
     """
-    Method to sync the WCS between a direct image and WFSS image.
+    Method to upgrade the WCS in a WFSS to match that of a direct image 
+    that has been tweaked to match Gaia.
 
     This is necessary for HST *ONLY* as at some point the WCS in the
     direct image was updated with respect to Gaia, but the WFSS images
@@ -65,22 +65,32 @@ def syncwcs(imgfile, wfssfile, key='A', newfile=None, inplace=False):
 
     """
 
-    LOGGER.info(f'Syncing WCS between WFSS and direct images: {wfssfile}, {imgfile}')
+    LOGGER.info(f'Upgrading WCS in WFSS ({wfssfile}) from direct ({imgfile})')
 
     if inplace:
         mode = 'update'
     else:
         mode = 'readonly'
 
-    wfss = WFSS.observed(wfssfile)
-    with fits.open(imgfile, mode='readonly') as dhdul,\
-            fits.open(wfssfile, mode=mode) as whdul:
+    wfss=WFSS.observed(wfssfile)
+    with fits.open(imgfile,mode='readonly') as dhdul,\
+         fits.open(wfssfile,mode=mode) as whdul:
 
-        for (detname, extname), extdata in wfss.extensions():
-            exten = extdata.extension
-            hdr = dhdul[exten].header
-            if f'WCSNAME{key}' in hdr:
+        # some quick error checking
+        if dhdul[0].header['OBSTYPE']!='IMAGING':
+            LOGGER.warning('direct image obstype is not imaging.')
+            return
+        if whdul[0].header['OBSTYPE']!='SPECTROSCOPIC':
+            LOGGER.warning('WFSS image obstype is not spectroscopic.')
+            return
 
+        # process all the data extensions        
+        for (detname,extname),extdata in wfss.extensions():
+            exten=extdata.extension
+            hdr=dhdul[exten].header
+            wcsname=hdr.get(f'WCSNAME{key}')
+            
+            if wcsname and (wcsname.lower().find('gaia')!=-1):
                 # get the best WCS and old WCS
                 bwcs = WCS(hdr, dhdul, relax=True)
                 owcs = WCS(hdr, dhdul, relax=True, key=key)
@@ -129,7 +139,6 @@ def syncwcs(imgfile, wfssfile, key='A', newfile=None, inplace=False):
         # figure out how to write the file and get a variable to return
         if inplace:
             outfile = wfssfile
-
         else:
             if newfile is None:
                 # get a new filename
