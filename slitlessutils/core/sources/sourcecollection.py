@@ -27,7 +27,7 @@ class SourceCollection(dict):
     # when cropping a source, this is the extra padding.  This should be
     # kept somewhat large so that a local sky background can be reliably
     # computed.  this is in units of pixels
-    PAD = 20
+    PAD = 10
 
     # the default zeropoint
     DEFZERO = 26.
@@ -105,7 +105,6 @@ class SourceCollection(dict):
 
 
         """
-
         self.segfile = segfile
         self.detfile = detfile
         self.maglim = maglim
@@ -126,12 +125,14 @@ class SourceCollection(dict):
                 msg = f'Segmentation {self.segfile} and direct ' +\
                     f'{self.detfile} have differing number of ' +\
                     f'extensions: {nhdus},{nhdud}'
-                LOGGER.error(msg)
+                LOGGER.warning(msg)
                 return
 
             # get the ZEROPOINT and THROUGHPUT
             self.zeropoint = self.get_zeropoint(hdud, zeropoint=zeropoint)
-            self.throughput = self.get_throughput(hdud, throughput=throughput, **kwargs)
+            self.throughput = self.get_throughput(hdud, throughput=throughput,
+                                                  **kwargs)
+
 
             # is it an MEF?
             self.mef = nhdus > 1
@@ -226,7 +227,7 @@ class SourceCollection(dict):
                 subreg = reg[y0:y1, x0:x1]
             else:
                 subreg = (subseg == segid).astype(int)
-            self.addSource(segid, subimg, subseg, subreg, subhdr)
+            self.addSource(segid, subimg, subseg, subreg, subhdr, **kwargs)
 
     def _load_mef(self, hdus, hdui, **kwargs):
         """
@@ -257,7 +258,7 @@ class SourceCollection(dict):
         LOGGER.info(f'Loading a MEF segmentation map: {self.segfile}')
         raise NotImplementedError()
 
-    def addSource(self, segid, img, seg, reg, hdr):
+    def addSource(self, segid, img, seg, reg, hdr, **kwargs):
         """
         Method to introduce a new source to the collection
 
@@ -275,11 +276,14 @@ class SourceCollection(dict):
         hdr : `astropy.io.fits.Header`
             The fits header for the direct image
 
+        kwargs : dict
+            Optional keywords passed to `Source()`        
+
         """
         if callable(self.preprocessor):
             img, seg, hdr = self.preprocessor(img, seg, hdr)
 
-        source = Source(segid, img, seg, reg, hdr, zeropoint=self.zeropoint)
+        source = Source(segid, img, seg, reg, hdr, zeropoint=self.zeropoint, **kwargs)
         if source and source.mag < self.maglim and source.npixels > self.minpix:
 
             # put in flat level to SED
