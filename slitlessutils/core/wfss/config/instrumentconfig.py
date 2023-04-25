@@ -549,6 +549,7 @@ class DetectorConfig:
         # clip against the pixel grid
         x, y, area, slices = polyclip.multi(xg, yg, self.naxis)
 
+        
         # make wavelength indices
         lam = np.empty_like(x, dtype=np.uint16)
         for i, s in enumerate(slices):
@@ -619,18 +620,20 @@ class InstrumentConfig(dict):
         Read a yaml file from the `slitlessutils_config` directory
 
         """
-
         self.filename = os.path.join(Config().confpath, 'instruments',
                                      f'{telescope}_{instrument}.yaml'.lower())
 
+        # load the yaml config file
         with open(self.filename, 'r') as f:
             data = yaml.safe_load(f)
 
+        # extract relevant data from the yaml dict
         self.telescope = data['telescope']
         self.instrument = data['instrument']
         self.bunit = data['bunit']
         self.suffix = data['suffix']
-
+        self.subarray = False
+        
         self.backgrounds = data.get('background')
 
         self.path = data['path']
@@ -647,9 +650,9 @@ class InstrumentConfig(dict):
 
         d = data['dispersers'][disperser][blocking]
         self.disperser = load_disperser(disperser, blocking, **d)
+        self.backgrounds = d.get('background')
 
         # self.grating=Grating(grating,blocking,*data['gratings'][grating][blocking].values())
-
         for detname, detdata in data['detectors'].items():
             self[detname] = DetectorConfig(detname, detdata, self.disperser,
                                            data['path'], **kwargs)
@@ -674,24 +677,46 @@ class InstrumentConfig(dict):
             The instrument configuration object
         """
 
-        h0 = fits.getheader(filename)
-        tel = h0['TELESCOP']
-        ins = h0['INSTRUME']
-        if ins == 'WFC3':
-            ins += h0['DETECTOR']
-            disperser = h0['FILTER']
+        with fits.open(filename, mode='readonly') as hdul:
+            h0 = hdul[0].header
 
-        elif ins == 'ACS':
-            ins += h0['DETECTOR']
-            disperser = h0['FILTER1']
+            tel = h0['TELESCOP']
+            ins = h0['INSTRUME']
+            if ins == 'WFC3':
+                ins += h0['DETECTOR']
+                disperser = h0['FILTER']
+                                
+            elif ins == 'ACS':
+                ins += h0['DETECTOR']
+                disperser = h0['FILTER1']
+                
+                
+            elif ins == 'NIRISS':
+                disperser = (h0['FILTER'], h0['PUPIL'])
+                kwargs['fwcpos'] = h0['FWCPOS']
+            else:
+                raise NotImplementedError(f"Unsupported: {tel = } {ins = }")
+            
+            
+            insconf = cls(tel, ins, disperser, **kwargs)
 
-        elif ins == 'NIRISS':
-            disperser = (h0['FILTER'], h0['PUPIL'])
-            kwargs['fwcpos'] = h0['FWCPOS']
-        else:
-            raise NotImplementedError(f"Unsupported: {tel = } {ins = }")
+            # update some things because subarrays
+            for detname in insconf.keys():
+                ext = insconf[detname].extensions['science'].extension
+                h = fits.getheader(filename, ext)
 
-        insconf = cls(tel, ins, disperser, **kwargs)
+                if insconf[detname].naxis[0] != h['NAXIS1']:
+                    insconf[detname].naxis[0] = h['NAXIS1']
+                    insconf.subarray = True
+                if insconf[detname].naxis[1] != h['NAXIS2']:
+                    insconf[detname].naxis[1] = h['NAXIS2']
+                    insconf.subarray = True
+                if insconf[detname].crpix[0] != h['CRPIX1']:
+                    insconf[detname].crpix[0] = h['CRPIX1']
+                    insconf.subarray = True
+                if insconf[detname].crpix[1] != h['CRPIX2']:
+                    insconf[detname].crpix[1] = h['CRPIX2']
+                    insconf.subarray = True
         return insconf
 
     def npixels(self):
@@ -824,6 +849,18 @@ class InstrumentConfig(dict):
         phdr['EXPEND'] = (mjd1, 'exposure end time (Modified Julian Date)')
         phdr['EXPTIME'] = (exptime, 'exposure duration (seconds)')
         phdr['EXPFLAG'] = ('NORMAL', 'Exposure interruption indicator')
+=======
+        
+        phdr['DATE-OBS']=(dt.strftime('%Y-%m-%d'),'UT date of start of observation (yyyy-mm-dd)')
+        phdr['TIME-OBS']=(dt.strftime('%H:%M:%S'),'UT time of start of observation (hh:mm:ss)')
+        phdr['EXPSTART']=(mjd0,'exposure start time (Modified Julian Date)')
+        phdr['EXPEND']=(mjd1,'exposure end time (Modified Julian Date)')
+        phdr['EXPTIME']=(exptime,'exposure duration (seconds)')
+        phdr['EXPFLAG']=('NORMAL','Exposure interruption indicator')
+        phdr['SUBARR']=(self.subarray,'Was this a subarray')
+        
+        headers.add_stanza(phdr,'Exposure Information',before='DATE-OBS')
+>>>>>>> b8b4cab (added support for subarrays)
 
         headers.add_stanza(phdr, 'Exposure Information', before='DATE-OBS')
 
