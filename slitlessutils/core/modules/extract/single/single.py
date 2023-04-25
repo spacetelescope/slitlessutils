@@ -47,6 +47,14 @@ class Single(Module):
     kwargs : dict, optional
        Dictionary of additional arguments passed to `su.core.modules.Module`
 
+    Notes
+    -----
+    The canonical Horne (1986) approach is very tricky to implement for
+    WFSS data, as there are many sums over the cross dispersion profile.
+    But many WFSS instruments have a cross-dispersion profile that is
+    not parallel to either the x- or y-axes, or even has many twists
+    and turns.  Therefore those sums can be tedious to define, let alone
+    compute.  This approach is conceptually similar, but framed differently.    
 
     Example
     -------
@@ -218,8 +226,6 @@ class Single(Module):
                 wht = 1./func[g]**2
                 cnt = cont[g]
 
-                unc = 1./np.sqrt(np.sum(wht))
-
                 # update the weights with sigma clipping if requested
                 if hasattr(self, 'sigclip'):
                     masked = self.sigclip(val, masked=True, copy=True)
@@ -242,7 +248,7 @@ class Single(Module):
 
                 # save the results
                 out['flam'][ind] = np.sum(wht*val)/wsum
-                out['func'][ind] = unc  # 1./np.sqrt(wsum)
+                out['func'][ind] = 1./np.sqrt(np.sum(wht))
                 out['cont'][ind] = np.sum(wht*cnt)/wsum
                 out['npix'][ind] = np.count_nonzero(wht)
 
@@ -255,6 +261,7 @@ class Single(Module):
 
             # store source in the OUTPUT file
             hdul.append(source.as_HDU())
+
 
         # get basename of output file
         LOGGER.info(f'Writing: {self.filename}')
