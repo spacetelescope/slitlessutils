@@ -133,7 +133,7 @@ class HDF5File(HDF5Columns):
             LOGGER.warning('no HDF5file is open to close')
 
     def __str__(self):
-        return 'HDF5File'
+        return f'HDF5 File for {self.dataset}'
 
     def add_detector(self, detconf):
         """
