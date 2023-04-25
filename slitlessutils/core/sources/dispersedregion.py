@@ -3,13 +3,16 @@ import numpy as np
 from ..photometry import SED
 
 
-class SpectralRegion:
+class DispersedRegion:
     """
     class to implement a spectral region.  Here a 'spectral region' is
     the collection of direct-image pixels that have the same spectrum
     """
 
+    PARNAMES = ('wave0', 'wave1', 'dwave', 'scale')    
+    
     def __init__(self, x, y, w, segid, regid, ltv=(0., 0.)):
+
         """
         Initializer
 
@@ -94,12 +97,12 @@ class SpectralRegion:
         return value
 
     def __str__(self):
-        return f'Spectral region: {self.name}'
+        return f'Dispersed region: {self.name}'
 
     @property
     def name(self):
         """
-        The name of this `SpectralRegion`
+        The name of this `DispersedRegion`
 
         Returns
         -------
@@ -153,13 +156,11 @@ class SpectralRegion:
         Parameters
         ----------
         kwargs : dict, optional
-            Dictionary of keywords, can be 'wave0','wave1','dwave','scale'
-
+            Dictionary of keywords, that can be any of the items set
+            in the `self.PARNAMES` list.
         """
-
-        parnames = ('wave0', 'wave1', 'dwave', 'scale')
         for k, v in kwargs.items():
-            if k in parnames:
+            if k in self.PARNAMES:
                 setattr(self, k, v)
 
     def get_spectral_parameters(self):
@@ -172,20 +173,14 @@ class SpectralRegion:
             A tuple of the extraction parameters and the seg/reg IDs
 
         """
-
+        
         pars = [self.segid, self.regid]
-        for parname in ('wave0', 'wave1', 'dwave', 'scale'):
+        for parname in self.PARNAMES:
             if hasattr(self, parname):
                 pars.append(float(getattr(self, parname)))
             else:
                 pars.append(np.nan)
         pars = tuple(pars)
-
-        # pars={}
-        # for parname in ('wave0','wave1','dwave','scale'):
-        #    if hasattr(self,parname):
-        #        pars[parname]=getattr(self,parname)
-
         return pars
 
     def pixels(self, dtype=int, weights=False, applyltv=False, **kwargs):

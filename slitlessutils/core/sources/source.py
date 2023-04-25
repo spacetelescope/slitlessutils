@@ -3,12 +3,13 @@ import os
 from astropy.io import fits
 from astropy.stats import sigma_clipped_stats
 from astropy.wcs import WCS, utils as wcsutils
+from astropy.modeling import fitting, functional_models
 import matplotlib.pyplot as plt
 import numpy as np
 from skimage.segmentation import expand_labels
 
 from ...logger import LOGGER
-from .spectralregion import SpectralRegion
+from .dispersedregion import DispersedRegion
 from ..utilities import headers, indices
 
 
@@ -17,7 +18,7 @@ class Source(list):
     Class to hold a single spectral source, which in turn may contain any
     number of spectral regions that have a unique spectrum.
 
-    inherits from list.  Each element of the list is a `SpectralRegion`,
+    inherits from list.  Each element of the list is a `DispersedRegion`,
     which controls the unique spectrum.
     """
 
@@ -69,12 +70,17 @@ class Source(list):
             the weights.  If equal to:
 
             'pixels'       Use the absolute value of the pixels
-
+            'fitprofile'   Fit a profile with some analytic profile, as
+                           specified by the `profile` variable.
+           
         profile : str, optional
             Name of the profile to fit.  See `astropy.modeling.models`.
-            This is only used if ```whttype='fitprofile'```.
-            Default is 'gaussian'
+            This is only used if ```whttype='fitprofile'```.  Presently,
 
+            gaussian:  will fit a 2d-Gaussian
+            sersic:  will fit a 2d-Sersic
+
+        Default is 'gaussian'
             NOTE: this functionality is not intended to provide reliable
                   estimates for the profile's parameters, but only a
                   smooth description of the source's spatial profile. As
@@ -137,16 +143,16 @@ class Source(list):
                 # grow the region to find the local sky background
                 # but use a mask in case it results in empty array
                 subseg2 = expand_labels(subseg, distance=self.backsize)
-                mask = np.logical_or(subseg2 != self.segid, subseg != 0)
+                submsk = ~np.logical_or(subseg2 != self.segid, subseg != 0)
                 try:
-                    ave, med, sig = sigma_clipped_stats(subimg, mask=mask,
+                    ave, med, sig = sigma_clipped_stats(subimg, mask=submsk,
                                                         sigma_lower=self.nsig[0],
                                                         sigma_upper=self.nsig[1])
                 except BaseException:
                     ave = 0.0
-
+                    
                 self.background = ave
-            else:
+             else:
                 self.background = 0.0
             img -= self.background
             # ---------------------------------------------------------------
@@ -154,9 +160,7 @@ class Source(list):
             # process the pixels based on the whttype specified
             if self.whttype == 'pixels':
                 w = np.abs(img[y, x])
-
             elif self.whttype == 'fitprofile':
-
                 # get an estimate on the source's elliptical properties
                 subwht = (subseg == self.segid).astype(float)
                 xc, yc, a, b, theta = self.ellipse_parameters(subimg, subwht)
@@ -178,7 +182,6 @@ class Source(list):
                                           n=2.5, r_eff=a,
                                           ellip=np.sqrt(1-(b/a)**2),
                                           theta=theta)
-
                 else:
                     msg = f'profile {profile} is not supported'
                     raise NotImplementedError(msg)
@@ -228,20 +231,11 @@ class Source(list):
             if reg is None:
                 reg = (seg == self.segid).astype(int)
 
-            # specdata={}
-            # for xx,yy in zip(self.x,self.y):
-            #    rr=reg[yy,xx]
-            #    if rr in specdata:
-            #        specdata[rr][0].append(xx)
-            #        specdata[rr][1].append(yy)
-            #    else:
-            #        specdata[rr]=([xx],[yy])
-
             # parse the region image
             ri = indices.reverse((seg == self.segid)*reg, ignore=(0,))
             for regid, (yy, xx) in ri.items():
                 ww = img[yy, xx]/self.norm
-                reg = SpectralRegion(xx, yy, ww, self.segid, regid, ltv=self.ltv)
+                reg = DispersedRegion(xx, yy, ww, self.segid, regid, ltv=self.ltv)
                 self.append(reg)
 
             #
@@ -253,15 +247,15 @@ class Source(list):
             # that can describe an arbitrary arrangement of spectral regions
             #
             # if self.segid < 0:
-            #    # a compound source, so each pixel in a separate SpectralRegion
-            #    for i,(xx,yy,ww) in enumerate(zip(x,y,w),start=1):
-            #        reg=SpectralRegion([xx],[yy],[ww],self.segid,i,
+            #     # a compound source, so each pixel in a separate DispersedRegion
+            #     for i,(xx,yy,ww) in enumerate(zip(x,y,w),start=1):
+            #         reg=DispersedRegion([xx],[yy],[ww],self.segid,i,
             #                           ltv=self.ltv)
-            #        self.append(reg)
+            #         self.append(reg)
             # elif self.segid >0:
-            #    self.append(SpectralRegion(x,y,w,self.segid,0,ltv=self.ltv))
+            #     self.append(DispersedRegion(x,y,w,self.segid,0,ltv=self.ltv))
             # else:
-            #    LOGGER.warning(f"Ignoring {segid=}")
+            #     LOGGER.warning(f"Ignoring {segid=}")
 
     def __str__(self):
         return super().__str__()
@@ -326,12 +320,11 @@ class Source(list):
     @property
     def is_compound(self):
         """
-        A flag if the source is a compound source (ie. has multiple
-        `SpectralRegions`)
+        A flag if the source is a compound source (ie. has multiple 
+        `DispersedRegion`s)
         """
-        # return self.nregions >1
         return len(self) > 1
-
+    
     @property
     def pixelarea(self):
         """
@@ -346,9 +339,8 @@ class Source(list):
     @property
     def nregions(self):
         """
-        Compute the number of spectral regions
+        Compute the number of dispersed regions
         """
-        # return len(self.spectralregions)
         return len(self)
 
     def pixels(self, **kwargs):  # weights=False,applyltv=False,dtype=int):
@@ -377,26 +369,6 @@ class Source(list):
         for region in self:
             yield from region.pixels(**kwargs)
 
-        # if applyltv:
-        #    for region in self:
-        #        for x,y in region.pixels():
-        #            yield self.image_coordinates(x,y,dtype=dtype)
-        # else:
-        #    for region in self:
-        #        for x,y in region.pixels():
-        #            yield (dtype(x),dtype(y))
-
-        # if applyltv:
-        #    #for region in self.spectralregions:
-        #    for region in self:
-        #        for x,y in region.pixels():
-        #            #if applyltv:
-        #            yield self.image_coordinates(x,y,dtype=dtype)
-        # else:
-        #    #for region in self.spectralregions:
-        #    for region in self:
-        #        yield from region.pixels()
-
     def items(self):
         """
         Generator to implement `items()`
@@ -409,13 +381,9 @@ class Source(list):
         regid : int
              The spectral region ID
 
-        region : `SpectralRegion`
-             The spectral region
+        region : `DispersedRegion`
+             The disersed region region
         """
-
-        # for i,region in enumerate(self.spectralregions):
-        #    yield (self.segid,i),region
-
         for i, region in enumerate(self):
             yield (self.segid, i), region
 
@@ -439,7 +407,6 @@ class Source(list):
         If the source is compound, then it wil be written with 3-dimensional
             WCS.
         """
-
         hdr = fits.Header()
         hdr['EXTNAME'] = (str(self.segid),)
 
@@ -509,43 +476,9 @@ class Source(list):
             hdu = fits.ImageHDU(dat, hdr)
         else:
             # set the data as a single spectrum
-            # dat=self.spectralregions[0].sed.data
             dat = self[0].sed.data
             hdu = fits.BinTableHDU(dat, hdr)
         return hdu
-
-
-#    def update_header(self,hdr,group=0):
-#
-#        hdr['SEGID']=(self.segid,'Segmentation ID')
-#        hdr['GRPID']=(group,'Group ID')
-#        hdr['RA']=(self.adc[0],'Right Ascension (deg)')
-#        hdr['DEC']=(self.adc[1],'Declination (deg)')
-#        hdr['X']=(self.xyc[0],'X barycenter')
-#        hdr['Y']=(self.xyc[1],'Y barycenter')
-#        hdr['FLUX']=(self.flux,'instrumental flux in direct image')
-#        hdr['MAG']=(self.mag,'AB magnitude in direct image')
-#        hdr['FNU']=(self.fnu,'flux in erg/s/cm2/Hz in direct image')
-#        hdr['NPIXELS']=(self.npixels,'total number of extracted pixels')
-#        hdr['WHTTYPE']=(self.whttype,'Type of source profile weights')
-#        hdr['NREGIONS']=(self.nregions,'number of spectral regions')
-#        hdr['AREA']=(self.npixels*self.pixelarea,'source area (arcsec2)')
-#        headers.add_stanza(hdr,'Source Properties',before='SEGID')
-#
-#
-#        hdr['BCKSUB']=(self.local_back,'Was local background in direct image su#btracted')
-#        hdr['BCKSIZE']=(self.backsize,'Size of background annulus (in pix)')
-#        hdr['BCKVAL']=(self.background,'Background level in direct image')
-#        hdr['BCKLOSIG']=(self.nsig[0],'N sigma for low level')
-#        hdr['BCKHISIG']=(self.nsig[1],'N sigma for high level')
-#        headers.add_stanza(hdr,'Direct Image Background',before='BCKSUB')
-#
-#
-#
-#        #for k,v in kwargs.items():
-#        #    hdr[k]=v
-#
-#
 
     def image_coordinates(self, x, y, dtype=None):
         """
@@ -657,7 +590,7 @@ class Source(list):
 
         Notes
         -----
-        The input spectrum is used for all the `SpectralRegion`s
+        The input spectrum is used for all the `DispersedRegion`s
         """
 
         for regkey, region in self.items():
@@ -691,10 +624,9 @@ class Source(list):
             if not os.path.isdir(path):
                 os.mkdir(path)
 
-        # for regid,region in enumerate(self.spectralregions):
         for regid, region in enumerate(self):
             filename = os.path.join(path, f'segid_{self.segid}_{regid}.{filetype}')
-            region.sed.write_file(filename, **kwargs)
+            region.sed.write_file(filename,**kwargs)
 
     @staticmethod
     def ellipse_parameters(img, wht):
