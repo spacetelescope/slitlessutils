@@ -635,7 +635,6 @@ class InstrumentConfig(dict):
         self.subarray = False
         
         self.backgrounds = data.get('background')
-
         self.path = data['path']
         self.header = data.get('header', {})
 
@@ -651,8 +650,6 @@ class InstrumentConfig(dict):
         d = data['dispersers'][disperser][blocking]
         self.disperser = load_disperser(disperser, blocking, **d)
         self.backgrounds = d.get('background')
-
-        # self.grating=Grating(grating,blocking,*data['gratings'][grating][blocking].values())
         for detname, detdata in data['detectors'].items():
             self[detname] = DetectorConfig(detname, detdata, self.disperser,
                                            data['path'], **kwargs)
@@ -676,8 +673,7 @@ class InstrumentConfig(dict):
         inscnf : `InstrumentConfig`
             The instrument configuration object
         """
-
-        with fits.open(filename, mode='readonly') as hdul:
+        with fits.open(filename,mode='readonly') as hdul:
             h0 = hdul[0].header
 
             tel = h0['TELESCOP']
@@ -696,7 +692,6 @@ class InstrumentConfig(dict):
                 kwargs['fwcpos'] = h0['FWCPOS']
             else:
                 raise NotImplementedError(f"Unsupported: {tel = } {ins = }")
-            
             
             insconf = cls(tel, ins, disperser, **kwargs)
 
@@ -717,6 +712,7 @@ class InstrumentConfig(dict):
                 if insconf[detname].crpix[1] != h['CRPIX2']:
                     insconf[detname].crpix[1] = h['CRPIX2']
                     insconf.subarray = True
+
         return insconf
 
     def npixels(self):
@@ -849,18 +845,7 @@ class InstrumentConfig(dict):
         phdr['EXPEND'] = (mjd1, 'exposure end time (Modified Julian Date)')
         phdr['EXPTIME'] = (exptime, 'exposure duration (seconds)')
         phdr['EXPFLAG'] = ('NORMAL', 'Exposure interruption indicator')
-=======
-        
-        phdr['DATE-OBS']=(dt.strftime('%Y-%m-%d'),'UT date of start of observation (yyyy-mm-dd)')
-        phdr['TIME-OBS']=(dt.strftime('%H:%M:%S'),'UT time of start of observation (hh:mm:ss)')
-        phdr['EXPSTART']=(mjd0,'exposure start time (Modified Julian Date)')
-        phdr['EXPEND']=(mjd1,'exposure end time (Modified Julian Date)')
-        phdr['EXPTIME']=(exptime,'exposure duration (seconds)')
-        phdr['EXPFLAG']=('NORMAL','Exposure interruption indicator')
-        phdr['SUBARR']=(self.subarray,'Was this a subarray')
-        
-        headers.add_stanza(phdr,'Exposure Information',before='DATE-OBS')
->>>>>>> b8b4cab (added support for subarrays)
+
 
         headers.add_stanza(phdr, 'Exposure Information', before='DATE-OBS')
 
