@@ -48,8 +48,6 @@ class Tabulate(Module):
     def __init__(self, orders=None, ttype='pdt', nsub=5, remake=True, **kwargs):
         Module.__init__(self, self.tabulate, **kwargs)
 
-        print(f"Tabulate: {remake=}")
-
         # which type of Table to make (PDT is normal)
         self.ttype = ttype
 
@@ -63,7 +61,7 @@ class Tabulate(Module):
         self.pixfrac = 1.0  # DO NOT CHANGE THIS!
 
         self.orders = as_iterable(orders)
-
+        
     def __str__(self):
         s = f'Tabulation Module: \n'+super().__str__()
         return s
