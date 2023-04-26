@@ -60,17 +60,20 @@ class HDF5File(HDF5Columns):
         self.path = path
         self.mode = mode
 
+        # if the file exists and we want to remake them, then we
+        # will wipe the existing file and start over
+        if self.remake and os.path.exists(self.filename):
+            os.remove(self.filename)
+            
     @property
     def filename(self):
         base = os.path.join(self.path, self.dataset)
         return f'{base}.{self.EXT}'
-        # return f'{base}_{self.TTYPE}.{self.EXT}'
 
     def __enter__(self):
         """
         Method to implement a context manager
         """
-
         if self.mode == 'w' or self.mode == 'a':
             # trying to make a table
             if not os.path.exists(self.filename) or self.remake:
