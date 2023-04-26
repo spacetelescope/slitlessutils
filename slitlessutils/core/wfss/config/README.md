@@ -44,8 +44,8 @@ This configures the instrumental setup, which describes many things.
   -  ```UnityFlatField``` assume the flat is all 1.0 (effectively no flat fielding)
   -  ```ImageFlatField``` this is effectively a "gray" flat that is generally taken from an image flat.
   -  ```PolynomialFlatField``` this is true, wavelength-dependent flat field described as a polynomial in wavelength:
-   $$F(\lambda,x_g,y_g) = F_0(x_0,y_0) + F_1(x_0,y_0)\left(\frac{\lambda-\lambda_0}{\lambda_1-\lambda_0}\right) + F_2(x_0,y_0)\left(\frac{\lambda-\lambda_0}{\lambda_1-\lambda_0}\right)^2...$$
-where $\lambda_0$ and $\lambda_1$ are the range of the grating (and specified in the calibration), and the images $F_0$, $F_1$, $F_2$, ... are given in a MEF file from calibration.
+   $$F(\lambda,x_g,y_g) = F_0(x_g,y_g) + F_1(x_g,y_g)\left(\frac{\lambda-\lambda_0}{\lambda_1-\lambda_0}\right) + F_2(x_g,y_g)\left(\frac{\lambda-\lambda_0}{\lambda_1-\lambda_0}\right)^2...$$
+where $\lambda_0$ and $\lambda_1$ are the range of the grating (and specified in the calibration), and the images $\{F\}$ are given in a MEF file from calibration.
 - **pom.py** This describes the "pick-off mirror" and the effective size of the field-of-regard (ie. the region of the sky that surrounds a ```WFSSDetector``` that could potentially disperse light onto the detector), which can be either:
   - ```UnityPOM``` assume the POM is all 1.0 (effectively no POM restrictions)
   - ```RangePOM``` a POM that is 1.0 within a rectangular range and 0.0 outside of it.  This is typical for the HST instruments.
