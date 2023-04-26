@@ -13,24 +13,24 @@ from .parameters import *
 
 
 ROOT = 'starfield'            # base name for files in this example
-DATASETS = ('a', 'b', 'c')      # dataset names (will do 3 datasets)
+DATASETS = ('a', 'b', 'c')    # dataset names (will do 3 datasets)
 TELESCOPE = 'HST'             # name of the telescope
 INSTRUMENT = 'ACS'            # name of the instrument
 DETECTOR = 'WFC'              # name of the detector in the instrument
 DISPERSER = 'G800L'           # name of the spectral element
 BLOCKING = ''                 # name of the blocking filter
-WRANGE = (5500., 9500.)        # wavelength range to inspect
+WRANGE = (5500., 9500.)       # wavelength range to inspect
 FILTER = 'F775W'              # name of the filter for the direct image
-SUFFIX = 'flc'              # type of suffix
+SUFFIX = 'flc'                # type of suffix
 NCPU = 1                      # number of CPUs to use
 
 
-DETECTOR = 'SBC'
-DISPERSER = 'P130L'
-WRANGE = (1150., 1900.)
-FILTER = 'F125LP'
-SUFFIX = 'flt'
-
+# Settings to look at Prism for SBC
+# DETECTOR = 'SBC'
+# DISPERSER = 'P130L'
+# WRANGE = (1150., 1900.)
+# FILTER = 'F125LP'
+# SUFFIX = 'flt'
 
 SPECCAT = 'pickles'
 
@@ -157,7 +157,6 @@ def simulate_grisms():
     3) All products are written to disk.
 
     """
-
     # write a "WCS" file to disk that contains properites of
     # the images to emulate an observers setup
     with open(f'{ROOT}_wcs.csv', 'w') as fp:
@@ -326,7 +325,6 @@ def compare(nsig=1.):
 
     regid = 0
     for ax, (segid, (x, y, mag, sedfile)) in zip(axes, SOURCES.items()):
-
         filename = os.path.join(SEDPATH, f'{segid}_{regid}.sed')
         l, f = np.loadtxt(filename, usecols=(0, 1), unpack=True)
         f /= 1e-17
@@ -353,7 +351,6 @@ def compare(nsig=1.):
                     s = str(segid)
                     if s in hdul:
                         hdu = hdul[s]
-
                         lo = hdu.data['flam']-nsig*hdu.data['func']
                         hi = hdu.data['flam']+nsig*hdu.data['func']
 
@@ -390,11 +387,8 @@ def run_all():
     """
 
     make_scene()
-
     simulate_grisms()
-
     extract_single()
     extract_multi()
     extract_group()
-    # compare('multi')
     compare()
