@@ -33,9 +33,17 @@ class Throughput(Band):
         keys = (telescope, instrument, band)
 
         LOGGER.info(f'loading throughput from keys: {keys}')
+
         filename = f'{telescope}_{instrument}_{band}.fits'.lower()
         filename = Config().get_reffile(filename, path='bandpasses')
 
+        # check the file is valid.
+        if filename is None:
+            msg=f"Cannot find filter file"
+            LOGGER.error(msg)
+            raise RuntimeError(msg)
+        
+        # read the fits file with the throughput curve
         data, header = fits.getdata(filename, exten=1, header=True)
 
         obj = cls(data['wavelength'], data['transmission'],

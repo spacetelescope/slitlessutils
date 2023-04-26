@@ -66,7 +66,6 @@ def upgrade_wcs(imgfile,wfssfile,key='A',newfile=None,inplace=False):
     """
 
     LOGGER.info(f'Upgrading WCS in WFSS ({wfssfile}) from direct ({imgfile})')
-
     if inplace:
         mode = 'update'
     else:
@@ -125,6 +124,8 @@ def upgrade_wcs(imgfile,wfssfile,key='A',newfile=None,inplace=False):
                 comment = 'tweak w.r.t. Gaia'
                 whdul[exten].header.set('WCSTWEAK', value=True,
                                         comment='Was WCS tweaked w.r.t. Gaia')
+                whdul[exten].header.set('WCSTYPE', value='upgrade',
+                                        comment = 'WCS upgraded to match Gaia')
                 whdul[exten].header.set('DCRVAL1', value=dcrval[0],
                                         comment=comment)
                 whdul[exten].header.set('DCRVAL2', value=dcrval[1],

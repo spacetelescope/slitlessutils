@@ -21,8 +21,9 @@ class Order:
         self.dispx = StandardPolynomial()
         self.dispy = StandardPolynomial()
 
+
         # print("WORRY ABOUT ORDER OF COEFS")
-        for k, v in data[order].items():
+        for k, v in data[self.order].items():
             if k.startswith('DISPX'):
                 self.dispx.append(v)
             elif k.startswith('DISPY'):
@@ -161,13 +162,7 @@ class Order:
                 t = self.displ.invert(_x, _y, wav)
                 dx[:, i] = self.dispx.evaluate(_x, _y, t)
                 dy[:, i] = self.dispy.evaluate(_x, _y, t)
-
-                w = self.displ.evaluate(_x, _y, t)
-                if not np.allclose(w, wav):
-                    print(wav, w)
-                    import pdb
-                    pdb.set_trace()
-
+                
         return dx, dy
 
     @property

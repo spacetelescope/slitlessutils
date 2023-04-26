@@ -2,6 +2,10 @@ from astropy import convolution
 from astropy.io import fits
 from astropy.modeling import fitting,models
 from astropy.stats import sigma_clip,sigma_clipped_stats
+<<<<<<< HEAD
+=======
+from contextlib import nullcontext
+>>>>>>> da9d25a (updated background module for master-sky, poly1d)
 import numpy as np
 import os
 from scipy.signal import savgol_filter
@@ -24,13 +28,9 @@ def background_processing(mastersky=False):
         flag to read master sky image
 
     """
-    
-    
 
-    
     def background(func):
         def wrapper(self,filename,newfile=None,inplace=False,**kwargs):
-
             # a flag on how to read the image
             if inplace:
                 mode='update'
@@ -42,7 +42,6 @@ def background_processing(mastersky=False):
             if mastersky:
                 # get the name of the background file:
                 backfile=data.background_filename('master')
-
                 
             with fits.open(filename,mode=mode) as hdul:
                 # will need the primary header below
@@ -158,8 +157,6 @@ class Background:
     def __init__(self,dispaxis='x',skysigma=3.,srcsigma=3.,
                  outliersigma=3.,minpix=5,maxiter=10):
 
-
-        
         kernsig=0.8
         kernlen=50
         
@@ -373,9 +370,6 @@ class Background:
 
         return out,np.logical_not(sky)
 
-
-    
-
     @background_processing(mastersky=False)
     def poly1d(self,sci,hdr,unc,mod,gpx,degree=2,filtwindow=51,filtorder=1):
 
@@ -434,8 +428,6 @@ class Background:
         elif self.dispaxis==0:
             loopcross=lambda lam: (slice(None,None,None),lam)
             loopdisp=lambda eta: (eta,slice(None,None,None))
-            
-        
 
         # set up the iteration
         npix=np.count_nonzero(sky)

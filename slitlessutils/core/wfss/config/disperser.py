@@ -60,7 +60,7 @@ class Disperser:
 
         Parameters
         ----------
-        specreg : `su.core.sources.SpectralRegion`
+        specreg : `su.core.sources.DispersedRegion`
            The spectral region to grab the parameters from.  Alternatively,
            this can be any object that has the correct attributes.
 
@@ -102,7 +102,7 @@ class Disperser:
         name : str
             The trimmed name
         """
-        print(self.__class__.__name__)
+
         if self.name[-1].isalpha():
             return self.name[:-1]
         else:

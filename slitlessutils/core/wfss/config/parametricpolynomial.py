@@ -9,16 +9,18 @@ class ParametricPolynomial(list):
     Parameters
     ----------
     maxiter : int, optional
-        Maximum number of iterations for the Newton-Raphson Method.  default is 10
+        Maximum number of iterations for the Newton-Raphson Method.
+        default is 10
 
     threshold : float, optional
-        Threshold for convergence of the Newton-Raphson Method.  default is 1e-3
+        Threshold for convergence of the Newton-Raphson Method.
+        default is 1e-3
     """
 
     def __init__(self, maxiter=10, threshold=1e-3):
 
         # set a default for the parametric order
-        self.order = 0
+        self.order = -1
         self.invert = lambda x, y, f: None    # a default functional inversion
 
         # set some defaults
@@ -48,8 +50,8 @@ class ParametricPolynomial(list):
             else:
                 self.invert = self._nth
 
-    def coefs(self, x, y):
-        """
+    def coefs(self,x,y):
+        """ 
         Method to evaluate all the `SpatialPolynomial` coefficients
         for a given position.
 
@@ -185,19 +187,18 @@ class StandardPolynomial(ParametricPolynomial):
         -----
         For a second-order polynomial, this will terminate in one step and will
         be exactly correct.
+
+        See the `wikipedia https://en.wikipedia.org/wiki/Halley%27s_method`
+        article on Halley's modification of Newton's method.
+        
         """
 
+        # compute the polynomial coefficients
         p = np.polynomial.Polynomial(self.coefs(x, y))
+
+        # compute the derivatives
         dpdt = p.deriv()
         d2pdt2 = dpdt.deriv()
-
-        # compute the polynomial coefficients
-        # coefs=np.asarray(self.coefs(x,y))[::-1]
-
-        # compute the derivative coeffs
-        # i=np.arange(-self.order,0)                    # for recip
-        # dcoefs=coefs[:-1]*i
-        # d2coefs=dcoefs*(i-1)
 
         # initialize and start the Newton-Raphson method
         convmsg = 'reach maximum number of iterations'
@@ -231,8 +232,7 @@ class ReciprocalPolynomial(ParametricPolynomial):
     Class to implement a nested parametric polynomial of the form:
 
     .. math::
-
-       p(t|x,y) = a(x,y) + b(x,y)/(t-t*) + c(x,y)/(t-t*)^2 + ....
+       p(t|x,y) = a(x,y) + b(x,y)/(t-t^*) + c(x,y)/(t-t^*)^2 + ....
 
     where :math:`a(x,y)`, :math:`b(x,y)`, and so on are `SpatialPolynomial`s.
 
@@ -349,10 +349,6 @@ class ReciprocalPolynomial(ParametricPolynomial):
         i = np.arange(1-self.order, 0)                    # for recip
         dcoefs = coefs[:-1]*i
         d2coefs = dcoefs*(i-1)
-
-        # p=lambda t: np.polyval(coefs,1./(t-tstar))
-        # dpdt=lambda t: np.polyval(dcoefs,1./(t-star))/(t-tstar)**2
-        # d2pdt2=lambda t: np.polyval(d2coefs,1./(t-star))/(t-tstar)**3
 
         # compute the bias
         tstar = self.tstar.evaluate(x, y)                # for recip

@@ -8,7 +8,6 @@ from ....logger import LOGGER
 from ....config import Config
 
 
-
 class WFSSConfig(dict):
 
     COMMENTS = ("%", '#', '!', ';')
