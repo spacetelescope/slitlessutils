@@ -194,6 +194,74 @@ class WFSSCollection(dict):
         self.filename = filename
         self.filetype = filetype
 
+
+
+    def get_visits(self):
+        """
+        Method to get visit ids for all the files in this collection
+
+        Returns
+        -------
+        visit : `np.ndarray` dtype="<U2"
+            The visit identifier for each exposure
+        """
+        visits = [obs.load_file().visit for obs in self.values()]
+        return np.asarray(visits)
+
+    def get_orbits(self):
+        """
+        Method to get orbit ids for all the files in this collection
+
+        Returns
+        -------
+        visit : `np.ndarray` dtype="<U2"
+            The visit identifier for each exposure
+        """
+        orbits = [obs.load_file().orbit for obs in self.values()]
+        return np.asarray(orbits)
+       
+
+    def get_pas(self,**kwargs):
+        """
+        Method to get the average PAs for each exposure
+
+        Parameters
+        ----------
+        kwargs : dict, optional
+            See `WFSSDetector.get_pa()` for the options
+
+        Returns
+        -------
+        pa : `np.ndarray` dtype=float
+            The position angle for each exposure
+        """
+
+        pas = [obs.load_file().get_pa(**kwargs) for obs in self.values()]
+        return np.asarray(pas)
+    
+        
+    def get_pixscls(self):
+        """
+        Method to get the average pixel scales for each exposure
+
+        Returns
+        -------
+        px : `np.ndarray`, dtype=float
+            The pixel scale in the x-axis for each exposure
+        
+        py : `np.ndarray`, dtype=float
+            The pixel scale in the y-axis for each exposure
+        """
+        
+        n = len(self)
+        pxs = np.zeros(n, dtype=float)
+        pys = np.zeros(n, dtype=float)
+        for i, obs in enumerate(self.values()):
+            wfss = obs.load_file()
+            pxs[i], pys[i] = wfss.get_pixscl()
+                
+        return pxs,pys   
+
     def __bool__(self):
         """
         Method to overload the bool() operator
@@ -503,17 +571,6 @@ class WFSSCollection(dict):
         npix = sum(v.npixels() for v in self.values())
         return npix
 
-    # Eventually remove these things.
-    # @property
-    # def nfiles(self):
-    #    raise RuntimeError("THIS iS JUST LEN")
-    #
-    # @property
-    # def nconfig(self):
-    #    raise RuntimeError("DO I NEED THIS?")#
-    #
-    # def files(self):
-    #    raise RuntimeError("this is just normal iter")
 
     def update_header(self, hdr):
         """
@@ -528,10 +585,14 @@ class WFSSCollection(dict):
         -------
         None
         """
-
         hdr['NWFSS'] = (len(self), 'Number of WFSS exposures')
         hdr['WFSSFILE'] = (self.filename, 'Name of WFSS file')
         headers.add_stanza(hdr, 'WFSS Observations', before='NWFSS')
+        
+if __name__=='__main__':
+    #data=WFSSCollection.from_filelist('files.lst')
+    data=WFSSCollection.from_wcsfile('wcs.csv')
+>>>>>>> 751e274 (finished support for getting PA from CD matrix, visit, and other stuff)
 
 
 if __name__ == '__main__':

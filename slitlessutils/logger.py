@@ -182,7 +182,7 @@ def start_logging(asciilog=True, stdout=True, stderr=False, level=10):
     setLevel(level)
 
     # do some pre-logging
-    log.info(f"Starting loger with {level=}")
+    log.info(f"Starting logger with {level=}")
     log.info(f'Importing {__code__} at {datetime.now()}')
 
 
