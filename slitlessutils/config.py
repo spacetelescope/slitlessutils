@@ -31,9 +31,7 @@ def download_config_files(extract_path=gettempdir()):
                 tar.extract(file, path=extract_path)
 
     # Prepare environment required for slitlessutils to be imported
-    environ['slitlessutils_config'] = str(extract_path)
-
-    print("Config ready!")
+    environ['slitlessutils_config'] = str(extract_path / 'slitlessutils_config')
 
 
 # file suffixes.  Probably shouldn't ever change these, but here they are:
