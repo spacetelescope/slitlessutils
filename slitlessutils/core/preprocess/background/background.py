@@ -2,10 +2,6 @@ from astropy import convolution
 from astropy.io import fits
 from astropy.modeling import fitting,models
 from astropy.stats import sigma_clip,sigma_clipped_stats
-<<<<<<< HEAD
-=======
-from contextlib import nullcontext
->>>>>>> da9d25a (updated background module for master-sky, poly1d)
 import numpy as np
 import os
 from scipy.signal import savgol_filter
