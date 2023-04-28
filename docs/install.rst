@@ -47,23 +47,6 @@ There are several ways to install ``slitlessutils``:
 
 
 
-
-Fetching Reference Data
------------------------
-
-There are a host of reference and configuration files needed by
-``slitlessutils``, which have been staged at `slitlessutils data <BOX>`_.
-You should download the `.tar.gz` file for instrument of interest,
-copy it to the home directory, and unpack with:
-
-.. code-block:: bash
-
-   tar -xcvzf <FILENAME>.tar.gz
-
-This will create a directory in the home as :code:`.slitlessutils`
-
-
-
 Adjust Primary Defaults
 -----------------------
 
