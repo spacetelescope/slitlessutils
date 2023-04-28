@@ -152,7 +152,7 @@ class Source(list):
                     ave = 0.0
                     
                 self.background = ave
-             else:
+            else:
                 self.background = 0.0
             img -= self.background
             # ---------------------------------------------------------------
