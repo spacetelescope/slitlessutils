@@ -588,10 +588,6 @@ class WFSSCollection(dict):
         hdr['NWFSS'] = (len(self), 'Number of WFSS exposures')
         hdr['WFSSFILE'] = (self.filename, 'Name of WFSS file')
         headers.add_stanza(hdr, 'WFSS Observations', before='NWFSS')
-        
-if __name__=='__main__':
-    #data=WFSSCollection.from_filelist('files.lst')
-    data=WFSSCollection.from_wcsfile('wcs.csv')
 
 
 if __name__ == '__main__':
