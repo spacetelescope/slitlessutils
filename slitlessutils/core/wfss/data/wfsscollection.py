@@ -592,7 +592,6 @@ class WFSSCollection(dict):
 if __name__=='__main__':
     #data=WFSSCollection.from_filelist('files.lst')
     data=WFSSCollection.from_wcsfile('wcs.csv')
->>>>>>> 751e274 (finished support for getting PA from CD matrix, visit, and other stuff)
 
 
 if __name__ == '__main__':
