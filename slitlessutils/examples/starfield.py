@@ -325,7 +325,7 @@ def compare(nsig=1.):
 
     regid = 0
     for ax, (segid, (x, y, mag, sedfile)) in zip(axes, SOURCES.items()):
-        filename = os.path.join(SEDPATH, f'{segid}_{regid}.sed')
+        filename = os.path.join(SEDPATH, f'segid_{regid}.sed')
         l, f = np.loadtxt(filename, usecols=(0, 1), unpack=True)
         f /= 1e-17
 
