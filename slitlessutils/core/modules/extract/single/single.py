@@ -74,8 +74,6 @@ class Single(Module):
              ('func', np.float32),
              ('cont', np.float32),
              ('npix', np.uint16)]
-    # CSVHDR = ','.join(d[0] for d in DTYPE)
-    # CSVFMT = ['%f','%f','%f','%f','%d']          # output datatypes
 
     FILETYPE = '1d spectra'
 
@@ -216,8 +214,11 @@ class Single(Module):
             ri = indices.reverse(lamb)
 
             # make an output data structure
-            out = np.full(nwave, np.nan, dtype=self.DTYPE)
-            out['lamb'] = pars.wavelengths()
+            out = np.zeros(nwave, dtype=self.DTYPE)
+            out['lamb'] = pars.wavelength()
+            out['flam'] = np.nan
+            out['func'] = np.nan
+            out['cont'] = np.nan
             out['npix'] = 0
 
             # compute weighted-averages over the bins
