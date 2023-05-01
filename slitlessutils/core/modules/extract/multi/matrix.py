@@ -289,10 +289,8 @@ class Matrix:
             self.lamids = self.juniq-self.cumlam[extind]
 
         except BaseException:
-            LOGGER.debug("matrix is fishy")
             LOGGER.debug(ni, nj, self.nsources)
-            import pdb
-            pdb.set_trace()
+            raise RuntimeError("Matrix calulation has failed")
 
         # get the indices to do all reverse calculations
         self.ri = indices.reverse(extind)
