@@ -391,7 +391,8 @@ class WFSSDetector:
         """
 
         if imtype in self.extensions:
-            return self.extensions[imtype].readfits(self.filename, header=header)
+            return self.extensions[imtype].readfits(self.filename,
+                                                    header=header)
 
             # args=self.extensions[imtype].readfits(self.filename,header=header)
             #
@@ -570,7 +571,7 @@ class WFSS(dict):
         self.filename = filename
         self.filetype = filetype
         self.config = insconf
-
+                
         for detname, detconf in self.config.items():
             self[detname] = WFSSDetector(self.filename, detconf,
                                          bunit=insconf.bunit)
@@ -692,12 +693,7 @@ class WFSS(dict):
             The full path to the requested sky image.  If key does not exist,
             then returns `None`
         """
-
-        back = self.config.backgrounds.get(key)
-        if back:
-            back = os.path.join(Config().confpath, 'instruments',
-                                self.config.path, back)
-        return back
+        return self.config.background_filename(key)
     
     @classmethod
     def simulated(cls, telescope, instrument, dataset, ra, dec, orientat, disperser,
