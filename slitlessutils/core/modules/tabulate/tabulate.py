@@ -157,7 +157,6 @@ class Tabulate(Module):
         # grating=insconf.parameters
         # wav=insconf.parameters.wavelengths(nsub=self.nsub)
 
-        # with PDTFile(insdata,remake=remake,path=self.path) as h5:
         with PDTFile(data, remake=self.remake, path=self.path) as h5:
             if not isinstance(h5, PDTFile):
                 return h5

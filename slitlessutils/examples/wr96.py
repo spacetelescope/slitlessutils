@@ -66,13 +66,23 @@ def download():
 
 
 def preprocess_grism():
+
+    # create a background subtraction object
+    back = su.core.preprocess.background.Background()
+
     for imgdset, grismdset in zip(DATASETS[FILTER], DATASETS[GRATING]):
         grismfile = f'{grismdset}_{SUFFIX}.fits'
         imgfile = f'{imgdset}_{SUFFIX}.fits'
 
+        # flag CRs by Laplace filtering
         su.core.preprocess.crrej.laplace(grismfile, inplace=True)
-        su.core.preprocess.background.mastersky(grismfile, inplace=True)
-        su.core.preprocess.astrometry.syncwcs(imgfile, grismfile, inplace=True)
+
+        # subtract background via master-sky
+        back.master(grismfile)
+
+        # update WCS to match Gaia
+        su.core.preprocess.astrometry.upgrade_wcs(imgfile, grismfile,
+                                                  inplace=True)
 
 
 def preprocess_direct():
@@ -87,7 +97,8 @@ def preprocess_direct():
                               static=False, skysub=True, driz_separate=False,
                               median=False, blot=False, driz_cr=False,
                               driz_combine=True, final_wcs=True,
-                              final_rot=0., final_scale=SCALE, final_pixfrac=1.0,
+                              final_rot=0., final_scale=SCALE,
+                              final_pixfrac=1.0,
                               overwrite=True, final_fillval=0.0)
 
     # AGH gotta remove second extensions
