@@ -633,11 +633,9 @@ class InstrumentConfig(dict):
         self.bunit = data['bunit']
         self.suffix = data['suffix']
         self.subarray = False
-        
-        self.backgrounds = data.get('background')
+
         self.path = data['path']
         self.header = data.get('header', {})
-
         self.siaf = SIAF(*data['siaf'].values())
 
         if isinstance(disperser, str):
@@ -649,7 +647,7 @@ class InstrumentConfig(dict):
 
         d = data['dispersers'][disperser][blocking]
         self.disperser = load_disperser(disperser, blocking, **d)
-        self.backgrounds = d.get('background')
+        self.backgrounds = d.get('background',{})
         for detname, detdata in data['detectors'].items():
             self[detname] = DetectorConfig(detname, detdata, self.disperser,
                                            data['path'], **kwargs)
@@ -716,6 +714,28 @@ class InstrumentConfig(dict):
 
         return insconf
 
+    def background_filename(self,key):
+        """
+        A method to return the filename of the background image(s)
+
+        Parameters
+        ----------
+        key : str
+            The type of background to retrieve
+
+        Returns
+        -------
+        filename : str
+            The full path to the requested sky image.  If key does not exist,
+            then returns `None`
+        """
+        back = self.backgrounds.get(key)
+        if back:
+            back = os.path.join(Config().confpath, 'instruments',
+                                self.path, back)
+        return back
+
+    
     def npixels(self):
         """
         Method to get the total number of pixels in a single file

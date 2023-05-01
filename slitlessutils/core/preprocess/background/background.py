@@ -67,8 +67,8 @@ def background_processing(mastersky=False):
 
                             a,m,s=sigma_clipped_stats(mod)
                             if np.abs(a-1)>1e-3:
-                                msg='The master sky image ({backfile}) is '+\
-                                    'unnormalized. Results will be fine,\n'+\
+                                msg=f'The master sky image ({backfile}) is '+\
+                                    'unnormalized. Results will be fine, '+\
                                     'but the units will not make sense.'
                                 LOGGER.warning(msg)
 
