@@ -215,7 +215,7 @@ class Single(Module):
 
             # make an output data structure
             out = np.zeros(nwave, dtype=self.DTYPE)
-            out['lamb'] = pars.wavelength()
+            out['lamb'] = pars.wavelengths()
             out['flam'] = np.nan
             out['func'] = np.nan
             out['cont'] = np.nan
