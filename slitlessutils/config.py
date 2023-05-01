@@ -21,7 +21,7 @@ def download_config_files(extract_path=gettempdir()):
     extract_path = Path(extract_path)
 
     # Download the tar file
-    config_url = 'https://stsci.box.com/shared/static/1l2ploh74s4viltu491elxh82q6ms96w.gz'
+    config_url = 'https://stsci.box.com/shared/static/fzlb7y36ofi18ziy6mkbyg710stmygjf.gz'
     config_archive = Path(download_file(config_url, cache=True))
 
     with tar_open(config_archive) as tar:
