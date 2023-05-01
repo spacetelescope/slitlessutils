@@ -23,7 +23,7 @@ class HDF5File(HDF5Columns):
     # the presumed file extension
     EXT = 'h5'
 
-    def __init__(self, wfssfile, path='tables', mode='a', remake=True):
+    def __init__(self, wfssfile, path='tables', mode='a', remake=False):
         """
         Initializer
 
