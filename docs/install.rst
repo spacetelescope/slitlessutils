@@ -53,13 +53,7 @@ Fetching Reference Data
 
 There are a host of reference and configuration files needed by
 ``slitlessutils``, which have been staged at `slitlessutils data <BOX>`_.
-To download, you can either ask slitlessutils to automatically fetch them:
-
-.. code-block:: python
-  >>> from slitlessutils.config import download_config_files
-  >>> download_config_files()
-
-or download the `.tar.gz` file manually for instrument of interest,
+You should download the `.tar.gz` file for instrument of interest,
 copy it to the home directory, and unpack with:
 
 .. code-block:: bash
