@@ -167,13 +167,14 @@ def plot():
     plt.show()
 
 
-def run_all():
+def run_all(plot=True):
     su.start_logging()
     download()
     preprocess_grism()
     preprocess_direct()
     extract_single()
-    plot()
+    if plot:
+        plot()
 
 
 if __name__ == '__main__':
