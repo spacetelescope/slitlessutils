@@ -102,7 +102,11 @@ def preprocess_direct():
                               overwrite=True, final_fillval=0.0)
 
     # AGH gotta remove second extensions
-    img, hdr = fits.getdata(f'{ROOT}_{DRZSUF}_sci.fits', header=True)
+    # Must use memmap=False to force close all handles and allow file overwrite
+    with fits.open(f'{ROOT}_{DRZSUF}_sci.fits', memmap=False) as hdulist:
+        img = hdulist['PRIMARY'].data
+        hdr = hdulist['PRIMARY'].header
+    
     wcs = WCS(hdr)
     x, y = wcs.all_world2pix(RA, DEC, 0)
 
