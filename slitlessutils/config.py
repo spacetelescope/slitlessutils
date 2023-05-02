@@ -7,6 +7,7 @@ import os
 from .logger import LOGGER
 from .core.utilities import headers
 
+
 # file suffixes.  Probably shouldn't ever change these, but here they are:
 SUFFIXES = {'1d spectra': 'x1d',
             '2d spectra': 'x2d',
