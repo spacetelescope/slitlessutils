@@ -187,3 +187,18 @@ def simulate_grisms():
     imgfiles = sim(data, sources)
 
     return imgfiles
+
+
+def run_all():
+    """
+    Method to run all of the substeps in a single call
+    (Order copied from starfield example)
+
+    Notes
+    -----
+    1) See individual functions for their descriptions
+
+    """
+
+    make_scene()
+    simulate_grisms()
