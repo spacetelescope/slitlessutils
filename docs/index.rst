@@ -1,5 +1,5 @@
-Welcome to the slitlessutils package documentation!
-===================================================
+Slitlessutils Documentation
+===========================
 
 ``Slitlessutils`` is a package for simulating and extracting wide-field
 slitless spectroscopy (WFSS) data, highly focused on data from the
@@ -23,18 +23,24 @@ Division (INS) at the `Space Telescope Science Institute (STScI)
 
    
 :Developers:
-   Russell Ryan (STScI),
+   Russell Ryan (STScI), Ricky O'Steen (STScI), Duy Nguyen (STScI)
    
 
    
 
-Getting Started
-===============
+Using Slitlessutils
+===================
 
 .. toctree::
    :maxdepth: 2
    :numbered: 3
 
-   Installation <install.rst>
-   License license.rst
+   getting_started.rst
+   install.rst
+   background.rst
+   extraction.rst
+   cosmicrays.rst
+   simulation.rst
+   faq.rst
+   citation.rst
    
