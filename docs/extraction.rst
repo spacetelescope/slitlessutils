@@ -1,5 +1,5 @@
-Spectral Extraction (`slitlessutils.modules.extract`)
-=====================================================
+Spectral Extraction
+===================
 
 
 Introduction
