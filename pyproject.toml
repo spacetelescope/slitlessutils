@@ -34,3 +34,13 @@ dependencies = [
     "tqdm>=4.64.0"
 ]
 dynamic = ["version"]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-astropy"
+]
+docs = [
+    "sphinx-rtd-theme",
+    "sphinx-astropy"
+]
