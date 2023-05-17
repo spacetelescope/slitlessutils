@@ -17,10 +17,6 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Astronomy",
     "Programming Language :: Python :: 3",
 ]
-docs = [
-    "sphinx-rtd-theme",
-    "sphinx-astropy"
-]
 dependencies = [
     "astropy>=5.0.4",
     "astroquery",
@@ -38,3 +34,13 @@ dependencies = [
     "tqdm>=4.64.0"
 ]
 dynamic = ["version"]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-astropy"
+]
+docs = [
+    "sphinx-rtd-theme",
+    "sphinx-astropy"
+]
