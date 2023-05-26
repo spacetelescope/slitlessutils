@@ -33,6 +33,24 @@ COMMON_ARGS = {
 
 
 def drizzle(files, instrument=None, outdir=Path().absolute(), **kwargs):
+    '''
+    Runs AstroDrizzle as part of Cosmic Ray handling. Passes any additional arguments
+    not listed here directly to AstroDrizzle. Any user-specified arguments will override
+    
+
+    Parameters
+    ----------
+    files : str to a file catalog, or a python list of files
+        The list of file to be processed by AstroDrizzle
+    
+    instrument : str (one of 'ir', 'uvis', 'acs')
+        One of three instruments on HST of which to apply a set of default arguments
+        captured from the official HSTaXe FullFrame Cookbooks
+
+    outdir : str or `pathlib.Path`
+        A directory to write the final rectified mosaics to.
+        By default, the current working directory
+    '''
     # Start with known defaults
     drizzle_kwargs = {
         'output': 'su_drizzle',
