@@ -34,4 +34,3 @@ def test_wr96_drizzle():
         drizzle(rawdata_filepaths, outdir=mosaic_dir, **WR96_DRIZZLE_PARAMS)
         # Confirm we have our output mosaics
         assert len(list(mosaic_dir.iterdir())) > 0
-
