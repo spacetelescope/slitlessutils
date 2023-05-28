@@ -256,7 +256,6 @@ class Source(list):
                 yy = y[pixid]
                 ww = w[pixid]
 
-                print(np.amin(ww),np.amax(ww))
                 
                 # make and save the region
                 reg = DispersedRegion(xx, yy, ww, self.segid, regid,
