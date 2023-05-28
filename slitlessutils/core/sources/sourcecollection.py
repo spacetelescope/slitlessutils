@@ -192,7 +192,7 @@ class SourceCollection(dict):
         if isfloat:
             seg, reg = np.divmod(seg, 1)
             seg = seg.astype(int)
-            reg = np.floor(reg*self.MAXSPECREG).astype(int)
+            reg = np.floor(reg*Source.MAXSPECREG).astype(int)
 
         # find pixels for each object
         ri = indices.reverse(seg, ignore=(0,))
@@ -217,18 +217,22 @@ class SourceCollection(dict):
             subhdr['LTV2'] = hdr.get("LTV2", 0.)-y0
 
             # make a region id
-            if segid < 0:
-                # make checkerboard reg
-                subreg = np.zeros_like(subseg, dtype=int)
-                gy, gx = np.where(subseg == segid)
-                subreg[gy, gx] = np.arange(1, len(gx)+1, dtype=int)
-            elif isfloat:
+            if isfloat:
                 # use existing reg
-                subreg = reg[y0:y1, x0:x1]
+                subreg = reg[y0:y1, x0:x1].astype(int)
             else:
-                subreg = (subseg == segid).astype(int)
+                # create a region image based on 2 rules:
+                gy, gx = np.where(subseg == segid)
+                subreg = np.zeros_like(subseg, dtype=int)
+                if segid < 0:
+                    # make checkerboard disp region
+                    subreg[gy, gx] = np.arange(1, len(gx)+1, dtype=int)
+                else:
+                    # make a flat disp region
+                    subseg[gy, gx] = 1
+                    
             self.addSource(segid, subimg, subseg, subreg, subhdr, **kwargs)
-
+            
     def _load_mef(self, hdus, hdui, **kwargs):
         """
         Method to load a multi-extension fits (MEF) file for the
@@ -283,7 +287,8 @@ class SourceCollection(dict):
         if callable(self.preprocessor):
             img, seg, hdr = self.preprocessor(img, seg, hdr)
 
-        source = Source(segid, img, seg, reg, hdr, zeropoint=self.zeropoint, **kwargs)
+        source = Source(segid, img, seg,  hdr, reg=reg,
+                        zeropoint=self.zeropoint, **kwargs)
         if source and source.mag < self.maglim and source.npixels > self.minpix:
 
             # put in flat level to SED

@@ -3,11 +3,12 @@ import slitlessutils as su
 from astropy.io import fits
 from astropy.wcs import WCS
 from astropy.modeling import models
-from skimage.morphology import label
 import matplotlib.pyplot as plt
 import numpy as np
-
 import os
+from skimage.morphology import label
+import warnings
+
 
 from .parameters import *
 
@@ -23,6 +24,7 @@ WRANGE = (5500., 9500.)       # wavelength range to inspect
 FILTER = 'F775W'              # name of the filter for the direct image
 SUFFIX = 'flc'                # type of suffix
 NCPU = 1                      # number of CPUs to use
+LOCAL_BACK = False             # flag for local background in direct image
 
 
 # Settings to look at Prism for SBC
@@ -89,6 +91,9 @@ def make_scene():
 
         # download the file from CDBS
         localfile = su.photometry.SED.get_from_CDBS(SPECCAT, f)
+        if localfile is None:
+            warnings.warn("Did not download file, this might cause problems",
+                          RuntimeWarning)
 
         # put the spectrum in the fits file
         hdr = fits.Header()
@@ -175,7 +180,9 @@ def simulate_grisms():
     data = su.wfss.WFSSCollection.from_wcsfile(f'{ROOT}_wcs.csv')
 
     # load the sources
-    sources = su.sources.SourceCollection(f'{ROOT}_seg.fits', f'{ROOT}_sci.fits',
+    sources = su.sources.SourceCollection(f'{ROOT}_seg.fits',
+                                          f'{ROOT}_sci.fits',
+                                          local_back=LOCAL_BACK,
                                           sedfile=f'{ROOT}_seds.fits')
 
     # save the normalized SEDs
@@ -211,7 +218,8 @@ def extract_single():
 
     # load the sources into SU
     sources = su.sources.SourceCollection(f'{ROOT}_seg.fits',
-                                          f'{ROOT}_sci.fits')
+                                          f'{ROOT}_sci.fits',
+                                          local_back=LOCAL_BACK)
 
     # run the single-file extraction
     ext = su.modules.Single('+1', root=ROOT, ncpu=NCPU)
@@ -238,7 +246,8 @@ def extract_multi():
 
     # load the sources into SU
     sources = su.sources.SourceCollection(f'{ROOT}_seg.fits',
-                                          f'{ROOT}_sci.fits')
+                                          f'{ROOT}_sci.fits',
+                                          local_back=LOCAL_BACK)
 
     # run the multi-orient extraction
     ext = su.modules.Multi('+1', (-3., 1., 0.1), algorithm='grid')
@@ -270,7 +279,8 @@ def extract_group():
 
     # load the sources into SU
     sources = su.sources.SourceCollection(f'{ROOT}_seg.fits',
-                                          f'{ROOT}_sci.fits')
+                                          f'{ROOT}_sci.fits',
+                                          local_back=LOCAL_BACK)
 
     # run the grouping algorithms
     grp = su.modules.Group(orders=('+1',), ncpu=NCPU)
@@ -301,7 +311,8 @@ def regions():
 
     # load the sources into SU
     sources = su.sources.SourceCollection(f'{ROOT}_seg.fits',
-                                          f'{ROOT}_sci.fits')
+                                          f'{ROOT}_sci.fits',
+                                          local_back=LOCAL_BACK)
 
     reg = su.modules.Region(ncpu=1)
     res = reg(data, sources)
@@ -325,7 +336,7 @@ def compare(nsig=1.):
 
     regid = 0
     for ax, (segid, (x, y, mag, sedfile)) in zip(axes, SOURCES.items()):
-        filename = os.path.join(SEDPATH, f'segid_{regid}.sed')
+        filename = os.path.join(SEDPATH, f'segid_{segid}_{regid}.sed')
         l, f = np.loadtxt(filename, usecols=(0, 1), unpack=True)
         f /= 1e-17
 
@@ -354,10 +365,11 @@ def compare(nsig=1.):
                         lo = hdu.data['flam']-nsig*hdu.data['func']
                         hi = hdu.data['flam']+nsig*hdu.data['func']
 
-                        patch = ax.fill_between(hdu.data['lamb'], lo/10000, hi/10000,
+                        patch = ax.fill_between(hdu.data['lamb'], lo, hi,
                                                 color=c, alpha=0.2)
-                        meas = ax.plot(hdu.data['lamb'], hdu.data['flam']/10000, color=c)
-
+                        meas = ax.plot(hdu.data['lamb'], hdu.data['flam'],
+                                       color=c)
+                        
                         if first:
                             artists.append((patch, meas[0]))
                             labels.append(label)

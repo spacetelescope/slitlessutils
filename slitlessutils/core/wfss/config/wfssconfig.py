@@ -284,20 +284,51 @@ class WFSSConfig(dict):
 
     @staticmethod
     def read_asciifile(conffile):
+        """
+        Method to read grism configuration file in the ascii format into a
+        dict with some keywords specially parsed
+
+        Parameters
+        ---------
+        conffile : str
+            Full path to a configuration file
+
+        Returns
+        -------
+        data : dict
+            A dictionary of keyword/value pairs from the file
+
+        """
+
+
+        # main output structure:        
         data = {}
+
+        # open the file
         with open(conffile, 'r') as fp:
+
+            # parse the file, line-by-line and look for commented lines
             for line in fp:
                 line = line.strip()
                 tokens = line.split()
                 if tokens and tokens[0][0] not in WFSSConfig.COMMENTS:
                     key = tokens.pop(0)
+
+                    # here 'key' will become the dict key and is the
+                    # left-most column in the config file.  'tokens' will
+                    # be further parsed to determine what to do
                     n = len(tokens)
                     if n == 0:
+                        # if no tokens, then this is a "order marker" and an
+                        # order will be interpreted as a sub-dict
                         order = key.split('_')[1]
                         data[order] = {}
                     else:
+
+                        # something to hold the parsed values
                         values = []
                         for token in tokens:
+                            # try casting as int, then float, then str
                             try:
                                 value = int(token)
                             except ValueError:
@@ -305,8 +336,13 @@ class WFSSConfig(dict):
                                     value = float(token)
                                 except ValueError:
                                     value = token
+                                    
+                            # save the recast value
                             values.append(value)
                         if len(values) == 1:
+
+                            # if there is only one value, the pop it. else
+                            # convert to a np array
                             if isinstance(values[0], str):
                                 values = values[0]
                             else:
@@ -314,9 +350,13 @@ class WFSSConfig(dict):
                         else:
                             values = np.asarray(values)
 
+                        # now further parse the keyword, to remove the
+                        # order name
                         k = key.split('_')
                         if k[0] in WFSSConfig.KEYWORDS and k[1] in data:
                             if key.startswith('SENSITIVITY'):
+                                # if the keyword indicates the sensitivity
+                                # curve, then check the file exists
                                 confpath = os.path.dirname(conffile)
                                 newkey = 'SENSITIVITY'
                                 values = os.path.join(confpath, values)
@@ -325,10 +365,13 @@ class WFSSConfig(dict):
                                 k.remove(order)
                                 newkey = '_'.join(k)
 
+                            # record the key/value pair for this order
                             data[order][newkey] = values
                         elif key.startswith('WEDGE') and len(values) == 2:
+                            # check for a wedge-offset table
                             data[key] = tuple(values)
                         else:
+                            # fall back condition
                             data[key] = values
 
         return data

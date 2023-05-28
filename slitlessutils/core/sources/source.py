@@ -25,7 +25,7 @@ class Source(list):
     # maximum number of spectral regions
     MAXSPECREG = 1000
 
-    def __init__(self, segid, img, seg, reg, hdr, zeropoint=26., grpid=0,
+    def __init__(self, segid, img, seg, hdr, reg=None, zeropoint=26., grpid=0,
                  local_back=True, backsize=5, nsig=(5, 5),
                  whttype='pixels', profile='gaussian'):
         """
@@ -39,10 +39,10 @@ class Source(list):
         seg : `np.ndarray`
             A two-dimensional array from the segmentation image
 
-        reg : `np.ndarray` or None
+        reg : `np.ndarray`, optional
             If an np.array, then this is a "segmentation map" like object,
             then these pixels get aggregated.  If None, then creates a flat
-            region image
+            region image.  Default is None
 
         hdr : `astropy.io.fits.Header`
             A fits header for the passed direct image
@@ -124,7 +124,11 @@ class Source(list):
         self.nsig = nsig
 
         # find the pixels for this segmentation
-        y, x = np.where((img > 0) & (seg == self.segid))
+        #y, x = np.where((img > 0) & (seg == self.segid))
+        y, x = np.where(seg == self.segid)
+
+
+        # check for a vlid image
         self.npixels = len(x)
         if self.npixels > 0:
 
@@ -139,6 +143,7 @@ class Source(list):
                 # cut out regions
                 subimg = img[y0:y1, x0:x1]
                 subseg = seg[y0:y1, x0:x1]
+                
 
                 # grow the region to find the local sky background
                 # but use a mask in case it results in empty array
@@ -194,11 +199,12 @@ class Source(list):
                 self.whttype = 'pixels'
                 w = np.abs(img[y, x])
             # ---------------------------------------------------------------
-
+            
             # normalize the weights
             self.norm = np.sum(w)
             w /= self.norm
 
+            
             # compute the centeroids
             xyc = (np.average(x, weights=w), np.average(y, weights=w))
             self.xyc = self.image_coordinates(*xyc)
@@ -220,23 +226,53 @@ class Source(list):
             self.flux = np.sum(img[y, x])
             self.fnu = self.flux*10.**(-0.4*(zeropoint+48.6))
             if self.flux < 0:
-                self.mag = 99.
+                self.mag = np.nan # 99.
             else:
                 self.mag = -2.5*np.log10(self.flux)+zeropoint
 
             # put coordinates back on original footprint
             # x,y=self.image_coordinates(x,y,dtype=np.int)
 
-            # if the spectral region image is None, then set it flat
-            if reg is None:
-                reg = (seg == self.segid).astype(int)
 
-            # parse the region image
-            ri = indices.reverse((seg == self.segid)*reg, ignore=(0,))
-            for regid, (yy, xx) in ri.items():
-                ww = img[yy, xx]/self.norm
-                reg = DispersedRegion(xx, yy, ww, self.segid, regid, ltv=self.ltv)
+
+            # Now parse the source for the DispersedRegions.
+            if isinstance(reg,np.ndarray) and reg.shape == seg.shape:
+                # have a valid region image, so use it
+                r = reg[y, x].astype(int)
+            elif self.segid < 0:
+                # a negative SEGID means checkerboard REGION
+                r = np.arange(1, len(x)+1, dtype=int)
+            else:
+                # if everything is invalid, then set to a single value
+                r = np.ones_like(x, dtype=int)
+
+            # find the pixel coordinates for each unique value of the
+            # region image
+            ri = indices.reverse(r, ignore=(0,))
+            for regid, pixid in ri.items():
+
+                # pixels and weights for this region
+                xx = x[pixid]
+                yy = y[pixid]
+                ww = w[pixid]
+
+                print(np.amin(ww),np.amax(ww))
+                
+                # make and save the region
+                reg = DispersedRegion(xx, yy, ww, self.segid, regid,
+                                      ltv=self.ltv)
                 self.append(reg)
+                
+                
+                
+            
+            # parse the region image
+            #ri = indices.reverse((seg == self.segid)*reg, ignore=(0,))
+            #for regid, (yy, xx) in ri.items():
+            #    ww = img[yy, xx]/self.norm
+            #    reg = DispersedRegion(xx, yy, ww, self.segid, regid,
+            #                          ltv=self.ltv)
+            #     self.append(reg)
 
             #
             # with weights process if for different segmentation regions
@@ -625,7 +661,8 @@ class Source(list):
                 os.mkdir(path)
 
         for regid, region in enumerate(self):
-            filename = os.path.join(path, f'segid_{self.segid}_{regid}.{filetype}')
+            filename = os.path.join(path,
+                                    f'segid_{self.segid}_{regid}.{filetype}')
             region.sed.write_file(filename,**kwargs)
 
     @staticmethod

@@ -4,7 +4,6 @@ from .parametricpolynomial import StandardPolynomial, ReciprocalPolynomial
 from .spatialpolynomial import SpatialPolynomial
 from .sensitivity import Sensitivity
 
-
 class Order:
 
     def __init__(self, data, order):
@@ -100,13 +99,13 @@ class Order:
 
         # invert the DISPL function
         t = self.displ.invert(x0, y0, wavelength)
-
+        
         # evaluate the derivatives (w.r.t. to t) of the DISPX,
         # DISPY, and DISPL functions, which came from grism conf
         dxdt = self.dispx.deriv(x0, y0, t)
         dydt = self.dispy.deriv(x0, y0, t)
         dldt = self.displ.deriv(x0, y0, t)
-
+        
         # return the dispersion
         dldr = dldt/np.sqrt(dxdt*dxdt+dydt*dydt)
         return dldr
@@ -173,11 +172,18 @@ class Order:
 
         return str(self.order)
 
-    @classmethod
-    def from_asciifile(cls, filename, order):
-        data = WFSSConfig.read_asciifile(filename)
-        obj = cls(data, order)
-        return obj
+    def __str__(self):
+        return f'Spectral order: {self.disptype}, {self.order}'
+
+
+
+    
+    #@classmethod
+    #def from_asciifile(cls, filename, order):
+    #    from .wfssconfig import WFSSConfig
+    #    data = WFSSConfig.read_asciifile(filename)
+    #    obj = cls(data, order)
+    #    return obj
 
 
 if __name__ == '__main__':

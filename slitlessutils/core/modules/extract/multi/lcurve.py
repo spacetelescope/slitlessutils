@@ -181,24 +181,41 @@ class LCurve:
         lmin = np.amin(self.data['logdamp'])
         lmax = np.amax(self.data['logdamp'])
 
-        # plot the data in black and data points in color
-        line = ax1.plot(self.data['logchi2'], self.data['lognorm'], '-k',
-                        linewidth=1, zorder=1)
+        # create dummy variables for the plotting
+        logchi2 = self.data['logchi2']
+        lognorm = self.data['lognorm']
 
-        scat = ax1.scatter(self.data['logchi2'], self.data['lognorm'], zorder=2,
+        # scale the norm if need be
+        rescale = self.norm is not None
+        if rescale:
+            lognorm += np.log10(self.norm)
+        
+        # plot the data in black and data points in color
+        #line = ax1.plot(self.data['logchi2'], self.data['lognorm'], '-k',
+        line = ax1.plot(logchi2,lognorm, '-k', linewidth=1, zorder=1)
+
+        #scat = ax1.scatter(self.data['logchi2'], self.data['lognorm'], zorder=2,
+        scat = ax1.scatter(logchi2, lognorm, zorder=2,
                            c=self.data['logdamp'], s=40, cmap=cmap, edgecolors='k',
                            marker='o', vmin=lmin, vmax=lmax)
 
         # put the frobenius norm in the plot
-        if self.norm is not None:
+        #if self.norm is not None:
+        if rescale:
             text = ax1.text(0.67, 0.88,
-                            r'$\log\ ||A||_F=${0:+.3f}'.format(self.norm),
+                            r'$\log\ ||W||_F=${0:+.3f}'.format(self.norm),
                             horizontalalignment='left', transform=ax1.transAxes,
                             bbox=dict(facecolor='white', edgecolor='white'))
+            ylabel = r'$\log\ ||W||_F^2\,||f||^2$'
+        else:
+            ylabel = r'$\log\ ||f||^2$'
 
+            
         # plot the labels
-        ax1.set(xlabel=r'$\log\ ||Ax-b||^2$',
-                ylabel=r'$\log\ ||x||^2$')
+        #ax1.set(xlabel=r'$\log\ ||Ax-b||^2$',
+        #        ylabel=r'$\log\ ||x||^2$')
+        ax1.set(xlabel=r'$\log\ ||Wf-{\cal I}||^2$',
+                ylabel=ylabel)
         ax1.set_axisbelow(True)
 
         # put on a grid

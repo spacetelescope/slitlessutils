@@ -211,7 +211,7 @@ class Tabulate(Module):
 
         # get the bandwidth
         wav = disperser.wavelengths(nsub=self.nsub)
-
+        
         wav0 = np.amin(wav)
         wav1 = np.amax(wav)
         nwav = len(wav)
@@ -250,13 +250,12 @@ class Tabulate(Module):
             # drizzle this pixel
             xx, yy, ll, aa = detdata.config.drizzle(xg, yg, ordname, wav)
             if len(xx) > 0:
-
                 # decimate this pixel.
                 # in theory, this isn't needed, but if we have really small
                 # direct image pixels, and/or small bandwidth (ie. large
                 # NSub), then this can be important.
                 aa, xx, yy, ll = indices.decimate(aa, xx, yy, ll, dims=dims)
-
+                
                 # At this point, the only effect accounted for is the
                 # relative area between the grism and direct image (aa).
                 # now we will include three effects:

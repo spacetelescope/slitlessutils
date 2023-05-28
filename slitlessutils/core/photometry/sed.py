@@ -2,6 +2,7 @@
 from astropy.io import fits
 import numpy as np
 from scipy.constants import c
+import socket
 
 
 import os
@@ -644,23 +645,34 @@ class SED:
 
         """
 
+        # first check that internet is alive
+        IP = socket.gethostbyname(socket.gethostname())
+        if IP == '127.0.0.1':
+            LOGGER.warning(f'Invalid IP: {IP}.  Skipping download from CDBS.')
+            return
+        
         # base URL for CDBS
         url = 'https://archive.stsci.edu/hlsps/reference-atlases/cdbs/grid/'
 
+        
         # do something for each valid atlas
         if atlas == 'bc95':
             serverfile = f'{url}{atlas}/templates/{filename}'
         elif atlas == 'pickles':
             serverfile = f'{url}{atlas}/dat_uvk/{filename}'
         else:
+            LOGGER.warning(f'Invalid CDBS Atlas: {atlas}.  Skipping download.')
             return
 
-        # try downloading the file.
+        # try getting the file
         try:
             f, r = request.urlretrieve(serverfile, filename)
+            localfile = filename
+            return localfile
         except BaseException:
             LOGGER.warning(f'Cannot find server-side file: {serverfile}')
             return
+        
 
     @classmethod
     def from_CDBS(obj, atlas, filename, cleanup=True):

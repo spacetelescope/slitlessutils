@@ -292,7 +292,7 @@ class ReciprocalPolynomial(ParametricPolynomial):
 
         tstar = self.tstar.evaluate(x, y)
         omega = 1./(t-tstar)
-        return sum(p.evaluate(x, y)*i*omega**(i-1) for i, p in enumerate(self[1:], start=1))
+        return -sum(p.evaluate(x, y)*i*omega**(i+1) for i, p in enumerate(self[1:], start=1))
 
     def _first(self, x, y, f):
         """
@@ -346,10 +346,12 @@ class ReciprocalPolynomial(ParametricPolynomial):
         coefs = np.asarray(self.coefs(x, y))[::-1]
 
         # compute the derivative coeffs
-        i = np.arange(1-self.order, 0)                    # for recip
+        i = np.arange(-self.order, 0)                    # for recip
         dcoefs = coefs[:-1]*i
         d2coefs = dcoefs*(i-1)
+        
 
+        
         # compute the bias
         tstar = self.tstar.evaluate(x, y)                # for recip
 
