@@ -245,7 +245,7 @@ class Source(list):
             else:
                 # if everything is invalid, then set to a single value
                 r = np.ones_like(x, dtype=int)
-
+                
             # find the pixel coordinates for each unique value of the
             # region image
             ri = indices.reverse(r, ignore=(0,))

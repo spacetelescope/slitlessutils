@@ -91,19 +91,22 @@ class Module:
 
         """
 
+
+        # a description of this process
+        if hasattr(self, 'DESCRIPTION'):
+            desc = self.DESCRIPTION
+        else:
+            desc = ''
+
         if len(data) == 0:
-            LOGGER.warning('there are no WFSS images to process')
+            LOGGER.warning(f'There are no WFSS images to process {desc}')
             return
 
         if len(sources) == 0:
-            LOGGER.warning("There are no sources to process")
+            LOGGER.warning(f"There are no sources to process {desc}")
             return
 
         if self.multiprocess:
-            if hasattr(self, 'DESCRIPTION'):
-                desc = self.DESCRIPTION
-            else:
-                desc = ''
 
             # build a custom pool object:
             pool = Pool(self.func, ncpu=self.ncpu, desc=desc)

@@ -229,8 +229,8 @@ class SourceCollection(dict):
                     subreg[gy, gx] = np.arange(1, len(gx)+1, dtype=int)
                 else:
                     # make a flat disp region
-                    subseg[gy, gx] = 1
-                    
+                    subreg[gy, gx] = 1
+
             self.addSource(segid, subimg, subseg, subreg, subhdr, **kwargs)
             
     def _load_mef(self, hdus, hdui, **kwargs):
