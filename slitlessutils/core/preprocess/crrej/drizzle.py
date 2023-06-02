@@ -105,4 +105,4 @@ def drizzle(files, instrument=None, outdir=Path().absolute(), **kwargs):
     outdir.mkdir(parents=True, exist_ok=True)
     drizzle_kwargs['output'] = str(outdir / drizzle_kwargs['output'])
 
-    astrodrizzle.AstroDrizzle(files, **drizzle_kwargs)
+    return astrodrizzle.AstroDrizzle(files, **drizzle_kwargs)
