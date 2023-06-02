@@ -75,7 +75,7 @@ def drizzle(files, instrument=None, outdir=Path().absolute(), **kwargs):
     files : str or list of str
         The list of files to be processed by AstroDrizzle
     
-    instrument (optional) : str (one of 'ir', 'uvis', 'acs')
+    instrument : {'ir', 'uvis', 'acs'}, optional
         One of three instruments on HST of which to apply a set of default arguments
         captured from the official HSTaXe FullFrame Cookbooks. If not provided, will attempt
         to be automatically detected from the header of the FIRST input file
