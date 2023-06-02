@@ -72,7 +72,7 @@ def drizzle(files, instrument=None, outdir=Path().absolute(), **kwargs):
 
     Parameters
     ----------
-    files : str to a file catalog, or a python list of files
+    files : str or list of str
         The list of files to be processed by AstroDrizzle
     
     instrument (optional) : str (one of 'ir', 'uvis', 'acs')
@@ -80,7 +80,7 @@ def drizzle(files, instrument=None, outdir=Path().absolute(), **kwargs):
         captured from the official HSTaXe FullFrame Cookbooks. If not provided, will attempt
         to be automatically detected from the header of the FIRST input file
 
-    outdir : str or `pathlib.Path`
+    outdir : str or `pathlib.Path`, optional
         A directory to write the final rectified mosaics to.
         By default, the current working directory
     '''
