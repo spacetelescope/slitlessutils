@@ -23,7 +23,7 @@ def test_wr96_drizzle():
         mosaic_dir.mkdir(parents=True)
         # Download wr96 visit files
         for filename in mast_links:
-            Observations.download_file(uris[filename], local_path=str(rawdata_dir / filename))
+            Observations.download_file(mast_links[filename], local_path=str(rawdata_dir / filename))
         rawdata_filepaths = [str(filepath) for filepath in rawdata_dir.iterdir()]
 
         # Check that our temp folder is indeed empty
