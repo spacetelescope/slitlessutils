@@ -1,35 +1,67 @@
-from drizzlepac import astrodrizzle
 from pathlib import Path
 
-# Args taken from INS HSTaXe FullFrame Cookbooks
-COMMON_ARGS = {
-    'ir': {
-        'mdriztab': True,
-        'preserve': False,
-        'skysub': False,
-        'final_fillval': None
-    },
-    'uvis': {
-        'mdriztab': True,
-        'preserve': False,
-        'skysub': True,
-        'skymethod': 'match',
-        'final_fillval': None
-    },
-    'acs': {
-        'build': True,
-        'mdriztab': True,
-        'in_memory': False,
-        'skysub': False,
-        'driz_separate': False,
-        'median': False,
-        'blot': False,
-        'driz_cr': False,
-        'driz_sep_wcs': False,
-        'driz_combine': True,
-        'final_wcs': False
+from astropy.io import fits
+from drizzlepac import astrodrizzle
+
+
+
+def _get_instrument_defaults(file, instrument=None):
+    # Args taken from INS HSTaXe FullFrame Cookbooks
+    instrument_args = {
+        'ir': {
+            'mdriztab': True,
+            'preserve': False,
+            'skysub': False,
+            'final_fillval': None
+        },
+        'uvis': {
+            'mdriztab': True,
+            'preserve': False,
+            'skysub': True,
+            'skymethod': 'match',
+            'final_fillval': None
+        },
+        'acs': {
+            'build': True,
+            'mdriztab': True,
+            'in_memory': False,
+            'skysub': False,
+            'driz_separate': False,
+            'median': False,
+            'blot': False,
+            'driz_cr': False,
+            'driz_sep_wcs': False,
+            'driz_combine': True,
+            'final_wcs': False
+        }
     }
-}
+
+    # Immediately return if the instrument was provided
+    if instrument in instrument_args.keys():
+        return instrument_args[instrument]
+
+    with fits.open(file, mode='readonly') as hdul:
+        h = hdul[0].header
+        telescope = h['TELESCOP']
+        if telescope == 'HST':
+            instrument = h['INSTRUME']
+            if instrument == 'WFC3':
+                csmid = h['CSMID']
+                if csmid == 'IR':
+                    return instrument_args['ir']
+                elif csmid == 'UVIS':
+                    return instrument_args['uvis']
+                else: 
+                    raise ValueError(f'Invalid CSMID: {csmid}')
+            elif instrument == 'ACS':
+                if h['DETECTOR'] == 'WFC':
+                    return instrument_args['acs']
+                elif h['DETECTOR'] == 'SBC':
+                    raise ValueError(f'SBC does not need drizzling')
+            else:
+                raise ValueError(f'\'{instrument}\' is not supported')
+        else: 
+            raise ValueError(f'\'{telescope}\' is not supported')
 
 
 def drizzle(files, instrument=None, outdir=Path().absolute(), **kwargs):
@@ -41,11 +73,12 @@ def drizzle(files, instrument=None, outdir=Path().absolute(), **kwargs):
     Parameters
     ----------
     files : str to a file catalog, or a python list of files
-        The list of file to be processed by AstroDrizzle
+        The list of files to be processed by AstroDrizzle
     
-    instrument : str (one of 'ir', 'uvis', 'acs')
+    instrument (optional) : str (one of 'ir', 'uvis', 'acs')
         One of three instruments on HST of which to apply a set of default arguments
-        captured from the official HSTaXe FullFrame Cookbooks
+        captured from the official HSTaXe FullFrame Cookbooks. If not provided, will attempt
+        to be automatically detected from the header of the FIRST input file
 
     outdir : str or `pathlib.Path`
         A directory to write the final rectified mosaics to.
@@ -59,10 +92,12 @@ def drizzle(files, instrument=None, outdir=Path().absolute(), **kwargs):
         'clean': True
     }
     # Apply instrument-specific defaults
-    try:
-        drizzle_kwargs.update(COMMON_ARGS[instrument])
-    except KeyError:
-        raise ValueError(f'\'{instrument}\' is not one of {list(COMMON_ARGS.keys())}')
+    if isinstance(files, list):
+        file_to_check = files[0]
+    elif isinstance(files, str):
+        with open(files, 'r') as f:
+            file_to_check = f.readline()
+    drizzle_kwargs.update(_get_instrument_defaults(file_to_check, instrument))
     # Finally override any args with the ones the user supplied
     drizzle_kwargs.update(kwargs)
     # Prepend outdir to output
