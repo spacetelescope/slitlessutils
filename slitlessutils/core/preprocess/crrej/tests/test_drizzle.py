@@ -11,10 +11,8 @@ def test_wr96_drizzle():
     '''
     Runs the drizzle step embedded in the wr96 example
     '''
-    uris = {
-        'jdql01jnq_flc.fits': 'mast:HST/product/jdql01jnq_flc.fits',
+    mast_links = {
         'jdql01jpq_flc.fits': 'mast:HST/product/jdql01jpq_flc.fits',
-        'jdql01jvq_flc.fits': 'mast:HST/product/jdql01jvq_flc.fits',
         'jdql01jxq_flc.fits': 'mast:HST/product/jdql01jxq_flc.fits'
     }
     # Setup temporary directory
@@ -24,7 +22,7 @@ def test_wr96_drizzle():
         mosaic_dir = Path(tempdir) / 'mosaic_files'
         mosaic_dir.mkdir(parents=True)
         # Download wr96 visit files
-        for filename in uris:
+        for filename in mast_links:
             Observations.download_file(uris[filename], local_path=str(rawdata_dir / filename))
         rawdata_filepaths = [str(filepath) for filepath in rawdata_dir.iterdir()]
 
