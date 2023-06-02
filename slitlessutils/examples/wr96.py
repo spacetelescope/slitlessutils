@@ -10,7 +10,6 @@ import os
 import shutil
 
 import slitlessutils as su
-from slitlessutils.core.preprocess.crrej.drizzle import drizzle
 
 '''
   1) download data
@@ -109,7 +108,7 @@ def preprocess_direct():
         files.append(imgfile)
 
     # mosaic data via astrodrizzle
-    drizzle(files, output=ROOT, **WR96_DRIZZLE_PARAMS)
+    astrodrizzle.AstroDrizzle(files, output=ROOT, **WR96_DRIZZLE_PARAMS)
 
     # AGH gotta remove second extensions
     # Must use memmap=False to force close all handles and allow file overwrite
