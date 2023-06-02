@@ -59,7 +59,10 @@ def drizzle(files, instrument=None, outdir=Path().absolute(), **kwargs):
         'clean': True
     }
     # Apply instrument-specific defaults
-    drizzle_kwargs.update(COMMON_ARGS.get(instrument, {}))
+    try:
+        drizzle_kwargs.update(COMMON_ARGS[instrument])
+    except KeyError:
+        raise ValueError(f'\'{instrument}\' is not one of {list(COMMON_ARGS.keys())}')
     # Finally override any args with the ones the user supplied
     drizzle_kwargs.update(kwargs)
     # Prepend outdir to output
