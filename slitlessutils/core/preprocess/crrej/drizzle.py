@@ -8,30 +8,10 @@ def _get_instrument_defaults(file, instrument=None):
     # Args taken from INS HSTaXe FullFrame Cookbooks
     instrument_args = {
         'ir': {
-            'mdriztab': True,
-            'preserve': False,
-            'skysub': False,
-            'final_fillval': None
         },
         'uvis': {
-            'mdriztab': True,
-            'preserve': False,
-            'skysub': True,
-            'skymethod': 'match',
-            'final_fillval': None
         },
         'acs': {
-            'build': True,
-            'mdriztab': True,
-            'in_memory': False,
-            'skysub': False,
-            'driz_separate': False,
-            'median': False,
-            'blot': False,
-            'driz_cr': False,
-            'driz_sep_wcs': False,
-            'driz_combine': True,
-            'final_wcs': False
         }
     }
 
