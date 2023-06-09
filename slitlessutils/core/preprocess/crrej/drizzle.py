@@ -4,7 +4,7 @@ from astropy.io import fits
 from drizzlepac import astrodrizzle
 
 
-def _get_instrument_defaults(file, instrument=None):
+def _get_instrument_defaults(file):
     # Args taken from INS HSTaXe FullFrame Cookbooks
     instrument_args = {
         'ir': {
@@ -14,10 +14,6 @@ def _get_instrument_defaults(file, instrument=None):
         'acs': {
         }
     }
-
-    # Immediately return if the instrument was provided
-    if instrument in instrument_args.keys():
-        return instrument_args[instrument]
 
     with fits.open(file, mode='readonly') as hdul:
         h = hdul[0].header
@@ -43,7 +39,7 @@ def _get_instrument_defaults(file, instrument=None):
             raise ValueError(f'\'{telescope}\' is not supported')
 
 
-def drizzle(files, instrument=None, outdir=Path().absolute(), **kwargs):
+def drizzle(files, outdir=Path().absolute(), **kwargs):
     '''
     Runs AstroDrizzle as part of Cosmic Ray handling. Passes any additional arguments
     not listed here directly to AstroDrizzle. Any user-specified arguments will override
@@ -53,11 +49,6 @@ def drizzle(files, instrument=None, outdir=Path().absolute(), **kwargs):
     ----------
     files : str or list of str
         The list of files to be processed by AstroDrizzle
-
-    instrument : {'ir', 'uvis', 'acs'}, optional
-        One of three instruments on HST of which to apply a set of default arguments
-        captured from the official HSTaXe FullFrame Cookbooks. If not provided, will attempt
-        to be automatically detected from the header of the FIRST input file
 
     outdir : str or `pathlib.Path`, optional
         A directory to write the final rectified mosaics to.
@@ -76,7 +67,7 @@ def drizzle(files, instrument=None, outdir=Path().absolute(), **kwargs):
     elif isinstance(files, str):
         with open(files, 'r') as f:
             file_to_check = f.readline()
-    drizzle_kwargs.update(_get_instrument_defaults(file_to_check, instrument))
+    drizzle_kwargs.update(_get_instrument_defaults(file_to_check))
     # Finally override any args with the ones the user supplied
     drizzle_kwargs.update(kwargs)
     # Prepend outdir to output
