@@ -46,21 +46,6 @@ RAD = 0.5             # in arcsec
 SUFFIX, DRZSUF = 'flc', 'drc'
 SCALE = 0.05          # driz image pix scale
 
-WR96_DRIZZLE_PARAMS = {
-    'build': False,
-    'static': False,
-    'skysub': True,
-    'driz_separate': False,
-    'median': False,
-    'blot': False,
-    'driz_cr': False,
-    'driz_combine': True,
-    'final_wcs': True,
-    'final_rot': 0.,
-    'final_scale': SCALE,
-    'final_pixfrac': 1.0,
-    'final_fillval': 0.0
-}
 
 def download():
     obs_ids = tuple(d.lower() for k, v in DATASETS.items() for d in v)
@@ -108,7 +93,13 @@ def preprocess_direct():
         files.append(imgfile)
 
     # mosaic data via astrodrizzle
-    astrodrizzle.AstroDrizzle(files, output=ROOT, **WR96_DRIZZLE_PARAMS)
+    astrodrizzle.AstroDrizzle(files, output=ROOT, build=False,
+                              static=False, skysub=True, driz_separate=False,
+                              median=False, blot=False, driz_cr=False,
+                              driz_combine=True, final_wcs=True,
+                              final_rot=0., final_scale=SCALE,
+                              final_pixfrac=1.0,
+                              overwrite=True, final_fillval=0.0)
 
     # AGH gotta remove second extensions
     # Must use memmap=False to force close all handles and allow file overwrite

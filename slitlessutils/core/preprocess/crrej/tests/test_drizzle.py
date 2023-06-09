@@ -4,7 +4,6 @@ from tempfile import TemporaryDirectory
 from astroquery.mast import Observations
 
 from slitlessutils.core.preprocess.crrej.drizzle import drizzle
-from slitlessutils.examples.wr96 import WR96_DRIZZLE_PARAMS
 
 
 def test_wr96_drizzle():
@@ -29,6 +28,6 @@ def test_wr96_drizzle():
         # Check that our temp folder is indeed empty
         assert len(list(mosaic_dir.iterdir())) == 0
         # Actually perform drizzle
-        drizzle(rawdata_filepaths, outdir=mosaic_dir, **WR96_DRIZZLE_PARAMS)
+        drizzle(rawdata_filepaths, outdir=mosaic_dir)
         # Confirm we have our output mosaics
         assert len(list(mosaic_dir.iterdir())) > 0
