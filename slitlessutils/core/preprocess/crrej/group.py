@@ -1,7 +1,7 @@
 import numpy as np
 
 from slitlessutils.core.wfss import WFSSCollection
-from ....logger import LOGGER
+from slitlessutils import LOGGER
 
 
 def group_by_visit(files, return_unique_visits=False, **kwargs):
