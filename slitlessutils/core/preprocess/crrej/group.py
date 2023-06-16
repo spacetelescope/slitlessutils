@@ -14,8 +14,9 @@ def group_by_visit(files, return_unique_visits=False, **kwargs):
         List of filenames
 
     return_unique_visits : bool, optional
-        Indicating whether to return unique visits along with grouped files.
-        If `True`, a tuple containing grouped files and unique visits is returned.
+        Indicates whether to return unique visits along with grouped files.
+        If `True`, a list containing lists of grouped files and an array of unique
+        visits are returned.
         If `False`, only grouped files are returned. Default is `False`.
 
     **kwargs
