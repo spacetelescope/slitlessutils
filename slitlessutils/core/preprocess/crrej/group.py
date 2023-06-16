@@ -44,7 +44,7 @@ def group_by_visit(files, return_unique_visits=False, **kwargs):
     for r in rev:
         grouped_files.append(list(files[r]))
         if len(r) == 1:
-            LOGGER.warning("It's a singleton. The file: {}".format(files[r]))
+            LOGGER.warning(f"The file {files[r][0]} was not grouped with any others."))
 
     if return_unique_visits:
         return grouped_files, unique_visits
