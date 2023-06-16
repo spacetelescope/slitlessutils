@@ -110,6 +110,12 @@ This will update the file in place, as the flag is set:
    Example of cosmic-ray flagging from convolution from a Laplacian kernel and bilinear interpolation to highlight the differences.
 
       
+AstroDrizzle Cosmic Ray flagging
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Slitlessutils provides functionality to utilize AstroDrizzle as part of Cosmic Ray handling.
+Slitlessutils only stores the final rectified mosaics and the original files (updated in place) by default.
+Any AstroDrizzle arguments the user passes in will, by default, override the default behavior
+
 
 Dithered Exposures
 ^^^^^^^^^^^^^^^^^^

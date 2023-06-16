@@ -1,6 +1,7 @@
 *.pyc
 *.py~
 **/build
+**/_build
 **/OLD
 **/FOO
 todo*txt*
@@ -12,6 +13,13 @@ test/
 *.so
 *egg-info
 *.ipy*
+*.pyd
 *figures
 
 env*/
+*.fits
+*.sed
+*.h5
+*.log
+*.csv
+.vscode/
