@@ -40,8 +40,9 @@ def group_by_position_angle(files, degrees=True, max_pa_diff=0.2, **kwargs):
     # Input needs to be 2D
     position_angles = np.reshape(position_angles, (len(position_angles), 1))
 
-    # Precompute distance matrix for input to clustering
-    distance_matrix = distance.pdist(position_angles, angular_distance)
+    # Precompute distance matrix for input to clustering.
+    # Degrees keyword arg will get passed on to angular distance function.
+    distance_matrix = distance.pdist(position_angles, metric=angular_distance, degrees=degrees)
     # We need an NxN matrix instead of the condensed distance matrix
     distance_matrix = distance.squareform(distance_matrix)
 
