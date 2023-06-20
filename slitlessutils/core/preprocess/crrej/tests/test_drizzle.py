@@ -28,7 +28,7 @@ def mock_visits():
 
 @pytest.fixture
 def mock_pas():
-    return [42.13, 42.14, 80.0, 179.95, -179.95]
+    return [42.13, 42.14, 80.0, 179.95, -179.95, 360.0, 0.01]
 
 
 def test_wr96_drizzle():
@@ -95,6 +95,7 @@ def test_group_by_visits(mock_files, mock_visits, return_unique_visits, monkeypa
 
 def test_group_by_pas(mock_files, mock_pas, monkeypatch):
     np.random.seed(42)
+
     def mock_from_list(files):
         return WFSSCollection()
 
@@ -104,9 +105,10 @@ def test_group_by_pas(mock_files, mock_pas, monkeypatch):
     monkeypatch.setattr(WFSSCollection, "from_list", mock_from_list)
     monkeypatch.setattr(WFSSCollection, "get_pas", mock_get_pas)
 
-    result = group_by_position_angle(mock_files)
+    result = group_by_position_angle(mock_files + ["360_test1", "360_test2"])
 
-    assert len(result) == 3
+    assert len(result) == 4
     assert result[0] == ["file4_visit_03.fits", "file5_visit_02.fits"]
     assert result[1] == ["file1_visit_01.fits", "file2_visit_01.fits"]
-    assert result[2] == ["file3_visit_02.fits",]
+    assert result[2] == ['360_test1', '360_test2']
+    assert result[3] == ["file3_visit_02.fits",]

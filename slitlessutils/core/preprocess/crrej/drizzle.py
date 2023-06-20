@@ -48,7 +48,7 @@ def _angular_distance(angle1, angle2, degrees=True):
     else:
         circumference = 2 * math.pi
     arc_length = abs(angle2 - angle1)
-    distance = min(arc_length, circumference - arc_length)
+    distance = min(arc_length, circumference - arc_length % circumference)
     return distance
 
 
