@@ -11,6 +11,7 @@ import numpy as np
 from .menger import menger
 from slitlessutils.logger import LOGGER
 
+
 class LCurve:
     """
     Class to contain data for an L-curve analysis.

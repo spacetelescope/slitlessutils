@@ -1,5 +1,3 @@
-
-
 from ...utilities import headers
 
 
@@ -93,7 +91,7 @@ class GroupCollection(list):
         m = str(self.minarea) if self.minarea else 'N/A'
         o = ','.join(self.orders) if self.orders else "N/A"
 
-        ngroup = maximum(len(self), 1)
+        ngroup = max(len(self), 1)
         # grouped=ngroup>1
         # hdr['grouped']=(grouped,'Was this grouped?')
         hdr['groups'] = (ngroup, 'Number of groups')

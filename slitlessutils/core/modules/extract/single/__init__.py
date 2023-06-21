@@ -1,2 +1,2 @@
-from .contamination import Contamination
-from .single import Single
+from .contamination import Contamination  # noqa: F401
+from .single import Single  # noqa: F401

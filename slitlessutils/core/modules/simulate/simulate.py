@@ -3,12 +3,11 @@ from datetime import datetime
 from astropy.io import fits
 import numpy as np
 
-
 from ....info import __code__, __version__
 from ....logger import LOGGER
 from ..module import Module
-from ...tables import PDTFile, PDT
-from ...utilities import indices, headers, gzip, as_iterable
+from ...tables import PDTFile
+from ...utilities import indices, headers, gzip
 
 
 class Simulate(Module):
@@ -53,7 +52,7 @@ class Simulate(Module):
         self.orders = orders
 
     def __str__(self):
-        s = f'Simulation Module: \n'+super().__str__()
+        s = 'Simulation Module: \n'+super().__str__()
         return s
 
     def simulate(self, data, sources, **kwargs):

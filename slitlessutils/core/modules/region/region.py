@@ -5,7 +5,6 @@ import slitlessutils.ds9regions as ds9reg
 
 from ...utilities import indices
 from ..module import Module
-from ....logger import LOGGER
 
 
 class Region(Module):
@@ -88,7 +87,6 @@ class Region(Module):
 
         kwargs = {'width': 4, 'move': False, 'rotate': False, 'fixed': True, 'edit': False}
         for detname, detdata in data.items():
-            naxis = detdata.naxis      # this just saves typing later
             orders = self.orders if self.orders else detdata.orders
 
             regfile = f'{data.dataset}_{detdata.name}.reg'
