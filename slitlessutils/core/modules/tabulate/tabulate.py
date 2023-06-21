@@ -1,5 +1,4 @@
 import numpy as np
-import os
 
 from ....logger import LOGGER
 from ..module import Module
@@ -63,7 +62,7 @@ class Tabulate(Module):
         self.orders = as_iterable(orders)
 
     def __str__(self):
-        s = f'Tabulation Module: \n'+super().__str__()
+        s = 'Tabulation Module: \n'+super().__str__()
         return s
 
     @property
@@ -174,7 +173,7 @@ class Tabulate(Module):
                 pass
 
             else:
-                LOGGER.critical(f'Unknown image type: {type(insdata)}')
+                LOGGER.critical(f'Unknown image type: {type(data)}')
                 outfile = None
                 tabs = None
 
@@ -198,7 +197,7 @@ class Tabulate(Module):
 
                         # process each source
                         for segid, source in sources.items():
-                            tabs = self._tabfunc(source, detdata, ordname,
+                            _ = self._tabfunc(source, detdata, ordname,
                                                  disperser, hdf5=h5.h5order,
                                                  **kwargs)
 

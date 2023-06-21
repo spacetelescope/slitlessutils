@@ -1,9 +1,8 @@
+import os
+
 from astropy.io import fits
-from astropy.wcs import WCS
-import numpy as np
 
 from ....logger import LOGGER
-from ...utilities import headers
 
 
 def downgrade_wcs(imgfile, key='A', newfile=None, inplace=False):
@@ -55,13 +54,13 @@ def downgrade_wcs(imgfile, key='A', newfile=None, inplace=False):
                 # get the current WCS
                 crvals = [hdu.header['CRVAL1'], hdu.header['CRVAL2']]
                 cd = [[hdu.header['CD1_1'], hdu.header['CD1_2']],
-                     [hdu.header['CD2_1'], hdu.header['CD2_2']]]
+                      [hdu.header['CD2_1'], hdu.header['CD2_2']]]
 
                 # get the old WCS
                 wcsname2 = hdu.header[f'WCSNAME{key}']
                 crvals2 = [hdu.header[f'CRVAL1{key}'], hdu.header[f'CRVAL2{key}']]
                 cd2 = [[hdu.header[f'CD1_1{key}'], hdu.header[f'CD1_2{key}']],
-                     [hdu.header[f'CD2_1{key}'], hdu.header[f'CD2_2{key}']]]
+                       [hdu.header[f'CD2_1{key}'], hdu.header[f'CD2_2{key}']]]
 
                 # swap the WCSs
                 hdul[ext].header['WCSNAME'] = wcsname2
@@ -81,7 +80,6 @@ def downgrade_wcs(imgfile, key='A', newfile=None, inplace=False):
                 hdul[ext].header[f'CD2_2{key}'] = cd[1][1]
 
                 # update with some comments
-                comment = 'downgraded from Gaia'
                 hdul[ext].header.set('WCSTWEAK', value=True,
                                      comment='WCS tweaked by slitlessutils')
                 hdul[ext].header.set('WCSTYPE', value='downgrad',
@@ -89,7 +87,7 @@ def downgrade_wcs(imgfile, key='A', newfile=None, inplace=False):
 
         # figure out how to write the file and get a variable to return
         if inplace:
-            outfile = filename
+            outfile = imgfile
 
         else:
             if newfile is None:

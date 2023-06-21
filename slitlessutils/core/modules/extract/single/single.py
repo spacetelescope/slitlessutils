@@ -8,7 +8,7 @@ from .....info import __code__
 from .....logger import LOGGER
 from ...module import Module
 from ....tables import PDTFile
-from ....utilities import indices, headers,  # as_iterable
+from ....utilities import indices, headers  #, as_iterable
 
 
 class Single(Module):
