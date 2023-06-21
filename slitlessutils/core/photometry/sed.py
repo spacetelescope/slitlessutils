@@ -650,11 +650,10 @@ class SED:
         if IP == '127.0.0.1':
             LOGGER.warning(f'Invalid IP: {IP}.  Skipping download from CDBS.')
             return
-        
+
         # base URL for CDBS
         url = 'https://archive.stsci.edu/hlsps/reference-atlases/cdbs/grid/'
 
-        
         # do something for each valid atlas
         if atlas == 'bc95':
             serverfile = f'{url}{atlas}/templates/{filename}'
@@ -672,7 +671,6 @@ class SED:
         except BaseException:
             LOGGER.warning(f'Cannot find server-side file: {serverfile}')
             return
-        
 
     @classmethod
     def from_CDBS(obj, atlas, filename, cleanup=True):

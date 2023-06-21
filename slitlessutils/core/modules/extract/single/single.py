@@ -54,7 +54,7 @@ class Single(Module):
     But many WFSS instruments have a cross-dispersion profile that is
     not parallel to either the x- or y-axes, or even has many twists
     and turns.  Therefore those sums can be tedious to define, let alone
-    compute.  This approach is conceptually similar, but framed differently.    
+    compute.  This approach is conceptually similar, but framed differently.
 
     Example
     -------
@@ -262,7 +262,6 @@ class Single(Module):
 
             # store source in the OUTPUT file
             hdul.append(source.as_HDU())
-
 
         # get basename of output file
         LOGGER.info(f'Writing: {self.filename}')

@@ -69,10 +69,13 @@ class STDOUTFormatter(MyFormatter):
     """
 
     FORMATS = {logging.NOTSET: '%(message)s',
-               logging.DEBUG: "\033[34;1;3mDEBUG (%(module)s:%(lineno)s)> \033[00m\033[34;3m%(message)s\033[00m",
+               logging.DEBUG: ("\033[34;1;3mDEBUG (%(module)s:%(lineno)s)> "
+                               "\033[00m\033[34;3m%(message)s\033[00m"),
                logging.INFO: "\033[32;1mINFO %(processName)s> \033[00m\033[32m%(message)s\033[00m",
-               logging.WARNING: "\033[93;1mWARNING %(processName)s> \033[00m\033[93m%(message)s\033[00m",
-               logging.ERROR: "\033[91;5;1mERROR%(processName)s>\033[00m\033[91m %(message)s\033[00m",
+               logging.WARNING: ("\033[93;1mWARNING %(processName)s> "
+                                 "\033[00m\033[93m%(message)s\033[00m"),
+               logging.ERROR: ("\033[91;5;1mERROR%(processName)s>\033[00m"
+                               "\033[91m %(message)s\033[00m"),
                # logging.ERROR :"\033[91;1mERROR %(processName)s>
                # \033[00m\033[91;5m%(message)s\033[00m",
                logging.CRITICAL: "\033[91;1;5;7mCRITICAL %(processName)s> %(message)s\033[00m"}

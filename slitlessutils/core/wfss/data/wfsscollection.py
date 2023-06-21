@@ -194,8 +194,6 @@ class WFSSCollection(dict):
         self.filename = filename
         self.filetype = filetype
 
-
-
     def get_visits(self):
         """
         Method to get visit ids for all the files in this collection
@@ -219,9 +217,8 @@ class WFSSCollection(dict):
         """
         orbits = [obs.load_file().orbit for obs in self.values()]
         return np.asarray(orbits)
-       
 
-    def get_pas(self,**kwargs):
+    def get_pas(self, **kwargs):
         """
         Method to get the average PAs for each exposure
 
@@ -238,8 +235,7 @@ class WFSSCollection(dict):
 
         pas = [obs.load_file().get_pa(**kwargs) for obs in self.values()]
         return np.asarray(pas)
-    
-        
+
     def get_pixscls(self):
         """
         Method to get the average pixel scales for each exposure
@@ -248,19 +244,19 @@ class WFSSCollection(dict):
         -------
         px : `np.ndarray`, dtype=float
             The pixel scale in the x-axis for each exposure
-        
+
         py : `np.ndarray`, dtype=float
             The pixel scale in the y-axis for each exposure
         """
-        
+
         n = len(self)
         pxs = np.zeros(n, dtype=float)
         pys = np.zeros(n, dtype=float)
         for i, obs in enumerate(self.values()):
             wfss = obs.load_file()
             pxs[i], pys[i] = wfss.get_pixscl()
-                
-        return pxs,pys   
+
+        return pxs, pys
 
     def __bool__(self):
         """
@@ -570,7 +566,6 @@ class WFSSCollection(dict):
         """
         npix = sum(v.npixels() for v in self.values())
         return npix
-
 
     def update_header(self, hdr):
         """

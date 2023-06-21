@@ -61,7 +61,7 @@ class Tabulate(Module):
         self.pixfrac = 1.0  # DO NOT CHANGE THIS!
 
         self.orders = as_iterable(orders)
-        
+
     def __str__(self):
         s = f'Tabulation Module: \n'+super().__str__()
         return s
@@ -211,7 +211,7 @@ class Tabulate(Module):
 
         # get the bandwidth
         wav = disperser.wavelengths(nsub=self.nsub)
-        
+
         wav0 = np.amin(wav)
         wav1 = np.amax(wav)
         nwav = len(wav)
@@ -255,7 +255,7 @@ class Tabulate(Module):
                 # direct image pixels, and/or small bandwidth (ie. large
                 # NSub), then this can be important.
                 aa, xx, yy, ll = indices.decimate(aa, xx, yy, ll, dims=dims)
-                
+
                 # At this point, the only effect accounted for is the
                 # relative area between the grism and direct image (aa).
                 # now we will include three effects:

@@ -172,7 +172,7 @@ class Simulate(Module):
                                     yg = pdt.get('y')
                                     val = pdt.get('val')
                                     wav = pdt.wavelengths()
-                                    
+
                                     # need to apply a few things:
                                     # 1) sensitivity curve    (sens)
                                     # 2) flat field           (flat)
@@ -186,14 +186,14 @@ class Simulate(Module):
                                     # apply the corrections to the weights
                                     # val *= (sens*flat*area*flam)
                                     val *= (sens*flat*flam)
-                                    
+
                                     # sum over wavelengths
                                     vv, yy, xx = indices.decimate(val, yg, xg,
                                                                   dims=detdata.shape)
-                                    
+
                                     # apply pixel areas
                                     vv *= detdata.relative_pixelarea(xx, yy)
-                                                                        
+
                                     # now sum into the image
                                     sci[yy, xx] += vv
 

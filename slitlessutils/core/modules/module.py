@@ -91,7 +91,6 @@ class Module:
 
         """
 
-
         # a description of this process
         if hasattr(self, 'DESCRIPTION'):
             desc = self.DESCRIPTION

@@ -189,10 +189,10 @@ class LCurve:
         rescale = self.norm is not None
         if rescale:
             lognorm += np.log10(self.norm)
-        
+
         # plot the data in black and data points in color
         #line = ax1.plot(self.data['logchi2'], self.data['lognorm'], '-k',
-        line = ax1.plot(logchi2,lognorm, '-k', linewidth=1, zorder=1)
+        line = ax1.plot(logchi2, lognorm, '-k', linewidth=1, zorder=1)
 
         #scat = ax1.scatter(self.data['logchi2'], self.data['lognorm'], zorder=2,
         scat = ax1.scatter(logchi2, lognorm, zorder=2,
@@ -210,7 +210,6 @@ class LCurve:
         else:
             ylabel = r'$\log\ ||f||^2$'
 
-            
         # plot the labels
         #ax1.set(xlabel=r'$\log\ ||Ax-b||^2$',
         #        ylabel=r'$\log\ ||x||^2$')

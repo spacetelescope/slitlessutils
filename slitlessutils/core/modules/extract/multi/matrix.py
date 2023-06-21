@@ -57,7 +57,7 @@ class Matrix:
 
     def __init__(self, extorders, mskorders=None, invmethod='lsqr', path='tables',
                  minunc=1e-10):
-        
+
         LOGGER.debug("must finish documentation")
 
         # save some things

@@ -369,7 +369,7 @@ def compare(nsig=1.):
                                                 color=c, alpha=0.2)
                         meas = ax.plot(hdu.data['lamb'], hdu.data['flam'],
                                        color=c)
-                        
+
                         if first:
                             artists.append((patch, meas[0]))
                             labels.append(label)

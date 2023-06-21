@@ -9,7 +9,6 @@ from ....config import Config
 from ....logger import LOGGER
 
 
-
 class WFSSDetector:
     """
     Class to contain information for a single WFSS image detector.
@@ -26,7 +25,7 @@ class WFSSDetector:
             full path to a valid fits file that contains this data
 
         detconf :
-            Configuration object for this detector    
+            Configuration object for this detector
 
         bunit : str, optional
             the BUNIT of the data.  Default is 'e-/s'
@@ -55,7 +54,7 @@ class WFSSDetector:
         self.config = detconf
         self.bunit = bunit
 
-    def get_pa(self,degrees=True,limit=2.0):
+    def get_pa(self, degrees=True, limit=2.0):
         """
         Method to compute the position angle, defined as the angle between
         +y and N axes, at the CRPIX from a WCS object
@@ -68,31 +67,30 @@ class WFSSDetector:
         limit : float, optional
             Limit between two possible angles.  If large, then this is
             likely due to skew.  Default is 2 deg.
-        
+
         Returns
         -------
         theta : float
             The angle
         """
-        
+
         # get the handedness of the coordinates
         sgn = np.sign(np.linalg.det(self.wcs.wcs.piximg_matrix))
 
-
         # compute the two angles (+y to N and -x to E)
-        angx = np.arctan2(sgn*self.wcs.wcs.piximg_matrix[0,1],
-                          sgn*self.wcs.wcs.piximg_matrix[0,0])
-        angy = np.arctan2(-self.wcs.wcs.piximg_matrix[1,0],
-                          +self.wcs.wcs.piximg_matrix[1,1])
+        angx = np.arctan2(sgn*self.wcs.wcs.piximg_matrix[0, 1],
+                          sgn*self.wcs.wcs.piximg_matrix[0, 0])
+        angy = np.arctan2(-self.wcs.wcs.piximg_matrix[1, 0],
+                          +self.wcs.wcs.piximg_matrix[1, 1])
 
         # check the angular difference, mindful of the wrapping at on [0,2pi)
         dang = (angx-angy+np.pi)%(2*np.pi)-np.pi
 
         # issue a quick warning
         if np.abs(dang) < np.radians(limit):
-            msg=f'X and Y axes rotations differ by more than {limit} deg.'
+            msg = f'X and Y axes rotations differ by more than {limit} deg.'
             LOGGER.warning(msg)
-            
+
         if degrees:
             return np.degrees(angy)
         else:
@@ -102,7 +100,7 @@ class WFSSDetector:
         """
         Method to compute the pixel scale (in arcsec/pix) at the CRPIX
         from a WCS object
-    
+
         Returns
         -------
         px : float
@@ -114,7 +112,7 @@ class WFSSDetector:
         Notes
         -----
         Often the x-pixel scale will be negative --- this reflects the
-        N-up, E-left in usual astronomical coordinate systems.        
+        N-up, E-left in usual astronomical coordinate systems.
         """
 
         # get the handedness of the coordinates
@@ -124,10 +122,10 @@ class WFSSDetector:
         c2 = self.wcs.wcs.piximg_matrix**2
 
         # the pixel scales
-        px = sgn*np.sqrt(np.sum(c2[:,0]))*3600.
-        py = np.sqrt(np.sum(c2[:,1]))*3600.    
+        px = sgn*np.sqrt(np.sum(c2[:, 0]))*3600.
+        py = np.sqrt(np.sum(c2[:, 1]))*3600.
 
-        return px,py
+        return px, py
 
     def __str__(self):
         return self.name
@@ -278,7 +276,6 @@ class WFSSDetector:
             the WCS to set to this detector
         """
         self.wcs = wcs.copy()
-
 
     def make_header(self, imtype):
         """
@@ -571,7 +568,7 @@ class WFSS(dict):
         self.filename = filename
         self.filetype = filetype
         self.config = insconf
-                
+
         for detname, detconf in self.config.items():
             self[detname] = WFSSDetector(self.filename, detconf,
                                          bunit=insconf.bunit)
@@ -627,10 +624,9 @@ class WFSS(dict):
         pas = np.zeros(n, dtype=float)
         for i, det in enumerate(self.values()):
             pas[i] = det.get_pa(**kwargs)
-                
+
         return np.average(pas)
-    
-        
+
     def get_pixscl(self):
         """
         Method to get the average pixel scales over all the detectors
@@ -639,19 +635,19 @@ class WFSS(dict):
         -------
         px : float
             The average x-axis pixel scale
-        
+
         py : float
-            The average y-axis pixel scale        
+            The average y-axis pixel scale
         """
-        
+
         n = len(self)
         pxs = np.zeros(n, dtype=float)
         pys = np.zeros(n, dtype=float)
         for i, det in enumerate(self.values()):
             pxs[i], pys[i] = det.get_pixscl()
-        
+
         return np.average(pxs), np.average(pys)
-    
+
     @property
     def dataset(self):
         filename = os.path.basename(self.filename)
@@ -678,7 +674,7 @@ class WFSS(dict):
     def siaf(self):
         return self.config.siaf
 
-    def background_filename(self,key):
+    def background_filename(self, key):
         """
         A method to return the filename of the background image(s)
 
@@ -694,7 +690,7 @@ class WFSS(dict):
             then returns `None`
         """
         return self.config.background_filename(key)
-    
+
     @classmethod
     def simulated(cls, telescope, instrument, dataset, ra, dec, orientat, disperser,
                   **kwargs):
@@ -779,20 +775,20 @@ class WFSS(dict):
                 det.set_wcs(wcs)
 
         # parse the zeroth header to get the VISIT
-        phdr=fits.getheader(obj.filename,ext=0)
-        tel=phdr.get('TELESCOP')
-        if tel=='HST':
-            line=phdr.get('LINENUM')
+        phdr = fits.getheader(obj.filename, ext=0)
+        tel = phdr.get('TELESCOP')
+        if tel == 'HST':
+            line = phdr.get('LINENUM')
             if line is not None:
-                s=line.split('.')
-                obj.visit=s[0]
-                obj.orbit=int(s[1])
-        elif tel=='JWST':
+                s = line.split('.')
+                obj.visit = s[0]
+                obj.orbit = int(s[1])
+        elif tel == 'JWST':
             raise NotImplementedError('gotta get VISIT/ORBIT number from JWST')
         else:
-            msg=f'Telescope ({tel}) is not found to get visit'
+            msg = f'Telescope ({tel}) is not found to get visit'
             LOGGER.error(msg)
-                            
+
         return obj
 
 

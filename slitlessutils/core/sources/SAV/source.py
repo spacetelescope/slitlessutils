@@ -516,7 +516,6 @@ class Source(list):
 #
 #
 
-
     def image_coordinates(self, x, y, dtype=None):
         """
         Method to transform coordinates by the LTV keywords

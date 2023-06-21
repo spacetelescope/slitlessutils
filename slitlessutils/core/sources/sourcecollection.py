@@ -133,7 +133,6 @@ class SourceCollection(dict):
             self.throughput = self.get_throughput(hdud, throughput=throughput,
                                                   **kwargs)
 
-
             # is it an MEF?
             self.mef = nhdus > 1
             if self.mef:
@@ -232,7 +231,7 @@ class SourceCollection(dict):
                     subreg[gy, gx] = 1
 
             self.addSource(segid, subimg, subseg, subreg, subhdr, **kwargs)
-            
+
     def _load_mef(self, hdus, hdui, **kwargs):
         """
         Method to load a multi-extension fits (MEF) file for the
@@ -281,7 +280,7 @@ class SourceCollection(dict):
             The fits header for the direct image
 
         kwargs : dict
-            Optional keywords passed to `Source()`        
+            Optional keywords passed to `Source()`
 
         """
         if callable(self.preprocessor):

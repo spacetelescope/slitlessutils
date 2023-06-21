@@ -64,7 +64,7 @@ class HDF5File(HDF5Columns):
         # will wipe the existing file and start over
         if self.remake and os.path.exists(self.filename):
             os.remove(self.filename)
-            
+
     @property
     def filename(self):
         base = os.path.join(self.path, self.dataset)

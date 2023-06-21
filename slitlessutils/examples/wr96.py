@@ -106,7 +106,7 @@ def preprocess_direct():
     with fits.open(f'{ROOT}_{DRZSUF}_sci.fits', memmap=False) as hdulist:
         img = hdulist['PRIMARY'].data
         hdr = hdulist['PRIMARY'].header
-    
+
     wcs = WCS(hdr)
     x, y = wcs.all_world2pix(RA, DEC, 0)
 
