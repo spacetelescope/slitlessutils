@@ -1,8 +1,6 @@
-import slitlessutils as su
 import numpy as np
-from scipy.special import expit
+# from scipy.special import expit
 from astropy.modeling.models import Sersic2D
-
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -18,9 +16,10 @@ pa = 67.
 
 # plt.style.use('/Users/rryan/.matplotlib/idl.mplstyle')
 
-def V(R): return np.full_like(R, Vmax)
+# def V(R): return np.full_like(R, Vmax)
 # V=lambda R: Vmax*(r/10)
-def V(R): return Vmax/(1+np.exp(-R/Rscl))
+def V(R):
+    return Vmax/(1+np.exp(-R/Rscl))
 # V=lambda R: 2*(expit(R/Rscl)-0.5)*Vmax
 
 

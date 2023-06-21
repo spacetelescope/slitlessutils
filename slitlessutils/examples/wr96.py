@@ -1,8 +1,7 @@
 from astropy.io import fits
 from astropy.wcs import WCS
-from astroquery.mast import MastMissions, Observations
+from astroquery.mast import Observations
 from drizzlepac import astrodrizzle
-from scipy.ndimage import gaussian_filter1d
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -138,11 +137,11 @@ def extract_single():
 
     # project the sources onto the grism images
     tab = su.modules.Tabulate(ncpu=1)
-    pdtfiles = tab(data, sources)
+    pdtfiles = tab(data, sources)  # noqa: F841
 
     # run the single-orient extraction
     ext = su.modules.Single('+1', mskorders=None, root=ROOT)
-    res = ext(data, sources)
+    res = ext(data, sources)  # noqa: F841
 
 
 def plot():

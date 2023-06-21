@@ -1,11 +1,10 @@
-from astropy.wcs import WCS, Sip, utils as wcsutils, FITSFixedWarning
+from astropy.wcs import WCS, Sip, utils as wcsutils
 from astropy.io import fits
 import numpy as np
 import os
 import warnings
 
 from ..config import InstrumentConfig
-from ....config import Config
 from ....logger import LOGGER
 
 
@@ -84,7 +83,7 @@ class WFSSDetector:
                           +self.wcs.wcs.piximg_matrix[1, 1])
 
         # check the angular difference, mindful of the wrapping at on [0,2pi)
-        dang = (angx-angy+np.pi)%(2*np.pi)-np.pi
+        dang = (angx-angy+np.pi) % (2*np.pi)-np.pi
 
         # issue a quick warning
         if np.abs(dang) < np.radians(limit):

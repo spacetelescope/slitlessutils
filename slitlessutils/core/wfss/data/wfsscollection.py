@@ -288,7 +288,7 @@ class WFSSCollection(dict):
         """
 
         if not isinstance(v, (SimulatedData, ObservedData)):  # WFSS):
-            LOGGER.warning(f'Can only set WFSS objects')
+            LOGGER.warning('Can only set WFSS objects')
             return
 
         if not hasattr(self, 'config'):
