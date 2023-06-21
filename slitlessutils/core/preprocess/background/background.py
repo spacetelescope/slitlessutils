@@ -3,15 +3,11 @@ from astropy.io import fits
 from astropy.modeling import fitting, models
 from astropy.stats import sigma_clip, sigma_clipped_stats
 import numpy as np
-import os
 from scipy.signal import savgol_filter
-from skimage import morphology, measure
-
-import matplotlib.pyplot as plt
+from skimage import morphology
 
 from ....logger import LOGGER
-from ....config import Config
-from ...utilities import headers, indices
+from ...utilities import headers
 from ...wfss import WFSS
 
 
@@ -57,8 +53,7 @@ def background_processing(mastersky=False):
 
                         # get an estimate of the sky from statistics
                         gpx = (dqa == 0)      # these are good pixels
-                        ave, med, sig = sigma_clipped_stats(sci[gpx],
-                                                        sigma=self.skysigma)
+                        ave, med, sig = sigma_clipped_stats(sci[gpx], sigma=self.skysigma)
 
                         # if doing master sky, then need to prep the sky
                         if mastersky:
@@ -324,7 +319,7 @@ class Background:
             alpha = Fot/Ftt
 
             # the chi2 and best model
-            chi2 = Foo-alpha*Fot
+            # chi2 = Foo-alpha*Fot
             out = alpha*img
 
             # update the sky pixel mask
@@ -399,7 +394,7 @@ class Background:
         sky = self.skypixels(sci, unc, mod)
         fitter = fitting.LinearLSQFitter()
         ofitter = fitting.FittingWithOutlierRemoval(fitter, sigma_clip,
-                                                  sigma=self.outliersigma)
+                                                    sigma=self.outliersigma)
 
         # the output model
         out = np.zeros_like(sci, dtype=float)
@@ -436,7 +431,7 @@ class Background:
             for eta in range(sci.shape[self.crossaxis]):
                 xy = loopcross(eta)
                 out[xy] = savgol_filter(out[xy], filtwindow, filtorder,
-                                      deriv=0, mode='nearest')
+                                        deriv=0, mode='nearest')
 
             # update sky pixels
             sky = self.skypixels(sci, unc, out)
@@ -486,6 +481,7 @@ class Background:
         hdr.set('MAXITER', value=self.maxiter,
                 comment='Max iterations for source flagging')
         headers.add_stanza(hdr, 'Background Subtraction', before='SKYNSIG')
+
 
 if __name__ == '__main__':
     """

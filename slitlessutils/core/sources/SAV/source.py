@@ -1,6 +1,8 @@
 import os
 
+from astropy import fitting
 from astropy.io import fits
+from astropy.modeling import models
 from astropy.stats import sigma_clipped_stats
 from astropy.wcs import WCS, utils as wcsutils
 import matplotlib.pyplot as plt
@@ -9,7 +11,7 @@ from skimage.segmentation import expand_labels
 
 from ...logger import LOGGER
 from .spectralregion import SpectralRegion
-from ..utilities import headers, indices
+from ..utilities import headers
 
 
 class Source(list):
@@ -230,7 +232,7 @@ class Source(list):
             elif self.segid > 0:
                 self.append(SpectralRegion(x, y, w, self.segid, 0, ltv=self.ltv))
             else:
-                LOGGER.warning(f"Ignoring {segid=}")
+                LOGGER.warning(f"Ignoring {self.segid}")
 
     def __str__(self):
         return super().__str__()
@@ -515,6 +517,7 @@ class Source(list):
 #        #    hdr[k]=v
 #
 #
+
 
     def image_coordinates(self, x, y, dtype=None):
         """
