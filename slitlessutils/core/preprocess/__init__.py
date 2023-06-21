@@ -1,3 +1,3 @@
-from . import background
-from . import crrej
-from . import astrometry
+from . import background  # noqa: F401
+from . import crrej  # noqa: F401
+from . import astrometry  # noqa: F401

@@ -1,1 +1,1 @@
-from .laplace import laplace
+from .laplace import laplace  # noqa: F401

@@ -1,4 +1,4 @@
-from .avefnu import avefnu
-from .band import Band
-from .sed import SED
-from .throughput import Throughput
+from .avefnu import avefnu  # noqa: F401
+from .band import Band  # noqa: F401
+from .sed import SED  # noqa: F401
+from .throughput import Throughput  # noqa: F401
