@@ -1,3 +1,2 @@
-
-from .matrix import Matrix
-from .multi import Multi
+from .matrix import Matrix  # noqa: F401
+from .multi import Multi  # noqa: F401

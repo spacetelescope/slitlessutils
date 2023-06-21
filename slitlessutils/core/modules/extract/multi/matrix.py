@@ -1,8 +1,6 @@
-import h5py
 import numpy as np
 from scipy.sparse import linalg, coo_matrix
 from tqdm import tqdm
-
 
 from .....config import Config
 from .lcurve import LCurve
@@ -249,7 +247,7 @@ class Matrix:
 
         # first we need to compress over the indices, which can be slow
         # so we'll print a message
-        LOGGER.info(f'compressing indices')
+        LOGGER.info('Compressing indices')
         self.icomp, self.iuniq = indices.compress(self.i)
         self.i.clear()          # delete the data
 
@@ -262,9 +260,8 @@ class Matrix:
         dim = np.array([self.npix, self.npar], int)   # dimensionality of matrix
 
         # do a sanity check
-        # ni,nj=len(self.iuniq),len(self.juniq)
         if np.amax(self.icomp) != len(self.bi)-1:
-            msg = f'Matrix has invalid dimensionlity: ({ni}\u00d7{nj})'
+            msg = f'Matrix has invalid dimensionlity: ({self.npix}\u00d7{self.npar})'
             LOGGER.error(msg)
             raise RuntimeError(msg)
 
@@ -273,7 +270,7 @@ class Matrix:
 
         # do some more checks
         if not self.overdetermined:
-            LOGGER.warn(f"Underdetermined matrix: ({ni}\u00d7{nj}).\n" +
+            LOGGER.warn(f"Underdetermined matrix: ({self.npix}\u00d7{self.npar}).\n" +
                         "Results will be dubious")
 
         # compute some extra things for the ragged arrays (ie. where
@@ -289,7 +286,7 @@ class Matrix:
             self.lamids = self.juniq-self.cumlam[extind]
 
         except BaseException:
-            LOGGER.debug(ni, nj, self.nsources)
+            LOGGER.debug(self.npix, self.npar, self.nsources)
             raise RuntimeError("Matrix calulation has failed")
 
         # get the indices to do all reverse calculations
@@ -638,8 +635,8 @@ class Matrix:
 
         (x, istop, itn, norm, arnorm, anorm, acond, xnorm) = linalg.lsmr(self.A, self.bi,
                                                                          damp=damp, **kwargs)
-        r1norm = rnorm
-        r2norm = np.sqrt(rnorm**2+(damp*xnorm)**2)
+        r1norm = arnorm
+        r2norm = np.sqrt(arnorm**2+(damp*xnorm)**2)
         unc = np.full_like(x, np.nan)
         r = Result('LSMR', x, istop, itn, r1norm, r2norm, anorm, acond, arnorm, xnorm,
                    unc, damp)
