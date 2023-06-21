@@ -402,7 +402,7 @@ class DetectorConfig:
             self.sip = ()
 
         conffile = data['blockers'][disperser.blocking]['config'][disperser.name]
-        conffile = os.path.join(Config().confpath, 'instruments', path, conffile)
+        conffile = os.path.join(Config().refpath, 'instruments', path, conffile)
         self.config = WFSSConfig(conffile, **kwargs)
 
     @staticmethod
@@ -615,7 +615,7 @@ class InstrumentConfig(dict):
         Read a yaml file from the `slitlessutils_config` directory
 
         """
-        self.filename = os.path.join(Config().confpath, 'instruments',
+        self.filename = os.path.join(Config().refpath, 'instruments',
                                      f'{telescope}_{instrument}.yaml'.lower())
 
         # load the yaml config file
@@ -724,7 +724,7 @@ class InstrumentConfig(dict):
         """
         back = self.backgrounds.get(key)
         if back:
-            back = os.path.join(Config().confpath, 'instruments',
+            back = os.path.join(Config().refpath, 'instruments',
                                 self.path, back)
         return back
 

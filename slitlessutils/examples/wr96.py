@@ -144,24 +144,46 @@ def extract_single():
     res = ext(data, sources)  # noqa: F841
 
 
-def plot():
+def plot_spectra():
 
-    # l,f=np.loadtxt('wr96_hres.dat',unpack=True,usecols=(0,1))
-    # ff=gaussian_filter1d(f,32)
+    cfg = su.config.Config()
 
+    # get the Larsen et al. reference spectrum
+    subpath = os.path.join('instruments', 'ACSSBC')
+    reffile = cfg.get_reffile('wr96_hres.dat', subpath)
+
+    # load and smooth the Larsen spectrum
+    l, f = np.loadtxt(reffile, unpack=True, usecols=(0,1))
+    f /= 1e-13
+    ff = gaussian_filter1d(f, 50)
+
+    # load the data and change the units
     dat, hdr = fits.getdata(f'{ROOT}_x1d.fits', header=True)
-    dat['flam'] *= 1e-17
+    dat['flam'] *= cfg.fluxscale/1e-13
+    dat['func'] *= cfg.fluxscale/1e-13
 
-    plt.plot(dat['lamb'], dat['flam']/1e-13, label=GRATING)
-    # plt.plot(l,f/1e-13,label='Larsen et al. (high-res)')
-    # plt.plot(l,ff/1e-13,label='Larsen et al. (smoothed)')
+    # get a good range of points to compute a (variance-weighted) scale factor
+    g = np.where((dat['lamb'] > 5800) & (dat['lamb'] < 9900))[0]
+    ff2 = np.interp(dat['lamb'], l, ff)
+    num = np.sum((dat['flam'][g]/dat['func'][g])**2)
+    den = np.sum((ff2[g]/dat['func'][g])*(dat['flam'][g]/dat['func'][g]))
+    scl = num/den
+
+    # plot the SU spectrum
+    plt.plot(dat['lamb'], dat['flam'], label=GRATING)
+    #plt.plot(l,f,label='Larsen et al. (high-res)')
+    plt.plot(l,ff*scl, label='Larsen et al. (smoothed)')
+
+    # label the axes
     plt.ylabel(r'$f_{\lambda}$ ($10^{-13}$ erg s$^{-1}$ cm$^{-2}$ $\mathrm{\AA}^{-1}$)')
     plt.xlabel(r'$\lambda$ ($\mathrm{\AA}$)')
-    plt.legend()
-    plt.ylim(0., 1.4)
 
+    # put on legend and change limits
+    plt.legend(loc='upper left')
+    plt.ylim(0., 0.55)
     plt.xlim(5500, 10000)
 
+    # write the file to disk
     plt.savefig('wr96.pdf')
     plt.show()
 
@@ -173,7 +195,7 @@ def run_all(plot=True):
     preprocess_direct()
     extract_single()
     if plot:
-        plot()
+        plot_spectra()
 
 
 if __name__ == '__main__':
