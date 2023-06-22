@@ -91,7 +91,7 @@ class ODT(HDF5Table):
                 # ok... let's just save some space
                 self.pdts.clear()
 
-                # chagne datatypes
+                # change datatypes
                 x = np.array(x, dtype=int)
                 y = np.array(y, dtype=int)
                 lam = np.array(lam, dtype=int)
@@ -99,9 +99,8 @@ class ODT(HDF5Table):
 
                 # do the summations
                 vv, xx, yy, ll = indices.decimate(val, x, y, lam, dims=self.dims)
-                m = len(xx)
-                r = float(n-m)/float(n)
-
+                # m = len(xx)
+                # r = float(n-m)/float(n)
                 # print(f'Decimation factor: {r}')
 
                 # put these values in the self

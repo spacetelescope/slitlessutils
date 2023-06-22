@@ -787,7 +787,7 @@ class SED:
 
 
 if __name__ == '__main__':
-    x = sed()
+    x = SED()
     l = np.arange(50)
     f = np.arange(1, 51)
     x.append(l, f)

@@ -8,7 +8,7 @@ from .....info import __code__
 from .....logger import LOGGER
 from ...module import Module
 from ....tables import PDTFile
-from ....utilities import indices, headers  #, as_iterable
+from ....utilities import indices, headers  # , as_iterable
 
 
 class Single(Module):
@@ -236,7 +236,7 @@ class Single(Module):
                 #    frac=cnt[gc]/val[gc]
                 #    wht[gc]/=frac**2
 
-                ave = np.average(val, weights=wht)
+                # ave = np.average(val, weights=wht)
                 # err = np.sqrt(np.average((val-ave)**2, weights=wht))
 
                 # compute sum of weights (used later)
@@ -313,7 +313,7 @@ class Single(Module):
                 phdr = detdata.primaryheader()
                 sci, hdr = detdata.readfits('science', header=True)
                 unc = detdata.readfits('uncertainty')
-                dqa = detdata.readfits('dataquality')
+                # dqa = detdata.readfits('dataquality')
 
                 # get the flat field
                 flatfield = detdata.config.load_flatfield(**kwargs)

@@ -1,6 +1,5 @@
 import h5py
 import os
-import numpy as np
 
 from ...logger import LOGGER
 from . import attributes

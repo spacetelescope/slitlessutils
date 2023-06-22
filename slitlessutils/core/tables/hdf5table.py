@@ -1,13 +1,12 @@
-
 import numpy as np
 import pandas as pd
 from shapely import geometry
 from skimage import measure
 
-
 from . import attributes
 from .hdf5columns import HDF5Columns
 from ...config import Config
+from slitlessutils.logger import LOGGER
 
 
 class HDF5Table(HDF5Columns):

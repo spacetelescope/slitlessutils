@@ -1,6 +1,3 @@
-import numpy as np
-
-
 from .hdf5table import HDF5Table, attributes
 
 

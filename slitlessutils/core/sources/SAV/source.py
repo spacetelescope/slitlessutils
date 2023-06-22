@@ -515,11 +515,9 @@ class Source(list):
 #
 #        #for k,v in kwargs.items():
 #        #    hdr[k]=v
-#
-#
 
 
-    def image_coordinates(self, x, y, dtype=None):
+    def image_coordinates(self, x, y, dtype=None):  # noqa: E303
         """
         Method to transform coordinates by the LTV keywords
 

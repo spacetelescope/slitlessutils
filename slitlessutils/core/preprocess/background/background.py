@@ -311,7 +311,7 @@ class Background:
             i2 = img2[g]
 
             # compute some auxillary variables for linear fitting
-            Foo = np.sum(s2*s2)
+            # Foo = np.sum(s2*s2)
             Fot = np.sum(s2*i2)
             Ftt = np.sum(i2*i2)
 
@@ -400,12 +400,13 @@ class Background:
         out = np.zeros_like(sci, dtype=float)
 
         # set some slice objects
+        # TODO: change these from lambdas to defs
         if self.dispaxis == 1:
-            loopdisp = lambda lam: (slice(None, None, None), lam)
-            loopcross = lambda eta: (eta, slice(None, None, None))
+            loopdisp = lambda lam: (slice(None, None, None), lam)  # noqa
+            loopcross = lambda eta: (eta, slice(None, None, None))  # noqa
         elif self.dispaxis == 0:
-            loopcross = lambda lam: (slice(None, None, None), lam)
-            loopdisp = lambda eta: (eta, slice(None, None, None))
+            loopcross = lambda lam: (slice(None, None, None), lam)  # noqa
+            loopdisp = lambda eta: (eta, slice(None, None, None))  # noqa
 
         # set up the iteration
         npix = np.count_nonzero(sky)

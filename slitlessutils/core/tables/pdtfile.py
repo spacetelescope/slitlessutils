@@ -8,6 +8,7 @@ from .pdt import PDT
 from .rdt import RDT
 from slitlessutils.logger import LOGGER
 
+
 class PDTFile(HDF5File):
     """
     A class to hold a file of pixel-dispersion tables.

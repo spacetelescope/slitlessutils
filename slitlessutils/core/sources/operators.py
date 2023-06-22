@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from ..utilities import headers
 from slitlessutils.logger import LOGGER
 
+
 class Operator:
     """
     Base class to implement image operators
