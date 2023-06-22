@@ -175,7 +175,6 @@ class Tabulate(Module):
             else:
                 LOGGER.critical(f'Unknown image type: {type(data)}')
                 outfile = None
-                tabs = None
 
             # okay... process the file
             if outfile:
@@ -198,8 +197,8 @@ class Tabulate(Module):
                         # process each source
                         for segid, source in sources.items():
                             _ = self._tabfunc(source, detdata, ordname,
-                                                 disperser, hdf5=h5.h5order,
-                                                 **kwargs)
+                                              disperser, hdf5=h5.h5order,
+                                              **kwargs)
 
         # might need/want to return tables instead of filename
         return outfile

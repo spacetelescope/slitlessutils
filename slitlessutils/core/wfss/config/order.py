@@ -175,8 +175,8 @@ class Order:
     def __str__(self):
         return f'Spectral order: {self.disptype}, {self.order}'
 
-    #@classmethod
-    #def from_asciifile(cls, filename, order):
+    # @classmethod
+    # def from_asciifile(cls, filename, order):
     #    from .wfssconfig import WFSSConfig
     #    data = WFSSConfig.read_asciifile(filename)
     #    obj = cls(data, order)

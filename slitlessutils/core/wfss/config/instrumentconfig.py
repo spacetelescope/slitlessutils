@@ -1,18 +1,14 @@
 from dataclasses import dataclass
 from datetime import datetime
 import os
-import warnings
 
 from astropy.io import fits
-from astropy.wcs import Sip, FITSFixedWarning
 import numpy as np
 import pysiaf
 import yaml
 
-
 from ....config import Config
-from .disperser import load_disperser
-from ....logger import LOGGER
+from .disperser import load_disperser, Disperser
 from .polyclip import polyclip
 from ...utilities import headers
 from .wfssconfig import WFSSConfig

@@ -3,12 +3,11 @@ import os
 from astropy.io import fits
 from astropy.stats import sigma_clipped_stats
 from astropy.wcs import WCS, utils as wcsutils
-from astropy.modeling import fitting, functional_models
+from astropy.modeling import fitting, models
 import matplotlib.pyplot as plt
 import numpy as np
 from skimage.segmentation import expand_labels
 
-from ...logger import LOGGER
 from .dispersedregion import DispersedRegion
 from ..utilities import headers, indices
 
@@ -124,7 +123,7 @@ class Source(list):
         self.nsig = nsig
 
         # find the pixels for this segmentation
-        #y, x = np.where((img > 0) & (seg == self.segid))
+        # y, x = np.where((img > 0) & (seg == self.segid))
         y, x = np.where(seg == self.segid)
 
         # check for a vlid image
@@ -223,7 +222,7 @@ class Source(list):
             self.flux = np.sum(img[y, x])
             self.fnu = self.flux*10.**(-0.4*(zeropoint+48.6))
             if self.flux < 0:
-                self.mag = np.nan # 99.
+                self.mag = np.nan  # 99.
             else:
                 self.mag = -2.5*np.log10(self.flux)+zeropoint
 
@@ -257,8 +256,8 @@ class Source(list):
                 self.append(reg)
 
             # parse the region image
-            #ri = indices.reverse((seg == self.segid)*reg, ignore=(0,))
-            #for regid, (yy, xx) in ri.items():
+            # ri = indices.reverse((seg == self.segid)*reg, ignore=(0,))
+            # for regid, (yy, xx) in ri.items():
             #    ww = img[yy, xx]/self.norm
             #    reg = DispersedRegion(xx, yy, ww, self.segid, regid,
             #                          ltv=self.ltv)

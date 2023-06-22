@@ -5,7 +5,6 @@ from .flatfield import load_flatfield
 from .order import Order
 from .pom import load_pom
 from ....logger import LOGGER
-from ....config import Config
 
 
 class WFSSConfig(dict):

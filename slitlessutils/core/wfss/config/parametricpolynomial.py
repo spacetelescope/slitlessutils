@@ -201,7 +201,6 @@ class StandardPolynomial(ParametricPolynomial):
         d2pdt2 = dpdt.deriv()
 
         # initialize and start the Newton-Raphson method
-        convmsg = 'reach maximum number of iterations'
         t = np.full_like(f, 0.5, dtype=float)
         for itn in range(self.maxiter):
 
@@ -221,7 +220,6 @@ class StandardPolynomial(ParametricPolynomial):
 
             # check for early convergence
             if np.amax(np.abs(dt)) < self.threshold:
-                convmsg = 'reached required tolerance'
                 break
 
         return t
@@ -354,7 +352,6 @@ class ReciprocalPolynomial(ParametricPolynomial):
         tstar = self.tstar.evaluate(x, y)                # for recip
 
         # initialize and start the Newton-Raphson method
-        convmsg = 'reach maximum number of iterations'
         t = np.full_like(f, 0.5, dtype=float)
         for itn in range(self.maxiter):
 
@@ -375,7 +372,6 @@ class ReciprocalPolynomial(ParametricPolynomial):
 
             # check for early convergence
             if np.amax(np.abs(dt)) < self.threshold:
-                convmsg = 'reached required tolerance'
                 break
 
         return t

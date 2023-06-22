@@ -1,9 +1,4 @@
-import os
-
-
-import numpy as np
 from shapely.geometry import Polygon
-from shapely.ops import unary_union
 
 from . import attributes
 from .hdf5file import HDF5File
@@ -11,8 +6,7 @@ from .opt import OPT
 from .odt import ODT
 from .pdt import PDT
 from .rdt import RDT
-from ..utilities import indices
-
+from slitlessutils.logger import LOGGER
 
 class PDTFile(HDF5File):
     """
@@ -264,4 +258,3 @@ class PDTFile(HDF5File):
                 pdt[column] = data[column]
 
         return pdt
-

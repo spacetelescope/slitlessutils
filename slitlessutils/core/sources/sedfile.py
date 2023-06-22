@@ -1,7 +1,6 @@
 from astropy.io import fits
 import numpy as np
 
-from ...logger import LOGGER
 from ..photometry import SED
 
 
