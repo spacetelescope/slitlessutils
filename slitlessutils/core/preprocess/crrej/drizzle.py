@@ -180,7 +180,26 @@ def group_by_position_angle(files, degrees=True, max_pa_diff=0.05, **kwargs):
     return grouped_files
 
 
-def drizzle_for_cosmic_rays(input_data, grouping="visit", **kwargs):
+def drizzle_grouped_files(input_data, grouping="visit", **kwargs):
+    """
+    Apply cosmic ray masking using drizzle to a list of files or a WFSSCollection object,
+    and return the grouped files that have undergone cosmic ray masking.
+
+    Parameters
+    ----------
+    input_data: list of str or WFSSCollection object
+        List of input filenames or WFSSCollection object containing the input files.
+
+    grouping: str, optional
+        Grouping criteria: 'visit', 'position_angle', or 'none' (no grouping).
+        Default is 'visit'.
+
+    Returns
+    -------
+    grouped_files : list
+        List of grouped files that have undergone cosmic ray masking.
+
+    """
     if isinstance(input_data, WFSSCollection):
         files = list(input_data.keys())
     else:
