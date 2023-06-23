@@ -8,7 +8,7 @@ import requests
 import socket
 import tarfile
 from packaging import version
-
+from .core.utilities import headers
 from .logger import LOGGER
 
 
@@ -180,7 +180,7 @@ class Config(dict):
             LOGGER.info(f'Using reference path: {path}')
             self._refpath = path
 
-            vers = self.read_versfile()
+            # vers = self.read_versfile()
 
         else:
             LOGGER.warning(f'Reference path ({path}) does not exist.')
@@ -260,7 +260,7 @@ class Config(dict):
 
         # set the highest version
         if bestpath is None:
-            LOGGER.warning(f'Unable to determine the best reference directory')
+            LOGGER.warning(f'Unable to determine the reference directory in {self.REFROOT}')
         else:
             self._refpath = bestpath
 

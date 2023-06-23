@@ -2,6 +2,7 @@ from astropy.io import fits
 from astropy.wcs import WCS
 from astroquery.mast import Observations
 from drizzlepac import astrodrizzle
+from scipy.ndimage import gaussian_filter1d
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -153,7 +154,7 @@ def plot_spectra():
     reffile = cfg.get_reffile('wr96_hres.dat', subpath)
 
     # load and smooth the Larsen spectrum
-    l, f = np.loadtxt(reffile, unpack=True, usecols=(0,1))
+    l, f = np.loadtxt(reffile, unpack=True, usecols=(0, 1))
     f /= 1e-13
     ff = gaussian_filter1d(f, 50)
 
@@ -171,8 +172,10 @@ def plot_spectra():
 
     # plot the SU spectrum
     plt.plot(dat['lamb'], dat['flam'], label=GRATING)
-    #plt.plot(l,f,label='Larsen et al. (high-res)')
-    plt.plot(l,ff*scl, label='Larsen et al. (smoothed)')
+    plt.plot(l, ff*scl, label='Larsen et al. (smoothed)')
+
+    # uncomment this to see the hi-res file.
+    # plt.plot(l,f,label='Larsen et al. (high-res)')
 
     # label the axes
     plt.ylabel(r'$f_{\lambda}$ ($10^{-13}$ erg s$^{-1}$ cm$^{-2}$ $\mathrm{\AA}^{-1}$)')
