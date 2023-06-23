@@ -194,11 +194,11 @@ class Config(dict):
         index : int, optional
             The index of the version information to read (most recent is 0).
             If `None`, then will return all of the version history.
-            Default is 0            
+            Default is 0
 
         filename : str, optional
             The name of the version file.  If set to `None`, then will use
-            the class variable `self.VERSION`.  Default is None.            
+            the class variable `self.VERSION`.  Default is None.
 
         Returns
         -------
@@ -276,7 +276,7 @@ class Config(dict):
 
         reffile : str or None, optional
             The name of the box file.  If value is None, then the
-            class variable `Config.REFFILE` is used.  Default is None.        
+            class variable `Config.REFFILE` is used.  Default is None.
 
         update : bool, optional
             Flag to update the `refpath` after retrieving.  Default is True
