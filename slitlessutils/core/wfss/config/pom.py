@@ -268,8 +268,8 @@ class PolygonPOM(RangePOM):
 
         """
         super().update_header(h)
-        h.set('POMX', value=pomx, comment='x-coordinates of polygon')
-        h.set('POMY', value=pomy, comment='y-coordinates of polygon')
+        h.set('POMX', value=self.px1, comment='x-coordinates of polygon')
+        h.set('POMY', value=self.py1, comment='y-coordinates of polygon')
 
 
 class ImagePOM(RangePOM):
@@ -347,10 +347,10 @@ class ImagePOM(RangePOM):
 
         """
         super().update_header(h)
-        hdr.set('POMFILE', value=self.filename, comment='filename of the POM')
-        hdr.set('POMTHR', value=self.threshold, comment='threshold for valid')
-        hdr.set('POMNX', value=self.x1+1, comment='size in x')
-        hdr.set('POMNY', value=self.y1+1, comment='size in y')
+        h.set('POMFILE', value=self.filename, comment='filename of the POM')
+        h.set('POMTHR', value=self.threshold, comment='threshold for valid')
+        h.set('POMNX', value=self.x1+1, comment='size in x')
+        h.set('POMNY', value=self.y1+1, comment='size in y')
 
 
 def load_pom(**kwargs):

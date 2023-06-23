@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.interpolate import interp2d
 
 from .hdf5table import HDF5Table
 
@@ -153,6 +152,7 @@ class OPT(HDF5Table):
 
         # xx=np.arange(dx)
         # yy=np.arange(dy)
+        # will need from scipy.interpolate import interp2d if we re-enable this line
         # W = interp2d(x, y, wave[y,x],fill_value='extrapolate')
         # wave=W(xx,yy)
 

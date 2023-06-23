@@ -1,18 +1,14 @@
 from dataclasses import dataclass
 from datetime import datetime
 import os
-import warnings
 
 from astropy.io import fits
-from astropy.wcs import Sip, FITSFixedWarning
 import numpy as np
 import pysiaf
 import yaml
 
-
 from ....config import Config
-from .disperser import load_disperser
-from ....logger import LOGGER
+from .disperser import load_disperser, Disperser
 from .polyclip import polyclip
 from ...utilities import headers
 from .wfssconfig import WFSSConfig
@@ -549,7 +545,6 @@ class DetectorConfig:
         # clip against the pixel grid
         x, y, area, slices = polyclip.multi(xg, yg, self.naxis)
 
-        
         # make wavelength indices
         lam = np.empty_like(x, dtype=np.uint16)
         for i, s in enumerate(slices):
@@ -647,7 +642,7 @@ class InstrumentConfig(dict):
 
         d = data['dispersers'][disperser][blocking]
         self.disperser = load_disperser(disperser, blocking, **d)
-        self.backgrounds = d.get('background',{})
+        self.backgrounds = d.get('background', {})
         for detname, detdata in data['detectors'].items():
             self[detname] = DetectorConfig(detname, detdata, self.disperser,
                                            data['path'], **kwargs)
@@ -671,7 +666,7 @@ class InstrumentConfig(dict):
         inscnf : `InstrumentConfig`
             The instrument configuration object
         """
-        with fits.open(filename,mode='readonly') as hdul:
+        with fits.open(filename, mode='readonly') as hdul:
             h0 = hdul[0].header
 
             tel = h0['TELESCOP']
@@ -679,12 +674,11 @@ class InstrumentConfig(dict):
             if ins == 'WFC3':
                 ins += h0['DETECTOR']
                 disperser = h0['FILTER']
-                                
+
             elif ins == 'ACS':
                 ins += h0['DETECTOR']
                 disperser = h0['FILTER1']
-                
-                
+
             elif ins == 'NIRISS':
                 disperser = (h0['FILTER'], h0['PUPIL'])
                 kwargs['fwcpos'] = h0['FWCPOS']
@@ -711,10 +705,9 @@ class InstrumentConfig(dict):
                     insconf[detname].crpix[1] = h['CRPIX2']
                     insconf.subarray = True
 
-
         return insconf
 
-    def background_filename(self,key):
+    def background_filename(self, key):
         """
         A method to return the filename of the background image(s)
 
@@ -735,7 +728,6 @@ class InstrumentConfig(dict):
                                 self.path, back)
         return back
 
-    
     def npixels(self):
         """
         Method to get the total number of pixels in a single file
@@ -866,7 +858,6 @@ class InstrumentConfig(dict):
         phdr['EXPEND'] = (mjd1, 'exposure end time (Modified Julian Date)')
         phdr['EXPTIME'] = (exptime, 'exposure duration (seconds)')
         phdr['EXPFLAG'] = ('NORMAL', 'Exposure interruption indicator')
-
 
         headers.add_stanza(phdr, 'Exposure Information', before='DATE-OBS')
 

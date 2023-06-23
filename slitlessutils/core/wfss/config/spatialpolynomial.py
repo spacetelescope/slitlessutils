@@ -1,5 +1,6 @@
 import numpy as np
-# from .....logger import LOGGER
+
+from slitlessutils.logger import LOGGER
 
 
 class SpatialPolynomial(dict):

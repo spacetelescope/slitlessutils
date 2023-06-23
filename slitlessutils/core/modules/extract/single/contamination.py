@@ -1,5 +1,4 @@
 from astropy.io import fits
-import matplotlib.pyplot as plt
 import numpy as np
 
 from ....utilities import indices, headers
@@ -12,14 +11,15 @@ class ContOrders:
 
     def __str__(self):
         if isinstance(self.cntorders, str) and self.cntorders.lower() == 'all':
-            conords = '<all>'
+            conorders = '<all>'
         elif isinstance(self.cntorders, (tuple, list)):
             if len(self.cntorders) == 0:
                 conorders = '<all>'
             else:
                 conorders = ','.join(self.cntorders)
         else:
-            conords = '<None>'
+            conorders = '<None>'
+
         return conorders
 
     def __call__(self, h5):

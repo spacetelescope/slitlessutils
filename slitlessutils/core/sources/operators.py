@@ -3,8 +3,8 @@ from skimage import morphology as morph
 from scipy import ndimage as ndi
 import matplotlib.pyplot as plt
 
-
 from ..utilities import headers
+from slitlessutils.logger import LOGGER
 
 
 class Operator:
@@ -332,7 +332,6 @@ class Smooth(Operator):
             filt = self.__funcs[self.smthfunc.lower()]
 
             bad = seg != hdr['SEGID']
-            good = seg == hdr['SEGID']
 
             V = img.copy()
             V[bad] = 0

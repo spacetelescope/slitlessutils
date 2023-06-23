@@ -1,12 +1,15 @@
-import numpy as np
 import datetime
+import os
+
 from astropy.io import fits
 from astropy.table import Table
 import matplotlib.pyplot as plt
 import matplotlib.colors as mc
 from matplotlib.backends.backend_pdf import PdfPages
+import numpy as np
 
 from .menger import menger
+from slitlessutils.logger import LOGGER
 
 
 class LCurve:
@@ -189,30 +192,28 @@ class LCurve:
         rescale = self.norm is not None
         if rescale:
             lognorm += np.log10(self.norm)
-        
-        # plot the data in black and data points in color
-        #line = ax1.plot(self.data['logchi2'], self.data['lognorm'], '-k',
-        line = ax1.plot(logchi2,lognorm, '-k', linewidth=1, zorder=1)
 
-        #scat = ax1.scatter(self.data['logchi2'], self.data['lognorm'], zorder=2,
+        # plot the data in black and data points in color
+        # line = ax1.plot(self.data['logchi2'], self.data['lognorm'], '-k',
+        ax1.plot(logchi2, lognorm, '-k', linewidth=1, zorder=1)
+
+        # scat = ax1.scatter(self.data['logchi2'], self.data['lognorm'], zorder=2,
         scat = ax1.scatter(logchi2, lognorm, zorder=2,
                            c=self.data['logdamp'], s=40, cmap=cmap, edgecolors='k',
                            marker='o', vmin=lmin, vmax=lmax)
 
         # put the frobenius norm in the plot
-        #if self.norm is not None:
+        # if self.norm is not None:
         if rescale:
-            text = ax1.text(0.67, 0.88,
-                            r'$\log\ ||W||_F=${0:+.3f}'.format(self.norm),
-                            horizontalalignment='left', transform=ax1.transAxes,
-                            bbox=dict(facecolor='white', edgecolor='white'))
+            ax1.text(0.67, 0.88, r'$\log\ ||W||_F=${0:+.3f}'.format(self.norm),
+                     horizontalalignment='left', transform=ax1.transAxes,
+                     bbox=dict(facecolor='white', edgecolor='white'))
             ylabel = r'$\log\ ||W||_F^2\,||f||^2$'
         else:
             ylabel = r'$\log\ ||f||^2$'
 
-            
         # plot the labels
-        #ax1.set(xlabel=r'$\log\ ||Ax-b||^2$',
+        # ax1.set(xlabel=r'$\log\ ||Ax-b||^2$',
         #        ylabel=r'$\log\ ||x||^2$')
         ax1.set(xlabel=r'$\log\ ||Wf-{\cal I}||^2$',
                 ylabel=ylabel)
@@ -223,8 +224,8 @@ class LCurve:
 
         # plot the curvature
 
-        line = ax2.plot(self.data['logdamp'], self.data['curvature'], '-k',
-                        linewidth=1, zorder=1)
+        ax2.plot(self.data['logdamp'], self.data['curvature'], '-k',
+                 linewidth=1, zorder=1)
 
         scat = ax2.scatter(self.data['logdamp'], self.data['curvature'],
                            zorder=3, s=40, cmap=cmap, edgecolors='k', marker='o',
@@ -280,15 +281,20 @@ class LCurve:
         """
         cdict = cmap._segmentdata
         step_dict = {}
-        # Firt get the list of points where the segments start or end
+
+        # First get the list of points where the segments start or end
         for key in ('red', 'green', 'blue'):
             step_dict[key] = list(map(lambda x: x[0], cdict[key]))
         step_list = sum(step_dict.values(), [])
         step_list = np.array(list(set(step_list)))
+
         # Then compute the LUT, and apply the function to the LUT
-        def reduced_cmap(step): return np.array(cmap(step)[0:3])
+        def reduced_cmap(step):
+            return np.array(cmap(step)[0:3])
+
         old_LUT = np.array(list(map(reduced_cmap, step_list)))
         new_LUT = np.array(list(map(function, old_LUT)))
+
         # Now try to make a minimal segment definition of the new LUT
         cdict = {}
         for i, key in enumerate(['red', 'green', 'blue']):
@@ -352,7 +358,7 @@ class LCurve:
         c = self.compute_curvature()
 
         with open(filename, 'w') as fp:
-            print(f'# File written by {__code__}: {date}')
+            print(f'# File written by LCurve: {date}')
             print(f'# FROBNORM = {self.norm}', file=fp)
             print('# 1: iteration', file=fp)
             print('# 2: log(ell)', file=fp)

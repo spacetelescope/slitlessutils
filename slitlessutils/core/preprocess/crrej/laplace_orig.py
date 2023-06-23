@@ -2,11 +2,7 @@ from astropy.io import fits
 import numpy as np
 import os
 from scipy import ndimage, interpolate
-from skimage import morphology, filters, measure
-
-import matplotlib.pyplot as plt
-import warnings
-
+from skimage import morphology, measure
 
 from ....logger import LOGGER
 from ...utilities import headers, indices
@@ -139,7 +135,7 @@ def laplace(filename, inplace=True, newfile=None, bitvalue=None,
         elif growform == 'star':
             grower = morphology.star(growsize)
         else:
-            LOGGER.warning(f'No valid grow form found.')
+            LOGGER.warning('No valid grow form found.')
 
     # grab the kernels
     kern = np.array(KERNELS.get(kernel, '3a'), dtype=float)
@@ -286,7 +282,8 @@ def laplace(filename, inplace=True, newfile=None, bitvalue=None,
                             #    warnings.simplefilter('error')
                             spline = interpolate.SmoothBivariateSpline(subx[subgpx],
                                                                        suby[subgpx],
-                                                                       subsci[subgpx], s=1e6, kx=1, ky=1)
+                                                                       subsci[subgpx],
+                                                                       s=1e6, kx=1, ky=1)
 
                             # if cr.area > 1000:
                             #    plt.imshow(subsci)
@@ -295,7 +292,9 @@ def laplace(filename, inplace=True, newfile=None, bitvalue=None,
                             # with warnings.catch_warnings():
                             #    warnings.simplefilter('error')
                             hdul[('SCI', extver)].data[by+y0, bx +
-                                                       x0] = spline(subx[subbpx], suby[subbpx], grid=False)
+                                                       x0] = spline(subx[subbpx],
+                                                                    suby[subbpx],
+                                                                    grid=False)
 
                         # gxy=(xx[gpx],yy[gpx])
                         # gsci=sci[gpx]

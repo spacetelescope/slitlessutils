@@ -5,7 +5,6 @@ from .flatfield import load_flatfield
 from .order import Order
 from .pom import load_pom
 from ....logger import LOGGER
-from ....config import Config
 
 
 class WFSSConfig(dict):
@@ -57,8 +56,8 @@ class WFSSConfig(dict):
             self.set_shift(*self.data[f'WEDGE_{band}'])
 
         # look for a flatfield
-        if self.data.get('FFNAME'):                        
-            self.ffname=os.path.join(self.confpath,self.data['FFNAME'])
+        if self.data.get('FFNAME'):
+            self.ffname = os.path.join(self.confpath, self.data['FFNAME'])
 
         # get pick-off mirror (POM) size
         self.pom = load_pom(**self.data)
@@ -300,8 +299,7 @@ class WFSSConfig(dict):
 
         """
 
-
-        # main output structure:        
+        # main output structure:
         data = {}
 
         # open the file
@@ -336,7 +334,7 @@ class WFSSConfig(dict):
                                     value = float(token)
                                 except ValueError:
                                     value = token
-                                    
+
                             # save the recast value
                             values.append(value)
                         if len(values) == 1:

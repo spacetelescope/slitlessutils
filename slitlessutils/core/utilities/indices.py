@@ -237,9 +237,6 @@ def decimate(val, *indices, dims=None, unravel=True, return_factor=False):
 
     """
 
-    # number of dimensions
-    ndim = len(indices)
-
     # we need to convert a tuple into a one-dimensional.
     # could be done by hand (see snippet below) or with ravelling
     # If we don't pass dimensions, then grab that from the max value
@@ -271,12 +268,11 @@ if __name__ == '__main__':
 
     x = np.array([0, 0, 1, 1, 1, 2, 3, 3])
     y = np.array([1, 1, 0, 3, 2, 2, 3, 4])
-    l = np.array([0, 0, 1, 1, 6, 6, 3, 4])
+    l = np.array([0, 0, 1, 1, 6, 6, 3, 4])  # noqa: E741
     ri = reverse(l)
 
     for ll, g in ri.items():
         print(x[g].shape, x[g[0]].shape)
-    lkdjf
 
     i = np.array([[1, 1, 1, 1, 2],
                   [2, 2, 4, 4, 9],
@@ -285,11 +281,9 @@ if __name__ == '__main__':
 
     print(ri)
 
-    lkdjf
-
     x = np.array([1, 1, 2, 2, 2, 2, 3], dtype=np.uint16)
     y = np.array([1, 1, 2, 2, 2, 2, 3], dtype=np.uint16)
-    l = np.array([1, 1, 2, 2, 2, 2, 3], dtype=np.uint16)
+    l = np.array([1, 1, 2, 2, 2, 2, 3], dtype=np.uint16)  # noqa: E741
     v = np.array([1, 1, 2, 2, 2, 2, 3], dtype=np.float64)
 
     # x=np.array([],dtype=np.uint16)
@@ -309,9 +303,6 @@ if __name__ == '__main__':
               [2, 2, 0, 0, 4]]
     ri = reverse(segids)
     print(ri)
-
-    ldj
-
 
 # if __name__=='__main__':
 #    print('hi')

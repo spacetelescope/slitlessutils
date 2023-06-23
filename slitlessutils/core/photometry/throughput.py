@@ -1,7 +1,4 @@
-
-
 from astropy.io import fits
-import numpy as np
 from scipy.constants import c
 
 
@@ -39,10 +36,10 @@ class Throughput(Band):
 
         # check the file is valid.
         if filename is None:
-            msg=f"Cannot find filter file"
+            msg = "Cannot find filter file"
             LOGGER.error(msg)
             raise RuntimeError(msg)
-        
+
         # read the fits file with the throughput curve
         data, header = fits.getdata(filename, exten=1, header=True)
 

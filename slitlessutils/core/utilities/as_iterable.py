@@ -34,11 +34,3 @@ def as_iterable(d):
             return d
         else:
             raise TypeError('unsupported data type')
-
-
-if __name__ == '__main__':
-    print(mkiter('+1'))
-    print(mkiter(('+1', '+2')))
-    print(mkiter(['+1', '+2']))
-    print(mkiter(np.array(('+1', '+2'))))
-    print(mkiter(1))

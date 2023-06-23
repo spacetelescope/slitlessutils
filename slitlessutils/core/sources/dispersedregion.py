@@ -9,10 +9,9 @@ class DispersedRegion:
     the collection of direct-image pixels that have the same spectrum
     """
 
-    PARNAMES = ('wave0', 'wave1', 'dwave', 'scale')    
-    
-    def __init__(self, x, y, w, segid, regid, ltv=(0., 0.)):
+    PARNAMES = ('wave0', 'wave1', 'dwave', 'scale')
 
+    def __init__(self, x, y, w, segid, regid, ltv=(0., 0.)):
         """
         Initializer
 
@@ -173,7 +172,7 @@ class DispersedRegion:
             A tuple of the extraction parameters and the seg/reg IDs
 
         """
-        
+
         pars = [self.segid, self.regid]
         for parname in self.PARNAMES:
             if hasattr(self, parname):

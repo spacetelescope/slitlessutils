@@ -1,4 +1,3 @@
-import numpy as np
 from shapely import geometry
 
 from .groupcollection import GroupCollection

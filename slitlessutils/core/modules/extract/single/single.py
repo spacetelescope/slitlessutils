@@ -1,11 +1,6 @@
-from datetime import datetime
-
-
 from astropy.io import fits
 from astropy.stats import SigmaClip
-import matplotlib.pyplot as plt
 import numpy as np
-
 
 from .....config import Config, SUFFIXES
 from .contamination import Contamination
@@ -13,7 +8,7 @@ from .....info import __code__
 from .....logger import LOGGER
 from ...module import Module
 from ....tables import PDTFile
-from ....utilities import indices, headers, as_iterable
+from ....utilities import indices, headers  # , as_iterable
 
 
 class Single(Module):
@@ -54,7 +49,7 @@ class Single(Module):
     But many WFSS instruments have a cross-dispersion profile that is
     not parallel to either the x- or y-axes, or even has many twists
     and turns.  Therefore those sums can be tedious to define, let alone
-    compute.  This approach is conceptually similar, but framed differently.    
+    compute.  This approach is conceptually similar, but framed differently.
 
     Example
     -------
@@ -126,7 +121,7 @@ class Single(Module):
         This is likely not to be directly called.
         """
 
-        LOGGER.info(f"Combining the 1d spectra")
+        LOGGER.info("Combining the 1d spectra")
 
         # suffix of all output data
         prekwargs = {'filetype': (self.FILETYPE, 'contents of this file'),
@@ -153,7 +148,7 @@ class Single(Module):
 
         # get the flux funits
         config = Config()
-        funits = f'{config.fluxscale} {config.fluxunits}'
+        # funits = f'{config.fluxscale} {config.fluxunits}'
 
         # make an output structure
         hdul = fits.HDUList()
@@ -241,8 +236,8 @@ class Single(Module):
                 #    frac=cnt[gc]/val[gc]
                 #    wht[gc]/=frac**2
 
-                ave = np.average(val, weights=wht)
-                err = np.sqrt(np.average((val-ave)**2, weights=wht))
+                # ave = np.average(val, weights=wht)
+                # err = np.sqrt(np.average((val-ave)**2, weights=wht))
 
                 # compute sum of weights (used later)
                 wsum = np.sum(wht)
@@ -262,7 +257,6 @@ class Single(Module):
 
             # store source in the OUTPUT file
             hdul.append(source.as_HDU())
-
 
         # get basename of output file
         LOGGER.info(f'Writing: {self.filename}')
@@ -306,6 +300,8 @@ class Single(Module):
         #    LOGGER.debug("add stuff to contam images' primary headers")
         #    hdul.append(phdr)
 
+        hdul = fits.HDUList()
+
         # open the PDT for reading
         with PDTFile(data, path=self.path, mode='r') as h5:
 
@@ -317,7 +313,7 @@ class Single(Module):
                 phdr = detdata.primaryheader()
                 sci, hdr = detdata.readfits('science', header=True)
                 unc = detdata.readfits('uncertainty')
-                dqa = detdata.readfits('dataquality')
+                # dqa = detdata.readfits('dataquality')
 
                 # get the flat field
                 flatfield = detdata.config.load_flatfield(**kwargs)
@@ -364,9 +360,9 @@ class Single(Module):
                             ww /= vv
 
                             # get data quality
-                            d = dqa[yy, xx]
+                            # d = dqa[yy, xx]
 
-                            # GOTTA REMOVE PIXELS FROM DQA
+                            # TODO: GOTTA REMOVE PIXELS FROM DQA
 
                             # compute correction factors
                             sens = detdata.config[ordname].sensitivity(ww)

@@ -3,12 +3,11 @@ from datetime import datetime
 from astropy.io import fits
 import numpy as np
 
-
 from ....info import __code__, __version__
 from ....logger import LOGGER
 from ..module import Module
-from ...tables import PDTFile, PDT
-from ...utilities import indices, headers, gzip, as_iterable
+from ...tables import PDTFile
+from ...utilities import indices, headers, gzip
 
 
 class Simulate(Module):
@@ -53,7 +52,7 @@ class Simulate(Module):
         self.orders = orders
 
     def __str__(self):
-        s = f'Simulation Module: \n'+super().__str__()
+        s = 'Simulation Module: \n'+super().__str__()
         return s
 
     def simulate(self, data, sources, **kwargs):
@@ -172,7 +171,7 @@ class Simulate(Module):
                                     yg = pdt.get('y')
                                     val = pdt.get('val')
                                     wav = pdt.wavelengths()
-                                    
+
                                     # need to apply a few things:
                                     # 1) sensitivity curve    (sens)
                                     # 2) flat field           (flat)
@@ -186,14 +185,14 @@ class Simulate(Module):
                                     # apply the corrections to the weights
                                     # val *= (sens*flat*area*flam)
                                     val *= (sens*flat*flam)
-                                    
+
                                     # sum over wavelengths
                                     vv, yy, xx = indices.decimate(val, yg, xg,
                                                                   dims=detdata.shape)
-                                    
+
                                     # apply pixel areas
                                     vv *= detdata.relative_pixelarea(xx, yy)
-                                                                        
+
                                     # now sum into the image
                                     sci[yy, xx] += vv
 

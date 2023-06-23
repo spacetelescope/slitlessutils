@@ -1,12 +1,8 @@
+import warnings
+
 import numpy as np
 from astropy.wcs import WCS, FITSFixedWarning, utils as wcsutils
 from astropy.io import fits
-
-
-from contextlib import nullcontext
-import os
-import warnings
-
 
 from .sedfile import SEDFile
 from .source import Source
@@ -133,7 +129,6 @@ class SourceCollection(dict):
             self.throughput = self.get_throughput(hdud, throughput=throughput,
                                                   **kwargs)
 
-
             # is it an MEF?
             self.mef = nhdus > 1
             if self.mef:
@@ -232,7 +227,7 @@ class SourceCollection(dict):
                     subreg[gy, gx] = 1
 
             self.addSource(segid, subimg, subseg, subreg, subhdr, **kwargs)
-            
+
     def _load_mef(self, hdus, hdui, **kwargs):
         """
         Method to load a multi-extension fits (MEF) file for the
@@ -281,13 +276,13 @@ class SourceCollection(dict):
             The fits header for the direct image
 
         kwargs : dict
-            Optional keywords passed to `Source()`        
+            Optional keywords passed to `Source()`
 
         """
         if callable(self.preprocessor):
             img, seg, hdr = self.preprocessor(img, seg, hdr)
 
-        source = Source(segid, img, seg,  hdr, reg=reg,
+        source = Source(segid, img, seg, hdr, reg=reg,
                         zeropoint=self.zeropoint, **kwargs)
         if source and source.mag < self.maglim and source.npixels > self.minpix:
 
@@ -330,8 +325,6 @@ class SourceCollection(dict):
         """
 
         maglim = 'INF' if np.isinf(self.maglim) else self.maglim
-
-        sedfile = self.sedfile if self.sedfile else ' '*8
 
         hdr.set('SEGFILE', value=self.segfile, comment='segmentation image')
         hdr.set('DETFILE', value=self.detfile,
@@ -545,7 +538,7 @@ class SourceCollection(dict):
         LOGGER.info(f'loading SEDs from sedcat: {sedcat}')
         self.sedstype = 'sedcat'
         self.sedcat = sedcat
-        with open(cat, 'r') as f:
+        with open(self.sedcat, 'r') as f:
             for line in f:
                 line = line.strip()
                 if line.startswith('#'):

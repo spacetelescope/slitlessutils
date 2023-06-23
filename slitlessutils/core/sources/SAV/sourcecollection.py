@@ -1,12 +1,8 @@
-import numpy as np
-from astropy.wcs import WCS, FITSFixedWarning, utils as wcsutils
-from astropy.io import fits
-
-
-from contextlib import nullcontext
-import os
 import warnings
 
+from astropy.wcs import WCS, FITSFixedWarning, utils as wcsutils
+from astropy.io import fits
+import numpy as np
 
 from .sedfile import SEDFile
 from .source import Source
@@ -303,8 +299,6 @@ class SourceCollection(dict):
 
         maglim = 'INF' if np.isinf(self.maglim) else self.maglim
 
-        sedfile = self.sedfile if self.sedfile else ' '*8
-
         hdr.set('SEGFILE', value=self.segfile, comment='segmentation image')
         hdr.set('DETFILE', value=self.detfile,
                 comment='direct image for profile weights')
@@ -517,7 +511,7 @@ class SourceCollection(dict):
         LOGGER.info(f'loading SEDs from sedcat: {sedcat}')
         self.sedstype = 'sedcat'
         self.sedcat = sedcat
-        with open(cat, 'r') as f:
+        with open(self.sedcat, 'r') as f:
             for line in f:
                 line = line.strip()
                 if line.startswith('#'):

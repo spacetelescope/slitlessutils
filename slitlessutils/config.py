@@ -5,7 +5,6 @@ import json
 import os
 
 from .logger import LOGGER
-from .core.utilities import headers
 
 
 # file suffixes.  Probably shouldn't ever change these, but here they are:
@@ -186,7 +185,7 @@ class Config(dict):
                 self['confdate'] = Parameter('confdate', data[0]['date'],
                                              'config date', editable=False)
         else:
-            LOGGER.error(f'Invalid confpath, missing the version file.')
+            LOGGER.error('Invalid confpath, missing the version file.')
 
     def __getattr__(self, k):
         """

@@ -3,12 +3,11 @@ import os
 from astropy.io import fits
 from astropy.stats import sigma_clipped_stats
 from astropy.wcs import WCS, utils as wcsutils
-from astropy.modeling import fitting, functional_models
+from astropy.modeling import fitting, models
 import matplotlib.pyplot as plt
 import numpy as np
 from skimage.segmentation import expand_labels
 
-from ...logger import LOGGER
 from .dispersedregion import DispersedRegion
 from ..utilities import headers, indices
 
@@ -72,7 +71,7 @@ class Source(list):
             'pixels'       Use the absolute value of the pixels
             'fitprofile'   Fit a profile with some analytic profile, as
                            specified by the `profile` variable.
-           
+
         profile : str, optional
             Name of the profile to fit.  See `astropy.modeling.models`.
             This is only used if ```whttype='fitprofile'```.  Presently,
@@ -124,9 +123,8 @@ class Source(list):
         self.nsig = nsig
 
         # find the pixels for this segmentation
-        #y, x = np.where((img > 0) & (seg == self.segid))
+        # y, x = np.where((img > 0) & (seg == self.segid))
         y, x = np.where(seg == self.segid)
-
 
         # check for a vlid image
         self.npixels = len(x)
@@ -143,7 +141,6 @@ class Source(list):
                 # cut out regions
                 subimg = img[y0:y1, x0:x1]
                 subseg = seg[y0:y1, x0:x1]
-                
 
                 # grow the region to find the local sky background
                 # but use a mask in case it results in empty array
@@ -155,7 +152,7 @@ class Source(list):
                                                         sigma_upper=self.nsig[1])
                 except BaseException:
                     ave = 0.0
-                    
+
                 self.background = ave
             else:
                 self.background = 0.0
@@ -199,12 +196,11 @@ class Source(list):
                 self.whttype = 'pixels'
                 w = np.abs(img[y, x])
             # ---------------------------------------------------------------
-            
+
             # normalize the weights
             self.norm = np.sum(w)
             w /= self.norm
 
-            
             # compute the centeroids
             xyc = (np.average(x, weights=w), np.average(y, weights=w))
             self.xyc = self.image_coordinates(*xyc)
@@ -226,17 +222,15 @@ class Source(list):
             self.flux = np.sum(img[y, x])
             self.fnu = self.flux*10.**(-0.4*(zeropoint+48.6))
             if self.flux < 0:
-                self.mag = np.nan # 99.
+                self.mag = np.nan  # 99.
             else:
                 self.mag = -2.5*np.log10(self.flux)+zeropoint
 
             # put coordinates back on original footprint
             # x,y=self.image_coordinates(x,y,dtype=np.int)
 
-
-
             # Now parse the source for the DispersedRegions.
-            if isinstance(reg,np.ndarray) and reg.shape == seg.shape:
+            if isinstance(reg, np.ndarray) and reg.shape == seg.shape:
                 # have a valid region image, so use it
                 r = reg[y, x].astype(int)
             elif self.segid < 0:
@@ -245,7 +239,7 @@ class Source(list):
             else:
                 # if everything is invalid, then set to a single value
                 r = np.ones_like(x, dtype=int)
-                
+
             # find the pixel coordinates for each unique value of the
             # region image
             ri = indices.reverse(r, ignore=(0,))
@@ -256,18 +250,14 @@ class Source(list):
                 yy = y[pixid]
                 ww = w[pixid]
 
-                
                 # make and save the region
                 reg = DispersedRegion(xx, yy, ww, self.segid, regid,
                                       ltv=self.ltv)
                 self.append(reg)
-                
-                
-                
-            
+
             # parse the region image
-            #ri = indices.reverse((seg == self.segid)*reg, ignore=(0,))
-            #for regid, (yy, xx) in ri.items():
+            # ri = indices.reverse((seg == self.segid)*reg, ignore=(0,))
+            # for regid, (yy, xx) in ri.items():
             #    ww = img[yy, xx]/self.norm
             #    reg = DispersedRegion(xx, yy, ww, self.segid, regid,
             #                          ltv=self.ltv)
@@ -355,11 +345,11 @@ class Source(list):
     @property
     def is_compound(self):
         """
-        A flag if the source is a compound source (ie. has multiple 
+        A flag if the source is a compound source (ie. has multiple
         `DispersedRegion`s)
         """
         return len(self) > 1
-    
+
     @property
     def pixelarea(self):
         """
@@ -662,7 +652,7 @@ class Source(list):
         for regid, region in enumerate(self):
             filename = os.path.join(path,
                                     f'segid_{self.segid}_{regid}.{filetype}')
-            region.sed.write_file(filename,**kwargs)
+            region.sed.write_file(filename, **kwargs)
 
     @staticmethod
     def ellipse_parameters(img, wht):

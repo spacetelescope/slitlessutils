@@ -1,3 +1,5 @@
+import os
+
 from astropy.io import fits
 from astropy.wcs import WCS
 import numpy as np
@@ -6,9 +8,10 @@ from ....logger import LOGGER
 from ...utilities import headers
 from ...wfss import WFSS
 
-def upgrade_wcs(imgfile,wfssfile,key='A',newfile=None,inplace=False):
+
+def upgrade_wcs(imgfile, wfssfile, key='A', newfile=None, inplace=False):
     """
-    Method to upgrade the WCS in a WFSS to match that of a direct image 
+    Method to upgrade the WCS in a WFSS to match that of a direct image
     that has been tweaked to match Gaia.
 
     This is necessary for HST *ONLY* as at some point the WCS in the
@@ -71,25 +74,25 @@ def upgrade_wcs(imgfile,wfssfile,key='A',newfile=None,inplace=False):
     else:
         mode = 'readonly'
 
-    wfss=WFSS.observed(wfssfile)
-    with fits.open(imgfile,mode='readonly') as dhdul,\
-         fits.open(wfssfile,mode=mode) as whdul:
+    wfss = WFSS.observed(wfssfile)
+    with fits.open(imgfile, mode='readonly') as dhdul,\
+         fits.open(wfssfile, mode=mode) as whdul:
 
         # some quick error checking
-        if dhdul[0].header['OBSTYPE']!='IMAGING':
+        if dhdul[0].header['OBSTYPE'] != 'IMAGING':
             LOGGER.warning('direct image obstype is not imaging.')
             return
-        if whdul[0].header['OBSTYPE']!='SPECTROSCOPIC':
+        if whdul[0].header['OBSTYPE'] != 'SPECTROSCOPIC':
             LOGGER.warning('WFSS image obstype is not spectroscopic.')
             return
 
-        # process all the data extensions        
-        for (detname,extname),extdata in wfss.extensions():
-            exten=extdata.extension
-            hdr=dhdul[exten].header
-            wcsname=hdr.get(f'WCSNAME{key}')
-            
-            if wcsname and (wcsname.lower().find('gaia')!=-1):
+        # process all the data extensions
+        for (detname, extname), extdata in wfss.extensions():
+            exten = extdata.extension
+            hdr = dhdul[exten].header
+            wcsname = hdr.get(f'WCSNAME{key}')
+
+            if wcsname and (wcsname.lower().find('gaia') != -1):
                 # get the best WCS and old WCS
                 bwcs = WCS(hdr, dhdul, relax=True)
                 owcs = WCS(hdr, dhdul, relax=True, key=key)
@@ -125,7 +128,7 @@ def upgrade_wcs(imgfile,wfssfile,key='A',newfile=None,inplace=False):
                 whdul[exten].header.set('WCSTWEAK', value=True,
                                         comment='Was WCS tweaked w.r.t. Gaia')
                 whdul[exten].header.set('WCSTYPE', value='upgrade',
-                                        comment = 'WCS upgraded to match Gaia')
+                                        comment='WCS upgraded to match Gaia')
                 whdul[exten].header.set('DCRVAL1', value=dcrval[0],
                                         comment=comment)
                 whdul[exten].header.set('DCRVAL2', value=dcrval[1],

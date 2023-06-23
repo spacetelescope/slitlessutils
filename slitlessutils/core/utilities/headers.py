@@ -1,7 +1,7 @@
 from datetime import datetime
 
 # from ...logger import LOGGER
-from ...info import __version__, __code__, __email__, __author__
+from ...info import __version__, __code__, __author__
 
 """
 Methods to work with fits headers

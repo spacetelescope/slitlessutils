@@ -1,2 +1,2 @@
 # from . import polyclip
-from .tabulate import Tabulate
+from .tabulate import Tabulate  # noqa: F401

@@ -139,7 +139,6 @@ def single(x, y, nxy):
 
     # recast some things for C
     nclip = np.array([0], dtype=INT)
-    ri = np.zeros(npix+1, dtype=INT)
 
     # output polygon indices
     px_out = np.zeros((nverts[0]+24)*npix, dtype=FLT)

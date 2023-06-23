@@ -6,11 +6,9 @@ from astropy.modeling import models
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-from skimage.morphology import label
 import warnings
 
-
-from .parameters import *
+from .parameters import RA, DEC, NPIX, PIXSCL
 
 
 ROOT = 'starfield'            # base name for files in this example
@@ -189,8 +187,8 @@ def simulate_grisms():
     sources.write_seds(path=SEDPATH)
 
     # project the sources onto the grism images
-    tab = su.modules.Tabulate(ncpu=NCPU)
-    pdtfiles = tab(data, sources)
+    # tab = su.modules.Tabulate(ncpu=NCPU)
+    # pdtfiles = tab(data, sources)
 
     # use the projection tables and the SEDs to simulate grism images
     sim = su.modules.Simulate(ncpu=NCPU)
@@ -290,6 +288,8 @@ def extract_group():
     ext = su.modules.Multi('+1', (-3., 1., 0.1), algorithm='grid')
     res = ext(data, sources, root=ROOT+'_group', groups=groups)
 
+    return res
+
 
 def regions():
     """
@@ -316,6 +316,8 @@ def regions():
 
     reg = su.modules.Region(ncpu=1)
     res = reg(data, sources)
+
+    return res
 
 
 def compare(nsig=1.):
@@ -369,7 +371,7 @@ def compare(nsig=1.):
                                                 color=c, alpha=0.2)
                         meas = ax.plot(hdu.data['lamb'], hdu.data['flam'],
                                        color=c)
-                        
+
                         if first:
                             artists.append((patch, meas[0]))
                             labels.append(label)

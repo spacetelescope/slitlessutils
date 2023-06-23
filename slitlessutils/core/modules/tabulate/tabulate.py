@@ -1,5 +1,4 @@
 import numpy as np
-import os
 
 from ....logger import LOGGER
 from ..module import Module
@@ -61,9 +60,9 @@ class Tabulate(Module):
         self.pixfrac = 1.0  # DO NOT CHANGE THIS!
 
         self.orders = as_iterable(orders)
-        
+
     def __str__(self):
-        s = f'Tabulation Module: \n'+super().__str__()
+        s = 'Tabulation Module: \n'+super().__str__()
         return s
 
     @property
@@ -174,9 +173,8 @@ class Tabulate(Module):
                 pass
 
             else:
-                LOGGER.critical(f'Unknown image type: {type(insdata)}')
+                LOGGER.critical(f'Unknown image type: {type(data)}')
                 outfile = None
-                tabs = None
 
             # okay... process the file
             if outfile:
@@ -198,9 +196,9 @@ class Tabulate(Module):
 
                         # process each source
                         for segid, source in sources.items():
-                            tabs = self._tabfunc(source, detdata, ordname,
-                                                 disperser, hdf5=h5.h5order,
-                                                 **kwargs)
+                            _ = self._tabfunc(source, detdata, ordname,
+                                              disperser, hdf5=h5.h5order,
+                                              **kwargs)
 
         # might need/want to return tables instead of filename
         return outfile
@@ -211,7 +209,7 @@ class Tabulate(Module):
 
         # get the bandwidth
         wav = disperser.wavelengths(nsub=self.nsub)
-        
+
         wav0 = np.amin(wav)
         wav1 = np.amax(wav)
         nwav = len(wav)
@@ -255,7 +253,7 @@ class Tabulate(Module):
                 # direct image pixels, and/or small bandwidth (ie. large
                 # NSub), then this can be important.
                 aa, xx, yy, ll = indices.decimate(aa, xx, yy, ll, dims=dims)
-                
+
                 # At this point, the only effect accounted for is the
                 # relative area between the grism and direct image (aa).
                 # now we will include three effects:

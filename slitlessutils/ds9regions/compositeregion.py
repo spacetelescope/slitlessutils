@@ -10,7 +10,7 @@ class Composite(Region, list):
 
         x = 0.0
         y = 0.0
-        r = []
+        # r = []
 
         for reg in self:
             x += reg.x

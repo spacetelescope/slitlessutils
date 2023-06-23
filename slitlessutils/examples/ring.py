@@ -1,12 +1,10 @@
 import slitlessutils as su
-import os
 import numpy as np
 from scipy.special import gammaincinv
 from astropy.io import fits
 from astropy.wcs import WCS
 
-from .parameters import *
-
+from .parameters import RA, DEC, NPIX, PIXSCL
 
 # import matplotlib as mpl
 # import matplotlib.pyplot as plt
@@ -103,7 +101,7 @@ def make_scene():
 
     # now only take the points inside an aperture
     g = np.where(rad < R)
-    b = np.where(rad >= R)
+    # b = np.where(rad >= R)
     fint = np.sum(gal[g])   # instrumental flux (PRE-SCALE)
     # fout=np.sum(gal[b])
     # ftot=fint+fout
@@ -179,8 +177,8 @@ def simulate_grisms():
     sources.write_seds(SEDPATH)
 
     # project the sources onto the grism images
-    tab = su.modules.Tabulate()
-    pdtfiles = tab(data, sources)
+    # tab = su.modules.Tabulate()
+    # pdtfiles = tab(data, sources)
 
     # use the projection tables and the SEDs to simulate grism images
     sim = su.modules.Simulate(ncpu=1)

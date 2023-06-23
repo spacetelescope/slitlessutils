@@ -2,6 +2,7 @@ import numpy as np
 from astropy.io import fits
 
 from ...utilities import headers
+from slitlessutils.logger import LOGGER
 
 
 def check_in_field(func):
@@ -155,7 +156,6 @@ class ImageFlatField(FlatField):
         try:
             if 'ext' not in kwargs:
                 kwargs['ext'] = 1
-            data = fits.getdata(obj.filename, **kwargs)
             obj.shape = obj.data.shape
         except BaseException:
             LOGGER.warning("Image flat is invalid, using unity")
@@ -324,6 +324,6 @@ def load_flatfield(*args, unity=False):
         else:
             raise NotImplementedError(f"data type of args: {type(args[1])}")
     else:
-        raise NotImplementedError(f"Unknown number of arguments")
+        raise NotImplementedError("Unknown number of arguments")
 
     return obj

@@ -37,6 +37,6 @@ class Compass(AstroRegion):
 
     @property
     def region(self):
-        compass = f'compass={self.compass} {{{N}}} {{{E}}} {int(self.N)} {int(self.E)}'
+        compass = f'compass={self.compass} {{N}} {{E}} {int(self.N)} {int(self.E)}'
 
         return f'# compass({self.x0},{self.y0},{self.size}{self.unit}) {compass}'

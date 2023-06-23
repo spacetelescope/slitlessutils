@@ -1,2 +1,2 @@
-from .group import Group
-from .groupcollection import GroupCollection
+from .group import Group  # noqa: F401
+from .groupcollection import GroupCollection  # noqa: F401

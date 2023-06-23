@@ -2,11 +2,7 @@ from astropy.io import fits
 import numpy as np
 import os
 from scipy import ndimage, interpolate
-from skimage import morphology, filters, measure
-
-import matplotlib.pyplot as plt
-import warnings
-
+from skimage import morphology, measure
 
 from ....logger import LOGGER
 from ...utilities import headers, indices
@@ -139,7 +135,7 @@ def laplace(filename, inplace=True, newfile=None, bitvalue=None,
         elif growform == 'star':
             grower = morphology.star(growsize)
         else:
-            LOGGER.warning(f'No valid grow form found.')
+            LOGGER.warning('No valid grow form found.')
 
     # grab the kernels
     kern = np.array(KERNELS.get(kernel, '3a'), dtype=float)
