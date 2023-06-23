@@ -52,7 +52,8 @@ Fetching Reference Data
 -----------------------
 
 There are a host of reference and configuration files needed by
-``slitlessutils``, which have been staged at `slitlessutils data <BOX>`_.
+``slitlessutils``, which have been staged at
+`slitlessutils data <https://stsci.box.com/shared/static/fzlb7y36ofi18ziy6mkbyg710stmygjf.gz>`_.
 You should download the `.tar.gz` file for instrument of interest,
 copy it to the home directory, and unpack with:
 

@@ -268,8 +268,8 @@ class PolygonPOM(RangePOM):
 
         """
         super().update_header(h)
-        h.set('POMX', value=pomx, comment='x-coordinates of polygon')
-        h.set('POMY', value=pomy, comment='y-coordinates of polygon')
+        h.set('POMX', value=self.px1, comment='x-coordinates of polygon')
+        h.set('POMY', value=self.py1, comment='y-coordinates of polygon')
 
 
 class ImagePOM(RangePOM):
