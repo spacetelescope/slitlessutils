@@ -7,7 +7,6 @@ from pathlib import Path
 import requests
 import socket
 import tarfile
-import json
 from packaging import version
 
 from .logger import LOGGER
@@ -113,17 +112,11 @@ class Config(dict):
 
     """
 
-    # a list of required keywords:
-    #REQUIRED = ('fluxscale', 'fluxunits', 'compression', 'compression_opts')
-
     # the default config filename:
     DEFAULTS = 'defaults.cfg'
 
     # version filename
     VERSION = 'version.json'
-    
-    # name of the environment variable
-    #ENVVAR = 'slitlessutils_config'
 
     # the reference files on box
     REFURL = 'https://stsci.box.com/shared/static/'
@@ -131,7 +124,7 @@ class Config(dict):
 
     # local path to store reference files
     REFROOT = os.path.join(Path.home(), '.slitlessutils')
-    
+
     # enable the singleton
     _instance = None
 
@@ -141,7 +134,7 @@ class Config(dict):
             # make a new config object
             cls._instance = super().__new__(cls)
             cls._instance._refpath = os.getcwd()
-            
+
             # set the latest reference files
             cls._instance.set_reffiles()
 
@@ -174,7 +167,7 @@ class Config(dict):
         """
         Method to make root config directory.
         """
-        
+
         if not os.path.exists(self.REFROOT):
             os.mkdir(self.REFROOT)
 
@@ -188,10 +181,9 @@ class Config(dict):
             self._refpath = path
 
             vers = self.read_versfile()
-            
+
         else:
             LOGGER.warning(f'Reference path ({path}) does not exist.')
-
 
     def read_versfile(self, index=0, filename=None):
         """
@@ -207,7 +199,7 @@ class Config(dict):
         filename : str, optional
             The name of the version file.  If set to `None`, then will use
             the class variable `self.VERSION`.  Default is None.            
-        
+
         Returns
         -------
         data : dict
@@ -216,7 +208,7 @@ class Config(dict):
 
         # get the filename
         if filename is None:
-            filename = self.VERSION        
+            filename = self.VERSION
         versfile = os.path.join(self.refpath, filename)
 
         # check if the file exists
@@ -230,15 +222,16 @@ class Config(dict):
                 data = data[index]
         else:
             # return empty dict for a non-existent VERSION info
-            LOGGER.warning(f'Unable to find version file ({versfile}), suspicious behavior may follow.')
+            LOGGER.warning(
+                f'Unable to find version file ({versfile}), suspicious behavior may follow.')
             data = {}
         return data
-            
+
     def set_reffiles(self):
         """
         Set the reference file path in the root configurations
         """
-      
+
         # grab all the paths from the root directory
         glob_token = os.path.join(self.REFROOT, '*')
         paths = glob.glob(glob_token)
@@ -253,11 +246,10 @@ class Config(dict):
                 if len(paths) == 0:
                     LOGGER.warning("Failed auto setup of reference files")
 
-                    
         # initalize with a nonsense value
         bestvers = version.parse('0.0.0')
         bestpath = None
-        
+
         # check all the paths and take the highest version
         for path in paths:
             if os.path.isdir(path):
@@ -271,8 +263,7 @@ class Config(dict):
             LOGGER.warning(f'Unable to determine the best reference directory')
         else:
             self._refpath = bestpath
-        
-    
+
     def retrieve_reffiles(self, refurl=None, reffile=None, update=True):
         """
         Method to retrieve files from box
@@ -294,7 +285,7 @@ class Config(dict):
         -------
         flag : bool
             Flag if retrieval worked properly
-        
+
         """
 
         # first check if internet is alive
@@ -302,7 +293,7 @@ class Config(dict):
         if IP == '127.0.0.1':
             LOGGER.warning(f'Invalid IP: {IP} --- check internect connection')
             return False
-        
+
         # parse the inputs
         if refurl is None:
             refurl = self.REFURL
@@ -313,9 +304,9 @@ class Config(dict):
         # get the name of the files
         remotefile = refurl+reffile
         localfile = os.path.join(self.REFROOT, reffile)
-        
+
         # make sure refdir exists
-        self.make_refroot()        
+        self.make_refroot()
 
         # write the remote file into local file
         LOGGER.info(f'Retrieving remote file {remotefile} to {self.REFROOT}')
@@ -329,26 +320,24 @@ class Config(dict):
 
         # the current path
         curpath = os.path.join(self.REFROOT, 'slitlessutils_config')
-        
+
         # read the version number for this file
         data = self.read_versfile()
         vers = data['version']
 
         # rename the directory to the version string
-        newpath = os.path.join(self.REFROOT, vers) 
+        newpath = os.path.join(self.REFROOT, vers)
         os.rename(curpath, newpath)
 
         # use the new directory?
-        if update:        
+        if update:
             self.set_refpath(newpath)
-        
+
         # clean up the downloaded file
-        os.remove(localfile)        
+        os.remove(localfile)
 
         return True
 
-        
-   
     def __getattr__(self, k):
         """
         Method to override the getattr to enable attribute-like access
@@ -374,7 +363,7 @@ class Config(dict):
     def __setattr__(self, k, v):
         """
         Method to override the setattr to enable attribute-like access
-        
+
         Parameters
         ----------
         k : str
@@ -392,7 +381,7 @@ class Config(dict):
         else:
             # deal with normal attribute setting
             super(Config, self).__setattr__(k, v)
-            
+
     def update_header(self, hdr):
         """
         Method to update a fits header
@@ -413,15 +402,14 @@ class Config(dict):
                 comment='reference file date')
         headers.add_stanza(hdr, 'Reference File Settings', before='refpath')
 
-        # put the configuration info into the header        
-        first = None        
+        # put the configuration info into the header
+        first = None
         for k, v in self.items():
             v.update_header(hdr)
             if not first:
                 first = v.keyword
         headers.add_stanza(hdr, 'Configuration Settings', before=first)
 
-            
     def write(self, filename):
         """
         Method to write config file to disk as a *.cfg type
@@ -502,22 +490,22 @@ class Config(dict):
         """
         Method to override printing
         """
-        
+
         dat = self.read_versfile()
-        
+
         # do some stuff for reffiles files
         s = 'Slitlessutils Configuration\n'
-        
+
         s += '  Reference Files:\n'
         s += f'     refpath: {self.refpath}\n'
         s += f'     version: {dat.get("version")}\n'
         s += f'    use date: {dat.get("date")}\n'
-                
+
         # get the width of the config parameters
         width = 0
         for d in self.keys():
-            width = max(width, len(d))            
-            
+            width = max(width, len(d))
+
         # update for the config parameters
         s += '\n  Configuration:'
         for k, v in self.items():
@@ -525,7 +513,7 @@ class Config(dict):
 
         # add new line, just because I like it
         s += '\n'
-            
+
         return s
 
 
