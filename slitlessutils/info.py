@@ -6,3 +6,4 @@ d = metadata(__code__)
 
 __author__ = d['Author']
 __email__ = d['Email']
+__version__ = d['Version']
