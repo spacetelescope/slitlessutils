@@ -18,24 +18,20 @@ from .wfssconfig import WFSSConfig
 MJDREF = datetime(1858, 11, 17, 0, 0, 0)
 
 
-DTYPE = {'np.float16': np.float16,
-         'np.float32': np.float32,
-         'np.float64': np.float64,
-         'np.float128': np.float128,
-         'np.int8': np.int8,
-         'np.int16': np.int16,
-         'np.int32': np.int32,
-         'np.int64': np.int64,
-         'np.uint8': np.uint8,
-         'np.uint16': np.uint16,
-         'np.uint32': np.uint32,
-         'np.uint64': np.uint64,
-         'int': int,
-         'float': float}
-         
-         
-         
-         
+DTYPES = {'np.float16': np.float16,
+          'np.float32': np.float32,
+          'np.float64': np.float64,
+          'np.float128': np.float128,
+          'np.int8': np.int8,
+          'np.int16': np.int16,
+          'np.int32': np.int32,
+          'np.int64': np.int64,
+          'np.uint8': np.uint8,
+          'np.uint16': np.uint16,
+          'np.uint32': np.uint32,
+          'np.uint64': np.uint64,
+          'int': int,
+          'float': float}
 
 
 @dataclass

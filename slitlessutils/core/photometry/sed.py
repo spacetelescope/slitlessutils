@@ -673,9 +673,9 @@ class SED:
                 with open(filename, 'wb') as fp:
                     fp.write(resp.content)
                 return filename
-            except:
+            except BaseException:
                 LOGGER.warning(f"Cannot write local file: {filename}")
-                
+
         # try getting the file
         # try:
         #     f, r = request.urlretrieve(serverfile, filename)

@@ -5,7 +5,7 @@ import json
 import os
 from pathlib import Path
 import requests
-import socket
+# import socket
 import tarfile
 from packaging import version
 from .core.utilities import headers
@@ -258,7 +258,7 @@ class Config(dict):
                 if vers >= bestvers:
                     bestvers = vers
                     bestpath = os.path.join(self.REFROOT, path)
-                    
+
         # set the highest version
         if bestpath is None:
             LOGGER.warning(f'Unable to determine the reference directory in {self.REFROOT}')
@@ -290,8 +290,8 @@ class Config(dict):
         """
 
         # first check if internet is alive
-        #IP = socket.gethostbyname(socket.gethostname())
-        #if IP == '127.0.0.1':
+        # IP = socket.gethostbyname(socket.gethostname())
+        # if IP == '127.0.0.1':
         #    LOGGER.warning(f'Invalid IP: {IP} --- check internect connection')
         #    return False
 
@@ -315,7 +315,6 @@ class Config(dict):
         with open(localfile, 'wb') as f:
             f.write(req.content)
 
-
         print(localfile)
         # unpack the local file
         with tarfile.open(localfile) as tarf:
@@ -329,19 +328,19 @@ class Config(dict):
                 print(absname)
                 if absname.startswith(self.REFROOT):
                     print(name)
-                    tarf.extract(name, path=self.REFROOT)                    
-            
+                    tarf.extract(name, path=self.REFROOT)
+
         # the current path
         curpath = os.path.join(self.REFROOT, 'slitlessutils_config')
 
         # read the version number for this file
         data = self.read_versfile()
-        vers = data.get('version','0.0.0')
-        
+        vers = data.get('version', '0.0.0')
+
         # rename the directory to the version string
         newpath = os.path.join(self.REFROOT, vers)
         os.rename(curpath, newpath)
-        
+
         # use the new directory?
         if update:
             self.set_refpath(newpath)
