@@ -7,7 +7,8 @@ from ....info import __code__, __version__
 from ....logger import LOGGER
 from ..module import Module
 from ...tables import PDTFile
-from ...utilities import indices, headers, gzip
+from ...utilities import indices, headers
+from ...utilities.compression import compress
 
 
 class Simulate(Module):
@@ -239,6 +240,6 @@ class Simulate(Module):
 
         # do we gzip the file?
         if self.gzip:
-            filename = gzip.gzip(filename)
+            filename = compress(filename, comptype='gz')
 
         return filename

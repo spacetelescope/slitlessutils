@@ -116,7 +116,7 @@ class Config(dict):
     DEFAULTS = 'defaults.cfg'
 
     # version filename
-    VERSION = 'version.json'
+    VERSIONFILE = 'version.json'
 
     # the reference files on box
     REFURL = 'https://stsci.box.com/shared/static/'
@@ -198,7 +198,7 @@ class Config(dict):
 
         filename : str, optional
             The name of the version file.  If set to `None`, then will use
-            the class variable `self.VERSION`.  Default is None.
+            the class variable `self.VERSIONFILE`.  Default is None.
 
         Returns
         -------
@@ -208,7 +208,7 @@ class Config(dict):
 
         # get the filename
         if filename is None:
-            filename = self.VERSION
+            filename = self.VERSIONFILE
         versfile = os.path.join(self.refpath, filename)
 
         # check if the file exists
@@ -253,11 +253,12 @@ class Config(dict):
         # check all the paths and take the highest version
         for path in paths:
             if os.path.isdir(path):
-                vers = version.parse(os.path.basename(path))
-                if vers > bestvers:
+                basepath = os.path.basename(path)
+                vers = version.parse(basepath)
+                if vers >= bestvers:
                     bestvers = vers
                     bestpath = os.path.join(self.REFROOT, path)
-
+                    
         # set the highest version
         if bestpath is None:
             LOGGER.warning(f'Unable to determine the reference directory in {self.REFROOT}')
@@ -289,10 +290,10 @@ class Config(dict):
         """
 
         # first check if internet is alive
-        IP = socket.gethostbyname(socket.gethostname())
-        if IP == '127.0.0.1':
-            LOGGER.warning(f'Invalid IP: {IP} --- check internect connection')
-            return False
+        #IP = socket.gethostbyname(socket.gethostname())
+        #if IP == '127.0.0.1':
+        #    LOGGER.warning(f'Invalid IP: {IP} --- check internect connection')
+        #    return False
 
         # parse the inputs
         if refurl is None:
@@ -310,25 +311,37 @@ class Config(dict):
 
         # write the remote file into local file
         LOGGER.info(f'Retrieving remote file {remotefile} to {self.REFROOT}')
-        req = requests.get(remotefile)
+        req = requests.get(remotefile, timeout=10)
         with open(localfile, 'wb') as f:
             f.write(req.content)
 
-        # unpack the local file
-        with tarfile.open(localfile) as f:
-            f.extractall(self.REFROOT)
 
+        print(localfile)
+        # unpack the local file
+        with tarfile.open(localfile) as tarf:
+            # security flaw?
+            # f.extractall(self.REFROOT)
+            print(tarf)
+            for f in tarf:
+                name = f.name
+                relname = os.path.join(self.REFROOT, name)
+                absname = os.path.abspath(relname)
+                print(absname)
+                if absname.startswith(self.REFROOT):
+                    print(name)
+                    tarf.extract(name, path=self.REFROOT)                    
+            
         # the current path
         curpath = os.path.join(self.REFROOT, 'slitlessutils_config')
 
         # read the version number for this file
         data = self.read_versfile()
-        vers = data['version']
-
+        vers = data.get('version','0.0.0')
+        
         # rename the directory to the version string
         newpath = os.path.join(self.REFROOT, vers)
         os.rename(curpath, newpath)
-
+        
         # use the new directory?
         if update:
             self.set_refpath(newpath)

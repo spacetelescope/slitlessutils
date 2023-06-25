@@ -5,7 +5,8 @@ import socket
 
 
 import os
-from urllib import request
+# from urllib import request
+import requests
 
 from .throughput import Throughput
 from .avefnu import avefnu
@@ -662,14 +663,27 @@ class SED:
             LOGGER.warning(f'Invalid CDBS Atlas: {atlas}.  Skipping download.')
             return
 
-        # try getting the file
-        try:
-            f, r = request.urlretrieve(serverfile, filename)
-            localfile = filename
-            return localfile
-        except BaseException:
+        # try getting the file in a secure way
+        resp = requests.get(serverfile, timeout=5)
+        if resp == 404:
             LOGGER.warning(f'Cannot find server-side file: {serverfile}')
             return
+        else:
+            try:
+                with open(filename, 'wb') as fp:
+                    fp.write(resp.content)
+                return filename
+            except:
+                LOGGER.warning(f"Cannot write local file: {filename}")
+                
+        # try getting the file
+        # try:
+        #     f, r = request.urlretrieve(serverfile, filename)
+        #     localfile = filename
+        #     return localfile
+        # except BaseException:
+        #     LOGGER.warning(f'Cannot find server-side file: {serverfile}')
+        #     return
 
     @classmethod
     def from_CDBS(obj, atlas, filename, cleanup=True):
