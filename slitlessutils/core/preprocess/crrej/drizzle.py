@@ -140,7 +140,7 @@ def group_by_visit(files, return_unique_visits=False, **kwargs):
         return grouped_files
 
 
-def group_by_position_angle(files, degrees=True, max_pa_diff=0.2, **kwargs):
+def group_by_position_angle(files, degrees=True, max_pa_diff=0.04, **kwargs):
     '''
     Group input files by position angle using Agglomerative Clustering, for input
     to cosmic ray rejection routine.

@@ -46,8 +46,6 @@ There are several ways to install ``slitlessutils``:
   but is easier to make local modifcations and submit pull requests.
 
 
-
-
 Fetching Reference Data
 -----------------------
 
