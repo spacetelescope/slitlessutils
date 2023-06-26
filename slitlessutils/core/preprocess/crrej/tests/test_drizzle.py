@@ -28,7 +28,7 @@ def mock_visits():
 
 @pytest.fixture
 def mock_pas():
-    return [42.13, 42.14, 80.0, 179.95, -179.95, 360.0, 0.01]
+    return [42.13, 42.14, 80.0, 179.99, -179.98, 360.0, 0.01]
 
 
 def test_wr96_drizzle():
