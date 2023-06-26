@@ -5,7 +5,7 @@ from pathlib import Path
 from astropy.io import fits
 from drizzlepac import astrodrizzle
 from scipy.spatial import distance
-from sklearn.cluster import AgglomerativeClustering
+from scipy.cluster.hierarchy import fcluster, linkage
 
 from slitlessutils.core.wfss import WFSSCollection
 from slitlessutils import LOGGER
@@ -140,7 +140,7 @@ def group_by_visit(files, return_unique_visits=False, **kwargs):
         return grouped_files
 
 
-def group_by_position_angle(files, degrees=True, max_pa_diff=0.04, **kwargs):
+def group_by_position_angle(files, degrees=True, max_pa_diff=0.05, **kwargs):
     '''
     Group input files by position angle using Agglomerative Clustering, for input
     to cosmic ray rejection routine.
@@ -163,19 +163,16 @@ def group_by_position_angle(files, degrees=True, max_pa_diff=0.04, **kwargs):
     # Precompute distance matrix for input to clustering.
     # Degrees keyword arg will get passed on to angular distance function.
     distance_matrix = distance.pdist(position_angles, metric=_angular_distance, degrees=degrees)
-    # We need an NxN matrix instead of the condensed distance matrix
-    distance_matrix = distance.squareform(distance_matrix)
 
-    # Fit clustering model. Resulting clusters are integer values in model.labels_.
-    model = AgglomerativeClustering(n_clusters=None, linkage="single", metric="precomputed",
-                                    distance_threshold=max_pa_diff)
-    model.fit(distance_matrix)
+    # Fit clustering model. Resulting clusters are integer values in labels.
+    labels = fcluster(linkage(distance_matrix, method="complete"),
+                      max_pa_diff, criterion="distance")
 
     # Return list of grouped filenames
     grouped_files = []
     files = np.array(files)
-    for i in range(0, np.max(model.labels_)+1):
-        members = files[np.where(model.labels_ == i)]
+    for i in range(1, np.max(labels)+1):
+        members = files[np.where(labels == i)]
         if len(members) == 1:
             LOGGER.warning(f"The file: {members[0]} was not grouped with any others.")
         grouped_files.append(list(members))
