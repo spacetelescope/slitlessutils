@@ -21,7 +21,6 @@ MJDREF = datetime(1858, 11, 17, 0, 0, 0)
 DTYPES = {'np.float16': np.float16,
           'np.float32': np.float32,
           'np.float64': np.float64,
-          'np.float128': np.float128,
           'np.int8': np.int8,
           'np.int16': np.int16,
           'np.int32': np.int32,
