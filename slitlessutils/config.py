@@ -1,13 +1,14 @@
-
 import configparser
 import glob
 import json
 import os
+import shutil
 from pathlib import Path
-import requests
-# import socket
+from astropy.utils.data import download_file
 import tarfile
 from packaging import version
+
+
 from .core.utilities import headers
 from .logger import LOGGER
 
@@ -172,10 +173,31 @@ class Config(dict):
             os.mkdir(self.REFROOT)
 
     @property
+    def refversion(self):
+        data = self.read_versfile()
+        return data['version']
+
+    @property
+    def refdate(self):
+        data = self.read_versfile()
+        return data['date']
+
+    @property
     def refpath(self):
         return self._refpath
 
     def set_refpath(self, path):
+        """
+        Method to set the path to the reference files
+
+        Parameters
+        ----------
+        path : str
+            The path to the reference files.  Code will check that the
+            path exists.  It is not required, but code will look for a
+            `version.json` file in that directory
+
+        """
         if os.path.exists(path):
             LOGGER.info(f'Using reference path: {path}')
             self._refpath = path
@@ -289,12 +311,6 @@ class Config(dict):
 
         """
 
-        # first check if internet is alive
-        # IP = socket.gethostbyname(socket.gethostname())
-        # if IP == '127.0.0.1':
-        #    LOGGER.warning(f'Invalid IP: {IP} --- check internect connection')
-        #    return False
-
         # parse the inputs
         if refurl is None:
             refurl = self.REFURL
@@ -311,31 +327,31 @@ class Config(dict):
 
         # write the remote file into local file
         LOGGER.info(f'Retrieving remote file {remotefile} to {self.REFROOT}')
-        req = requests.get(remotefile, timeout=10)
-        with open(localfile, 'wb') as f:
-            f.write(req.content)
+        try:
+            tmpfile = download_file(self.REFURL+self.REFFILE, timeout=10)
+        except BaseException:
+            LOGGER.warning(f"Unable to retrieve server file: {remotefile}")
+            return False
 
-        print(localfile)
+        # move the file from a tmp dir
+        shutil.move(tmpfile, localfile)
+
         # unpack the local file
         with tarfile.open(localfile) as tarf:
-            # security flaw?
-            # f.extractall(self.REFROOT)
-            print(tarf)
             for f in tarf:
                 name = f.name
                 relname = os.path.join(self.REFROOT, name)
                 absname = os.path.abspath(relname)
-                print(absname)
                 if absname.startswith(self.REFROOT):
-                    print(name)
                     tarf.extract(name, path=self.REFROOT)
 
         # the current path
         curpath = os.path.join(self.REFROOT, 'slitlessutils_config')
 
         # read the version number for this file
-        data = self.read_versfile()
-        vers = data.get('version', '0.0.0')
+        with open(os.path.join(curpath, self.VERSIONFILE), 'r') as f:
+            data = json.load(f)
+            vers = data[0]['version']
 
         # rename the directory to the version string
         newpath = os.path.join(self.REFROOT, vers)
@@ -527,13 +543,3 @@ class Config(dict):
         s += '\n'
 
         return s
-
-
-# if __name__=='__main__':
-#    x=Config()
-#
-#    print(x.conffile)
-#    print(x.confpath)
-#    print(x.fluxscale)
-#    x.fluxscale=2
-#    print(x.fluxscale)
