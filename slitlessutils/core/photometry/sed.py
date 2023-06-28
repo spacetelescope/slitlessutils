@@ -1,11 +1,11 @@
 from astropy.io import fits
 import numpy as np
 from scipy.constants import c
-import socket
+from astropy.utils.data import download_file
 
-
+import shutil
 import os
-from urllib import request
+
 
 from .throughput import Throughput
 from .avefnu import avefnu
@@ -272,8 +272,6 @@ class SED:
         -------
         sed : `SED`
            A scaled spectrum
-
-
         """
 
         sed = SED()
@@ -643,33 +641,25 @@ class SED:
             The filename in the atlas
 
         """
-
-        # first check that internet is alive
-        IP = socket.gethostbyname(socket.gethostname())
-        if IP == '127.0.0.1':
-            LOGGER.warning(f'Invalid IP: {IP}.  Skipping download from CDBS.')
-            return
-
         # base URL for CDBS
         url = 'https://archive.stsci.edu/hlsps/reference-atlases/cdbs/grid/'
 
         # do something for each valid atlas
         if atlas == 'bc95':
-            serverfile = f'{url}{atlas}/templates/{filename}'
+            remotefile = f'{url}{atlas}/templates/{filename}'
         elif atlas == 'pickles':
-            serverfile = f'{url}{atlas}/dat_uvk/{filename}'
+            remotefile = f'{url}{atlas}/dat_uvk/{filename}'
         else:
             LOGGER.warning(f'Invalid CDBS Atlas: {atlas}.  Skipping download.')
             return
 
-        # try getting the file
+        # try getting the file in a secure way
         try:
-            f, r = request.urlretrieve(serverfile, filename)
-            localfile = filename
-            return localfile
+            tmpfile = download_file(remotefile, timeout=10)
         except BaseException:
-            LOGGER.warning(f'Cannot find server-side file: {serverfile}')
+            LOGGER.warning(f"Unable to retrieve server file: {remotefile}")
             return
+        shutil.move(tmpfile, filename)
 
     @classmethod
     def from_CDBS(obj, atlas, filename, cleanup=True):

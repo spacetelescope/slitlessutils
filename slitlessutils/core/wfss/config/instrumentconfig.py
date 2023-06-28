@@ -18,6 +18,21 @@ from .wfssconfig import WFSSConfig
 MJDREF = datetime(1858, 11, 17, 0, 0, 0)
 
 
+DTYPES = {'np.float16': np.float16,
+          'np.float32': np.float32,
+          'np.float64': np.float64,
+          'np.int8': np.int8,
+          'np.int16': np.int16,
+          'np.int32': np.int32,
+          'np.int64': np.int64,
+          'np.uint8': np.uint8,
+          'np.uint16': np.uint16,
+          'np.uint32': np.uint32,
+          'np.uint64': np.uint64,
+          'int': int,
+          'float': float}
+
+
 @dataclass
 class SIAF:
     """
@@ -166,12 +181,13 @@ class Extension:
 
         Should never be directly called
         """
+        self.dtype = DTYPES.get(self.dtype, 'float')
 
-        # if an invalid type is set, then assume float
-        try:
-            self.dtype = eval(self.dtype)
-        except BaseException:
-            self.dtype = float
+        # pep doesn't like this:  so deprecating this...
+        # try:
+        #     self.dtype = eval(self.dtype)
+        # except BaseException:
+        #     self.dtype = float
 
     @property
     def extension(self):
@@ -402,7 +418,7 @@ class DetectorConfig:
             self.sip = ()
 
         conffile = data['blockers'][disperser.blocking]['config'][disperser.name]
-        conffile = os.path.join(Config().confpath, 'instruments', path, conffile)
+        conffile = os.path.join(Config().refpath, 'instruments', path, conffile)
         self.config = WFSSConfig(conffile, **kwargs)
 
     @staticmethod
@@ -615,7 +631,7 @@ class InstrumentConfig(dict):
         Read a yaml file from the `slitlessutils_config` directory
 
         """
-        self.filename = os.path.join(Config().confpath, 'instruments',
+        self.filename = os.path.join(Config().refpath, 'instruments',
                                      f'{telescope}_{instrument}.yaml'.lower())
 
         # load the yaml config file
@@ -724,7 +740,7 @@ class InstrumentConfig(dict):
         """
         back = self.backgrounds.get(key)
         if back:
-            back = os.path.join(Config().confpath, 'instruments',
+            back = os.path.join(Config().refpath, 'instruments',
                                 self.path, back)
         return back
 
