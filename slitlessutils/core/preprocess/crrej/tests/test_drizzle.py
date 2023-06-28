@@ -5,8 +5,8 @@ from tempfile import TemporaryDirectory
 
 from astroquery.mast import Observations
 
-from slitlessutils.core.preprocess.crrej.drizzle import drizzle
-from slitlessutils.core.preprocess.crrej.drizzle import group_by_visit
+from slitlessutils.core.preprocess.crrej.drizzle import (drizzle, group_by_visit,
+                                                         group_by_position_angle)
 from slitlessutils.core.wfss import WFSSCollection
 
 
@@ -24,6 +24,11 @@ def mock_files():
 @pytest.fixture
 def mock_visits():
     return ["01", "01", "02", "03", "02"]
+
+
+@pytest.fixture
+def mock_pas():
+    return [42.13, 42.14, 80.0, 179.99, -179.98, 360.0, 0.01, 0.05, 0.09]
 
 
 def test_wr96_drizzle():
@@ -86,3 +91,27 @@ def test_group_by_visits(mock_files, mock_visits, return_unique_visits, monkeypa
     if return_unique_visits:
         assert len(unique_visits) == 3
         assert np.array_equal(unique_visits, ["01", "02", "03"])
+
+
+def test_group_by_pas(mock_files, mock_pas, monkeypatch):
+    np.random.seed(42)
+
+    def mock_from_list(files):
+        return WFSSCollection()
+
+    def mock_get_pas(self):
+        return mock_pas
+
+    monkeypatch.setattr(WFSSCollection, "from_list", mock_from_list)
+    monkeypatch.setattr(WFSSCollection, "get_pas", mock_get_pas)
+
+    additional_files = ["add_test1", "add_test2", "add_test3", "add_test4"]
+    result = group_by_position_angle(mock_files + additional_files)
+    print(result)
+
+    assert len(result) == 5
+    assert result[0] == ["file4_visit_03.fits", "file5_visit_02.fits"]
+    assert result[1] == ["add_test1", "add_test2"]
+    assert result[2] == ['add_test3', 'add_test4']
+    assert result[3] == ["file1_visit_01.fits", "file2_visit_01.fits"]
+    assert result[4] == ["file3_visit_02.fits",]

@@ -1,8 +1,11 @@
+import math
 import numpy as np
 from pathlib import Path
 
 from astropy.io import fits
 from drizzlepac import astrodrizzle
+from scipy.spatial import distance
+from scipy.cluster.hierarchy import fcluster, linkage
 
 from slitlessutils.core.wfss import WFSSCollection
 from slitlessutils import LOGGER
@@ -34,6 +37,19 @@ def _get_instrument_defaults(file):
                 raise ValueError(f"'{instrument}' is not supported")
         else:
             raise ValueError(f"'{telescope}' is not supported")
+
+
+def _angular_distance(angle1, angle2, degrees=True):
+    '''
+    Return angular distance between two angles
+    '''
+    if degrees:
+        circumference = 360
+    else:
+        circumference = 2 * math.pi
+    arc_length = abs(angle2 - angle1)
+    distance = min(arc_length, circumference - arc_length % circumference)
+    return distance
 
 
 def drizzle(files, outdir=Path().absolute(), **kwargs):
@@ -122,3 +138,43 @@ def group_by_visit(files, return_unique_visits=False, **kwargs):
         return grouped_files, unique_visits
     else:
         return grouped_files
+
+
+def group_by_position_angle(files, degrees=True, max_pa_diff=0.05, **kwargs):
+    '''
+    Group input files by position angle using Agglomerative Clustering, for input
+    to cosmic ray rejection routine.
+
+    Parameters
+    ----------
+    files : list of str
+        List of input filenames to be grouped for cosmic ray rejection.
+    degrees : bool, optional
+        Set to False if PA is in radians instead of degrees.
+    max_pa_diff : float, optional
+        The maximium difference between PAs for two files to be considered
+        part of the same group.
+    '''
+    data_collection = WFSSCollection.from_list(files)
+    position_angles = data_collection.get_pas()
+    # Input needs to be 2D
+    position_angles = np.reshape(position_angles, (len(position_angles), 1))
+
+    # Precompute distance matrix for input to clustering.
+    # Degrees keyword arg will get passed on to angular distance function.
+    distance_matrix = distance.pdist(position_angles, metric=_angular_distance, degrees=degrees)
+
+    # Fit clustering model. Resulting clusters are integer values in labels.
+    labels = fcluster(linkage(distance_matrix, method="complete"),
+                      max_pa_diff, criterion="distance")
+
+    # Return list of grouped filenames
+    grouped_files = []
+    files = np.array(files)
+    for i in range(1, np.max(labels)+1):
+        members = files[np.where(labels == i)]
+        if len(members) == 1:
+            LOGGER.warning(f"The file: {members[0]} was not grouped with any others.")
+        grouped_files.append(list(members))
+
+    return grouped_files
