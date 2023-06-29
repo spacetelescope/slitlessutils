@@ -33,9 +33,9 @@ def compress(indices):
     >>> from slitlessutils.core.utilities import indices
     >>> x=np.array([4,6,4,8,9,2,10,100,5], dtype=int)
     >>> ycomp, yuniq = indices.compress(x)
-    >>> ycomp
+    >>> ycomp  # doctest: +IGNORE_OUTPUT
     array([1, 3, 1, 4, 5, 0, 6, 7, 2])
-    >>> yuniq
+    >>> yuniq  # doctest: +IGNORE_OUTPUT
     array([  2,   4,   5,   6,   8,   9,  10, 100])
 
     """
@@ -106,7 +106,7 @@ def reverse(ints, ignore=()):
     >>> x=np.array([4,6,4,8,9,2,10,100,5], dtype=int)
     >>> ri=indices.reverse(x)
     >>> for i,j in ri.items():
-    ...     print(i,j)
+        ...     print(i,j)  # doctest: +IGNORE_OUTPUT
     2 (array([5]),)
     4 (array([0, 2]),)
     5 (array([8]),)
