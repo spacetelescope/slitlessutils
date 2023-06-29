@@ -106,7 +106,7 @@ def reverse(ints, ignore=()):
     >>> x=np.array([4,6,4,8,9,2,10,100,5], dtype=int)
     >>> ri=indices.reverse(x)
     >>> for i,j in ri.items():
-        ...     print(i,j)  # doctest: +IGNORE_OUTPUT
+    ...     print(i,j)  # doctest: +IGNORE_OUTPUT
     2 (array([5]),)
     4 (array([0, 2]),)
     5 (array([8]),)
