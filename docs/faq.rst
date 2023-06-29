@@ -21,7 +21,8 @@ in the main module:
 
         if __name__ == '__main__':
             freeze_support()
-        ...
+
+...
 
 The "freeze_support()" line can be omitted if the program
 is not going to be frozen to produce an executable.
