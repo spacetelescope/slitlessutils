@@ -20,7 +20,7 @@ child processes and you have forgotten to use the proper idiom
 in the main module:
 
         if __name__ == '__main__':
-        freeze_support()
+            freeze_support()
         ...
 
 The "freeze_support()" line can be omitted if the program
@@ -29,9 +29,8 @@ is not going to be frozen to produce an executable.
 
 Likely running in the __main__ of a script. Try putting commands inside
 of a code block, such as:
->>> if __name__=='__main__':
->>>     my_commands_here()
-
+>>> if __name__=='__main__':  # doctest: +SKIP
+>>>     my_commands_here()  # doctest: +SKIP
 
 
 
@@ -40,6 +39,6 @@ Why do I get the same logging message printed multiple times?
 You have probably explicitly started the logger with something like
 
 >>> import slitlessutils as su
->>> su.start_logging()
+>>> su.start_logging()  # doctest: +IGNORE_OUTPUT
 
 or it has been initialized multiple times.

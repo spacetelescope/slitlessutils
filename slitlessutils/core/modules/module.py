@@ -16,7 +16,7 @@ class Module:
         will iterate over the WFSS images.  See also `su.utilities.Pool()`
         for more information.  Calling signature should look like:
 
-        >>> def my_function(wfss,*args,**kwargs)
+            >>> def my_function(wfss,*args,**kwargs)  # doctest: +SKIP
 
         Where `wfss` is an instance of `WFSS()`.
 
@@ -34,7 +34,7 @@ class Module:
         See also `su.utilities.Pool()` for more information.  Calling
         signature should look like:
 
-        >>> def my_function(results,data,*args,**kwargs)
+            >>> def my_function(results,data,*args,**kwargs)  # doctest: +SKIP
 
         where `results` are the results from the `func()` call. Default
         is `None
