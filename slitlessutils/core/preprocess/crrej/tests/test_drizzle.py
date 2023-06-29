@@ -5,8 +5,12 @@ from tempfile import TemporaryDirectory
 
 from astroquery.mast import Observations
 
-from slitlessutils.core.preprocess.crrej.drizzle import (drizzle, group_by_visit,
-                                                         group_by_position_angle)
+from slitlessutils.core.preprocess.crrej.drizzle import (
+    drizzle,
+    group_by_visit,
+    group_by_position_angle,
+    drizzle_grouped_files,
+)
 from slitlessutils.core.wfss import WFSSCollection
 
 
@@ -112,6 +116,74 @@ def test_group_by_pas(mock_files, mock_pas, monkeypatch):
     assert len(result) == 5
     assert result[0] == ["file4_visit_03.fits", "file5_visit_02.fits"]
     assert result[1] == ["add_test1", "add_test2"]
-    assert result[2] == ['add_test3', 'add_test4']
+    assert result[2] == ["add_test3", "add_test4"]
     assert result[3] == ["file1_visit_01.fits", "file2_visit_01.fits"]
-    assert result[4] == ["file3_visit_02.fits",]
+    assert result[4] == [
+        "file3_visit_02.fits",
+    ]
+
+
+def test_drizzle_groups():
+    files_to_dowload = {
+        "icoi3adnq_flt.fits": "mast:HST/product/icoi3adnq_flt.fits",
+        "icoi3adpq_flt.fits": "mast:HST/product/icoi3adpq_flt.fits",
+        "icoi3adrq_flt.fits": "mast:HST/product/icoi3adrq_flt.fits",
+        "icoi3ae2q_flt.fits": "mast:HST/product/icoi3ae2q_flt.fits",
+        "icoi3ae4q_flt.fits": "mast:HST/product/icoi3ae4q_flt.fits",
+        "icoi3advq_flt.fits": "mast:HST/product/icoi3advq_flt.fits",
+        "icoi3fi2q_flt.fits": "mast:HST/product/icoi3fi2q_flt.fits",
+        "icoi3fhlq_flt.fits": "mast:HST/product/icoi3fhlq_flt.fits",
+        "icoi3fhzq_flt.fits": "mast:HST/product/icoi3fhzq_flt.fits",
+        "icoi3fhpq_flt.fits": "mast:HST/product/icoi3fhpq_flt.fits",
+        "icoi3fhnq_flt.fits": "mast:HST/product/icoi3fhnq_flt.fits",
+    }
+
+    with TemporaryDirectory() as tempdir:
+        rawdata_dir = Path(tempdir) / "raw_data"
+        rawdata_dir.mkdir(parents=True)
+        for filename in files_to_dowload:
+            Observations.download_file(
+                files_to_dowload[filename], local_path=str(rawdata_dir / filename)
+            )
+        rawdata_filepaths = [str(filepath) for filepath in rawdata_dir.iterdir()]
+        drizzled_files_by_visit = drizzle_grouped_files(
+            rawdata_filepaths, grouping="visit"
+        )
+        drizzled_files_by_pa = drizzle_grouped_files(
+            rawdata_filepaths, grouping="position_angle"
+        )
+        assert len(drizzled_files_by_pa) == len(files_to_dowload)
+        assert len(drizzled_files_by_visit) == len(files_to_dowload)
+
+
+def test_drizzle_groups():
+    files_to_dowload = {
+        "icoi3adnq_flt.fits": "mast:HST/product/icoi3adnq_flt.fits",
+        "icoi3adpq_flt.fits": "mast:HST/product/icoi3adpq_flt.fits",
+        "icoi3adrq_flt.fits": "mast:HST/product/icoi3adrq_flt.fits",
+        "icoi3ae2q_flt.fits": "mast:HST/product/icoi3ae2q_flt.fits",
+        "icoi3ae4q_flt.fits": "mast:HST/product/icoi3ae4q_flt.fits",
+        "icoi3advq_flt.fits": "mast:HST/product/icoi3advq_flt.fits",
+        "icoi3fi2q_flt.fits": "mast:HST/product/icoi3fi2q_flt.fits",
+        "icoi3fhlq_flt.fits": "mast:HST/product/icoi3fhlq_flt.fits",
+        "icoi3fhzq_flt.fits": "mast:HST/product/icoi3fhzq_flt.fits",
+        "icoi3fhpq_flt.fits": "mast:HST/product/icoi3fhpq_flt.fits",
+        "icoi3fhnq_flt.fits": "mast:HST/product/icoi3fhnq_flt.fits",
+    }
+
+    with TemporaryDirectory() as tempdir:
+        rawdata_dir = Path(tempdir) / "raw_data"
+        rawdata_dir.mkdir(parents=True)
+        for filename in files_to_dowload:
+            Observations.download_file(
+                files_to_dowload[filename], local_path=str(rawdata_dir / filename)
+            )
+        rawdata_filepaths = [str(filepath) for filepath in rawdata_dir.iterdir()]
+        drizzled_files_by_visit = drizzle_grouped_files(
+            rawdata_filepaths, grouping="visit"
+        )
+        drizzled_files_by_pa = drizzle_grouped_files(
+            rawdata_filepaths, grouping="position_angle"
+        )
+        assert len(drizzled_files_by_pa) == len(files_to_dowload)
+        assert len(drizzled_files_by_visit) == len(files_to_dowload)
