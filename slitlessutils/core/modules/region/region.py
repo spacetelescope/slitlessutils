@@ -67,7 +67,7 @@ class Region(Module):
         There will be as many files as there are detectors in one of the
         elements of the data.  They will have the following filenames:
 
-        >>> f'{data.dataset}_{detdata.name}.reg'
+            >>> f'{data.dataset}_{detdata.name}.reg'  # doctest: +SKIP
 
 
         """

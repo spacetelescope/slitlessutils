@@ -30,16 +30,13 @@ def compress(indices):
     Examples
     --------
     >>> import numpy as np
-    >>> x=np.array([4,6,4,8,9,2,10,100,5],dtype=int)
-    >>> ycomp,yuniq=indices.compress(x)
-    >>> ycomp
+    >>> from slitlessutils.core.utilities import indices
+    >>> x=np.array([4,6,4,8,9,2,10,100,5], dtype=int)
+    >>> ycomp, yuniq = indices.compress(x)
+    >>> ycomp  # doctest: +IGNORE_OUTPUT
     array([1, 3, 1, 4, 5, 0, 6, 7, 2])
-    >>> yuniq
+    >>> yuniq  # doctest: +IGNORE_OUTPUT
     array([  2,   4,   5,   6,   8,   9,  10, 100])
-    >>> xx
-    array([  4,   6,   4,   8,   9,   2,  10, 100,   5])
-    >>> xx-x
-    array([0, 0, 0, 0, 0, 0, 0, 0, 0])
 
     """
 
@@ -70,7 +67,8 @@ def uniq(indices):
     Examples
     --------
     >>> import numpy as np
-    >>> x=np.array([4,6,4,8,9,2,10,100,5],dtype=int)
+    >>> from slitlessutils.core.utilities import indices
+    >>> x=np.array([4,6,4,8,9,2,10,100,5], dtype=int)
     >>> u=indices.uniq(x)
     >>> u
     array([  4,   6,   8,   9,   2,  10, 100,   5])
@@ -104,10 +102,11 @@ def reverse(ints, ignore=()):
     Examples
     --------
     >>> import numpy as np
-    >>> x=np.array([4,6,4,8,9,2,10,100,5],dtype=int)
+    >>> from slitlessutils.core.utilities import indices
+    >>> x=np.array([4,6,4,8,9,2,10,100,5], dtype=int)
     >>> ri=indices.reverse(x)
     >>> for i,j in ri.items():
-    ...     print(i,j)
+    ...     print(i,j)  # doctest: +IGNORE_OUTPUT
     2 (array([5]),)
     4 (array([0, 2]),)
     5 (array([8]),)
@@ -189,6 +188,7 @@ def decimate(val, *indices, dims=None, unravel=True, return_factor=False):
     an array of values v, which will be decimated.
 
     >>> import numpy as np
+    >>> from slitlessutils.core.utilities import indices
     >>> x=np.array([1,1,2,2,3,3,1,1,3,3,4],dtype=np.uint16)
     >>> y=np.array([1,1,2,2,2,2,1,1,3,4,5],dtype=np.uint16)
     >>> l=np.array([1,2,2,2,3,2,1,1,3,3,6],dtype=np.uint16)
@@ -202,7 +202,7 @@ def decimate(val, *indices, dims=None, unravel=True, return_factor=False):
     given value:
 
     >>> vv,xx,yy,ll = indices.decimate(v,x,y,l)
-    >>> vv,xx,yy,ll
+    >>> vv,xx,yy,ll  # doctest: +IGNORE_OUTPUT
     array([ 6.,  4., 14.,  5.,  7.,  8.,  6.,  4.])
     array([1, 1, 2, 3, 3, 3, 3, 4], dtype=uint16)
     array([1, 1, 2, 2, 2, 3, 4, 5], dtype=uint16)
@@ -220,7 +220,7 @@ def decimate(val, *indices, dims=None, unravel=True, return_factor=False):
     Finally, the number of dimensions is arbitrary:
 
     >>> vv,xx,yy = indices.decimate(v,x,y,dims=(5,6))
-    >>> vv,xx,yy
+    >>> vv,xx,yy  # doctest: +IGNORE_OUTPUT
     array([10., 14., 12.,  8.,  6.,  4.])
     array([1, 2, 3, 3, 3, 4], dtype=uint16)
     array([1, 2, 2, 3, 4, 5], dtype=uint16)

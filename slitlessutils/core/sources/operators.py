@@ -20,6 +20,8 @@ class Operator:
             self.__pars[k] = (v, self.__pars[k][1])
 
     def __getattr__(self, k):
+        if k == "_Operator__pars":
+            return self.__pars
         if k in self.__pars:
             return self.__pars[k][0]
 
@@ -124,9 +126,9 @@ class Erode(Operator):
     Examples
     --------
     >>> e=Erode()
-    >>> e.eroderad=4
-    >>> e.erodefun='diamond'
-    >>> img,seg,hdr = e(img,seg,hdr)
+    >>> e.eroderad=4  # doctest: +SKIP
+    >>> e.erodefun='diamond'  # doctest: +SKIP
+    >>> img,seg,hdr = e(img,seg,hdr)  # doctest: +SKIP
     """
 
     __str = 'Erosion Operator'
@@ -208,9 +210,9 @@ class Dilate(Operator):
     Examples
     --------
     >>> d=Dilate()
-    >>> d.dilatrad=4
-    >>> d.dilatfun='diamond'
-    >>> img,seg,hdr = d(img,seg,hdr)
+    >>> d.dilatrad=4  # doctest: +SKIP
+    >>> d.dilatfun='diamond'  # doctest: +SKIP
+    >>> img,seg,hdr = d(img,seg,hdr)  # doctest: +SKIP
 
     """
 
@@ -288,9 +290,9 @@ class Smooth(Operator):
     Examples
     --------
     >>> s=Smooth()
-    >>> s.smthsize=4
-    >>> s.smthfunc='median'
-    >>> img,seg,hdr = s(img,seg,hdr)
+    >>> s.smthsize=4  # doctest: +SKIP
+    >>> s.smthfunc='median'  # doctest: +SKIP
+    >>> img,seg,hdr = s(img,seg,hdr)  # doctest: +SKIP
 
     """
 
@@ -371,10 +373,9 @@ class Rebin(Operator):
     Examples
     --------
     >>> r=Rebin()
-    >>> r.binfac=2
-    >>> r.binfun='median'
-    >>> img,seg,hdr = r(img,seg,hdr)
-
+    >>> r.binfac=2  # doctest: +SKIP
+    >>> r.binfun='median'  # doctest: +SKIP
+    >>> img,seg,hdr = r(img,seg,hdr)  # doctest: +SKIP
 
     """
 

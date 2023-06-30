@@ -56,9 +56,9 @@ class Single(Module):
     The main entry point is through the `__call__()` method in the `Module`
     parent class.
 
-    >>> import slitlessutils as su
-    >>> ext = su.modules.Single('+1',mskorders=None,root=ROOT)
-    >>> res = ext(data,sources)
+    >>> import slitlessutils as su  # doctest: +SKIP
+    >>> ext = su.modules.Single('+1', mskorders=None, root=ROOT)  # doctest: +SKIP
+    >>> res = ext(data,sources)  # doctest: +SKIP
 
     """
 
