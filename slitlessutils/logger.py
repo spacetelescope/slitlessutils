@@ -74,7 +74,7 @@ class STDOUTFormatter(MyFormatter):
                logging.INFO: "\033[32;1mINFO %(processName)s> \033[00m\033[32m%(message)s\033[00m",
                logging.WARNING: ("\033[93;1mWARNING %(processName)s> "
                                  "\033[00m\033[93m%(message)s\033[00m"),
-               logging.ERROR: ("\033[91;5;1mERROR%(processName)s>\033[00m"
+               logging.ERROR: ("\033[91;5;1mERROR %(processName)s>\033[00m"
                                "\033[91m %(message)s\033[00m"),
                # logging.ERROR :"\033[91;1mERROR %(processName)s>
                # \033[00m\033[91;5m%(message)s\033[00m",
