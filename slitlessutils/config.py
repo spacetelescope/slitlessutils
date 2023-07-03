@@ -1,4 +1,3 @@
-import configparser
 import glob
 import json
 import os
@@ -7,6 +6,7 @@ from pathlib import Path
 from astropy.utils.data import download_file
 import tarfile
 from packaging import version
+import textwrap
 
 
 from .core.utilities import headers
@@ -51,14 +51,14 @@ class Parameter:
         self.editable = editable
 
     @classmethod
-    def from_config(cls, p):
+    def from_dict(cls, p):
         """
         Classmethod to load config parameter from a config file
 
         Parameters
         ----------
-        p : `configparser.Section`
-            The section from the config file
+        p : dict (or dict like)
+            A dictionary to load the parameter from
 
         Returns
         -------
@@ -66,17 +66,7 @@ class Parameter:
             The output parameter
         """
 
-        try:
-            value = int(p['value'])
-        except BaseException:
-            try:
-                value = float(p['value'])
-            except BaseException:
-                value = p['value']
-
-        obj = cls(p['keyword'], value, p['comment'])
-
-        return obj
+        return cls(p['keyword'], p['value'], p['comment'])
 
     def __iter__(self):
         """
@@ -114,14 +104,16 @@ class Config(dict):
     """
 
     # the default config filename:
-    DEFAULTS = 'defaults.cfg'
+    DEFAULTS = 'defaults.json'
 
     # version filename
     VERSIONFILE = 'version.json'
 
     # the reference files on box
-    REFURL = 'https://stsci.box.com/shared/static/'
-    REFFILE = 'fzlb7y36ofi18ziy6mkbyg710stmygjf.gz'
+    # REFURL = 'https://stsci.box.com/shared/static/'
+    # REFFILE = 'fzlb7y36ofi18ziy6mkbyg710stmygjf.gz'
+    REFURL = 'https://data.science.stsci.edu/redirect/slitlessutils/'
+    REFDB = 'slitlessutils_config_versions.json'
 
     # local path to store reference files
     REFROOT = os.path.join(Path.home(), '.slitlessutils')
@@ -136,26 +128,32 @@ class Config(dict):
             cls._instance = super().__new__(cls)
             cls._instance._refpath = os.getcwd()
 
+            # first check if the refroot exists
+            cls._instance.make_refroot()
+
             # set the latest reference files
-            cls._instance.set_reffiles()
+            _ = cls._instance.set_reffiles()
 
             # load the defaults
             deffile = os.path.join(cls._instance.refpath,
                                    cls._instance.DEFAULTS)
 
-            # get the parser
-            cfg = configparser.ConfigParser()
+            # read the defaults as json
+            if os.path.exists(deffile):
+                with open(deffile, 'r') as f:
+                    cfg = json.load(f)
+            else:
+                cfg = {}
 
-            # read the files
-            cfg.read(deffile)
+            # if a conffile is given, read and update with that
+            if conffile:
+                with open(conffile, 'r') as f:
+                    custom = json.load(f)
+                cfg.update(custom)
 
-            # if user sets a conffile, then let's use that
-            if conffile is not None:
-                cfg.read(conffile)
-
-            # set the results to the local dict
-            for k in cfg.sections():
-                cls._instance[k] = Parameter.from_config(cfg[k])
+            # load each keyword into the self
+            for k, v in cfg.items():
+                cls._instance[k] = Parameter.from_dict(v)
 
             # update any keywords
             for k, v in kwargs.items():
@@ -175,12 +173,12 @@ class Config(dict):
     @property
     def refversion(self):
         data = self.read_versfile()
-        return data['version']
+        return data.get('version')
 
     @property
     def refdate(self):
         data = self.read_versfile()
-        return data['date']
+        return data.get('date')
 
     @property
     def refpath(self):
@@ -198,26 +196,28 @@ class Config(dict):
             `version.json` file in that directory
 
         """
+
+        if not path.startswith(self.REFROOT):
+            path = os.path.join(self.REFROOT, path)
+
         if os.path.exists(path):
+            # ensure that the last char is a separator
+            if path[-1] != os.sep:
+                path += os.sep
+
+            # report result and set the variable
             LOGGER.info(f'Using reference path: {path}')
             self._refpath = path
-
-            # vers = self.read_versfile()
 
         else:
             LOGGER.warning(f'Reference path ({path}) does not exist.')
 
-    def read_versfile(self, index=0, filename=None):
+    def read_versfile(self, filename=None):
         """
         Method to read the version file
 
         Parameters
         ----------
-        index : int, optional
-            The index of the version information to read (most recent is 0).
-            If `None`, then will return all of the version history.
-            Default is 0
-
         filename : str, optional
             The name of the version file.  If set to `None`, then will use
             the class variable `self.VERSIONFILE`.  Default is None.
@@ -230,108 +230,228 @@ class Config(dict):
 
         # get the filename
         if filename is None:
-            filename = self.VERSIONFILE
-        versfile = os.path.join(self.refpath, filename)
+            filename = os.path.join(self.refpath, self.VERSIONFILE)
 
         # check if the file exists
-        if os.path.exists(versfile):
+        if os.path.exists(filename):
             # open file as a json
-            with open(versfile, 'r') as fp:
+            with open(filename, 'r') as fp:
                 data = json.load(fp)
 
-            # return the requested index
-            if index is not None:
-                data = data[index]
         else:
             # return empty dict for a non-existent VERSION info
-            LOGGER.warning(
-                f'Unable to find version file ({versfile}), suspicious behavior may follow.')
+            msg = f'Unable to find version file ({filename}).  This should be concerning.'
+            LOGGER.warning(msg)
             data = {}
+
         return data
 
-    def set_reffiles(self):
+    def set_reffiles(self, refversion=None):
         """
         Set the reference file path in the root configurations
+
+        Parameters
+        ----------
+        refversion : str, `version.Version`, optional
+            Name of the version to use.  If `None`, then use latest.
+            default is None.
         """
 
-        # grab all the paths from the root directory
-        glob_token = os.path.join(self.REFROOT, '*')
-        paths = glob.glob(glob_token)
+        # for messaging:
+        failure = "Cannot set refpath:"
 
-        # check that there are valid paths to parse
-        if len(paths) == 0:
-            # there are no paths, which means there are no ref files.
-            # so we should go fetch some
-            if self.retrieve_reffiles():
-                # check the paths again
-                paths = glob.glob(glob_token)
-                if len(paths) == 0:
-                    LOGGER.warning("Failed auto setup of reference files")
+        # process based on the data type of the refversion
+        if refversion is None:
+            # if refvserion is `None`, then compute the latest-greatest.
 
-        # initalize with a nonsense value
-        bestvers = version.parse('0.0.0')
-        bestpath = None
+            # initalize with a nonsense value
+            bestvers = version.parse('0.0.0')
+            bestpath = None
 
-        # check all the paths and take the highest version
-        for path in paths:
-            if os.path.isdir(path):
-                basepath = os.path.basename(path)
-                vers = version.parse(basepath)
-                if vers >= bestvers:
-                    bestvers = vers
-                    bestpath = os.path.join(self.REFROOT, path)
+            # get the paths in the root dir
+            glob_token = os.path.join(self.REFROOT, '*'+os.sep)
+            paths = glob.glob(glob_token)
 
-        # set the highest version
-        if bestpath is None:
-            LOGGER.warning(f'Unable to determine the reference directory in {self.REFROOT}')
+            # check for empty paths
+            if len(paths) == 0:
+                msg = f"{failure} there are no reference files in " + \
+                    "{self.REFROOT}, trying to fetch some."
+                LOGGER.warning(msg)
+
+                # try retrieving some files
+                reffile = self.retrieve_reffiles(update=True)
+                if not reffile:
+                    LOGGER.error("Cannot set any reffiles")
+            else:
+                # check all the paths and take the highest version
+                for path in paths:
+                    basepath = os.path.basename(path[:-1])
+                    vers = version.parse(basepath)
+                    if vers >= bestvers:
+                        bestvers = vers
+                        bestpath = os.path.join(self.REFROOT, path)
+
+                # ok now set the best path
+                if bestpath is None:
+                    LOGGER.warning(f"{failure} latest version not found in {self.REFROOT}")
+                    return
+                else:
+                    self.set_refpath(bestpath)
+
         else:
-            self._refpath = bestpath
+            # if not `None`, then sort it out
+            if isinstance(refversion, str):
+                # if a string, then use it as is
+                vers = refversion
+            elif isinstance(refversion, version.Version):
+                # if a Python version object, then distill as a string
+                vers = str(refversion)
+            else:
+                # invalid data type
+                LOGGER.warning(f"{failure} invalid datatype for refversion ({refversion})")
+                return
 
-    def retrieve_reffiles(self, refurl=None, reffile=None, update=True):
+            # now look for this refversion in the archive of reference files:
+            path = os.path.join(self.REFROOT, refversion)
+            if os.path.isdir(path):
+                # valid path was found.  Use it
+                self.set_refpath(path)
+            else:
+                # no valid path was found.  give an error
+                LOGGER.warning(f"{failure} refversion not found ({refversion})")
+
+        # return a value to indicate success
+        return self._refpath
+
+    def help_refmanifest(self):
+        """
+        Method to print properties of the reference-file manifest to
+        the screen
+
+        """
+        # indentations
+        used = ' * '
+        others = '   '
+
+        # get manifest and print item by item
+        man = self.retrieve_refmanifest()
+        for vers, data in man.items():
+
+            # get the version number, indentation, and format them
+            vers = str(vers)
+            if vers == self.refversion:
+                indent = used
+            else:
+                indent = others
+
+            # print the main line
+            print(f'{indent}{vers:<9} {data["file"]:<40} {data["date"]}')
+
+            # print the notes field
+            for text in textwrap.wrap(data["notes"]):
+                print(f'{others}{text}')
+            print()
+
+    def retrieve_refmanifest(self, return_latest=False):
+        """
+        Method to read the manifest file about all the reference files
+
+        Parameters
+        ----------
+        return_latest : bool, optional
+            Flag to also return the highest (ie. latest) version number.
+            Default is False
+
+        Returns
+        -------
+        manifest : dict
+            A dictionary of the possible reference files.  Keywords are
+            version numbers, values are the filenames.
+
+        version : `version.Version`, optional
+            The version number of the highest (ie. latest) version, if
+            requested.
+
+        """
+        # download the manifest file
+        f = download_file(self.REFURL+self.REFDB, timeout=3)
+
+        # open the manifest as a json file
+        with open(f, 'r') as fp:
+            data = json.load(fp)
+
+        # output variables:
+        manifest = {}
+        latest = version.parse('0.0.0')
+
+        # parse the manifest
+        for datum in data:
+            vers = version.parse(datum.get('version', '0.0.0'))
+            if vers >= latest:
+                latest = vers
+
+            # remove the version variable (since it's the keyword) and
+            # save to manifest dict for output
+            if 'version' in datum:
+                del datum['version']
+            manifest[vers] = datum
+
+        # sort out what to return
+        if return_latest:
+            return manifest, latest
+        else:
+            return manifest
+
+    def retrieve_reffiles(self, refversion=None, update=True):
         """
         Method to retrieve files from box
 
         Parameters
         ----------
-        refurl : str or None, optional
-            The URL for the box file.  If value is None, then the
-            class variable `Config.REFURL` is used.   Default is None
-
-        reffile : str or None, optional
-            The name of the box file.  If value is None, then the
-            class variable `Config.REFFILE` is used.  Default is None.
+        refversion : str or `version.Version`, optional
+            The name of the reference file version info.  If `None`, then the
+            latest (ie. highest) version are used.  Default is None.
 
         update : bool, optional
             Flag to update the `refpath` after retrieving.  Default is True
 
         Returns
         -------
-        flag : bool
-            Flag if retrieval worked properly
+        reffile : str
+            name of the reference library downloaded or `None` if retrieval failed.
 
         """
 
-        # parse the inputs
-        if refurl is None:
-            refurl = self.REFURL
+        # read the manifest
+        man, latest = self.retrieve_refmanifest(return_latest=True)
+        if refversion is None:
+            reffile = man[latest]['file']
+        else:
+            if isinstance(refversion, str):
+                refversion = version.parse(refversion)
+            elif isinstance(refversion, version.Version):
+                pass
+            else:
+                LOGGER.warning(f"Unsupported datatype for refversion ({refversion})")
+                return
 
-        if reffile is None:
-            reffile = self.REFFILE
+            if refversion in man:
+                reffile = man[refversion]['file']
+            else:
+                LOGGER.warning(f"Refversion ({refversion}) not found in manifest.")
+                return
 
         # get the name of the files
-        remotefile = refurl+reffile
+        remotefile = self.REFURL+reffile
         localfile = os.path.join(self.REFROOT, reffile)
-
-        # make sure refdir exists
-        self.make_refroot()
 
         # write the remote file into local file
         LOGGER.info(f'Retrieving remote file {remotefile} to {self.REFROOT}')
         try:
-            tmpfile = download_file(self.REFURL+self.REFFILE, timeout=10)
+            tmpfile = download_file(remotefile, timeout=30)
         except BaseException:
-            LOGGER.warning(f"Unable to retrieve server file: {remotefile}")
-            return False
+            LOGGER.warning(f"Unable to retrieve server file ({remotefile})")
+            return
 
         # move the file from a tmp dir
         shutil.move(tmpfile, localfile)
@@ -345,26 +465,31 @@ class Config(dict):
                 if absname.startswith(self.REFROOT):
                     tarf.extract(name, path=self.REFROOT)
 
+        # delete the local file now that we're done with it
+        os.remove(localfile)
+
         # the current path
         curpath = os.path.join(self.REFROOT, 'slitlessutils_config')
 
         # read the version number for this file
-        with open(os.path.join(curpath, self.VERSIONFILE), 'r') as f:
-            data = json.load(f)
-            vers = data[0]['version']
+        versdata = self.read_versfile(filename=os.path.join(curpath, self.VERSIONFILE))
+        vers = versdata.get('version', '0.0.0')
 
-        # rename the directory to the version string
+        # get name of the new directory
         newpath = os.path.join(self.REFROOT, vers)
+
+        # if new path is full, then empty it
+        if os.path.isdir(newpath) and os.listdir(newpath):
+            shutil.rmtree(newpath)
+
+        # rename path
         os.rename(curpath, newpath)
 
         # use the new directory?
         if update:
             self.set_refpath(newpath)
 
-        # clean up the downloaded file
-        os.remove(localfile)
-
-        return True
+        return remotefile
 
     def __getattr__(self, k):
         """
@@ -385,8 +510,12 @@ class Config(dict):
             # get the value of a configuration parameter
             return self[k].value
         else:
-            # return the actual value
-            return super(Config, self).__getattribute__(k)
+            try:
+                # return the actual value
+                return super(Config, self).__getattribute__(k)
+            except AttributeError:
+                LOGGER.warning(f"Attribute {k} not found.")
+                return
 
     def __setattr__(self, k, v):
         """
@@ -440,30 +569,21 @@ class Config(dict):
 
     def write(self, filename):
         """
-        Method to write config file to disk as a *.cfg type
+        Method to write config file to disk as a *.json type
 
         Parameters
         ----------
         filename : str
             The name of the config file
 
-        Notes
-        -----
-        will check the extension is one of (cfg, cnf, conf, config)
-
         """
 
         ext = os.path.splitext(filename)[-1][1:]
-        if ext not in ('cfg', 'cnf', 'conf', 'config'):
-            LOGGER.warning(f'Invalid extension: {ext}')
-            return
+        if ext in ('json',):
+            data = {k: dict(v) for k, v in self.items()}
 
-        config = configparser.ConfigParser()
-        for k, v in self.items():
-            if v.editable:
-                config[k] = dict(v)
-        with open(filename, 'w') as f:
-            config.write(f)
+            with open(filename, 'w') as f:
+                json.dump(data, f, indent=4)
 
     def get_reffile(self, reffile, path='', **kwargs):
         """
@@ -512,7 +632,7 @@ class Config(dict):
         """
 
         return {'compression': self.compression,
-                'compression_opts': int(self.compression_opts)}
+                'compression_opts': self.compression_opts}
 
     def __str__(self):
         """
