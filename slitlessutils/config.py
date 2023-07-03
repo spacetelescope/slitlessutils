@@ -395,7 +395,6 @@ class Config(dict):
             requested.
 
         """
-
         # download the manifest file
         try:
             f = download_file(self.REFURL + self.REFDB, timeout=self.TIMEOUT,
@@ -495,6 +494,9 @@ class Config(dict):
                 absname = os.path.abspath(relname)
                 if absname.startswith(self.REFROOT):
                     tarf.extract(name, path=self.REFROOT, filter="tar")
+
+        # delete the local file now that we're done with it
+        os.remove(localfile)
 
         # delete the local file now that we're done with it
         os.remove(localfile)
