@@ -75,7 +75,7 @@ def upgrade_wcs(imgfile, wfssfile, key='A', newfile=None, inplace=False):
         mode = 'readonly'
 
     wfss = WFSS.observed(wfssfile)
-    with fits.open(imgfile, mode='readonly') as dhdul,\
+    with fits.open(imgfile, mode='readonly') as dhdul, \
          fits.open(wfssfile, mode=mode) as whdul:
 
         # some quick error checking
