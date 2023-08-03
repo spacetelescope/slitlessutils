@@ -1,18 +1,17 @@
+import os
 from dataclasses import dataclass
 from datetime import datetime
-import os
 
-from astropy.io import fits
 import numpy as np
 import pypolyclip
 import pysiaf
 import yaml
+from astropy.io import fits
 
 from ....config import Config
-from .disperser import load_disperser, Disperser
 from ...utilities import headers
+from .disperser import Disperser, load_disperser
 from .wfssconfig import WFSSConfig
-
 
 # MJD is defined as number of days since midnight on November 17, 1858
 MJDREF = datetime(1858, 11, 17, 0, 0, 0)
