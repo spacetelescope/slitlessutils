@@ -109,7 +109,7 @@ class SourceCollection(dict):
         self.sedfile = sedfile
 
         fitsargs = {'mode': 'readonly', 'ignore_missing_simple': True}
-        with fits.open(self.segfile, **fitsargs) as hdus,\
+        with fits.open(self.segfile, **fitsargs) as hdus, \
                 fits.open(self.detfile, **fitsargs) as hdud:
 
             # hide warnings that are an issue for JWST
