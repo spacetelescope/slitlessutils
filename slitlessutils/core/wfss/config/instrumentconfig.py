@@ -1,15 +1,16 @@
-from astropy.io import fits
+import os
 from dataclasses import dataclass
 from datetime import datetime
+
+from astropy.io import fits
 import numpy as np
-import os
+import pypolyclip
 import pysiaf
 import yaml
 
 from ....config import Config
-from .disperser import load_disperser, Disperser
-from .polyclip import polyclip
 from ...utilities import headers
+from .disperser import Disperser, load_disperser
 from .wfssconfig import WFSSConfig
 
 # MJD is defined as number of days since midnight on November 17, 1858
@@ -552,12 +553,12 @@ class DetectorConfig:
         # disperse the pixel
         xg, yg = self.config.disperse(x0, y0, order, wav)
 
-        # truncate pixels to be in the grid (move this into polyclip?)
+        # truncate pixels to be in the grid (move this into pypolyclip?)
         xg = np.clip(xg, 0, self.naxis[0])
         yg = np.clip(yg, 0, self.naxis[1])
 
         # clip against the pixel grid
-        x, y, area, slices = polyclip.multi(xg, yg, self.naxis)
+        x, y, area, slices = pypolyclip.multi(xg, yg, self.naxis)
 
         # make wavelength indices
         lam = np.empty_like(x, dtype=np.uint16)
