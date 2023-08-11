@@ -1,3 +1,4 @@
+.. _background:
 
 Background Subtraction
 ======================
@@ -15,7 +16,7 @@ function, there is a nontrivial *shape* in the background of a
 two-dimensional slitless image.  This shape is further complicated by
 the limited distance from the detector that a patch can be and still
 project light (of any order) onto the detector, which often arises
-from the finite size of the pick-off mirror (POM) or other optical
+from the finite size of the :term:`pick-off mirror` (POM) or other optical
 element.  A final confounding issue is that each pixel in the detector
 likely has a unique, wavelength-dependent flat field, which further
 modulates the effective brightness from the sky.
@@ -35,8 +36,8 @@ Master Sky Subtraction
 Given the issues inherent in the sky background for wide-field
 slitless spectroscopy summarized above, the canonical approach to
 separating this signal from the astrophysical sources of interest is
-the use of a *master-sky image*.  Here many science and calibration
-exposures have been aggregated and combined in a way to remove the
+the use of a :term:`master-sky image`.  Here many science and calibration
+exposures have been combined in a way to remove the
 sources, and provide a clean image of the sky background.  Therefore
 the present task is to scale this sky image such that it matches the
 sky pixels in a :math:`{\chi}^2`-sense.  For a single sky image, this
@@ -56,19 +57,10 @@ sky-subtracted slitless image will be given by
 For a Gaussian likelihood function, the pixel weight are given as the
 inverse of the uncertainties squared: :math:`w_{i,j}=U_{i,j}^{-2}`.
 However, many pixels are known to be bad for various reasons, which is
-encoded in the data-quality arrays (DQAs).  Therefore, we including an
+encoded in the :term:`data-quality array` (DQA).  Therefore, we including an
 additional binary weighting factor (:math:`d_{i,j}`) that is unity for
 pixels with no data-quality bits set.  There are two additional
 effects that must be included to determine :math:`\alpha`.
-
-
-
-
-
-
-
-
-
 
 
 Object Masking
@@ -93,7 +85,7 @@ The `slitlessutils` algorithm for masking objects is:
    with
    
    .. math::
-      \left|I_{i,j}-\alpha S_{i,j}\right| > n_{sig} U_{i,j}
+      \left|I_{i,j}-\alpha S_{i,j}\right| \geq n_{sig} U_{i,j}
     
    where :math:`n_{sig}` is a number of sigma for sources.
 
@@ -102,8 +94,10 @@ The `slitlessutils` algorithm for masking objects is:
    convergence threshold :math:`\epsilon`:
    
    .. math::
-      \left|(\alpha^{(i+1)} - \alpha^{(i)}\right| \leq \epsilon \alpha^{(i+1)}
+      \left|(\alpha^{(k)} - \alpha^{(k-1)}\right| \leq \epsilon \alpha^{(k)}
    
+   for iteration :math:`k`.  
+
 #. Use the optimized scaling parameter to compute the sky-subtracted
    science frame as :math:`I_{i,j}-\alpha S_{i,j}`.
 
@@ -151,20 +145,7 @@ Not yet implemented.
 Special Notes for WFC3/IR
 -------------------------
 
-The above description is for a single-component sky-background
-spectrum.  However, the infrared channel in the Wide-Field Camera 3
-(WFC3) instrument on HST is known to exhibit multiple spectral
-components.  `Pirzkal & Ryan (2020)
-<https://www.stsci.edu/files/live/sites/www/files/home/hst/instrumentation/wfc3/documentation/instrument-science-reports-isrs/_documents/2020/WFC3_IR_2020-04.pdf>`_
-the background image for each spectral component for each infrared
-grism.  These multiple components should be used with the
-`WFC3_Back_Sub <https://github.com/NorPirzkal/WFC3_Back_Sub>`_ utility
-available by N. Pirzkal on github, as these ideas are not subsumed
-into `slitlessutils`.  In brief, this requires starting with the *RAW*
-files for the grism data, and processing for each visit (WFC3_Back_Sub
-will group the data by visit).
-
-
+The above description is for a single-component sky-background spectrum.  However, the infrared channel in the Wide-Field Camera 3 (WFC3) instrument on HST is known to exhibit multiple spectral components.  `Pirzkal & Ryan (2020) <https://www.stsci.edu/files/live/sites/www/files/home/hst/instrumentation/wfc3/documentation/instrument-science-reports-isrs/_documents/2020/WFC3_IR_2020-04.pdf>`_ the background image for each spectral component for each infrared grism.  These multiple components should be used with the `WFC3_Back_Sub <https://github.com/NorPirzkal/WFC3_Back_Sub>`_ utility available by N. Pirzkal on github, as these ideas are not subsumed into `slitlessutils`.  In brief, this requires starting with the *RAW* files for the grism data, and processing for each visit (WFC3_Back_Sub will group the data by visit).
 
 
 .. rubric:: Footnotes
@@ -172,7 +153,7 @@ will group the data by visit).
 	 genuine astrophysical sources or spectral traces and cosmic rays.
 	 However for future analyses (such as spectral extraction), this
 	 distinction will become important.  See `the documentation
-	 on cosmic rays <cosmicrays.rst>`_ for more information.	 
+	 on cosmic rays <cosmicrays>`_ for more information.	 
 
 
 

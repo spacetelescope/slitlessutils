@@ -1,7 +1,8 @@
-Getting Started with Slitlessutils
-==================================
+.. _gettingstarted::
+
+Getting Started with ``Slitlessutils``
+======================================
 
 
 
 
-Examples

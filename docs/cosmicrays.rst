@@ -1,3 +1,5 @@
+.. _cosmicrays:
+
 Cosmic Rays
 ===========
 
@@ -23,7 +25,7 @@ shapes.
 
 
 Edge Detection with Laplacians
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+------------------------------
 
 Detecting sharp edges in imaging has long been a subject of computer
 vision research, and one common technique is to identify regions where
@@ -90,7 +92,6 @@ Example
 This are the kernels and can be envoked by the subscript, for example
 
 .. code:: python
-
    	  
    import slitlessutils as su
 
@@ -98,27 +99,22 @@ This are the kernels and can be envoked by the subscript, for example
    su.start_logging()
 
    # perform the master sky subtraction on the filename "grismfile"
-   su.core.preprocess.cosmicrays.(grismfile, kernel='3a', inplace=True)
+   su.core.preprocess.crrej.laplace(grismfile, kernel='3a', inplace=True)
 
-This will update the file in place, as the flag is set:
-:code:`inplace=True`.
+This will update the file in place, as the flag is set: :code:`inplace=True`.
 
 .. figure:: images/cr_animation.gif
    :width: 600
    :alt: Example for cosmic ray flagging and interpolation from convolution from a Laplacian kernel.
 
-   Example of cosmic-ray flagging from convolution from a Laplacian kernel and bilinear interpolation to highlight the differences.
+   Example of cosmic-ray flagging from convolution from a Laplacian kernel and bilinear 
+   interpolation to highlight the differences.
 
       
 AstroDrizzle Cosmic Ray flagging
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Slitlessutils provides functionality to utilize AstroDrizzle as part of Cosmic Ray handling.
-Slitlessutils only stores the final rectified mosaics and the original files (updated in place) by default.
-Any AstroDrizzle arguments the user passes in will, by default, override the default behavior
+--------------------------------
 
-
-Dithered Exposures
-^^^^^^^^^^^^^^^^^^
+Coming Soon.
 
 
 
@@ -126,9 +122,6 @@ Dithered Exposures
 
 Examples
 ~~~~~~~~
-
-
-
 
 
       

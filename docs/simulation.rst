@@ -1,3 +1,4 @@
+.. _simulation:
 
 WFSS Image Simulation
 =====================
@@ -17,19 +18,18 @@ Methodology
 
 
 
-
-Included Effects
-^^^^^^^^^^^^^^^^
+The science image(s) are given as a sum of Poisson and Gaussian 
+terms
 
 
 The uncertainty image is given by the
 
 .. math::
-   U = \frac{\sqrt{(I+S+D) t+R^2}}{t}
+   U = \frac{\sqrt{(I+B+D) t+R^2}}{t}
 
-where :math:`I`, :math:`S` [#f1]_, and :math:`D` are the Poissonian noise
+where :math:`I`, :math:`B` [#f1]_, and :math:`D` are the Poissonian noise
 terms that represent the flux (in :math:`e^-`/s) from the simulated
-science image, the specified sky level, and the dark rate,
+science image, the specified background level, and the dark rate,
 respectively.  The read noise (in :math:`e^-`) is specified as
 :math:`R`, and represents the lone Gaussian noise term.  The specified
 exposure time (in s) is given by :math:`t`.  Therefore, the simulated
@@ -43,14 +43,19 @@ The `SCI` extension
    f \sim \mathcal{N}(0,R^2)
 
    
+.. note::
+   The WFC3/IR images are in units of :math:`e-`/s, while all the data for 
+   all other instruments will be in :math:`e-`.  
 
-(P((I+S+D)*t) + N(0,R))/t-S-D
 
 
    
 
 Excluded Effects
 ^^^^^^^^^^^^^^^^
+
+Currently, ``slitlessutils`` 
+
 
 
 .. rubric:: Footnotes
