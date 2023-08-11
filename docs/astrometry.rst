@@ -1,4 +1,4 @@
-.. _astrometry::
+.. _astrometry:
 
 Astrometry
 ==========

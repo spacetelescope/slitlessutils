@@ -4,7 +4,7 @@
 
 
 Multi-Exposure Extraction (`~slitlessutils.modules.extract.multi`)
-=================================================================
+==================================================================
 
 .. math::
       \left|I_{i,j}-\alpha S_{i,j}\right| > n_{sig} U_{i,j}

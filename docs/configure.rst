@@ -56,26 +56,26 @@ To ensure consistency between several major subcomponents of ``slitlessutils``,
 global variables are stored in the singleton configuration class.  These
 variables are:
 
-+----------------------+----------------+------------------------------------+
-| variable name        | type           | Purpose                            |
-|                      |                |                                    |
-+======================+================+====================================+
-| fluxscale            | float          | Numeric scale of the spectral      |
-|                      |                | elements.  This is important to    |
-|                      |                | avoid numeric underflow in some    |
-|                      |                | cases.                             |
-+----------------------+----------------+------------------------------------+
-| fluxunits            | str            | The physical units of the spectral |
-|                      |                | elements.                          |
-+----------------------+----------------+------------------------------------+
-| compression          | str            | The type of data compression used  |
-|                      |                | in the HDF5 files as implemented   |
++----------------------+----------------+-----------------------------------------------+
+| variable name        | type           | Purpose                                       |
+|                      |                |                                               |
++======================+================+===============================================+
+| fluxscale            | float          | Numeric scale of the spectral                 |
+|                      |                | elements.  This is important to               |
+|                      |                | avoid numeric underflow in some               |
+|                      |                | cases.                                        |
++----------------------+----------------+-----------------------------------------------+
+| fluxunits            | str            | The physical units of the spectral            |
+|                      |                | elements.                                     |
++----------------------+----------------+-----------------------------------------------+
+| compression          | str            | The type of data compression used             |
+|                      |                | in the HDF5 files as implemented              |
 |                      |                | by `h5py <https://pypi.org/project/h5py/>`_.  |
-+----------------------+----------------+------------------------------------+
-| compression_opts     | int            | The compression level of used in   |
-|                      |                | in the HDF5 files as implemented   |
++----------------------+----------------+-----------------------------------------------+
+| compression_opts     | int            | The compression level of used in              |
+|                      |                | in the HDF5 files as implemented              |
 |                      |                | by `h5py <https://pypi.org/project/h5py/>`_.  |
-+----------------------+----------------+------------------------------------+
++----------------------+----------------+-----------------------------------------------+
 
 
 The default values are set in the file :file:`$HOME/.slitlessutils/<VERSION_NUMBER>/defaults.json`.

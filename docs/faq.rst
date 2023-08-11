@@ -1,4 +1,4 @@
-.. _faq::
+.. _faq:
 
 Frequently-Asked Questions
 ==========================
@@ -20,8 +20,9 @@ Likely not connected to the internet or change in `pysiaf <https://github.com/sp
     This probably means that you are not using fork to start your
     child processes and you have forgotten to use the proper idiom
     in the main module:
-            if __name__ == '__main__':
-                freeze_support()
+    
+    if __name__ == '__main__':
+        freeze_support()
 
 
     The "freeze_support()" line can be omitted if the program
@@ -30,7 +31,7 @@ Likely not connected to the internet or change in `pysiaf <https://github.com/sp
 
 Likely running in the __main__ of a script. Try putting commands inside of a code block, such as:
 
-.. code:: python
+.. code: python
     if __name__=='__main__':  # doctest: +SKIP
         my_commands_here()  # doctest: +SKIP
 

@@ -1,4 +1,4 @@
-.. _gettingstarted::
+.. _gettingstarted:
 
 Getting Started with ``Slitlessutils``
 ======================================

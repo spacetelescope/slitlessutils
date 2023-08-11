@@ -81,9 +81,9 @@ Since ``slitlessutils`` is largely predicated forward-modeling the WFSS data, th
 
 *. Use the world-coordinate system (WCS) to transform from the direct image position to the *undispersed position* in the WFSS image.  
 
-*. Invert the spectral dispersion to find the parameter :math:`t`.
+*. Invert the spectral dispersion to find the parameter.
 
-*. Evaluate the spectral trace with the parameter :math:`t`.  
+*. Evaluate the spectral trace with the parameter.
 
 
 .. note::
@@ -112,7 +112,7 @@ and the parameters :math:`\lambda_0, \lambda_1` are the lower and upper bounds (
 * Unity flat field: :class :`~slitlessutils.core.wfss.config.UnityFlatField`
 * Gray flat field: :class :`~slitlessutils.core.wfss.config.ImageFlatField`
 * Polynomial flat field: :class :`~slitlessutils.core.wfss.config.PolynomialFlatField`
-* factory function to load these: :function:`~slitlessutils.core.wfss.config.load_flatfield()`
+* factory function to load these: :func:`~slitlessutils.core.wfss.config.load_flatfield()`
 
 
 Sensitivity Curves
