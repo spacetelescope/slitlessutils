@@ -6,11 +6,11 @@ Background Subtraction
 Introduction
 ------------
 
-The background in a slitless spectroscopic image is generally far more complex than the equivalent for standard imaging, despite likely having the same background SED(s).  This occurs because each patch of sky acts as an emitting source and projects its spectrum onto the detector.  However, the detector records the sum over all the patches for every spectral order, and since each order has a unique response function, there is a nontrivial *shape* in the background of a two-dimensional slitless image.  This shape is further complicated by the limited distance from the detector that a patch can be and still project light (of any order) onto the detector, which often arises from the finite size of the :term:`pick-off mirror` (POM) or other optical element.  A final confounding issue is that each pixel in the detector likely has a unique, wavelength-dependent flat field, which further modulates the effective brightness from the sky.  The net result of these effects is a background map with significant structure (see :num:`figure #background` for an example background for G800L with HST/ACS-WFC).
+The background in a slitless spectroscopic image is generally far more complex than the equivalent for standard imaging, despite likely having the same background SED(s).  This occurs because each patch of sky acts as an emitting source and projects its spectrum onto the detector.  However, the detector records the sum over all the patches for every spectral order, and since each order has a unique response function, there is a nontrivial *shape* in the background of a two-dimensional slitless image.  This shape is further complicated by the limited distance from the detector that a patch can be and still project light (of any order) onto the detector, which often arises from the finite size of the :term:`pick-off mirror` (POM) or other optical element.  A final confounding issue is that each pixel in the detector likely has a unique, wavelength-dependent flat field, which further modulates the effective brightness from the sky.  The net result of these effects is a background map with significant structure (see :num:`figure #backgroundexample` for an example background for G800L with HST/ACS-WFC).
 
-.. _background:
+.. _backgroundexample:
 .. figure:: images/acs_g800l.png
-   :width: 600
+   :align: center
    :alt: Example master sky image for HST/ACS G800L.
 
    The smoothed master sky image for the Advanced Camera for Surveys (ACS)
