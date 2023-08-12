@@ -101,10 +101,10 @@ This are the kernels and can be envoked by the subscript, for example
    # perform the master sky subtraction on the filename "grismfile"
    su.core.preprocess.crrej.laplace(grismfile, kernel='3a', inplace=True)
 
-This will update the file in place, as the flag is set: :code:`inplace=True`.  See :numref:`cosmicraysanimate` for an animation of how cosmic rays appear and then can be bilinearly-interpolated over.
+This will update the file in place, as the flag is set: :code:`inplace=True`.  See :numref:`animatedcrs` for an animation of how cosmic rays appear and then can be bilinearly-interpolated over.
 
 
-.. _cosmicrayanimate:
+.. _animatedcrs:
 .. figure:: images/cr_animation.gif
    :width: 600
    :alt: Example for cosmic ray flagging and interpolation from convolution from a Laplacian kernel.
