@@ -20,15 +20,17 @@ The :term:`spectral trace` describes the position of the spectrum on the detecto
 
 .. math::
    \begin{eqnarray}
-		\tilde{x}(t;x_0,y_0) &=& a_0(x_0,y_0) + a_1(x_0,y_0)t + a_2(x_0,y_0)t^2 + ...\\
-		\tilde{y}(t;x_0,y_0) &=& b_0(x_0,y_0) + b_1(x_0,y_0)t + b_2(x_0,y_0)t^2 + ...
+		\tilde{x}(t;x_0,y_0) &=& a_0(x_0,y_0) + a_1(x_0,y_0)t + a_2(x_0,y_0)t^2 + \ldots \\
+		\tilde{y}(t;x_0,y_0) &=& b_0(x_0,y_0) + b_1(x_0,y_0)t + b_2(x_0,y_0)t^2 + \ldots
 	\end{eqnarray}
 
 However, the spectral element may be rotated with respect to the calibration observations, and therefore, requires introducing a small rotation matrix.  Now the position in the spectroscopic image will be:
 
 .. math::
-	x_s(t;x_0,y_0,\theta) = x_0 + \cos(\theta)\tilde{x}(t;x_0,y_0)} - \sin(\theta)\tilde{y}(t;x_0,y_0)} + \Delta x
-	y_s(t;x_0,y_0,\theta) = y_0 + \sin(\theta)\tilde{x}(t;x_0,y_0)} + \cos(\theta)\tilde{y}(t;x_0,y_0)} + \Delta y
+	\begin{eqnarray}
+		x_s(t;x_0,y_0,\theta) &=& x_0 + \cos(\theta)\tilde{x}(t;x_0,y_0)} - \sin(\theta)\tilde{y}(t;x_0,y_0)} + \Delta x \\
+		y_s(t;x_0,y_0,\theta) &=& y_0 + \sin(\theta)\tilde{x}(t;x_0,y_0)} + \cos(\theta)\tilde{y}(t;x_0,y_0)} + \Delta y
+	\end{eqnarray}
 
 where :math:`(\Delta x, \Delta y)` are the :term:`wedge offsets`.
 
@@ -40,18 +42,14 @@ Spectral Dispersion
 The :term:`spectral dispersion` describes the wavelength along the spectral trace.  The spectral dispersion of a :term:`grism` element is often constant with wavelength, which corresponds to a linear (or low-order polynomial) in the parameter:
 
 .. math::
-	\lambda(t;x_0,y_0) = \alpha_0(x_0,y_0) + \alpha_1(x_0,y_0)t + \alpha_2(x_0,y_0)t^2 + ...
+	\lambda(t;x_0,y_0) = \alpha_0(x_0,y_0) + \alpha_1(x_0,y_0)t + \alpha_2(x_0,y_0)t^2 + \ldots
 
 which will be given by a :class:`~slitlessutils.core.wfss.config.StandardPolynomial`.  However, :term:`prism` elements often exhibit a dispersion that is highly non-linear (as a function of wavelength), which can be described as a `Laurent polynomial <https://mathworld.wolfram.com/LaurentPolynomial.html>`_ (e.g. `Bohlin et al 2000 <https://www.stsci.edu/files/live/sites/www/files/home/hst/instrumentation/acs/documentation/instrument-science-reports-isrs/_documents/isr0001.pdf>`_):
 
 .. math::
-	\lambda(t;x_0,y_0) = \alpha_0(x_0,y_0) + \frac{\alpha_1(x_0,y_0)}{(t-t^*(x_0,y_0))} + \frac{\alpha_2(x_0,y_0)}{(t-t^*(x_0,y_0))^2} + \frac{\alpha_3(x_0,y_0)}{(t-t^*(x_0,y_0))^3} + ...
+	\lambda(t;x_0,y_0) = \alpha_0(x_0,y_0) + \frac{\alpha_1(x_0,y_0)}{(t-t^*(x_0,y_0))} + \frac{\alpha_2(x_0,y_0)}{(t-t^*(x_0,y_0))^2} + \frac{\alpha_3(x_0,y_0)}{(t-t^*(x_0,y_0))^3} + \ldots
 
-This introduces an additional parameter :math:`t^*` that effectively modulates the non-linearity (e.g. )
-
-
-
-:class:`~slitlessutils.core.wfss.config.ReciprocalPolynomial`
+This introduces an additional parameter :math:`t^*` that effectively modulates the non-linearity.  This form is implemented in the :class:`~slitlessutils.core.wfss.config.ReciprocalPolynomial()` object.
 
 
 
@@ -66,7 +64,7 @@ Field-Dependence
 As noted above, the coefficients in the trace and dispersion polynomials can be polynomials of the undispersed positions:
 
 .. math::
-	\kappa(x_0,y_0) = \kappa_{0,0} + \kappa_{1,0}x_0 + \kappa_{0,1}y_0 + \kappa_{2,0}x_0^2 + \kappa_{1,1}x_0y_0 + \kappa_{0,2}y^0^2 + ...
+	\kappa(x_0,y_0) = \kappa_{0,0} + \kappa_{1,0}x_0 + \kappa_{0,1}y_0 + \kappa_{2,0}x_0^2 + \kappa_{1,1}x_0y_0 + \kappa_{0,2}y_0^2 + \ldots
 
 where :math:`\kappa` can be any of the elements of :math:`a, b, \alpha` or :math:`t^*` (for the prism dispersion). These spatial polynomials are specified by :class:`~slitlessutils.core.wfss.config.SpatialPolynomial` and are of fixed total order :math:`n`.  This implies the number of any set of these coefficients will be a `triangular number <https://en.wikipedia.org/wiki/Triangular_number>`_ and serialized with `Cantor pairing <https://en.wikipedia.org/wiki/Pairing_function>`_.  
 
@@ -86,7 +84,7 @@ Since ``slitlessutils`` is largely predicated forward-modeling the WFSS data, th
 #. Evaluate the spectral trace with the parameter (:math:`t`).
 
 .. note::
-	For linear dispersion models, this inversion can be done analytically.  For higher-order polynomials, ``slitlessutils`` inverts using `Halleys Method <https://en.wikipedia.org/wiki/Halley%27s_method>`_.
+	For linear dispersion models, this inversion can be done analytically.  For higher-order polynomials, ``slitlessutils`` inverts using `Halley's Method <https://en.wikipedia.org/wiki/Halley%27s_method>`_.
 
 
 
@@ -96,22 +94,33 @@ Flat Field
 The flat-field corrects for differences in the pixel-to-pixel sensitivity, and is derived by observing a suitably flat illumination pattern.  Importantly, this correction is wavelength-dependent, but the wavelength covered by a WFSS image pixel will depend on the *undispersed position* :math:`(x_0,y_0)`.  Therefore, the WFSS images are not flat-fielded by the calibration pipelines, and so it must be accounted for in the extraction/simulation processes.  ``Slitlessutils`` implements the wavelength-dependent flat field as a polynomial in wavelength:
 
 .. math::
-	{\cal F}(x,y,\lambda) = \sum_k {\cal F}(x,y)\left(w(\lambda))^k
+	{\cal F}(x,y,\lambda) = \sum_k {\cal F}(x,y)\,w(\lambda)^k
 
 where 
 
 .. math::
-	w(\lambda) = \left\{\begin{array{ll}
+	w(\lambda) = \left\{\begin{array}{ll}
 	0 & \text{for } \lambda<\lambda_0 \\
 	\frac{\lambda-\lambda_0}{\lambda_1-\lambda_0} & \text{for } \lambda_0\leq\lambda\leq\lambda_1 \\
-	0 & \text{for } \lambda_1<\lambda\end{array}}\right.
+	0 & \text{for } \lambda_1<\lambda\end{array}\right.
 
-and the parameters :math:`\lambda_0, \lambda_1` are the lower and upper bounds (respectively) for which the flat-field cube is defined. Additionally, users may also specify a *gray flat* (typically derived from a direct image flat field) or a unity flat (effectively ignoring the flat-field correction entirely).  See:
+and the parameters :math:`\lambda_0, \lambda_1` are the lower and upper bounds (respectively) for which the flat-field cube is defined.  See :num:`figure #flatfield` below for a schematic layout of this polynomial flat field.  Additionally, users may also specify a *gray flat* (typically derived from a direct image flat field, which is effectively just a single level in :num:`figure #flatfield`) or a unity flat (effectively ignoring the flat-field correction entirely).  See:
 
-* Unity flat field: :class :`~slitlessutils.core.wfss.config.UnityFlatField`
-* Gray flat field: :class :`~slitlessutils.core.wfss.config.ImageFlatField`
-* Polynomial flat field: :class :`~slitlessutils.core.wfss.config.PolynomialFlatField`
+* Unity flat field: :class :`~slitlessutils.core.wfss.config.UnityFlatField()`
+* Gray flat field: :class :`~slitlessutils.core.wfss.config.ImageFlatField()`
+* Polynomial flat field: :class :`~slitlessutils.core.wfss.config.PolynomialFlatField()`
 * factory function to load these: :func:`~slitlessutils.core.wfss.config.load_flatfield()`
+
+
+
+.. _flatfield:
+.. figure:: images/FITSFlat.png
+   :width: 600
+   :alt: The schematic layout of a fits flat-field cube.
+
+   A schematic layout of the fits flat-field cube.  This figure is taken from the `aXe manual <https://hstaxe.readthedocs.io/en/latest/>`_.
+
+
 
 
 Sensitivity Curves
@@ -119,7 +128,7 @@ Sensitivity Curves
 
 Conversion between :math:`e^-`/s and :math:`erg/s/cm^2/s`.
 
-
+.. _senscurves:
 .. figure:: images/hst_sensitivity.png
    :width: 600
    :alt: The sensitivity curves for HST ACS and WFC3.
