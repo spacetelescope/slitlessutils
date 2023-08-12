@@ -104,7 +104,7 @@ where
 	\frac{\lambda-\lambda_0}{\lambda_1-\lambda_0} & \text{for } \lambda_0\leq\lambda\leq\lambda_1 \\
 	0 & \text{for } \lambda_1<\lambda\end{array}\right.
 
-and the parameters :math:`\lambda_0, \lambda_1` are the lower and upper bounds (respectively) for which the flat-field cube is defined.  See :numref:`figure #flatfield` below for a schematic layout of this polynomial flat field.  Additionally, users may also specify a *gray flat* (typically derived from a direct image flat field, which is effectively just a single level in :numref:`figure #flatfield`) or a unity flat (effectively ignoring the flat-field correction entirely).  See:
+and the parameters :math:`\lambda_0, \lambda_1` are the lower and upper bounds (respectively) for which the flat-field cube is defined.  See :numref:`flatfield` below for a schematic layout of this polynomial flat field.  Additionally, users may also specify a *gray flat* (typically derived from a direct image flat field, which is effectively just a single level in :numref:`flatfield`) or a unity flat (effectively ignoring the flat-field correction entirely).  See:
 
 * Unity flat field: :class :`~slitlessutils.core.wfss.config.UnityFlatField()`
 * Gray flat field: :class :`~slitlessutils.core.wfss.config.ImageFlatField()`
