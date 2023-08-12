@@ -15,18 +15,23 @@ Preprocessing WFSS Images
 Before one can extract WFSS data, there are several *preprocessing* steps that should considered.  Below is a table that lists the three major preprocessing steps that one should implement for their data:
 
 
+.. toctree::
+	astrometry.rst
+	background.rst
+	cosmicrays.rst
 
-
-
-
-* `astrometry <astrometry>`
-* `background <background>`
-* `cosmic ray rejection <cosmicrays>`
+..
+	* `astrometry <astrometry>`
+	* `background <background>`
+	* `cosmic ray rejection <cosmicrays>`
 
 
 How to extract the data?
 ------------------------
 
 
-* `single <single>`
-* `multi <multi>`
+
+
+..
+	* `single <single>`
+	* `multi <multi>`

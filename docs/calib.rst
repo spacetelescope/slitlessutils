@@ -79,12 +79,9 @@ Usual Workflow
 
 Since ``slitlessutils`` is largely predicated forward-modeling the WFSS data, the usual workflow begins with a known direct image position and assumed wavelength, then the WFSS image position can be found by:
 
-*. Use the world-coordinate system (WCS) to transform from the direct image position to the *undispersed position* in the WFSS image.  
-
-*. Invert the spectral dispersion to find the parameter.
-
-*. Evaluate the spectral trace with the parameter.
-
+#. Use the world-coordinate system (WCS) to transform from the direct image position to the *undispersed position* in the WFSS image.  
+#. Invert the spectral dispersion to find the parameter (:math:`t`).
+#. Evaluate the spectral trace with the parameter (:math:`t`).
 
 .. note::
 	For linear dispersion models, this inversion can be done analytically.  For higher-order polynomials, ``slitlessutils`` inverts using `Halleys Method <https://en.wikipedia.org/wiki/Halley%27s_method>`_.
