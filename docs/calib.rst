@@ -19,8 +19,10 @@ Spectral Trace
 The :term:`spectral trace` describes the position of the spectrum on the detector(s).  The relative position of the spectral trace is given as a polynomial in the parameter:
 
 .. math::
-	\tilde{x}(t;x_0,y_0) = a_0(x_0,y_0) + a_1(x_0,y_0)t + a_2(x_0,y_0)t^2 + ...
-	\tilde{y}(t;x_0,y_0) = b_0(x_0,y_0) + b_1(x_0,y_0)t + b_2(x_0,y_0)t^2 + ...
+   \begin{eqnarray}
+		\tilde{x}(t;x_0,y_0) &=& a_0(x_0,y_0) + a_1(x_0,y_0)t + a_2(x_0,y_0)t^2 + ...\\
+		\tilde{y}(t;x_0,y_0) &=& b_0(x_0,y_0) + b_1(x_0,y_0)t + b_2(x_0,y_0)t^2 + ...
+	\end{eqnarray}
 
 However, the spectral element may be rotated with respect to the calibration observations, and therefore, requires introducing a small rotation matrix.  Now the position in the spectroscopic image will be:
 

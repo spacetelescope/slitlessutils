@@ -3,7 +3,7 @@
 Configuring ``slitlessutils``
 =============================
 
-Many of the functions and classes within ``slitlessutils`` expose their individual default settings, however in some cases it is important to define *global* variables that govern calibration files or large-scale aspects of the package.  Consequently, ``slitlessutils`` establishes these settings in a singleton class :class:``~slitlessutils.Config`` that generally acts like a standard Python dictionary.  
+Many of the functions and classes within ``slitlessutils`` expose their individual default settings, however in some cases it is important to define *global* variables that govern calibration files or large-scale aspects of the package.  Consequently, ``slitlessutils`` establishes these settings in a singleton class :class:``~slitlessutils.config.Config()`` that generally acts like a standard Python dictionary.  
 
 
 ``Slitlessutils`` Calibration Files
