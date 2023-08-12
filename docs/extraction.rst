@@ -30,7 +30,9 @@ How to extract the data?
 ------------------------
 
 
-
+.. toctree::
+	single.rst
+	multi.rst
 
 ..
 	* `single <single>`
