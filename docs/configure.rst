@@ -1,26 +1,14 @@
 .. _configure:
 
-Configuring ``Slitlessutils``
+Configuring ``slitlessutils``
 =============================
 
-Many of the functions and classes within ``slitlessutils`` expose their
-individual default settings, however in some cases it is important to
-define *global* variables that govern calibration files or large-scale aspects
-of the package.  Consequently, ``slitlessutils`` establishes these settings
-in a singleton class :class:``~slitlessutils.Config`` that generally acts like 
-a standard Python dictionary.  
+Many of the functions and classes within ``slitlessutils`` expose their individual default settings, however in some cases it is important to define *global* variables that govern calibration files or large-scale aspects of the package.  Consequently, ``slitlessutils`` establishes these settings in a singleton class :class:``~slitlessutils.Config`` that generally acts like a standard Python dictionary.  
 
 
 ``Slitlessutils`` Calibration Files
 -----------------------------------
-The reference files used to perform the spectral extraction and modeling with
-``slitlessutils`` must be installed in a dot-directory in the user's home:
-:file:`{$HOME}/.slitlessutils`.  When the :class:`~slitlessutils.Config` object is instantiated, 
-it will check if this directory exists and valid reference files are populated.  If
-no such directory is found, then it is created; if no such reference files
-are found, then the most recent files will be automatically retrieved from
-a public box directory.  However, users can programmatically retrieve and
-use older versions of files:
+The reference files used to perform the spectral extraction and modeling with ``slitlessutils`` must be installed in a dot-directory in the user's home: :file:`{$HOME}/.slitlessutils`.  When the :class:`~slitlessutils.config.Config()` object is instantiated, it will check if this directory exists and valid reference files are populated.  If no such directory is found, then it is created; if no such reference files are found, then the most recent files will be automatically retrieved from a public box directory.  However, users can programmatically retrieve and use older versions of files:
 
 .. code-block:: python
 
@@ -28,11 +16,15 @@ use older versions of files:
    from slitlessutils import config
    cfg = config.Config()
 
-   # download reference files
-   reffile = cfg.retrieve_reffiles(refversion='1.0.1', update=True)
+   # download the latest reference files
+   reffile = cfg.retrieve_reffiles(update=True)
 
-The :code:`update=True` flag will use these versions for the remainder of this
-session.  One can list available reference libraries or swap between them:
+   # download a particular version, but do not use it
+   reffile = cfg.retrieve_reffiles(version='1.0.1', update=False)
+
+
+
+The :code:`update=True` flag will use these versions for the remainder of this session.  One can list available reference libraries or swap between them:
 
 
 .. code-block:: python
@@ -43,18 +35,17 @@ session.  One can list available reference libraries or swap between them:
    # swap the reference file versions
    cfg.set_reffiles(refversion='1.0.1')
 
+   # show the manifest again, to see the new files were used
+   cfg.help_refmanifest()
+
 
 .. warning::
-   Each time that ``slitlessutils`` is imported, it will use the most advanced
-   version of the reference files that are cached in the user's home
-   directory: :file:`{$HOME}/.slitlessutils`
+   Each time that ``slitlessutils`` is imported, it will use the most advanced version of the reference files that are cached in the user's home directory: :file:`{$HOME}/.slitlessutils`
 
 
 Global Variables
 ----------------
-To ensure consistency between several major subcomponents of ``slitlessutils``,
-global variables are stored in the singleton configuration class.  These
-variables are:
+To ensure consistency between several major subcomponents of ``slitlessutils``, global variables are stored in the singleton configuration class.  These variables are:
 
 +----------------------+----------------+-----------------------------------------------+
 | variable name        | type           | Purpose                                       |
@@ -78,9 +69,7 @@ variables are:
 +----------------------+----------------+-----------------------------------------------+
 
 
-The default values are set in the file :file:`$HOME/.slitlessutils/<VERSION_NUMBER>/defaults.json`.
-These versions can be accessed and/or adjusted programmatically as either
-dictionary-like or attribute-like access and saved to a file for usage later:
+The default values are set in the file :file:`$HOME/.slitlessutils/<VERSION_NUMBER>/defaults.json`. These versions can be accessed and/or adjusted programmatically as either dictionary-like or attribute-like access and saved to a file for usage later:
 
 .. code-block:: python
 
@@ -94,6 +83,4 @@ dictionary-like or attribute-like access and saved to a file for usage later:
    cfg.write("myconf.json")
 
 .. note::
-   One can manually edit the defaults file, however new reference files packages will come
-   with their own `defaults.json` file. Therefore, we recommend programmatically alter the
-   settings to ensure consistency in results if the reference files are updated.
+   One can manually edit the defaults file, however new reference files packages will come with their own `defaults.json` file. Therefore, we recommend programmatically alter the settings to ensure consistency in results if the reference files are updated.

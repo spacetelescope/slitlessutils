@@ -41,7 +41,7 @@ finite differences, which is an approximation to the continuous case.
 One such approximation is given by:
 
 .. math::
-   \nabla^2 I \approx \frac{I(x+h,y)+I(x-h,y)-4\,I(x,y)+I(x,y-h)+I(x,y+h)}{h^2}
+   \nabla^2 I_{x,y} \approx \frac{I_{x+h,y}+I_{x-h,y}-4\,I_{x,y}+I_{x,y-h}+I_{x,y+h}}{h^2}
 
 and for :math:`h=1`, this expression is concisely given as a simple image
 convolution :math:`\nabla^2 I \approx K \ast I`.  `slitlessutils` offers
@@ -74,7 +74,7 @@ deviate more than :math:`n` times above their respective uncertainties
 (:math:`U`) are considered as candidate CR pixels:
 
 .. math::
-   \left|\nabla^2 I\right| \geq n U
+   \left|\nabla^2 I\right| \geq n\, U
 
 These candidate pixels are grouped based on their connectivity (see
 `skimage.measure.label()`) and only groups with a minimum number of

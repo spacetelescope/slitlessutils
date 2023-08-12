@@ -149,11 +149,7 @@ The above description is for a single-component sky-background spectrum.  Howeve
 
 
 .. rubric:: Footnotes
-.. [#f1] For our present purposes, we do not need to distinguish between
-	 genuine astrophysical sources or spectral traces and cosmic rays.
-	 However for future analyses (such as spectral extraction), this
-	 distinction will become important.  See `the documentation
-	 on cosmic rays <cosmicrays>`_ for more information.	 
+.. [#f1] For our present purposes, we do not need to distinguish between genuine astrophysical sources or spectral traces and cosmic rays.  However for future analyses (such as spectral extraction), this distinction will become important.  See :doc:`the documentation on cosmic rays <cosmicrays>` for more information.	 
 
 
 

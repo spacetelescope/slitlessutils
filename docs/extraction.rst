@@ -16,14 +16,11 @@ Before one can extract WFSS data, there are several *preprocessing* steps that s
 
 
 .. toctree::
+	:titlesonly:
+	
 	astrometry.rst
 	background.rst
 	cosmicrays.rst
-
-..
-	* `astrometry <astrometry>`
-	* `background <background>`
-	* `cosmic ray rejection <cosmicrays>`
 
 
 How to extract the data?
@@ -31,9 +28,7 @@ How to extract the data?
 
 
 .. toctree::
+	:titlesonly:
+
 	single.rst
 	multi.rst
-
-..
-	* `single <single>`
-	* `multi <multi>`

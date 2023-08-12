@@ -1,7 +1,7 @@
 .. _other:
 
 
-Other Operations in ``Slitlessutils``
+Other Operations in ``slitlessutils``
 =====================================
 
 
