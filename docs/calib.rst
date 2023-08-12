@@ -114,7 +114,7 @@ and the parameters :math:`\lambda_0, \lambda_1` are the lower and upper bounds (
 
 
 .. _flatfield:
-.. figure:: images/FITSFlat.png
+.. figure:: images/FITSflat.png
    :width: 600
    :alt: The schematic layout of a fits flat-field cube.
 
