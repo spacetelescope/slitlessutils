@@ -21,7 +21,7 @@ Tabulation in ``slitlessutils``
    :align: center
    :alt: fractional pixel animation
 
-	Dispersed pixel and fractional area calculations.  ``Slitlessutils`` uses `pypolyclip <https://github.com/spacetelescope/pypolyclip>`_ to compute fractional pixel area on a dispersed image pixel grid (shown by colored polygons).  The known area of the input polygon (shown in blue) is 0.64 pix:math:`^2`.  
+   Dispersed pixel and fractional area calculations.  ``Slitlessutils`` uses `pypolyclip <https://github.com/spacetelescope/pypolyclip>`_ to compute fractional pixel area on a dispersed image pixel grid (shown by colored polygons).  The known area of the input polygon (shown in blue) is 0.64 pix:math:`^2`.  
 
 
 

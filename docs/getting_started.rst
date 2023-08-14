@@ -17,35 +17,5 @@ Primary Data Objects
 	wfss.rst
 
 
-Pre-Processing Options
-----------------------
-.. toctree::
-	:titlesonly:
-	:maxdepth: 1
-
-	astrometry.rst
-	background.rst
-	cosmicrays.rst
-
-Computational Modules
----------------------
-.. toctree::
-	:titlesonly:
-	:maxdepth: 1
-
-Examples
---------
-.. toctree::
-	:titlesonly:
-	:maxdepth: 1
-
-
-Utilities
----------
-.. toctree::
-	:titlesonly:
-	:maxdepth: 1
-
-
 
 
