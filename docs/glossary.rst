@@ -23,7 +23,7 @@ Glossary
 	    An optical element that redirects the light to the instrument in question. 
 
 	pixel-dispersion table
-		A look-up table that describes the weights that a :term:`direct image` pixel projects onto the pixels of a WFSS image/detector as a function of wavelength for each spectral order.  Due to the hierarchical nature of this transformation, these data are stored as `hierarchical data-format 5 (HDF) <https://www.hdfgroup.org/solutions/hdf5/>`_.  This intermediate data product is also referred to as a PDT.
+		A look-up table that describes the weights that the :term:`direct imaging` pixel projects onto the pixels of a WFSS image/detector as a function of wavelength for each spectral order.  Due to the hierarchical nature of this transformation, these data are stored as `hierarchical data-format 5 (HDF) <https://www.hdfgroup.org/solutions/hdf5/>`_.  This intermediate data product is also referred to as a PDT.
 
 	post-imaging
 	 	The contemporaneously :term:`direct imaging` taken *after* the WFSS observation.  See also :term:`pre-imaging`.
