@@ -1,3 +1,6 @@
+.. sectionauthor:: Russell Ryan <rryan@stsci.edu>
+.. codeauthor:: Russell Ryan <rryan@stsci.edu>
+
 *************
 Slitlessutils
 *************
@@ -39,7 +42,7 @@ User Documentation
    configure.rst
    extraction.rst
    simulation.rst
-   other.rst
+   additional.rst
    calib.rst
    faq.rst
    citation.rst

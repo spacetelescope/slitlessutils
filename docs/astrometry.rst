@@ -11,7 +11,7 @@ The standard tools for updating the WCS keywords (ie. `drizzlepac and tweakreg <
 For much of the HST data, the direct imaging has been matched to some existing astrometric catalog (often Gaia dr3), but the WFSS data is left at a less-refined state.  
 
 .. important::
-	Astrometric corrections for the WFSS data from HST are almost always needed.
+	**Astrometric corrections for the WFSS data from HST are almost always needed.**
 
 The corrections can be either downgrading the astrometry in the direct image to match that in the WFSS, or upgrading the WFSS to match that of the direct image.
 

@@ -28,8 +28,8 @@ However, the spectral element may be rotated with respect to the calibration obs
 
 .. math::
 	\begin{eqnarray}
-		x_s(t;x_0,y_0,\theta) &=& x_0 + \cos(\theta)\tilde{x}(t;x_0,y_0)} - \sin(\theta)\tilde{y}(t;x_0,y_0)} + \Delta x \\
-		y_s(t;x_0,y_0,\theta) &=& y_0 + \sin(\theta)\tilde{x}(t;x_0,y_0)} + \cos(\theta)\tilde{y}(t;x_0,y_0)} + \Delta y
+		x_s(t;x_0,y_0,\theta) &=& x_0 + \cos(\theta)\tilde{x}(t;x_0,y_0)) + \sin(\theta)\tilde{y}(t;x_0,y_0)) + \Delta x \\
+		y_s(t;x_0,y_0,\theta) &=& y_0 - \sin(\theta)\tilde{x}(t;x_0,y_0)) + \cos(\theta)\tilde{y}(t;x_0,y_0)) + \Delta y
 	\end{eqnarray}
 
 where :math:`(\Delta x, \Delta y)` are the :term:`wedge offsets`.

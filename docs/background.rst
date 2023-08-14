@@ -53,10 +53,10 @@ The `slitlessutils` algorithm for masking objects is:
     
    where :math:`n_{sig}` is a number of sigma for sources.
 
-#. Go to step 2.  Repeat until either a maximum number of iterations is reached or the fractional change in :math:`\alpha` is below a convergence threshold :math:`\epsilon`:
+#. Go to step 2, and repeat until either a maximum number of iterations is reached or the fractional change in :math:`\alpha` is below a convergence threshold :math:`\epsilon`:
    
    .. math::
-      \left|(\alpha^{(k)} - \alpha^{(k-1)}\right| \leq \epsilon \alpha^{(k)}
+      \left|\alpha^{(k)} - \alpha^{(k-1)}\right| \leq \epsilon \alpha^{(k)}
    
    for iteration :math:`k`.  
 
@@ -82,10 +82,6 @@ Here we show a quick example to use the master-sky subtraction for a single gris
    su.core.preprocess.background.mastersky(grismfile, inplace=True)
 
 This will update the file in place, as the flag is set: :code:`inplace=True`, but will additionally write a :code:`f"{base}_src.fits"` file to disk.
-	
-
-
-
 
 
 Column-Based Refinement
@@ -98,7 +94,7 @@ Not yet implemented.
 Special Notes for WFC3/IR
 -------------------------
 
-The above description is for a single-component sky-background spectrum.  However, the infrared channel in the Wide-Field Camera 3 (WFC3) instrument on HST is known to exhibit multiple spectral components.  `Pirzkal & Ryan (2020) <https://www.stsci.edu/files/live/sites/www/files/home/hst/instrumentation/wfc3/documentation/instrument-science-reports-isrs/_documents/2020/WFC3_IR_2020-04.pdf>`_ the background image for each spectral component for each infrared grism.  These multiple components should be used with the `WFC3_Back_Sub <https://github.com/NorPirzkal/WFC3_Back_Sub>`_ utility available by N. Pirzkal on github, as these ideas are not subsumed into `slitlessutils`.  In brief, this requires starting with the *RAW* files for the grism data, and processing for each visit (WFC3_Back_Sub will group the data by visit).
+The above description is for a single-component sky-background spectrum.  However, the infrared channel in the Wide-Field Camera 3 (WFC3) instrument on HST is known to exhibit multiple spectral components.  `Pirzkal & Ryan (2020) <https://www.stsci.edu/files/live/sites/www/files/home/hst/instrumentation/wfc3/documentation/instrument-science-reports-isrs/_documents/2020/WFC3_IR_2020-04.pdf>`_ derive a separate background image for each spectral component for each infrared grism.  These multiple components should be used with the `WFC3_Back_Sub <https://github.com/NorPirzkal/WFC3_Back_Sub>`_ utility, as these ideas are not subsumed into `slitlessutils`.  In brief, this requires starting with the *RAW* files for the grism data, and processing for each visit (WFC3_Back_Sub will group the data by visit).
 
 
 .. rubric:: Footnotes

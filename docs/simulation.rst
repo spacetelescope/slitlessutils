@@ -18,8 +18,7 @@ Methodology
 
 
 
-The science image(s) are given as a sum of Poisson and Gaussian 
-terms
+The science image(s) are given as a sum of Poisson and Gaussian terms
 
 
 The uncertainty image is given by the
@@ -27,13 +26,7 @@ The uncertainty image is given by the
 .. math::
    U = \frac{\sqrt{(I+B+D) t+R^2}}{t}
 
-where :math:`I`, :math:`B` [#f1]_, and :math:`D` are the Poissonian noise
-terms that represent the flux (in :math:`e^-`/s) from the simulated
-science image, the specified background level, and the dark rate,
-respectively.  The read noise (in :math:`e^-`) is specified as
-:math:`R`, and represents the lone Gaussian noise term.  The specified
-exposure time (in s) is given by :math:`t`.  Therefore, the simulated
-images will have an `ERR` extension will be populated with these values.
+where :math:`I`, :math:`B` [#f1]_, and :math:`D` are the Poissonian noise terms that represent the flux (in :math:`e^-`/s) from the simulated science image, the specified background level, and the dark rate, respectively.  The read noise (in :math:`e^-`) is specified as :math:`R`, and represents the lone Gaussian noise term.  The specified exposure time (in s) is given by :math:`t`.  Therefore, the simulated images will have an `ERR` extension will be populated with these values.
 
 The `SCI` extension
 
@@ -44,8 +37,7 @@ The `SCI` extension
 
    
 .. note::
-   The WFC3/IR images are in units of :math:`e-`/s, while all the data for 
-   all other instruments will be in :math:`e-`.  
+   The WFC3/IR images are in units of :math:`e-`/s, while all the data for all other instruments will be in :math:`e-`.  
 
 
 
@@ -59,7 +51,5 @@ Currently, ``slitlessutils``
 
 
 .. rubric:: Footnotes
-.. [#f1] Currently the sky background is assumed as a single constant
-	 value, and adding in the `master-sky backgrounds
-	 <background.rst>`_ are not yet implemented.
+.. [#f1] Currently the sky background is assumed as a single constant value, and adding in the :doc:`master-sky backgrounds <background>` are not yet implemented.
    
