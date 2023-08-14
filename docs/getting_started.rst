@@ -44,7 +44,7 @@ Utilities
 ---------
 .. toctree::
 	:titlesonly:
-	:maxdepth:
+	:maxdepth: 1
 
 
 
