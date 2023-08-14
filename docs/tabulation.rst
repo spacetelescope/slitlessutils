@@ -5,15 +5,19 @@ Tabulation in ``slitlessutils``
 ===============================
 
 
-#. For each WFSS file:
-	#. For each detector in the WFSS file:
-		#. For each source in the source collection:
-			#. for each pixel in the source:
-				#. apply WCS transformation
-				#. for each tabulation wavelength:
-					#. Invert
-					#. fractional pixel area
+Creating a :term:`pixel-dispersion table` (PDT):
 
+# For each WFSS file:
+	# For each detector in the WFSS file:
+		# For each source in the source collection:
+			# For each pixel in the source:
+				#. apply WCS transformation between direct image and WFSS image
+				#. For each spectral order:
+					#. For each tabulation wavelength:
+						#. convert wavelength into parameter :math:`t` using the inverse of the dispersion relation
+						#. evaluate the trace at the paramter :math:`t`
+						#. compute fractional pixel area (see :numref:`animatedpixel` below)
+						#. record the fractional pixel area for each WFSS pixel multiplied by the bandwidth from the tabulation wavelengths.
 
 
 .. _animatedpixel:
@@ -21,7 +25,7 @@ Tabulation in ``slitlessutils``
    :align: center
    :alt: fractional pixel animation
 
-   Dispersed pixel and fractional area calculations.  ``Slitlessutils`` uses `pypolyclip <https://github.com/spacetelescope/pypolyclip>`_ to compute fractional pixel area on a dispersed image pixel grid (shown by colored polygons).  The known area of the input polygon (shown in blue) is 0.64 pix:math:`^2`.  
+   Dispersed pixel and fractional area calculations.  ``Slitlessutils`` uses `pypolyclip <https://github.com/spacetelescope/pypolyclip>`_ to compute fractional pixel area on a dispersed image pixel grid (shown by colored polygons).  The known area of the input polygon (shown in blue) is :math:`0.64 \mathrm{pix}^2`.  
 
 
 

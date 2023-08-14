@@ -22,6 +22,9 @@ Glossary
 	pick-off mirror
 	    An optical element that redirects the light to the instrument in question. 
 
+	pixel-dispersion table
+		A look-up table that describes the weights that a :term:`direct image` pixel projects onto the pixels of a WFSS image/detector as a function of wavelength for each spectral order.  Due to the hierarchical nature of this transformation, these data are stored as `hierarchical data-format 5 (HDF) <https://www.hdfgroup.org/solutions/hdf5/>`_.  This intermediate data product is also referred to as a PDT.
+
 	post-imaging
 	 	The contemporaneously :term:`direct imaging` taken *after* the WFSS observation.  See also :term:`pre-imaging`.
 
@@ -39,6 +42,9 @@ Glossary
 
 	undispersed position
 	    The position a source would have in the absence of the spectral grating: :math:`(x_0,y_0)`.  Importantly, this is **not** equivalent to the zeroth-order spectral trace.
+
+	wide-field slitless spectroscopy
+		The broad term for the use of a transmissive and dispersive optic to provide a complete, unbiased spectroscopic view of a scene.  This term may also refer to the data product of a single exposure/file taken through one of these optics.  May also be called WFSS for short.
 
 	wedge offsets
 		Positional offsets due to the variations in the thickness of the optical elements (see `Sabbi 2012 <https://www.stsci.edu/files/live/sites/www/files/home/hst/instrumentation/wfc3/documentation/instrument-science-reports-isrs/_documents/2012/WFC3-2012-01.pdf>`_).
