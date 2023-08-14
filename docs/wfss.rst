@@ -47,8 +47,11 @@ Simulated data
 * :func:`~slitlessutils.wfss.WFSSCollection.from_wcsfile()`
 
 
-.. list-table:: Simulation Inputs
-	:header-rows: 1
+
+.. list-table:: Title
+   :widths: 25 25 50
+   :header-rows: 1
+
 	* - Keyword
 	  - Data type
 	  - Description
