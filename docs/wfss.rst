@@ -24,7 +24,8 @@ Observed data
 Simulated data
 ^^^^^^^^^^^^^^
 
-.. include:: <ascii/wcs.csv>
+.. include:: ascii/wcs.csv
+	:literal: 
 
 print('dataset,ra,dec,orientat,telescope,instrument,disperser,blocking', file=fp)
 
