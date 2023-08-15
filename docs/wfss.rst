@@ -23,15 +23,15 @@ A light weight object that describes a single WFSS image.  This object will emul
 WFSS Collections (`~slitlessutils.core.wfss.data.WFSSCollection()`)
 -------------------------------------------------------------------
 
-While one can instantiate a single WFSS file using the above, it is generally more common to load many of the files as a collection, as a :class:`~slitlessutils.wfss.WFSSCollection()` is the primary input to many of the additional functions/modules.  The :class:`~slitlessutils.wfss.WFSSCollection()` will act like a ``dict``, where the keyword/value pairs are the dataset name and *file-loading key*.  These keys are ``dataclass``es that are for loading observed and simulated data:
+While one can instantiate a single WFSS file using the above, it is generally more common to load many of the files as a collection, as a :class:`~slitlessutils.wfss.WFSSCollection()` is the primary input to many of the additional functions/modules.  The :class:`~slitlessutils.wfss.WFSSCollection()` will act like a ``dict``, where the keyword/value pairs are the dataset name and *file-loading key*.  These keys are ``dataclass`` that are for loading observed and simulated data:
 
 
 
 
 Observed Data (`~slitlessutils.wfss.data.wfsscollection.ObservedData()`) 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-To load observed fits files, there are three classmethods 
 
+To load observed fits files, there are three classmethods 
 
 * :func:`~slitlessutils.wfss.WFSSCollection.from_glob()`:  
 
@@ -40,9 +40,27 @@ To load observed fits files, there are three classmethods
 * :func:`~slitlessutils.wfss.WFSSCollection.from_file()` (list of filenames)
 
 
+Example
+~~~~~~~
+.. code:: python
+	
+	import slitlessutils as su
+
+	# load as a glob string
+	data1 = su.wfss.WFSSCollection.from_glob('*flt.fits')
+
+	# load from a list
+	filenames = ['file1_flt.fits', 'file2_flt.fits', 'file3_flt.fits']
+	data2 = su.wfss.WFSSCollection.from_list(filenames)
+
+	# load from an ascii file that contains filenames
+	data3 = su.wfss.WFSSCollection.from_file(filelist)
+
 
 Simulated data
 ^^^^^^^^^^^^^^
+
+To load simulated fits files, there are two classemthods
 
 * :func:`~slitlessutils.wfss.WFSSCollection.from_dataframe()`
 
@@ -61,7 +79,10 @@ Simulated data
      - the file basename (ie. the IPPPSOOT for HST files)
    * - ra
      - ``float``
-     - the right ascension of the instrument's reference point
+     - the right ascension of the instrument's reference point (in degrees)
+   * - dec
+     - ``float``
+     - the declination of the instrument's reference point (in degrees)
 
 
 
