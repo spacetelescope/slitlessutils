@@ -60,13 +60,13 @@ Example
 Simulated data
 ^^^^^^^^^^^^^^
 
-To load simulated fits files, there are two classemthods
+To load simulated fits files, there are two classmethods
 
-* :func:`~slitlessutils.wfss.WFSSCollection.from_dataframe()`:  Load a 
+* :func:`~slitlessutils.wfss.WFSSCollection.from_dataframe()`:  Load a simulated ``WFSSCollection`` from a `pandas.DataFrame() <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html>`_.  The table shall have columns and datatypes given in :numref:`simulkeys`.
 
 * :func:`~slitlessutils.wfss.WFSSCollection.from_wcsfile()`
 
-
+.. _simulkeys:
 .. list-table:: Simulated Data Keywords
    :widths: 15 10 75
    :header-rows: 1
@@ -99,7 +99,9 @@ To load simulated fits files, there are two classemthods
      - the name of the dispersive optic (e.g. ``G800L`` or ``G102``)
    * - blocking
      - ``str``
-     - the name of the blocking filter.  For HST instruments, this is to be left blank, but is reserved for future development to support JWST instruments or ACS spectropolarimetry.
+     - | the name of the blocking filter.  For HST instruments, this is to be left blank,
+       | but is reserved for future development to support JWST instruments or ACS 
+       | spectropolarimetry.
 
 
 Example WCS File (in csv format)
