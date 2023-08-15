@@ -64,7 +64,7 @@ To load simulated fits files, there are two classmethods
 
 * :func:`~slitlessutils.wfss.WFSSCollection.from_dataframe()`:  Load a simulated ``WFSSCollection`` from a `pandas.DataFrame() <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html>`_.  The table shall have columns and datatypes given in :numref:`simulkeys`.
 
-* :func:`~slitlessutils.wfss.WFSSCollection.from_wcsfile()`
+* :func:`~slitlessutils.wfss.WFSSCollection.from_wcsfile()`:  Load a simulated ``WFSSCollection`` from a comma-separated value (CSV) file whose columns and datatypes are given in :numref:`simulkeys`, but see :numref:`wcsexample` for an example CSV file.
 
 .. _simulkeys:
 .. list-table:: Simulated Data Keywords
@@ -100,12 +100,14 @@ To load simulated fits files, there are two classmethods
    * - blocking
      - ``str``
      - | the name of the blocking filter.  For HST instruments, this is to be left blank,
-       | but is reserved for future development to support JWST instruments or ACS 
-       | spectropolarimetry.
+       | or set to ``None``, but is reserved for future development to support JWST 
+       | instruments or ACS spectropolarimetry.
 
 
 Example WCS File (in csv format)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _wcsexample:
 .. include:: include/wcs.csv
 	:literal: 
 
