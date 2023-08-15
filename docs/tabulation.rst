@@ -58,6 +58,7 @@ Example
 This example loads :doc:`sources <source>` and :doc:`WFSS data <wfss>`, instantiates the tabulation module, and returns the names of the PDT files.  
 
 .. code:: python
+
 	import slitlessutils as su
 
 	# instantiate source from a segmentation image
