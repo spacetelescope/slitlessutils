@@ -23,20 +23,17 @@ A light weight object that describes a single WFSS image.  This object will emul
 WFSS Collections (`~slitlessutils.core.wfss.data.WFSSCollection()`)
 -------------------------------------------------------------------
 
-While one can instantiate a single WFSS file using the above, it is generally more common to load many of the files as a collection, as a :class:`~slitlessutils.wfss.WFSSCollection()` is the primary input to many of the additional functions/modules.  The :class:`~slitlessutils.wfss.WFSSCollection()`
+While one can instantiate a single WFSS file using the above, it is generally more common to load many of the files as a collection, as a :class:`~slitlessutils.wfss.WFSSCollection()` is the primary input to many of the additional functions/modules.  The :class:`~slitlessutils.wfss.WFSSCollection()` will act like a ``dict``, where the keyword/value pairs are the dataset name and *file-loading key*.  These keys are ``dataclass``es that are for loading observed and simulated data:
 
 
 
 
-
-Observed data
-^^^^^^^^^^^^^
+Observed Data (`~slitlessutils.wfss.data.wfsscollection.ObservedData()`) 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 To load observed fits files, there are three classmethods 
 
 
 * :func:`~slitlessutils.wfss.WFSSCollection.from_glob()`:  
-	
-
 
 * :func:`~slitlessutils.wfss.WFSSCollection.from_list()`
 
@@ -60,11 +57,11 @@ Simulated data
      - Datatype
      - Notes
    * - dataset
-     - str
+     - ``str``
      - the file basename (ie. the IPPPSOOT for HST files)
-   * - Row 2, column 1
-     - Row 2, column 2
-     - Row 2, column 3
+   * - ra
+     - ``float``
+     - the right ascension of the instrument's reference point
 
 
 
