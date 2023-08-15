@@ -31,7 +31,12 @@ While one can instantiate a single WFSS file using the above, it is generally mo
 
 Observed data
 ^^^^^^^^^^^^^
-* :func:`~slitlessutils.wfss.WFSSCollection.from_glob()`
+To load observed fits files, there are three classmethods 
+
+
+* :func:`~slitlessutils.wfss.WFSSCollection.from_glob()`:  
+	
+
 
 * :func:`~slitlessutils.wfss.WFSSCollection.from_list()`
 
@@ -47,16 +52,16 @@ Simulated data
 * :func:`~slitlessutils.wfss.WFSSCollection.from_wcsfile()`
 
 
-.. list-table:: Title
-   :widths: 25 25 50
+.. list-table:: Simulated Data Keywords
+   :widths: 20 20 60
    :header-rows: 1
 
-   * - Heading row 1, column 1
-     - Heading row 1, column 2
-     - Heading row 1, column 3
-   * - Row 1, column 1
-     -
-     - Row 1, column 3
+   * - Keyword
+     - Datatype
+     - Notes
+   * - dataset
+     - str
+     - the file basename (ie. the IPPPSOOT for HST files)
    * - Row 2, column 1
      - Row 2, column 2
      - Row 2, column 3
