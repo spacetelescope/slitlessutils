@@ -16,7 +16,7 @@ The current implementation will *only* simulate the signal from the sources, whi
 #. Initialize noiseless science and uncertainty images
 
 
-.. list-table:: Simulation Parameters
+.. list-table:: User-Specified Simulation Parameters
    :widths: 25 25 50
    :header-rows: 1
 
@@ -25,7 +25,8 @@ The current implementation will *only* simulate the signal from the sources, whi
      - Description
    * - Background 
      - :math:`e^-/s`
-     - The notional background level, which is assumed to be constant across the detector
+     - | The notional background level, which is assumed to be constant across the 
+       | detector
    * - Exposure time
      - :math:`s`
      - The exposure time
@@ -35,19 +36,62 @@ The current implementation will *only* simulate the signal from the sources, whi
 However, there are many other parameters required to simulate a WFSS image, and these are stored in ``yaml`` files in the configuration directory in :file:`{$HOME}/.slitlessutils`.  Most of these parameters are the subject of considerable calibration efforts, and as such, should probably not be adjusted if the results are to be trusted.  
 
 
+.. list-table:: Instrument-Wide Settings
+   :widths: 25 25 50
+   :header-rows: 1
+
+   * - Keyword
+     - Unit
+     - Description
+   * - Image units
+     - :math:`e^-/s` or :math:`e^-`
+     - The units of the images to be written.
+   * - File suffix
+     - ``flt`` or ``flc``
+     - The file suffix in the HST parlance.
+   * - Path
+     - ``str``
+     - | The relative path from the ``yaml`` file where the files for this 
+       | instrument are stored.
+   * - Focal-plane position
+     - 3-elements
+     - | The :math:`(v_2,v_3)` position of the reference point 
+       | and :math:`v_{3y}` angle with respect the :math:`v_3`-axis.
+
+.. list-table:: Instrument-Wide Grating/Blocking [#gbnote]_
+   :widths: 25 25 50
+   :header-rows: 1
+
+   * - Keyword
+     - Unit
+     - Description
+   * - Master-Sky Image
+     - 
+     - The name of the master-sky image.
+   * - Tabulation Parameters
+     - ``dict``
+     - | This contains the starting wavelength (``wave0``), ending 
+       | wavelength (``wave1``), sampling frequency (``dwave``), 
+       | units (usually ``angstrom``), and disptype.  
+   * - Extraction Parameters [#extnote]_
+     - ``dict``
+     - | This contains the starting wavelength (``wave0``), ending 
+       | wavelength (``wave1``), sampling frequency (``dwave``), 
+       | units (usually ``angstrom``), and disptype.  
 
 
-Globally set for the whole instrument
-the image units (usually :math:`e^-1/s` or :math:`e^-`)
-file suffix (usually ``flt`` or ``flc``)
-focal-plane position of the instrument
+.. list-table:: Detector Settings [#detnote]_
+   :widths: 25 25 50
+   :header-rows: 1
 
-Globally for each grating/blocking combination
-master-sky image
-tabulation properties
-extraction properties
-
-
+   * - Keyword
+     - Unit
+     - Description
+   * - Focal-plane position
+     - 3-elements
+     - | The :math:`(v_2,v_3)` position of the reference point 
+       | and :math:`v_{3y}` angle with respect the :math:`v_3`-axis.
+       
 
 
 for each detector:
@@ -62,7 +106,6 @@ reference file for spectral calibrations (this will contain the flat field and s
 
 
 .. math::
-
    \begin{eqnarray}
       S' &\sim& \mathcal{P}left(t\,(S+B+D)\right)/t - B - D + \mathcal{N}(0,R^2)\\
       U &=& \frac{\sqrt{(I+B+D) t+R^2}}{t} 
@@ -110,5 +153,6 @@ The simulations provided by ``slitlessutils`` make several simplifying assumptio
 
 
 .. rubric:: Footnotes
-.. [#f1] Currently the sky background is assumed as a single constant value, and adding in the :doc:`master-sky backgrounds <background>` are not yet implemented.
-   
+.. [#gbnote] These settings are set for each grating/blocking combination, and if no blocking filter exists, then it is set as the ``null`` variable in ``yaml``.
+.. [#extnote] The extraction and tabulation settings need-not be the same.  Indeed, to encapsulate the non-linearity in the prism modes they will **NOT** be the same.
+.. [#detnote] There should be a separate stanza like this for each detector in the instrument (e.g. such as the two CCDs in ACS-WFC).
