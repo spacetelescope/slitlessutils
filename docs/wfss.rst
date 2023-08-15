@@ -64,7 +64,7 @@ To load simulated fits files, there are two classmethods
 
 * :func:`~slitlessutils.wfss.WFSSCollection.from_dataframe()`:  Load a simulated ``WFSSCollection`` from a `pandas.DataFrame() <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html>`_.  The table shall have columns and datatypes given in :numref:`simulkeys`.
 
-* :func:`~slitlessutils.wfss.WFSSCollection.from_wcsfile()`:  Load a simulated ``WFSSCollection`` from a comma-separated value (CSV) file whose columns and datatypes are given in :numref:`simulkeys`, but see :numref:`wcsexample` for an example CSV file.
+* :func:`~slitlessutils.wfss.WFSSCollection.from_wcsfile()`:  Load a simulated ``WFSSCollection`` from a comma-separated value (CSV) file whose columns and datatypes are given in :numref:`simulkeys` and an example CSV file is shown below.
 
 .. _simulkeys:
 .. list-table:: Simulated Data Keywords
@@ -107,7 +107,6 @@ To load simulated fits files, there are two classmethods
 Example WCS File (in csv format)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. _wcsexample:
 .. include:: include/wcs.csv
 	:literal: 
 

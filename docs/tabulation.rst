@@ -4,6 +4,8 @@
 Tabulation in ``slitlessutils``
 ===============================
 
+The most computationally expensive aspect of extracting or simulating WFSS observations comes from the forward-modeling every (relevant) pixel in the :term:`direct imaging` 
+
 
 Creating a :term:`pixel-dispersion table` (PDT):
 
