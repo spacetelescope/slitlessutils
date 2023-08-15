@@ -13,7 +13,7 @@ The most computationally expensive aspect of extracting or simulating WFSS obser
 			+ For each :term:`direct imaging` pixel :math:`(x_d,y_d)` in the source:
 				#. convert the direct imaging pixel to the :term:`undispersed position` :math:`(x_0,y_0)` using the WCS information for both images
 				#. For each spectral order:
-					#. For each tabulation wavelength (see :ref:`The tabulation wavelengths` below):
+					#. For each tabulation wavelength (see Note below):
 						#. convert wavelength into parameter :math:`t` using the inverse of the dispersion relation
 						#. evaluate the trace at the parameter :math:`t`
 						#. compute fractional pixel area (see :numref:`animatedpixel` below)
