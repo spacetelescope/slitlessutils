@@ -4,22 +4,41 @@ WFSS Image Simulation
 =====================
 
 
-Introduction
-------------
-
-
-
-
-
-
 Methodology
 -----------
 
 
+The current implementation will *only* simulate the signal from the sources, while including noise from many effects.  
 
 
-The science image(s) are given as a sum of Poisson and Gaussian terms
+.. list-table:: Simulation Parameters
+   :widths: 25 25 50
+   :header-rows: 1
 
+   * - Keyword
+     - Unit
+     - Description
+   * - Background 
+     - :math:`e^-/s`
+     - The notional background level, which is assumed to be constant across the detector
+   * - Exposure time
+     - :math:`s`
+     - The exposure time
+
+
+
+.. math::
+   :label: sneqns
+
+   \begin{eqnarray}
+      S' &\sim& \mathcal{P}left(t\,(S+B+D)\right)/t - B - D + \mathcal{N}(0,R^2)\\
+      U &=& \frac{\sqrt{(I+B+D) t+R^2}}{t} 
+   \end{eqnarray}
+
+ The science image(s) is en
+
+
+:doc:`tabulation module <tabulation>`
 
 The uncertainty image is given by the
 
@@ -31,7 +50,7 @@ where :math:`I`, :math:`B` [#f1]_, and :math:`D` are the Poissonian noise terms 
 The `SCI` extension
 
 .. math::
-   p \sim \mathcal{P}(I+S+D,t)
+   p \sim \mathcal{P}(I+S+D)
 
    f \sim \mathcal{N}(0,R^2)
 
@@ -46,7 +65,13 @@ The `SCI` extension
 Excluded Effects
 ^^^^^^^^^^^^^^^^
 
-Currently, ``slitlessutils`` 
+The simulations provided by ``slitlessutils`` make several simplifying assumptions that will be reevaluated in future releases.  In order of relative importance, these are:
+
+* The sky background is assumed to be a single value, however as discussed in :doc:`the master sky <background>` belies this assumption.  Employing a realistic :term:`master-sky image` with a scale factor (:math:`\alpha`) is simply modifying :eq:`sneqns` to have :math:`B\rightarrow \alpha\,B_{x,y}`
+
+* The dark current is assumed to be a single value that applies uniformly to *all* pixels, yet real detectors have pixel-to-pixel variations.
+
+* The sky background is assumed to be a single value, however as discussed in :doc:`the master sky <background>` belies this assumption.  
 
 
 

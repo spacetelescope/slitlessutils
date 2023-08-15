@@ -11,7 +11,7 @@ The calibration files for ``slitlessutils`` are staged on a centralized box repo
 Spectral Specification
 ----------------------
 
-To extract or simulate WFSS data, we must specify the `Spectral Trace`_  and the `Spectral Dispersion`_, which are each given as parametric curves (as described in `Pirzkal and Ryan 2017 <https://www.stsci.edu/files/live/sites/www/files/home/hst/instrumentation/wfc3/documentation/instrument-science-reports-isrs/_documents/2017/WFC3-2017-01.pdf>`_). In brief, here a parameter: :math:`0 \leq t \leq 1` describes the :math:`(x_s(t), y_s(t),\lambda(t))`.  However, these functions can vary within the field-of-view, which is parametrized by the :term:`undispersed position` :math:`(x_0,y_0)`.  
+To extract or simulate WFSS data, we must specify the `Spectral Trace`_  and the `Spectral Dispersion`_, which are each given as parametric curves (as described in `Pirzkal and Ryan 2017 <https://www.stsci.edu/files/live/sites/www/files/home/hst/instrumentation/wfc3/documentation/instrument-science-reports-isrs/_documents/2017/WFC3-2017-01.pdf>`_). In brief, here a parameter: :math:`0 \leq t \leq 1` describes the :math:`(x(t), y(t),\lambda(t))`.  However, these functions can vary within the field-of-view, which is parametrized by the :term:`undispersed position` :math:`(x_0,y_0)`.  
 
 
 Spectral Trace
@@ -28,8 +28,8 @@ However, the spectral element may be rotated with respect to the calibration obs
 
 .. math::
 	\begin{eqnarray}
-		x_s(t;x_0,y_0,\theta) &=& x_0 + \cos(\theta)\,\tilde{x}(t;x_0,y_0) + \sin(\theta)\,\tilde{y}(t;x_0,y_0) + \Delta x \\
-		y_s(t;x_0,y_0,\theta) &=& y_0 - \sin(\theta)\,\tilde{x}(t;x_0,y_0) + \cos(\theta)\,\tilde{y}(t;x_0,y_0) + \Delta y
+		x(t;x_0,y_0,\theta) &=& x_0 + \cos(\theta)\,\tilde{x}(t;x_0,y_0) + \sin(\theta)\,\tilde{y}(t;x_0,y_0) + \Delta x \\
+		y(t;x_0,y_0,\theta) &=& y_0 - \sin(\theta)\,\tilde{x}(t;x_0,y_0) + \cos(\theta)\,\tilde{y}(t;x_0,y_0) + \Delta y
 	\end{eqnarray}
 
 where :math:`(\Delta x, \Delta y)` are the :term:`wedge offsets`.
