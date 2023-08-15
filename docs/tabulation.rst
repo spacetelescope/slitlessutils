@@ -10,14 +10,14 @@ The most computationally expensive aspect of extracting or simulating WFSS obser
 * For each WFSS file:
 	- For each detector in the WFSS file:
 		> For each source in the source collection:
-			+ For each pixel in the source:
-				#. apply WCS transformation between direct image and WFSS image
+			+ For each :term:`direct imaging` pixel :math:`(x_d,y_d)` in the source:
+				#. convert the direct imaging pixel to the :term:`undispersed position` :math:`(x_0,y_0)` using the WCS information for both images
 				#. For each spectral order:
 					#. For each tabulation wavelength:
 						#. convert wavelength into parameter :math:`t` using the inverse of the dispersion relation
 						#. evaluate the trace at the parameter :math:`t`
 						#. compute fractional pixel area (see :numref:`animatedpixel` below)
-						#. record an entry in the PDT  fractional pixel area for each WFSS pixel multiplied by the bandwidth from the tabulation wavelengths.
+						#. record an entry in the PDT as :math:`(x, y, l, w)`, where :math:`w` is the fractional pixel area that the :term:`direct imaging` pixel :math:`(x_d,y_d)` projects onto the WFSS image pixel :math:`(x,y)` at the wavelength index :math:`l` [#wavefoot]_.
 
 .. _animatedpixel:
 .. figure:: images/pixel_animate.gif
@@ -34,5 +34,9 @@ Given the hierarchical nature outlined in the above algorithm, the PDTs are stor
 
 
 .. math::
-	:label: ravel
-	i = x + n_x\,y + n_x\,n_y\,\lambda
+	i = x + n_x\,y + n_x\,n_y\,l
+
+
+
+.. rubric:: Footnotes
+.. [#wavefoot] lkdjf lkdj dlkjf kjf ldfjd kld fj
