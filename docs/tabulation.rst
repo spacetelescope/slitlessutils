@@ -19,6 +19,16 @@ The most computationally expensive aspect of extracting or simulating WFSS obser
 						#. compute fractional pixel area (see :numref:`animatedpixel` below)
 						#. record an entry in the PDT as :math:`(x, y, l, a)`, where :math:`a` is the fractional pixel area that the :term:`direct imaging` pixel :math:`(x_d,y_d)` projects onto the WFSS image pixel :math:`(x,y)` at the wavelength index :math:`l` [#wavefoot]_.
 
+.. note::
+	.. math::
+		\begin{eqnarray}
+			\lambda_l &=& \lambda_0 + \delta\,l\\
+			l &\in& (0, 1, 2, 3, ..., \frac{\lambda_1-\lambda_0}{\delta}-1)
+		\end{eqnarray}
+
+
+
+
 .. _animatedpixel:
 .. figure:: images/pixel_animate.gif
    :align: center
@@ -40,12 +50,6 @@ which requires *raveling* these three indices into a single index:
 	i = x + n_x\,y + n_x\,n_y\,l
 
 where :math:`(n_x,n_y)` represents the dimensionality of the WFSS image.  
-
-.. math::
-	\begin{eqnarray}
-		\lambda_l &=& \lambda_0 + \delta\,l\\
-		l &\in& (0, 1, 2, 3, ..., (\lambda_1-\lambda_0)/\delta-1)
-	\end{eqnarray}
 
 
 .. rubric:: Footnotes
