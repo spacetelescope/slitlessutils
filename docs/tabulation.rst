@@ -28,12 +28,24 @@ The most computationally expensive aspect of extracting or simulating WFSS obser
 
 
 
-Given the hierarchical nature outlined in the above algorithm, the PDTs are stored as `hierarchical data-format 5 (HDF5) <https://www.hdfgroup.org/solutions/hdf5/>`_ and then can be viewed or manually edited with standard tools (e.g. `HDFView <https://www.hdfgroup.org/downloads/hdfview/>`_).  Now the process of extraction or simulation will begin by aggregating the PDTs from the appropriate :term:`direct imaging` pixels and spectral order, and summing over unique triplets :math:`(x,y,l)`, which requires *raveling* these three indices into a single index:
+Given the hierarchical nature outlined in the above algorithm, the PDTs are stored as `hierarchical data-format 5 (HDF5) <https://www.hdfgroup.org/solutions/hdf5/>`_ and then can be viewed or manually edited with standard tools (e.g. `HDFView <https://www.hdfgroup.org/downloads/hdfview/>`_).  Now the process of extraction or simulation will begin by aggregating the PDTs from the appropriate :term:`direct imaging` pixels and spectral order, and summing over unique triplets :math:`(x,y,l)`.
+
+
+
+
+
+which requires *raveling* these three indices into a single index:
 
 .. math:: 
 	i = x + n_x\,y + n_x\,n_y\,l
 
-where :math:`(n_x,n_y)` represents the dimensionality of the WFSS image.
+where :math:`(n_x,n_y)` represents the dimensionality of the WFSS image.  
+
+.. math::
+	\begin{eqnarray}
+		\lambda_l &=& \lambda_0 + \delta\,l\\
+		l &\in& (0, 1, 2, 3, ..., (\lambda_1-\lambda_0)/\delta-1)
+	\end{eqnarray}
 
 
 .. rubric:: Footnotes

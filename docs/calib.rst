@@ -20,16 +20,16 @@ The :term:`spectral trace` describes the position of the spectrum on the detecto
 
 .. math::
    \begin{eqnarray}
-		\tilde{x}(t;x_0,y_0) &=& a_0(x_0,y_0) + a_1(x_0,y_0)t + a_2(x_0,y_0)t^2 + \ldots \\
-		\tilde{y}(t;x_0,y_0) &=& b_0(x_0,y_0) + b_1(x_0,y_0)t + b_2(x_0,y_0)t^2 + \ldots
+		\tilde{x}(t;x_0,y_0) &=& a_0(x_0,y_0) + a_1(x_0,y_0)\,t + a_2(x_0,y_0)\,t^2 + \ldots \\
+		\tilde{y}(t;x_0,y_0) &=& b_0(x_0,y_0) + b_1(x_0,y_0)\,t + b_2(x_0,y_0)\,t^2 + \ldots
 	\end{eqnarray}
 
 However, the spectral element may be rotated with respect to the calibration observations, and therefore, requires introducing a small rotation matrix.  Now the position in the spectroscopic image will be:
 
 .. math::
 	\begin{eqnarray}
-		x_s(t;x_0,y_0,\theta) &=& x_0 + \cos(\theta)\tilde{x}(t;x_0,y_0)) + \sin(\theta)\tilde{y}(t;x_0,y_0)) + \Delta x \\
-		y_s(t;x_0,y_0,\theta) &=& y_0 - \sin(\theta)\tilde{x}(t;x_0,y_0)) + \cos(\theta)\tilde{y}(t;x_0,y_0)) + \Delta y
+		x_s(t;x_0,y_0,\theta) &=& x_0 + \cos(\theta)\,\tilde{x}(t;x_0,y_0) + \sin(\theta)\,\tilde{y}(t;x_0,y_0) + \Delta x \\
+		y_s(t;x_0,y_0,\theta) &=& y_0 - \sin(\theta)\,\tilde{x}(t;x_0,y_0) + \cos(\theta)\,\tilde{y}(t;x_0,y_0) + \Delta y
 	\end{eqnarray}
 
 where :math:`(\Delta x, \Delta y)` are the :term:`wedge offsets`.
@@ -42,7 +42,7 @@ Spectral Dispersion
 The :term:`spectral dispersion` describes the wavelength along the spectral trace.  The spectral dispersion of a :term:`grism` element is often constant with wavelength, which corresponds to a linear (or low-order polynomial) in the parameter:
 
 .. math::
-	\lambda(t;x_0,y_0) = \alpha_0(x_0,y_0) + \alpha_1(x_0,y_0)t + \alpha_2(x_0,y_0)t^2 + \ldots
+	\lambda(t;x_0,y_0) = \alpha_0(x_0,y_0) + \alpha_1(x_0,y_0)\,t + \alpha_2(x_0,y_0)\,t^2 + \ldots
 
 which will be given by a :class:`~slitlessutils.core.wfss.config.StandardPolynomial`.  However, :term:`prism` elements often exhibit a dispersion that is highly non-linear (as a function of wavelength), which can be described as a `Laurent polynomial <https://mathworld.wolfram.com/LaurentPolynomial.html>`_ (e.g. `Bohlin et al 2000 <https://www.stsci.edu/files/live/sites/www/files/home/hst/instrumentation/acs/documentation/instrument-science-reports-isrs/_documents/isr0001.pdf>`_):
 
@@ -64,7 +64,7 @@ Field-Dependence
 As noted above, the coefficients in the trace and dispersion polynomials can be polynomials of the undispersed positions:
 
 .. math::
-	\kappa(x_0,y_0) = \kappa_{0,0} + \kappa_{1,0}x_0 + \kappa_{0,1}y_0 + \kappa_{2,0}x_0^2 + \kappa_{1,1}x_0y_0 + \kappa_{0,2}y_0^2 + \ldots
+	\kappa(x_0,y_0) = \kappa_{0,0} + \kappa_{1,0}\,x_0 + \kappa_{0,1}\,y_0 + \kappa_{2,0}\,x_0^2 + \kappa_{1,1}\,x_0y_0 + \kappa_{0,2}\,y_0^2 + \ldots
 
 where :math:`\kappa` can be any of the elements of :math:`a, b, \alpha` or :math:`t^*` (for the prism dispersion). These spatial polynomials are specified by :class:`~slitlessutils.core.wfss.config.SpatialPolynomial` and are of fixed total order :math:`n`.  This implies the number of any set of these coefficients will be a `triangular number <https://en.wikipedia.org/wiki/Triangular_number>`_ and serialized with `Cantor pairing <https://en.wikipedia.org/wiki/Pairing_function>`_.  
 
