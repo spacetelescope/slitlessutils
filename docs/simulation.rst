@@ -27,8 +27,10 @@ The current implementation will *only* simulate the signal from the sources, whi
 
 
 
+
+
 .. math::
-   :label: sneqns
+   :name: sneqns
 
    \begin{eqnarray}
       S' &\sim& \mathcal{P}left(t\,(S+B+D)\right)/t - B - D + \mathcal{N}(0,R^2)\\
@@ -67,7 +69,7 @@ Excluded Effects
 
 The simulations provided by ``slitlessutils`` make several simplifying assumptions that will be reevaluated in future releases.  In order of relative importance, these are:
 
-* The sky background is assumed to be a single value, however as discussed in :doc:`the master sky <background>` belies this assumption.  Employing a realistic :term:`master-sky image` with a scale factor (:math:`\alpha`) is simply modifying :eq:`sneqns` to have :math:`B\rightarrow \alpha\,B_{x,y}`
+* The sky background is assumed to be a single value, however as discussed in :doc:`the master sky <background>` belies this assumption.  Employing a realistic :term:`master-sky image` with a scale factor (:math:`\alpha`) is simply modifying :ref:`<sneqns>` to have :math:`B\rightarrow \alpha\,B_{x,y}`
 
 * The dark current is assumed to be a single value that applies uniformly to *all* pixels, yet real detectors have pixel-to-pixel variations.
 

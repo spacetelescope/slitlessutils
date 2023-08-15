@@ -55,7 +55,7 @@ where :math:`(n_x,n_y)` represents the dimensionality of the WFSS image.  This c
 Example
 -------
 
-This example loads :doc:`sources <source>` and :doc:`WFSS data <wfss>`, instantiates the tabulation module, and returns the names of the PDT files.  
+This example loads :doc:`sources <sources>` and :doc:`WFSS data <wfss>`, instantiates the tabulation module, and returns the names of the PDT files.  
 
 .. code:: python
 
