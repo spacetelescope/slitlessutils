@@ -32,13 +32,7 @@ The current implementation will *only* simulate the signal from the sources, whi
 
 
 
-However, there are many other parameters required to simulate a WFSS image, and these are stored in ``yaml`` files in the configuration directory in :file:`{$HOME}/.slitlessutils`.  
-
-.. warning::
-   
-   Most o
-
-Most of these parameters are the subject of considerable calibration efforts, and as such, should probably not be adj
+However, there are many other parameters required to simulate a WFSS image, and these are stored in ``yaml`` files in the configuration directory in :file:`{$HOME}/.slitlessutils`.  Most of these parameters are the subject of considerable calibration efforts, and as such, should probably not be adjusted if the results are to be trusted.  
 
 
 
@@ -49,6 +43,10 @@ file suffix (usually ``flt`` or ``flc``)
 focal-plane position of the instrument
 
 Globally for each grating/blocking combination
+master-sky image
+tabulation properties
+extraction properties
+
 
 
 
@@ -64,7 +62,6 @@ reference file for spectral calibrations (this will contain the flat field and s
 
 
 .. math::
-   :name: eq:1
 
    \begin{eqnarray}
       S' &\sim& \mathcal{P}left(t\,(S+B+D)\right)/t - B - D + \mathcal{N}(0,R^2)\\
@@ -103,7 +100,7 @@ Excluded Effects
 
 The simulations provided by ``slitlessutils`` make several simplifying assumptions that will be reevaluated in future releases.  In order of relative importance of their adverse effect on the expected :term:`signal-to-noise` (S/N), these are:
 
-* The sky background is assumed to be a single value, however as discussed in :doc:`the master sky <background>` belies this assumption.  Employing a realistic :term:`master-sky image` with a scale factor (:math:`\alpha`) is simply modifying :numref:`<eq:1>` to have :math:`B\rightarrow \alpha\,B_{x,y}`.  This assumption will give the illusion of a constant S/N over the detector, but the deviations from constant will depend on the how adopted level compares to the (large-scale) variations in the :term:`master-sky image`. Therefore this may introduce small systematic biases based on the position of the sources.
+* The sky background is assumed to be a single value, however as discussed in :doc:`the master sky <background>` belies this assumption.  Employing a realistic :term:`master-sky image` with a scale factor (:math:`\alpha`) by modifying the source/uncertainty equations to have :math:`B\rightarrow \alpha\,B_{x,y}`.  This assumption will give the illusion of a constant S/N over the detector, but the deviations from constant will depend on the how adopted level compares to the (large-scale) variations in the :term:`master-sky image`. Therefore this may introduce small systematic biases based on the position of the sources.
 
 * The DQA is assumed to have no bad pixels flagged, which effectively *overestimates* the number of valid science pixels and perhaps slightly the S/N.
 
