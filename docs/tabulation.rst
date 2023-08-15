@@ -13,19 +13,19 @@ The most computationally expensive aspect of extracting or simulating WFSS obser
 			+ For each :term:`direct imaging` pixel :math:`(x_d,y_d)` in the source:
 				#. convert the direct imaging pixel to the :term:`undispersed position` :math:`(x_0,y_0)` using the WCS information for both images
 				#. For each spectral order:
-					#. For each tabulation wavelength (see :ref:`tabnote` below):
+					#. For each tabulation wavelength (see :ref:`The tabulation wavelengths` below):
 						#. convert wavelength into parameter :math:`t` using the inverse of the dispersion relation
 						#. evaluate the trace at the parameter :math:`t`
 						#. compute fractional pixel area (see :numref:`animatedpixel` below)
 						#. record an entry in the PDT as :math:`(x, y, l, a)`, where :math:`a` is the fractional pixel area that the :term:`direct imaging` pixel :math:`(x_d,y_d)` projects onto the WFSS image pixel :math:`(x,y)` at the wavelength index :math:`l` [#wavefoot]_.
 
-.. _tabnote:
+
 .. note:: The tabulation wavelengths
 	This is some text. his is some text. his is some text. his is some text. his is some text. his is some text. his is some text. his is some text. his is some text. his is some text. his is some text. his is some text. 
 
 	.. math::
 		\lambda(l) = \lambda_0 + \left(\lambda_1-\lambda_0\right)\frac{l}{N-1}
-	
+
 	his is some text. his is some text. his is some text. his is some text. his is some text. his is some text. his is some text. his is some text. 
 
 
