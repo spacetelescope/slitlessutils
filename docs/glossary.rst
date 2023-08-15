@@ -4,6 +4,10 @@ Glossary
 ========
 
 .. glossary::
+	
+	attitude
+		This may have many definitions, but in this context it refers to the direction and orientation that the telescope is pointed.  It is largely set by the CRVAL-keywords and the position angle, which is encoded in either the CD- or PC-matrices.  Here, this is considered synonymous with *pointing*.
+
 	cosmic ray
 		A high energy particle that imparts a significant amount of charge.  Cosmic rays often appear as very sharp, discontinuous features that do not reappear in successive images.
 
@@ -34,6 +38,9 @@ Glossary
 	prism
 		A transmissive and dispersive spectral element with a highly non-uniform rate of dispersion.  See :term:`grism` for the similarities/differences between the two.
 
+	signal-to-noise
+		An empirical estimate of the quality of the data by comparing the measurement (the signal) to its corresponding uncertainty (the noise).  This may also be referred to as S/N or quoted as a *number of sigma* (:math:`n_{sig}`).
+
 	spectral dispersion
 		The parametric curve governing the wavelength along the :term:`spectral trace`.  Sometimes called the *wavelength solution*.  
 
@@ -48,3 +55,6 @@ Glossary
 
 	wedge offsets
 		Positional offsets due to the variations in the thickness of the optical elements (see `Sabbi 2012 <https://www.stsci.edu/files/live/sites/www/files/home/hst/instrumentation/wfc3/documentation/instrument-science-reports-isrs/_documents/2012/WFC3-2012-01.pdf>`_).
+
+	world-coordinate system
+		The complete description of the instrument layout on the sky, including the :term:`attitude` of the telescope, the relative position of the detectors, and their individual distortion models.  Also called WCS, and see also: `world-coordinate system <https://docs.astropy.org/en/stable/wcs/>`_.

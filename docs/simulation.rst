@@ -8,7 +8,12 @@ Methodology
 -----------
 
 
-The current implementation will *only* simulate the signal from the sources, while including noise from many effects.  
+The current implementation will *only* simulate the signal from the sources, while including noise from many effects.  To simulate an image
+
+
+
+#. Tabulate the WFSS image with the :doc:`tabulation module <tabulation>`
+#. Initialize noiseless science and uncertainty images
 
 
 .. list-table:: Simulation Parameters
@@ -67,14 +72,15 @@ The `SCI` extension
 Excluded Effects
 ^^^^^^^^^^^^^^^^
 
-The simulations provided by ``slitlessutils`` make several simplifying assumptions that will be reevaluated in future releases.  In order of relative importance, these are:
+The simulations provided by ``slitlessutils`` make several simplifying assumptions that will be reevaluated in future releases.  In order of relative importance of their adverse effect on the expected :term:`signal-to-noise` (S/N), these are:
 
-* The sky background is assumed to be a single value, however as discussed in :doc:`the master sky <background>` belies this assumption.  Employing a realistic :term:`master-sky image` with a scale factor (:math:`\alpha`) is simply modifying :ref:`<sneqns>` to have :math:`B\rightarrow \alpha\,B_{x,y}`
+* The sky background is assumed to be a single value, however as discussed in :doc:`the master sky <background>` belies this assumption.  Employing a realistic :term:`master-sky image` with a scale factor (:math:`\alpha`) is simply modifying :ref:`<sneqns>` to have :math:`B\rightarrow \alpha\,B_{x,y}`.  This assumption will give the illusion of a constant S/N over the detector, but the deviations from constant will depend on the how adopted level compares to the (large-scale) variations in the :term:`master-sky image`. Therefore this may introduce small systematic biases based on the position of the sources.
 
-* The dark current is assumed to be a single value that applies uniformly to *all* pixels, yet real detectors have pixel-to-pixel variations.
+* The DQA is assumed to have no bad pixels flagged, which effectively *overestimates* the number of valid science pixels and perhaps slightly the S/N.
 
-* The sky background is assumed to be a single value, however as discussed in :doc:`the master sky <background>` belies this assumption.  
+* The dark current is assumed to be a single value that applies uniformly to *all* pixels, yet real detectors have pixel-to-pixel variations.  Like the sky-background issue, this may introduce weak systematic, spatial biases.
 
+* The :term:`attitude` is set by the user and assumed to be noiseless, but in practice there are systematic uncertainties in the accuracy of the :term:`world-coordinate system` (WCS).  In general, errors in the WCS result in a systematic wavelength shift (sometimes called the *wavelength zeropoint*) and/or flux losses.  However `Ryan, Casertano, & Pirzkal (2018) <https://ui.adsabs.harvard.edu/abs/2018PASP..130c4501R/abstract>`_ show that these effects are very small compared for most HST observations and negligible compared to the spectro-photometric noise.  
 
 
 .. rubric:: Footnotes
