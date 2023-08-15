@@ -33,11 +33,11 @@ Observed Data (`~slitlessutils.wfss.data.wfsscollection.ObservedData()`)
 
 To load observed fits files, there are three classmethods 
 
-* :func:`~slitlessutils.wfss.WFSSCollection.from_glob()`:  
+* :func:`~slitlessutils.wfss.WFSSCollection.from_glob()`:  Load an observed ``WFSSCollection`` from a glob token.
 
-* :func:`~slitlessutils.wfss.WFSSCollection.from_list()`
+* :func:`~slitlessutils.wfss.WFSSCollection.from_list()`:  Load an observed ``WFSSCollection`` from a list of files.
 
-* :func:`~slitlessutils.wfss.WFSSCollection.from_file()` (list of filenames)
+* :func:`~slitlessutils.wfss.WFSSCollection.from_file()`:  Load an observed ``WFSSCollection`` from an ascii file that contains the fullpath to a file (one per line).
 
 
 Example
@@ -62,13 +62,13 @@ Simulated data
 
 To load simulated fits files, there are two classemthods
 
-* :func:`~slitlessutils.wfss.WFSSCollection.from_dataframe()`
+* :func:`~slitlessutils.wfss.WFSSCollection.from_dataframe()`:  Load a 
 
 * :func:`~slitlessutils.wfss.WFSSCollection.from_wcsfile()`
 
 
 .. list-table:: Simulated Data Keywords
-   :widths: 20 20 60
+   :widths: 15 10 75
    :header-rows: 1
    :stub-columns: 0
    :width: 600
@@ -106,16 +106,5 @@ Example WCS File (in csv format)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. include:: include/wcs.csv
 	:literal: 
-
-
-Example
-~~~~~~~
-.. code:: python
-	import slitlessutils as su
-
-
-
-
-
 
 
