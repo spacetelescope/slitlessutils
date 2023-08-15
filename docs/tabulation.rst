@@ -22,8 +22,10 @@ The most computationally expensive aspect of extracting or simulating WFSS obser
 .. _tabnote:
 .. note:: The tabulation wavelengths
 	This is some text. his is some text. his is some text. his is some text. his is some text. his is some text. his is some text. his is some text. his is some text. his is some text. his is some text. his is some text. 
+
 	.. math::
 		\lambda(l) = \lambda_0 + \left(\lambda_1-\lambda_0\right)\frac{l}{N-1}
+	
 	his is some text. his is some text. his is some text. his is some text. his is some text. his is some text. his is some text. his is some text. 
 
 
