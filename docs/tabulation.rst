@@ -4,15 +4,12 @@
 Tabulation in ``slitlessutils``
 ===============================
 
-The most computationally expensive aspect of extracting or simulating WFSS observations comes from the forward-modeling every (relevant) pixel in the :term:`direct imaging` 
+The most computationally expensive aspect of extracting or simulating WFSS observations comes from the forward-modeling every (relevant) pixel in the :term:`direct imaging`.  Therefore, ``slitlessutils`` only performs these calculations when requested and stores these intermediate results as a :term:`pixel-dispersion table` (PDT).  
 
-
-Creating a :term:`pixel-dispersion table` (PDT):
-
-# For each WFSS file:
-	# For each detector in the WFSS file:
-		# For each source in the source collection:
-			# For each pixel in the source:
+* For each WFSS file:
+	- For each detector in the WFSS file:
+		> For each source in the source collection:
+			+ For each pixel in the source:
 				#. apply WCS transformation between direct image and WFSS image
 				#. For each spectral order:
 					#. For each tabulation wavelength:
