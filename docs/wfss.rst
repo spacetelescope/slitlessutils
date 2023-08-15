@@ -83,6 +83,21 @@ To load simulated fits files, there are two classemthods
    * - dec
      - ``float``
      - the declination of the instrument's reference point (in degrees)
+   * - orientat
+     - ``float``
+     - the position angle of the instrument at its reference point (in degree)
+   * - telescope
+     - ``str``
+     - the name of the telescope (e.g. ``HST``)
+   * - instrument
+     - ``str``
+     - the tokenized name of the instrument (e.g. ``WFC3IR`` or ``ACSWFC``)
+   * - disperser
+     - ``str``
+     - the name of the dispersive optic (e.g. ``G800L`` or ``G102``)
+   * - blocking
+     - ``str``
+     - the name of the blocking filter.  For HST instruments, this is to be left blank, but is reserved for future development to support JWST instruments or ACS spectropolarimetry.
 
 
 
