@@ -1,5 +1,3 @@
-# Example file
-
 dataset,ra,dec,orientat,telescope,instrument,disperser,blocking
 a_starfield,53.0,-27.0,0.0,HST,ACSWFC,G800L,
 b_starfield,53.0,-27.0,60.0,HST,ACSWFC,G800L,

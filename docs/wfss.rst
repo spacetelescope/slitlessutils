@@ -70,6 +70,8 @@ To load simulated fits files, there are two classemthods
 .. list-table:: Simulated Data Keywords
    :widths: 20 20 60
    :header-rows: 1
+   :stub-columns: 0
+   :width: 600
 
    * - Keyword
      - Datatype
@@ -100,9 +102,17 @@ To load simulated fits files, there are two classemthods
      - the name of the blocking filter.  For HST instruments, this is to be left blank, but is reserved for future development to support JWST instruments or ACS spectropolarimetry.
 
 
-
+Example WCS File (in csv format)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. include:: include/wcs.csv
 	:literal: 
+
+
+Example
+~~~~~~~
+.. code:: python
+	import slitlessutils as su
+
 
 
 
