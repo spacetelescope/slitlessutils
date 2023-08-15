@@ -10,9 +10,6 @@ Glossary
 	data-quality array
 		A bitmask containing the flags that indicate different failure modes of a pixel.  In general, the *good* pixels have a data-quality value of 0.  Also called DQA.
 
-	decimating
-		kdjfljlkj
-
 	direct imaging
 		Data collected in a standard broadband imaging filter contemporaneously with the WFSS data.  These data are often used to improve the astrometric information in the WFSS data, but may have utility in other ways (such as determining the cross-dispersion profile weights, specifying the extraction apertures, or estimating contamination via broadband colors).  See also :term:`post-imaging` or :term:`pre-imaging`.
 

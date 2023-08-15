@@ -106,7 +106,6 @@ To load simulated fits files, there are two classmethods
 
 Example WCS File (in csv format)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 .. include:: include/wcs.csv
 	:literal: 
 
