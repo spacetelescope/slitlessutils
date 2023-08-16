@@ -115,10 +115,8 @@ However, there are many other parameters required to simulate a WFSS image, and 
 
 
 .. math::
-   \begin{eqnarray}
-      S' &\sim& \mathcal{P}left(t\,(S+B+D)\right)/t - B - D + \mathcal{N}(0,R^2)\\
-      U &=& \frac{\sqrt{(I+B+D) t+R^2}}{t} 
-   \end{eqnarray}
+
+   S' &\sim& \mathcal{P}left(t\,(S+B+D)\right)/t - B - D + \mathcal{N}\left(0,R^2\right)\\
 
  The science image(s) is en
 
