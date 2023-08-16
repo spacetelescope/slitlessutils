@@ -98,7 +98,7 @@ However, there are many other parameters required to simulate a WFSS image, and 
        | ``dtype``: a valid ``np.dtype``
    * - Noise properties
      - 
-     _ | dark current in :math:`e^-/s`
+     - | dark current in :math:`e^-/s`
        | readnoise in :math:`e^-`
    * - Detector dimensionality
      - 
