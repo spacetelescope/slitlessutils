@@ -123,6 +123,7 @@ and the parameters :math:`\lambda_0, \lambda_1` are the lower and upper bounds (
 
 
 .. _sensitivity:
+
 Sensitivity Curves
 ------------------
 

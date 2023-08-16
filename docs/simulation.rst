@@ -35,14 +35,23 @@ The current implementation will *only* simulate the signal from the sources, but
 
 
 .. _pam:
+
 Pixel-Area Maps
 ~~~~~~~~~~~~~~~
 
-The :term:`pixel-area map` (PAM) describes the relative pixel size due to distortions in the detector, which is given by the absolute value of the determinant of the Jacobian:
+The :term:`pixel-area map` (PAM) describes the relative pixel size due to distortions in the detector, which is given by the absolute value of the determinant of the Jacobian matrix.  In principle, the distortion can be described in many ways (e.g. look-up table), but ``slitlessutils`` currently assumes this will be described as `Simple-Imaging Polynomials (SIP) <https://docs.astropy.org/en/stable/wcs/note_sip.html>`_.  In which case, the Jacobian is simply:
+
 .. math::
    
     J = \left(\begin{array}{cc} \partial a/\partial x & \partial a/\partial y\\
       \partial b/\partial y & \partial b/\partial y\end{array}\right)
+
+and so the pixel-area map becomes:
+
+.. math::
+
+  A_{x,y} = \mathrm{abs}\left(\det(J)\right) = \left|\frac{\partial a}{x}\frac{\partial b}{\partial y} - \frac{\partial b}{x}\frac{\partial a}{\partial y}\right|
+
 
 
 
@@ -84,6 +93,31 @@ However, there are many other parameters required to simulate a WFSS image, and 
 
 
  The science image(s) is en
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 :doc:`tabulation module <tabulation>`
