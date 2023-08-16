@@ -89,20 +89,29 @@ However, there are many other parameters required to simulate a WFSS image, and 
      - Description
    * - Focal-plane position
      - 3-elements
-     - | The :math:`(v_2,v_3)` position of the reference point 
-       | and :math:`v_{3y}` angle with respect the :math:`v_3`-axis.
-       
+     - | :math:`(v_2,v_3)` position of the reference point 
+       | :math:`v_{3y}` angle with respect the :math:`v_3`-axis
+   * - Extension properties
+     - 
+     - | ``name``: the name of the extension (must be ``str``)
+       | ``ver``: the version of the extension (must be ``int``)
+       | ``dtype``: a valid ``np.dtype``
+   * - Noise properties
+     - 
+     _ | dark current in :math:`e^-/s`
+       | readnoise in :math:`e^-`
+   * - Detector dimensionality
+     - 
+     - | ``naxis``: 2-element list of size of detector (must be ``int``)
+       | ``crpix``: 2-element list for reference position (can be ``float``)
+       | ``scale``: 2-element list for pixel scale (can be ``float``)
+   * - Distortion model
+     - 
+     - `SIP coefficients <https://docs.astropy.org/en/stable/wcs/note_sip.html>`_ should be a ``dict``
+   * - Configuration files
+     - 
+     - The file name for each grating/blocking combination
 
-
-for each detector:
-focal-plane layout :math:`(V2, V3, V3Y)`
-image data types and extension names/versions
-noise properties: for the dark current and readnoise
-dimensionality
-reference pixel position in instrument coordinates
-pixel scale
-forward-model for the geometric distortion as SIP coefficients
-reference file for spectral calibrations (this will contain the flat field and sensitivity)
 
 
 .. math::
