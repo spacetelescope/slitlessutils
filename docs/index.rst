@@ -40,9 +40,8 @@ User Documentation
    install.rst
    getting_started.rst
    configure.rst
-   extraction.rst
-   simulation.rst
-   additional.rst
+   datastructs.rst
+   modules.rst
    calib.rst
    faq.rst
    citation.rst

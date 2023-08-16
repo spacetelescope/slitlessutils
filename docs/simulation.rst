@@ -8,12 +8,37 @@ Methodology
 -----------
 
 
-The current implementation will *only* simulate the signal from the sources, while including noise from many effects.  To simulate an image
+The current implementation will *only* simulate the signal from the sources, but includes the Poisson noise from the source(s), sky background, and dark current and Gaussian noise from the read noise.  To create a noiseless WFSS image:
 
 
-
+#. Load :doc:`WFSSCollection <wfss>` and :doc:`sources <sources>`, 
 #. Tabulate the WFSS image with the :doc:`tabulation module <tabulation>`
-#. Initialize noiseless science and uncertainty images
+#. Initialize noiseless science as all zero: :math:`S=0`
+#. For each detector in the WFSS file:
+      > For each source in the source collection:
+         + For each :term:`direct imaging` pixel :math:`(x_d,y_d)` in the source:
+            * load the PDT from the :class:`~slitlessutils.tables.PDTFile()
+            * append to a list
+         + multiply the fractional pixel (:math:`a`) from the PDTs by wavelength-dependent flat-field (:math:`F(\lambda)`), :term:`sensitivity curve` (:math:`\mathcal{S}(\lambda)`, :term:`pixel-area map` (:math:`A`, see more below), and the source spectrum (:math:`f(\lambda)`)
+
+         .. math::
+            s = a\,F(x,y,\lambda)\,\mathcal{S}(\lambda)\,f(\lambda)
+
+
+         + decimate the list of PDTs over the WFSS image pixels :math:`(x,y)`.  
+
+
+
+.. math::
+   
+   J = \left(\begin{array}{cc} \partial a/\partial x & \partial a/\partial y\\
+      \partial b/\partial y & \partial b/\partial y\end{array}\right)
+
+.. math::
+
+   \abs\left(\det(J)\right) = \left|\frac{\partial a}{\partial x}\frac{\partial b}{\partial y} - \frac{\partial a}{\partial y}\frac{\partial b}{\partial x}\right|
+
+
 
 
 .. list-table:: User-Specified Simulation Parameters
@@ -116,7 +141,11 @@ However, there are many other parameters required to simulate a WFSS image, and 
 
 .. math::
 
-   S' \sim \mathcal{P}left(t\,(S+B+D)\right)/t 
+   \begin{eqnarray}
+      S' &\sim& \mathcal{P}\left(t\,(S+B+D)\right)/t - B - D + \mathcal{N}\left(0,R^2\right)\\
+      U &=& \frac{\sqrt{(S+B+D) t+R^2}}{t} 
+   \end{eqnarray}
+
 
  The science image(s) is en
 

@@ -26,6 +26,9 @@ Glossary
 	pick-off mirror
 	    An optical element that redirects the light to the instrument in question. 
 
+	pixel-area map
+		The relative area of each pixel with respect to the area of the reference pixel, which is given by the absolute value of the determinant of the Jacobian matrix.  This arises due to geometric distortion, and in the case of a SIP distortion model is a polynomial in the pixel coordinates.  Also called PAM.
+
 	pixel-dispersion table
 		A look-up table that describes the weights that the :term:`direct imaging` pixel projects onto the pixels of a WFSS image/detector as a function of wavelength for each spectral order.  Due to the hierarchical nature of this transformation, these data are stored as `hierarchical data-format 5 (HDF) <https://www.hdfgroup.org/solutions/hdf5/>`_.  This intermediate data product is also referred to as a PDT.
 
@@ -38,8 +41,12 @@ Glossary
 	prism
 		A transmissive and dispersive spectral element with a highly non-uniform rate of dispersion.  See :term:`grism` for the similarities/differences between the two.
 
+	sensitivity curve
+		The conversion between instrumental units (usually :math:`e^-/s`) to physical units (usually :math:`erg/s/cm^2/\AA`), which is necessarily a function of wavelength.  
+
 	signal-to-noise
 		An empirical estimate of the quality of the data by comparing the measurement (the signal) to its corresponding uncertainty (the noise).  This may also be referred to as S/N or quoted as a *number of sigma* (:math:`n_{sig}`).
+
 
 	spectral dispersion
 		The parametric curve governing the wavelength along the :term:`spectral trace`.  Sometimes called the *wavelength solution*.  
