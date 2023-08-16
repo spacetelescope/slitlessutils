@@ -13,30 +13,36 @@ The current implementation will *only* simulate the signal from the sources, but
 
 #. Load :doc:`WFSSCollection <wfss>` and :doc:`sources <sources>`, 
 #. Tabulate the WFSS image with the :doc:`tabulation module <tabulation>`
-#. Initialize noiseless science as all zero: :math:`S=0`
+#. Initialize noiseless science as all zero: :math:`S_{x,y}=0` for all WFSS image pixels :math:`(x,y)`.
 #. For each detector in the WFSS file:
       > For each source in the source collection:
          + For each :term:`direct imaging` pixel :math:`(x_d,y_d)` in the source:
             * load the PDT from the :class:`~slitlessutils.tables.PDTFile()`
             * append to a list
-         + multiply the fractional pixel (:math:`a`) from the PDTs by wavelength-dependent flat-field (:math:`F(\lambda)`), :term:`sensitivity curve` (:math:`\mathcal{S}(\lambda)`, :term:`pixel-area map` (:math:`A`, see more below), and the source spectrum (:math:`f(\lambda)`)
+         + multiply the fractional pixel :math:`a_{x,y}` from the PDTs by :doc:`wavelength-dependent flat-field <calib>` :math:`F_{x,y}(\lambda)`, :doc:`sensitivity curve <calib#sensitivity>` :math:`s(\lambda)`, :term:`pixel-area map` :math:`A_{x,y}` (:ref:`see more below <pam>`), and the source spectrum :math:`f(\lambda)`
 
          .. math::
-            s = a\,F(x,y,\lambda)\,\mathcal{S}(\lambda)\,f(\lambda)
+            s_{x,y,l} = a_{x,y}\,F_{x,y}(\lambda)\,\mathcal{S}(\lambda)\,f(\lambda)\, A_{x,y}
+
+         + decimate the list of PDTs over the wavelength index (:math:`l`)
+         + sum this decimated list into to noiseless science image:
+
+         .. math::
+            S_{x,y} \rightarrow S_{x,y} + s_{x,y}
 
 
-         + decimate the list of PDTs over the WFSS image pixels :math:`(x,y)`.  
 
 
 
+.. _pam:
+Pixel-Area Maps
+~~~~~~~~~~~~~~~
+
+The :term:`pixel-area map` (PAM) describes the relative pixel size due to distortions in the detector, which is given by the absolute value of the determinant of the Jacobian:
 .. math::
    
-   J = \left(\begin{array}{cc} \partial a/\partial x & \partial a/\partial y\\
+    J = \left(\begin{array}{cc} \partial a/\partial x & \partial a/\partial y\\
       \partial b/\partial y & \partial b/\partial y\end{array}\right)
-
-.. math::
-
-   \abs\left(\det(J)\right) = \left|\frac{\partial a}{\partial x}\frac{\partial b}{\partial y} - \frac{\partial a}{\partial y}\frac{\partial b}{\partial x}\right|
 
 
 
@@ -58,84 +64,14 @@ The current implementation will *only* simulate the signal from the sources, but
 
 
 
-However, there are many other parameters required to simulate a WFSS image, and these are stored in ``yaml`` files in the configuration directory in :file:`{$HOME}/.slitlessutils`.  Most of these parameters are the subject of considerable calibration efforts, and as such, should probably not be adjusted if the results are to be trusted.  
+However, there are many other parameters required to simulate a WFSS image, and these are stored in ``yaml`` files in the configuration directory in :file:`{$HOME}/.slitlessutils`.  Most of these parameters are the subject of considerable calibration efforts, and as such, should probably not be adjusted if the results are to be trusted.
 
+.. toctree::
+  :titlesonly:
+  :maxdepth: 1
 
-.. list-table:: Instrument-Wide Settings
-   :widths: 25 25 50
-   :header-rows: 1
+  instrumentfiles.rst 
 
-   * - Keyword
-     - Unit
-     - Description
-   * - Image units
-     - :math:`e^-/s` or :math:`e^-`
-     - The units of the images to be written.
-   * - File suffix
-     - ``flt`` or ``flc``
-     - The file suffix in the HST parlance.
-   * - Path
-     - ``str``
-     - | The relative path from the ``yaml`` file where the files for this 
-       | instrument are stored.
-   * - Focal-plane position
-     - 3-elements
-     - | The :math:`(v_2,v_3)` position of the reference point 
-       | and :math:`v_{3y}` angle with respect the :math:`v_3`-axis.
-
-.. list-table:: Instrument-Wide Grating/Blocking [#gbnote]_
-   :widths: 25 25 50
-   :header-rows: 1
-
-   * - Keyword
-     - Unit
-     - Description
-   * - Master-Sky Image
-     - 
-     - The name of the master-sky image.
-   * - Tabulation Parameters
-     - ``dict``
-     - | This contains the starting wavelength (``wave0``), ending 
-       | wavelength (``wave1``), sampling frequency (``dwave``), 
-       | units (usually ``angstrom``), and disptype.  
-   * - Extraction Parameters [#extnote]_
-     - ``dict``
-     - | This contains the starting wavelength (``wave0``), ending 
-       | wavelength (``wave1``), sampling frequency (``dwave``), 
-       | units (usually ``angstrom``), and disptype.  
-
-
-.. list-table:: Detector Settings [#detnote]_
-   :widths: 25 25 50
-   :header-rows: 1
-
-   * - Keyword
-     - Unit
-     - Description
-   * - Focal-plane position
-     - 3-elements
-     - | :math:`(v_2,v_3)` position of the reference point 
-       | :math:`v_{3y}` angle with respect the :math:`v_3`-axis
-   * - Extension properties
-     - 
-     - | ``name``: the name of the extension (must be ``str``)
-       | ``ver``: the version of the extension (must be ``int``)
-       | ``dtype``: a valid ``np.dtype``
-   * - Noise properties
-     - 
-     - | dark current in :math:`e^-/s`
-       | readnoise in :math:`e^-`
-   * - Detector dimensionality
-     - 
-     - | ``naxis``: 2-element list of size of detector (must be ``int``)
-       | ``crpix``: 2-element list for reference position (can be ``float``)
-       | ``scale``: 2-element list for pixel scale (can be ``float``)
-   * - Distortion model
-     - 
-     - `SIP coefficients <https://docs.astropy.org/en/stable/wcs/note_sip.html>`_ should be a ``dict``
-   * - Configuration files
-     - 
-     - The file name for each grating/blocking combination
 
 
 
@@ -188,7 +124,3 @@ The simulations provided by ``slitlessutils`` make several simplifying assumptio
 * The :term:`attitude` is set by the user and assumed to be noiseless, but in practice there are systematic uncertainties in the accuracy of the :term:`world-coordinate system` (WCS).  In general, errors in the WCS result in a systematic wavelength shift (sometimes called the *wavelength zeropoint*) and/or flux losses.  However `Ryan, Casertano, & Pirzkal (2018) <https://ui.adsabs.harvard.edu/abs/2018PASP..130c4501R/abstract>`_ show that these effects are very small compared for most HST observations and negligible compared to the spectro-photometric noise.  
 
 
-.. rubric:: Footnotes
-.. [#gbnote] These settings are set for each grating/blocking combination, and if no blocking filter exists, then it is set as the ``null`` variable in ``yaml``.
-.. [#extnote] The extraction and tabulation settings need-not be the same.  Indeed, to encapsulate the non-linearity in the prism modes they will **NOT** be the same.
-.. [#detnote] There should be a separate stanza like this for each detector in the instrument (e.g. such as the two CCDs in ACS-WFC).

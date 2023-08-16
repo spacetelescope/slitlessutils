@@ -94,7 +94,7 @@ Flat Field
 The flat-field corrects for differences in the pixel-to-pixel sensitivity, and is derived by observing a suitably flat illumination pattern.  Importantly, this correction is wavelength-dependent, but the wavelength covered by a WFSS image pixel will depend on the *undispersed position* :math:`(x_0,y_0)`.  Therefore, the WFSS images are not flat-fielded by the calibration pipelines, and so it must be accounted for in the extraction/simulation processes.  ``Slitlessutils`` implements the wavelength-dependent flat field as a polynomial in wavelength:
 
 .. math::
-	{\cal F}(x,y,\lambda) = \sum_k {\cal F}(x,y)\,w(\lambda)^k
+	F_{x,y}(\lambda) = \sum_k F_{x,y}\,w(\lambda)^k
 
 where 
 
@@ -122,7 +122,7 @@ and the parameters :math:`\lambda_0, \lambda_1` are the lower and upper bounds (
 
 
 
-
+.. _sensitivity:
 Sensitivity Curves
 ------------------
 

@@ -12,7 +12,7 @@ inherits from :class:`~slitlessutils.modules.Module()`
 
 
 .. toctree::
-	:maxdepth: 2
+	:maxdepth: 1
 
 	tabulation.rst
 	extraction.rst
