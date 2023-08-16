@@ -3,6 +3,9 @@
 Instrument Files :file:`$HOME/.slitlessutils/instruments/`
 ==========================================================
 
+Most of these parameters are the subject of considerable calibration efforts, and as such, should probably not be adjusted if the results are to be trusted.  
+
+
 Instrument-Wide Settings
 ------------------------
 

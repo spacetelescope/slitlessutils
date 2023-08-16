@@ -86,7 +86,7 @@ Example
 
 Additional Instrument Settings
 ------------------------------
-However, there are many other parameters required to simulate a WFSS image, and these are stored in ``yaml`` files in the configuration directory in :file:`{$HOME}/.slitlessutils`.  Most of these parameters are the subject of considerable calibration efforts, and as such, should probably not be adjusted if the results are to be trusted.
+However, there are many other parameters required to simulate a WFSS image, and these are stored in ``yaml`` files in the configuration directory in :file:`{$HOME}/.slitlessutils`. 
 
 .. toctree::
   :titlesonly:
@@ -122,11 +122,10 @@ The :term:`pixel-area map` (PAM) describes the relative pixel size due to distor
     J = \left(\begin{array}{cc} \partial a/\partial x & \partial a/\partial y\\
       \partial b/\partial y & \partial b/\partial y\end{array}\right)
 
-and so the pixel-area map becomes:
+where all of these partial derivatives are polynomials of :math:`(x,y)`.  Therefore, the pixel-area map becomes:
 
 .. math::
 
   A_{x,y} = \left|\frac{\partial a}{\partial x}\frac{\partial b}{\partial y} - \frac{\partial b}{\partial x}\frac{\partial a}{\partial y}\right|
-
 
 

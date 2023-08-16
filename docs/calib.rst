@@ -35,8 +35,6 @@ However, the spectral element may be rotated with respect to the calibration obs
 where :math:`(\Delta x, \Delta y)` are the :term:`wedge offsets`.
 
 
-
-
 Spectral Dispersion
 ^^^^^^^^^^^^^^^^^^^
 The :term:`spectral dispersion` describes the wavelength along the spectral trace.  The spectral dispersion of a :term:`grism` element is often constant with wavelength, which corresponds to a linear (or low-order polynomial) in the parameter:
@@ -79,7 +77,7 @@ Usual Workflow
 
 Since ``slitlessutils`` is largely predicated forward-modeling the WFSS data, the usual workflow begins with a known direct image position and assumed wavelength, then the WFSS image position can be found by:
 
-#. Use the world-coordinate system (WCS) to transform from the direct image position to the *undispersed position* in the WFSS image.  
+#. Use the :term:`world-coordinate system` (WCS) to transform from the direct image position to the *undispersed position* in the WFSS image.  
 #. Invert the spectral dispersion to find the parameter (:math:`t`).
 #. Evaluate the spectral trace with the parameter (:math:`t`).
 
@@ -94,7 +92,7 @@ Flat Field
 The flat-field corrects for differences in the pixel-to-pixel sensitivity, and is derived by observing a suitably flat illumination pattern.  Importantly, this correction is wavelength-dependent, but the wavelength covered by a WFSS image pixel will depend on the *undispersed position* :math:`(x_0,y_0)`.  Therefore, the WFSS images are not flat-fielded by the calibration pipelines, and so it must be accounted for in the extraction/simulation processes.  ``Slitlessutils`` implements the wavelength-dependent flat field as a polynomial in wavelength:
 
 .. math::
-	F_{x,y}(\lambda) = \sum_k F_{x,y}\,w(\lambda)^k
+	F_{x,y}(\lambda) = \sum_{k=0} F_{x,y}\,w(\lambda)^k
 
 where 
 
@@ -118,7 +116,7 @@ and the parameters :math:`\lambda_0, \lambda_1` are the lower and upper bounds (
    :width: 600
    :alt: The schematic layout of a fits flat-field cube.
 
-   A schematic layout of the fits flat-field cube.  This figure is taken from the `aXe manual <https://hstaxe.readthedocs.io/en/latest/>`_.
+   A schematic layout of the fits flat-field cube.  This figure is taken from the `aXe manual <https://hstaxe.readthedocs.io/en/latest/>`_ and reproduced here courtesy of Nor Pirzkal.
 
 
 
