@@ -42,7 +42,7 @@ Glossary
 		A transmissive and dispersive spectral element with a highly non-uniform rate of dispersion.  See :term:`grism` for the similarities/differences between the two.
 
 	sensitivity curve
-		The conversion between instrumental units (usually :math:`e^-/s`) to physical units (usually :math:`erg/s/cm^2/\\AA`), which is necessarily a function of wavelength.  
+		The conversion between instrumental units (usually :math:`e^-/s`) to physical units (usually :math:`erg/s/cm^2/Å`), which is necessarily a function of wavelength.  
 
 	signal-to-noise
 		An empirical estimate of the quality of the data by comparing the measurement (the signal) to its corresponding uncertainty (the noise).  This may also be referred to as S/N or quoted as a *number of sigma* (:math:`n_{sig}`).
