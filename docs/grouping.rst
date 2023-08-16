@@ -1,4 +1,7 @@
 .. _grouping:
 
-Source Grouping
-===============
+Source Grouping (`~slitlessutils.modules.Group()`)
+==================================================
+
+
+Coming Soon.

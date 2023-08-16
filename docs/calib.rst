@@ -24,7 +24,7 @@ The :term:`spectral trace` describes the position of the spectrum on the detecto
 		\tilde{y}(t;x_0,y_0) &=& b_0(x_0,y_0) + b_1(x_0,y_0)\,t + b_2(x_0,y_0)\,t^2 + \ldots
 	\end{eqnarray}
 
-However, the spectral element may be rotated with respect to the calibration observations, and therefore, requires introducing a small rotation matrix.  Now the position in the spectroscopic image will be:
+However, the spectral element may be rotated with respect to the calibration observations (by an angle :math:`\theta`), and therefore, requires introducing a small rotation matrix.  Now the position in the spectroscopic image will be:
 
 .. math::
 	\begin{eqnarray}
@@ -47,7 +47,7 @@ The :term:`spectral dispersion` describes the wavelength along the spectral trac
 which will be given by a :class:`~slitlessutils.core.wfss.config.StandardPolynomial`.  However, :term:`prism` elements often exhibit a dispersion that is highly non-linear (as a function of wavelength), which can be described as a `Laurent polynomial <https://mathworld.wolfram.com/LaurentPolynomial.html>`_ (e.g. `Bohlin et al 2000 <https://www.stsci.edu/files/live/sites/www/files/home/hst/instrumentation/acs/documentation/instrument-science-reports-isrs/_documents/isr0001.pdf>`_):
 
 .. math::
-	\lambda(t;x_0,y_0) = \alpha_0(x_0,y_0) + \frac{\alpha_1(x_0,y_0)}{(t-t^*(x_0,y_0))} + \frac{\alpha_2(x_0,y_0)}{(t-t^*(x_0,y_0))^2} + \frac{\alpha_3(x_0,y_0)}{(t-t^*(x_0,y_0))^3} + \ldots
+	\lambda(t;x_0,y_0) = \beta_0(x_0,y_0) + \frac{\beta_1(x_0,y_0)}{(t-t^*(x_0,y_0))} + \frac{\beta_2(x_0,y_0)}{(t-t^*(x_0,y_0))^2} + \frac{\beta_3(x_0,y_0)}{(t-t^*(x_0,y_0))^3} + \ldots
 
 This introduces an additional parameter :math:`t^*` that effectively modulates the non-linearity.  This form is implemented in the :class:`~slitlessutils.core.wfss.config.ReciprocalPolynomial()` object.
 
@@ -66,7 +66,7 @@ As noted above, the coefficients in the trace and dispersion polynomials can be 
 .. math::
 	\kappa(x_0,y_0) = \kappa_{0,0} + \kappa_{1,0}\,x_0 + \kappa_{0,1}\,y_0 + \kappa_{2,0}\,x_0^2 + \kappa_{1,1}\,x_0y_0 + \kappa_{0,2}\,y_0^2 + \ldots
 
-where :math:`\kappa` can be any of the elements of :math:`a, b, \alpha` or :math:`t^*` (for the prism dispersion). These spatial polynomials are specified by :class:`~slitlessutils.core.wfss.config.SpatialPolynomial` and are of fixed total order :math:`n`.  This implies the number of any set of these coefficients will be a `triangular number <https://en.wikipedia.org/wiki/Triangular_number>`_ and serialized with `Cantor pairing <https://en.wikipedia.org/wiki/Pairing_function>`_.  
+where :math:`\kappa` can be any of the elements of :math:`a, b, \alpha`, :math:`\beta`, or :math:`t^*`. These spatial polynomials are specified by :class:`~slitlessutils.core.wfss.config.SpatialPolynomial` and are of fixed total order :math:`n`.  This implies the number of any set of these coefficients will be a `triangular number <https://en.wikipedia.org/wiki/Triangular_number>`_ and serialized with `Cantor pairing <https://en.wikipedia.org/wiki/Pairing_function>`_.  
 
 
 .. note::

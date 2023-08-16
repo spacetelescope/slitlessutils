@@ -20,8 +20,8 @@ A light weight object that describes a single WFSS image.  This object will emul
 
 
 
-WFSS Collections (`~slitlessutils.core.wfss.data.WFSSCollection()`)
--------------------------------------------------------------------
+WFSS Collection (`~slitlessutils.core.wfss.data.WFSSCollection()`)
+------------------------------------------------------------------
 
 While one can instantiate a single WFSS file using the above, it is generally more common to load many of the files as a collection, as a :class:`~slitlessutils.wfss.WFSSCollection()` is the primary input to many of the additional functions/modules.  The :class:`~slitlessutils.wfss.WFSSCollection()` will act like a ``dict``, where the keyword/value pairs are the dataset name and *file-loading key*.  These keys are ``dataclass`` that are for loading observed and simulated data:
 
@@ -57,8 +57,8 @@ Example
 	data3 = su.wfss.WFSSCollection.from_file(filelist)
 
 
-Simulated data
-^^^^^^^^^^^^^^
+Simulated data (`~slitlessutils.wfss.data.wfsscollection.SimulatedData()`) 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To load simulated fits files, there are two classmethods
 
@@ -101,7 +101,7 @@ To load simulated fits files, there are two classmethods
      - ``str``
      - | the name of the blocking filter.  For HST instruments, this is to be left blank,
        | or set to ``None``, but is reserved for future development to support JWST 
-       | instruments or ACS spectropolarimetry.
+       | instruments or ACS spectro-polarimetry.
 
 
 Example WCS File (in csv format)

@@ -1,17 +1,22 @@
 .. _modules:
 
 
-Computational Modules
-=====================
+Computational Modules (`~slitlessutils.modules.Module()`)
+=========================================================
+
+
+inherits from :class:`~slitlessutils.modules.Module()`
+
+
 
 
 
 .. toctree::
 	:maxdepth: 2
 
+	tabulation.rst
 	extraction.rst
 	simulation.rst
-	tabulation.rst
 	grouping.rst
 	regions.rst
 	

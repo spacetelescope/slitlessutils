@@ -43,30 +43,34 @@ The :code:`update=True` flag will use these versions for the remainder of this s
    Each time that ``slitlessutils`` is imported, it will use the most advanced version of the reference files that are cached in the user's home directory: :file:`{$HOME}/.slitlessutils`
 
 
-Global Variables
-----------------
+Global Variables (`~slitlessutils.config.Config()`)
+---------------------------------------------------
 To ensure consistency between several major subcomponents of ``slitlessutils``, global variables are stored in the singleton configuration class.  These variables are:
 
-+----------------------+----------------+-----------------------------------------------+
-| variable name        | type           | Purpose                                       |
-|                      |                |                                               |
-+======================+================+===============================================+
-| fluxscale            | float          | Numeric scale of the spectral                 |
-|                      |                | elements.  This is important to               |
-|                      |                | avoid numeric underflow in some               |
-|                      |                | cases.                                        |
-+----------------------+----------------+-----------------------------------------------+
-| fluxunits            | str            | The physical units of the spectral            |
-|                      |                | elements.                                     |
-+----------------------+----------------+-----------------------------------------------+
-| compression          | str            | The type of data compression used             |
-|                      |                | in the HDF5 files as implemented              |
-|                      |                | by `h5py <https://pypi.org/project/h5py/>`_.  |
-+----------------------+----------------+-----------------------------------------------+
-| compression_opts     | int            | The compression level of used in              |
-|                      |                | in the HDF5 files as implemented              |
-|                      |                | by `h5py <https://pypi.org/project/h5py/>`_.  |
-+----------------------+----------------+-----------------------------------------------+
+
+.. list-table:: Global Variables
+   :widths: 25 25 50
+   :header-rows: 1
+
+   * - Variable Name
+     - Data Type
+     - Purpose
+   * - fluxscale
+     - ``float``
+     - | The numeric scale of the spectral elements.  This is important to 
+       | avoid numeric underflow errors (in some cases).
+   * - fluxunits
+     - ``str``
+     - The physical units of the spectral elements.
+   * - compression
+     - ``str``
+     - | The type of data compression used in the HDF5 files as implemented 
+       | by `h5py <https://pypi.org/project/h5py/>`_. 
+   * - compression_opts
+     - ``int``
+     - | The compression level used in the HDF5 files as implemented by 
+       | `h5py <https://pypi.org/project/h5py/>`_. 
+
 
 
 The default values are set in the file :file:`$HOME/.slitlessutils/<VERSION_NUMBER>/defaults.json`. These versions can be accessed and/or adjusted programmatically as either dictionary-like or attribute-like access and saved to a file for usage later:

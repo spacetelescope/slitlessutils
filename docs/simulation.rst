@@ -1,7 +1,7 @@
 .. _simulation:
 
-WFSS Image Simulation
-=====================
+WFSS Image Simulation (`~slitlessutils.modules.Simulate()`)
+===========================================================
 
 
 Methodology

@@ -34,9 +34,9 @@ where :math:`(x,y)` refer to pixel positions, :math:`w_{x,y}`, :math:`I_{x,y}`, 
 For a Gaussian likelihood function, the pixel weight are given as the inverse of the uncertainties squared: :math:`w_{x,y}=U_{x,y}^{-2}`, but are modified for the presence of bad pixels encoded in the :term:`data-quality array` (DQA) or spectroscopic sources.  In the case of bad-pixel, the weights are set to zero for any pixel with a non-zero value in the DQA.  For the sources, the weights are multiplied by an object mask:
 
 .. math::
-   w_{x,y} = \frac{1-\theta_{x,y}}{U_{x,y}^2}
+   w_{x,y} = \frac{1-\Theta_{x,y}}{U_{x,y}^2}
 
-which is initialized to all zero: :math:`\theta_{x,y}=0`.  
+which is initialized to all zero: :math:`\Theta_{x,y}=0`.  
 
 Updating the Object Mask
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -50,7 +50,7 @@ The `slitlessutils` algorithm for masking objects is:
 
 #. Estimate the optimal scaling parameter :math:`\alpha` from the above expression.
 
-#. Flag pixels in the object weights by setting pixels in :math:`\theta_{x,y}` with
+#. Flag pixels in the object weights by setting pixels in :math:`\Theta_{x,y}` with
    
    .. math::
       \left|S_{x,y}-\alpha B_{x,y}\right| \geq n_{sig} U_{x,y}
@@ -66,7 +66,7 @@ The `slitlessutils` algorithm for masking objects is:
 
 #. Use the optimized scaling parameter to compute the sky-subtracted science frame as :math:`S_{x,y}-\alpha B_{x,y}`.
 
-At this point there are two things worth mentioning.  Firstly, there are effectively two parameters that govern the master-sky subtraction: :math:`n_{sig}` and :math:`\epsilon` that control the sigma clipping for sources and convergence tolerance, respectively.  Secondly, while the foremost goal was to determine the sky background level, a useful byproduct is the updated object model :math:`\theta_{x,y}`, which is saved by default to a file named :code:`f"{base}_src.fits"`.
+At this point there are two things worth mentioning.  Firstly, there are effectively two parameters that govern the master-sky subtraction: :math:`n_{sig}` and :math:`\epsilon` that control the sigma clipping for sources and convergence tolerance, respectively.  Secondly, while the foremost goal was to determine the sky background level, a useful byproduct is the updated object model :math:`\Theta_{x,y}`, which is saved by default to a file named :code:`f"{base}_src.fits"`.
 
 
 
