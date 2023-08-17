@@ -49,5 +49,3 @@ Why do I....
 
 * **Why do I get the same logging message printed multiple times?**  This is likely because there are multiple instances of the logger running for the separate threads.
 
-
-----

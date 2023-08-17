@@ -15,7 +15,7 @@ To determine the outline of a spectral source in a WFSS image, ``slitlessutils``
 				#. Decimate over wavelength
 				#. Make temporary mask with 1 for any pixel present in the PDT file(s) for the :class:`slitlessutils.sources.Source()`
 				#. Apply a *binary closing* morphological operator from `skimage.ndimage <https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.binary_closing.html>`_ with a square kernel, whose size is set in the :class:`slitlessutils.modules.Region()` object.
-				#. FInd the contours for a highly-connected binary image using `skimage <https://scikit-image.org/docs/stable/api/skimage.measure.html#skimage.measure.find_contours>`_ as a closed polygon.
+				#. FInd the contours for a highly-connected binary image using `scikit-image <https://scikit-image.org/docs/stable/api/skimage.measure.html#skimage.measure.find_contours>`_ as a closed polygon.
 				*. Write the polygon as a ``ds9`` `polygon regions <https://ds9.si.edu/doc/ref/region.html>`_
 
 
