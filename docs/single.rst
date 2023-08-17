@@ -5,6 +5,7 @@ Simple-Exposure Extraction (`~slitlessutils.modules.extract.single`)
 ====================================================================
 
 .. _extsec:
+
 Extraction
 ----------
 
@@ -18,6 +19,7 @@ Extraction
 		#. Record these values in a temporary data structure
 
 .. _expcombo:
+
 Exposure Combination
 --------------------
 

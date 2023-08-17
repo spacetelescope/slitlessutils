@@ -15,7 +15,7 @@ To determine the outline of a spectral source in a WFSS image, ``slitlessutils``
 				#. Decimate over wavelength
 				#. Make temporary mask with 1 for any pixel present in the PDT file(s) for the :class:`slitlessutils.sources.Source()`
 				#. Apply a *binary closing* morphological operator from `skimage.ndimage <https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.binary_closing.html>`_ with a square kernel, whose size is set in the :class:`slitlessutils.modules.Region()` object.
-				#. Find the contours for a highly-connected binary image using `scikit-image <https://scikit-image.org/docs/stable/api/skimage.measure.html>`_ as a closed polygon.
+				#. Find the contours for a highly-connected binary image using `scikit-image <https://scikit-image.org/docs/stable/api/skimage.measure.html#skimage.measure.find_contours>`_ as a closed polygon.
 				#. Write the polygon into the region file as a ``ds9`` `polygon regions <https://ds9.si.edu/doc/ref/region.html>`_
 	* Write the region file to disk.
 * Output a separate ``ds9`` regions file for each WFSS file and detector combination.  
@@ -38,9 +38,9 @@ Example
 	sources = su.sources.SourceCollection(segfile, imgfile)
 
 	# instantiate the region module
-    reg = su.modules.Region(ncpu=1, close_size=12)
+   reg = su.modules.Region(ncpu=1, close_size=12)
 
-    # run the module
+   # run the module
 	regfiles = reg(data, sources)
 
 
