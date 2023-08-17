@@ -8,9 +8,11 @@ Glossary
 	attitude
 		This may have many definitions, but in this context it refers to the direction and orientation that the telescope is pointed.  It is largely set by the CRVAL-keywords and the position angle, which is encoded in either the CD- or PC-matrices.  Here, this is considered synonymous with *pointing*.
 
+	compound source
+		A source that is decomposed into multiple :term:`dispersed regions`.
+
 	contamination model
 		A model that describes the amount of light from an unrelated source that adversely affects the flux of the source in question.  These models are built on existing observations, usually broadband photometry, but can be spectroscopic data as well.  The concept of a *contamination model* only pertains to the :doc:`Single-Exposure Extraction <single>`, as the :doc:`Multi-Exposure Extraction <multi>` uses data at multiple position angles to mitigate contamination (see `Ryan, Casertano, & Pirzkal (2018) <https://ui.adsabs.harvard.edu/abs/2018PASP..130c4501R/abstract>`_).
-
 
 	cosmic ray
 		A high energy particle that imparts a significant amount of charge.  Cosmic rays often appear as very sharp, discontinuous features that do not reappear in successive images.
@@ -20,6 +22,9 @@ Glossary
 
 	direct imaging
 		Data collected in a standard broadband imaging filter contemporaneously with the WFSS data.  These data are often used to improve the astrometric information in the WFSS data, but may have utility in other ways (such as determining the cross-dispersion profile weights, specifying the extraction apertures, or estimating contamination via broadband colors).  See also :term:`post-imaging` or :term:`pre-imaging`.
+
+	dispersed region
+		A subset of a source that has a single spectrum.  If a source has a single dispersed region, then it is said to be a :term:`simple source`.  Alternatively, a source that is decomposed into a many dispersed then it is a :term:`compound source`.
 
 	grism
 	    A transmissive and dispersive spectral element that often has a (nearly) constant rate of dispersion.  A grism differs from a :term:`prism` by having an additional diffractive surface on one side, which results in the constant dispersion, little spatial offset between the :term:`spectral trace` and :term:`undispersed position`, and multiple spectral orders.  See also :term:`prism`.
@@ -50,6 +55,9 @@ Glossary
 
 	signal-to-noise
 		An empirical estimate of the quality of the data by comparing the measurement (the signal) to its corresponding uncertainty (the noise).  This may also be referred to as S/N or quoted as a *number of sigma* (:math:`n_{sig}`).
+
+	simple source
+		A source that has a single :term:`dispersed region`.
 
 	spectral dispersion
 		The parametric curve governing the wavelength along the :term:`spectral trace`.  Sometimes called the *wavelength solution*.  
