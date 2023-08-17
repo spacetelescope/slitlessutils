@@ -125,7 +125,7 @@ The :term:`pixel-area map` (PAM) describes the relative pixel size due to distor
 .. math::
    
     J = \left(\begin{array}{cc} \partial a/\partial x & \partial a/\partial y\\
-      \partial b/\partial y & \partial b/\partial y\end{array}\right)
+      \partial b/\partial x & \partial b/\partial y\end{array}\right)
 
 where all of these partial derivatives are polynomials of :math:`(x,y)`.  Therefore, the pixel-area map becomes:
 

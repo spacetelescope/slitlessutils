@@ -1,7 +1,7 @@
 .. _extraction:
 
-Spectral Extraction 
-===================
+Spectral Extraction (`~slitlessutils.extract`)
+==============================================
 
 
 Introduction

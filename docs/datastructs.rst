@@ -7,6 +7,8 @@ Although there many data structures used by ``slitlessutils``, however users are
 
 
 .. toctree::
+	:maxdepth: 2
+
 	sources.rst
 	wfss.rst
 	

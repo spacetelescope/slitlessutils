@@ -20,6 +20,9 @@ Source (`~slitlessutils.core.sources.Source()`)
 discuss segmaps 
 
 
+Dispersed Region
+separate wavelength settings
+talk about grism/prism dispersers
 
 Source Collection (`~slitlessutils.core.sources.SourceCollection()`)
 --------------------------------------------------------------------

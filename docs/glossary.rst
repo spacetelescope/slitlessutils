@@ -3,6 +3,9 @@
 Glossary
 ========
 
+Since many terms may be used colloquially and/or have different definitions in other contexts, this Glossary provides a concrete definition for ambiguous terms.
+
+
 .. glossary::
 	
 	attitude
