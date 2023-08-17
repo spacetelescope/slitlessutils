@@ -12,6 +12,8 @@ I got this error/warning message...
 
 Likely not connected to the internet or change in `pysiaf <https://github.com/spacetelescope/pysiaf>`_.  Verify the connectivity and/or upgrade the ``pysiaf`` version.
 
+----
+
 
     RuntimeError: 
     An attempt has been made to start a new process before the

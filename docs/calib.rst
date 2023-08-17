@@ -24,7 +24,7 @@ The :term:`spectral trace` describes the position of the spectrum on the detecto
 		\tilde{y}(t;x_0,y_0) &=& b_0(x_0,y_0) + b_1(x_0,y_0)\,t + b_2(x_0,y_0)\,t^2 + \ldots
 	\end{eqnarray}
 
-However, the spectral element may be rotated with respect to the calibration observations (by an angle :math:`\theta`), and therefore, requires introducing a small rotation matrix.  Now the position in the spectroscopic image will be:
+However, the spectral element may be rotated with respect to the calibration observations (by an angle :math:`\theta`; the default value is :math:`\theta=0^circ`), and therefore, requires introducing a small rotation matrix.  Now the position in the spectroscopic image will be:
 
 .. math::
 	\begin{eqnarray}
