@@ -82,3 +82,6 @@ Since many terms may be used colloquially and/or have different definitions in o
 
 	world-coordinate system
 		The complete description of the instrument layout on the sky, including the :term:`attitude` of the telescope, the relative position of the detectors, and their individual distortion models.  Also called WCS, and see also: `world-coordinate system <https://docs.astropy.org/en/stable/wcs/>`_.
+
+	zeropoint
+		The magnitude corresponding to 1 unit of flux (typically given as :math:`e^-/s`).
