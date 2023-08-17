@@ -2,10 +2,14 @@
 
 
 
-Multi-Exposure Extraction (`~slitlessutils.modules.extract.multi`)
+Multi-Orient Extraction (`~slitlessutils.modules.extract.multi`)
 ==================================================================
 
-`Ryan, Casertano, & Pirzkal (2018) <https://ui.adsabs.harvard.edu/abs/2018PASP..130c4501R/abstract>`_
+The multi-orient extraction was first developed by `Ryan, Casertano, & Pirzkal (2018) <https://ui.adsabs.harvard.edu/abs/2018PASP..130c4501R/abstract>`_ and referred to as *LINEAR*
+
+
+Mathematical Foundation
+-----------------------
 
 .. math::
       \chi^2 = ||I_{\vartheta} - W_{\vartheta,\varphi} f_{\varphi}||^2   
@@ -19,10 +23,13 @@ where :math:`\ell` is the regularization parameter
 .. math::
       ||W||_F^2 = \sum_i\sum_j w_{i,j}^2
 
+Sparse Linear-Operator Construction
+-----------------------------------
+
+
 
 Regularization Optimization
 ---------------------------
-
 
 
 

@@ -38,19 +38,19 @@ The results from the :ref:`Extraction <extsec>` module are combined into a singl
 
 * For each source in the :doc:`Source Collection <sources>`:
 	* Bin the wavelengths according to the extraction wavelengths.
-	* Initialize the weights as the inverse of the square of the uncertainties: :math:`w_i\propto 1/\delta f_i^2`.
+	* Initialize the weights as the inverse of the square of the uncertainties: :math:`w_i\propto 1/u_i^2`.
 		- If requested, update the weights with a `sigma-clipping <https://docs.astropy.org/en/stable/api/astropy.stats.SigmaClip.html#astropy.stats.SigmaClip>`_ object.
 	* Compute the number of non-zero weights for each wavelength :math:`n_{\lambda}`, and the weighted moments of the photometric data:
 
 	.. math::
 
-		f_{\lambda} &=& \frac{\sum f_i w_i}{\sum w_i}\\
-		\delta f_{\lambda} &=& \frac{1}{np.sqrt{\sum w_i}}\\
-		c_{\lambda} &=& \frac{\sum c_i w_i}{\sum w_i}
+		f_{\lambda} &=& \frac{\sum f_i\,w_i}{\sum w_i}\\
+		u_{\lambda} &=& \frac{1}{\sqrt{\sum w_i}}\\
+		c_{\lambda} &=& \frac{\sum c_i\,w_i}{\sum w_i}
 
-	where :math:`f_{\lambda}`, :math:`\delta f_{\lambda}`, and :math:`c_{\lambda}` are the averaged spectrum, uncertainty, and contamination model that ``slitlessutils`` reports for this source
+	where :math:`f_{\lambda}`, :math:`u_{\lambda}`, and :math:`c_{\lambda}` are the averaged spectrum, uncertainty, and contamination model that ``slitlessutils`` reports for this source
 	
-	* Output the table of :math:`\lambda`, :math:`f_{\lambda}`, :math:`\delta f_{\lambda}`, and :math:`c_{\lambda}`, and :math:`n_{\lambda}` into an output fits file, whose suffix will be ``x1d.fits``.  
+	* Output the table of :math:`\lambda`, :math:`f_{\lambda}`, :math:`u_{\lambda}`, and :math:`c_{\lambda}`, and :math:`n_{\lambda}` into an output fits file, whose suffix will be ``x1d.fits``.  
 
 
 .. important::

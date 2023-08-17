@@ -85,6 +85,7 @@ Since ``slitlessutils`` is largely predicated forward-modeling the WFSS data, th
 	For linear dispersion models, this inversion can be done analytically.  For higher-order polynomials, ``slitlessutils`` inverts using `Halley's Method <https://en.wikipedia.org/wiki/Halley%27s_method>`_.
 
 
+.. _flatfield:
 
 Flat Field
 ----------
@@ -125,7 +126,11 @@ and the parameters :math:`\lambda_0, \lambda_1` are the lower and upper bounds (
 Sensitivity Curves
 ------------------
 
-Conversion between :math:`e^-`/s and :math:`erg/s/cm^2/s`.
+The :term:`sensitivity curve` provides the conversion between detector units (usually :math:`e^-/s`) to physical units (usually :math:`erg/s/cm^2/Å`), which depends on spectral order by **NOT** on spatial extent as that is addressed by the :ref:`flat-field <flatfield>`. This can be thought of as a wavelength-dependent :term:`zeropoint` in flux units.  :numref:`senscurves` shows the sensitivity curves for several :term:`grism` and :term:`prism` modes for several HST instruments.
+
+.. note::
+	Although the sensitivity curves have explicit units, they are adjusted by the :doc:`configurable parameters <configure>`: ``fluxscale`` and ``fluxunits``.  
+
 
 .. _senscurves:
 .. figure:: images/hst_sensitivity.png
