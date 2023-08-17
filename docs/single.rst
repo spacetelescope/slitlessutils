@@ -26,7 +26,7 @@ Extraction
 		#. Decimate the PDTs over the :term:`direct imaging` pixel
 		#. Decimate over wavelength to get the cross-dispersion profile
 		#. Compute average and range of wavelength in each WFSS pixel
-		#. Divide each pixel in the WFSS image by the flat-field, sensitivity curve, pixel-area map, and ``fluxscale`` (see the :doc:`configuration object <configure>`)
+		#. Divide each pixel in the WFSS image by the :doc:`flat-field <calib>`, :doc:`sensitivity curve <calib>`, :doc:`pixel-area map <simulation>`, and ``fluxscale`` (see the :doc:`configuration object <configure>`)
 		#. Record these values in a temporary data structure
 
 .. _expcombo:
