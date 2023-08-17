@@ -16,9 +16,8 @@ To determine the outline of a spectral source in a WFSS image, ``slitlessutils``
 				#. Make temporary mask with 1 for any pixel present in the PDT file(s) for the :class:`slitlessutils.sources.Source()`
 				#. Apply a *binary closing* morphological operator from `skimage.ndimage <https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.binary_closing.html>`_ with a square kernel, whose size is set in the :class:`slitlessutils.modules.Region()` object.
 				#. Find the contours for a highly-connected binary image using `scikit-image <https://scikit-image.org/docs/stable/api/skimage.measure.html>`_ as a closed polygon.
-				*. Write the polygon as a ``ds9`` `polygon regions <https://ds9.si.edu/doc/ref/region.html>`_
-
-
+				#. Write the polygon into the region file as a ``ds9`` `polygon regions <https://ds9.si.edu/doc/ref/region.html>`_
+	* Write the region file to disk.
 * Output a separate ``ds9`` regions file for each WFSS file and detector combination.  
 
 The resulting regions will have their title as the segmentation ID and the spectral order will encoded by the color of the region.  ``Slitlessutils`` assumes the ``tab20`` colormap from `matplotlib <https://matplotlib.org/stable/tutorials/colors/colormaps.html>`_, where the bold colors are for positive orders, pastel colors are for negative orders, and the zeroth order will be white.
