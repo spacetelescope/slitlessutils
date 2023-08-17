@@ -26,8 +26,8 @@ Regularization Optimization
 
 
 
-.. _regionsexample:
-.. figure:: images/starfield_multi_lcv.png
+.. _lcurveexample:
+.. figure:: images/starfield_multi_lcv.pdf
    :align: center
    :alt: Example regularization plot.
 
