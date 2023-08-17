@@ -26,7 +26,7 @@ Extraction
 		#. Decimate the PDTs over the :term:`direct imaging` pixel
 		#. Decimate over wavelength to get the cross-dispersion profile
 		#. Compute average and range of wavelength in each WFSS pixel
-		#. Divide each pixel in the WFSS image by the flat-field, sensitivity curve, pixel-area map, and ``fluxscale`` (see :doc:`<configure>`)
+		#. Divide each pixel in the WFSS image by the flat-field, sensitivity curve, pixel-area map, and ``fluxscale`` (see the :doc:`configuration object <configure>`)
 		#. Record these values in a temporary data structure
 
 .. _expcombo:
@@ -42,6 +42,7 @@ The results from the :ref:`Extraction <extsec>` module are combined into a singl
 
 Flux Contamination
 ------------------
-The :term:`contamination model` processes through the exact same steps in :ref:`Extraction <extsec>` and :ref:`Exposure Combination <expcombo>`.
+The :term:`contamination model` processes through the exact same steps in :ref:`Extraction <extsec>` and :ref:`Exposure Combination <expcombo>`. Additionally, the one-dimensional spectra output from the previous step are **NOT** contamination corrected, but rather the estimated model is provided. Therefore, users are free to heuristically adjust the contamination model *post facto*, ignore regions with egregious contamination, or any other post-extraction choice.  Finally, the contamination model will have the same units as the source spectra and uncertainties, which will be set by the :doc:`configuration object <configure>`.
+
 
 
