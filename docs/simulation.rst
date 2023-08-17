@@ -15,17 +15,17 @@ The current implementation will *only* simulate the signal from the sources, but
 #. Tabulate the WFSS image with the :doc:`tabulation module <tabulation>`
 #. Initialize noiseless science as all zero: :math:`\tilde{S}_{x,y}=0` for all WFSS image pixels :math:`(x,y)`.
 #. For each detector in the WFSS file:
-      > For each source in the source collection:
-         - For each :term:`direct imaging` pixel :math:`(x_d,y_d)` in the source:
+      - For each source in the source collection:
+         > For each :term:`direct imaging` pixel :math:`(x_d,y_d)` in the source:
             * load the PDT from the :class:`~slitlessutils.tables.PDTFile()`
             * append to a list
-         - multiply the fractional pixel :math:`a_{x,y}` from the PDTs by :doc:`wavelength-dependent flat-field <calib>` :math:`F_{x,y}(\lambda)`, :doc:`sensitivity curve <calib>` :math:`T(\lambda)`, :term:`pixel-area map` :math:`A_{x,y}` (:ref:`see more below <pam>`), and the source spectrum :math:`f(\lambda)`
+         > multiply the fractional pixel :math:`a_{x,y}` from the PDTs by :doc:`wavelength-dependent flat-field <calib>` :math:`F_{x,y}(\lambda)`, :doc:`sensitivity curve <calib>` :math:`T(\lambda)`, :term:`pixel-area map` :math:`A_{x,y}` (:ref:`see more below <pam>`), and the source spectrum :math:`f(\lambda)`
 
          .. math::
             s_{x,y,l} = a_{x,y}\,F_{x,y}(\lambda)\,T(\lambda)\,f(\lambda)\, A_{x,y}
 
-         - decimate the list of PDTs over the wavelength index (:math:`l`)
-         - sum this decimated list into to noiseless science image:
+         > decimate the list of PDTs over the wavelength index (:math:`l`)
+         > sum this decimated list into to noiseless science image:
 
          .. math::
             \tilde{S}_{x,y} \rightarrow \tilde{S}_{x,y} + s_{x,y}

@@ -10,7 +10,7 @@ I got this error/warning message...
    **WARNING**: LOCAL JWST PRD VERSION PRDOPSSOC-059 CANNOT BE CHECKED AGAINST ONLINE VERSION
 
 
-Likely not connected to the internet or change in `pysiaf <https://github.com/spacetelescope/pysiaf>`_.  Verify the connectivity and/or upgrade the ``pysiaf`` version.
+Likely not connected to the internet or change in `pysiaf <https://github.com/spacetelescope/pysiaf>`_.  Verify the connectivity and/or upgrade the ``pysiaf`` version.  This could also have the number ``059`` may be another value (e.g. ``062``).
 
 ----
 
@@ -34,11 +34,20 @@ Likely not connected to the internet or change in `pysiaf <https://github.com/sp
 Likely running in the __main__ of a script. Try putting commands inside of a code block, such as:
 
 .. code: python
-    if __name__=='__main__':  # doctest: +SKIP
-        my_commands_here()  # doctest: +SKIP
+
+    if __name__ == '__main__':  # doctest: +SKIP
+        my_commands_here()      # doctest: +SKIP
+
+
+----
+
+
 
 
 Why do I....
 ------------
 
 * **Why do I get the same logging message printed multiple times?**  This is likely because there are multiple instances of the logger running for the separate threads.
+
+
+----
