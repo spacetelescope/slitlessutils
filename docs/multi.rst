@@ -115,11 +115,18 @@ As discussed above, the regularized least-squares introduces a tunable parameter
    The top panel shows the standard L-curve with the scaling factor of the Frobenius norm to ensure that the regularization parameter :math:`\ell` is dimensionless, which is encoded in the color of the plot symbols (see colorbar at the very bottom).  The lower panel shows the curvature [#curvefoot]_ as a function of the logarithm (base 10) of the (dimensionless) regularization parameter.  The clear peak at :math:`\log\ell\sim-1.9` represents the sharp vertex in the L-curve at :math:`\sim(2.1,3.6)`.  This point is adopted as it represents a roughly "equal" trade-off between modeling the data (ie. the parameter on the x-axis) and damping high-frequency structure (ie. the parameter on the y-axis).  This plot was made using the Golden-ratio search.
 
 
+
+
 Grouping
 --------
 
+As framed above, the multi-orient extraction simultaneously solves for the spectra for entire collection of sources, which depending on the number of sources and/or number of wavelength elements, can result in quite sizeable linear operators.  Obviously this would require significant computing resources, something that may not be available.  Therefore, ``slitlessutils`` has a *grouping* module that will group any spectral traces that overlap in all combinations of the WFSS data together, and these groups can be considered "atomic" problems that can be solved with with significantly less computing resources.  This can be thought of as block diagonalizing this sparse operator into chunks that are also sparse systems.  See the :doc:`Grouping Module <grouping>` for more details.
 
-:doc:`Grouping Module <grouping>`
+
+Example
+-------
+
+Coming Soon.
 
 
 
