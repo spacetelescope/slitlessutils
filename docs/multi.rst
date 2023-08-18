@@ -84,13 +84,12 @@ Sparse Least-Squares Solution
 
 There have been several algorithms devised to find the vector :math:`f_{\varph}` that minimizes the cost function for :math:`\psi^2`, and many have been implemented into the `scipy sparse solvers <https://docs.scipy.org/doc/scipy/reference/sparse.linalg.html#module-scipy.sparse.linalg>`_.  However, ``slitlessutils`` is only organized to work with the two most common methods:
 
-* LSQR: first presented by `Paige & Saunders (1982) <https://dl.acm.org/doi/10.1145/355984.355989>`_, is the 
-* LSMR: 
+* LSQR: first presented by `Paige & Saunders (1982) <https://dl.acm.org/doi/10.1145/355984.355989>`_, is the standard tool for these types of linear systems. 
+* LSMR: later developed by `Fong & Saunders (2011) <https://arxiv.org/abs/1006.0758>`_, and improves upon LSQR by generally converging faster.  
 
 
-
-
-
+.. warning::
+   Based on experimentation with the *LINEAR* work, the LSQR solver yields better results, and so it is set as the default sparse least-squares solver.
 
 
 .. _regularization:
@@ -106,7 +105,6 @@ As discussed above, the regularized least-squares
    :align: center
    :alt: Example regularization plot.
 
-   The top panel shows the standard L-curve with the scaling factor of the `Frobenius norm <https://en.wikipedia.org/wiki/Matrix_norm>`_ to ensure that the regularization parameter :math:`\ell` is dimensionless, which is encoded in the color of the plot symbols (see colorbar at the very bottom). 
-
+   The top panel shows the standard L-curve with the scaling factor of the `Frobenius norm <https://en.wikipedia.org/wiki/Matrix_norm>`_ to ensure that the regularization parameter 
 
 
