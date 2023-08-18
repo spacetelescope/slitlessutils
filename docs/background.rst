@@ -23,12 +23,12 @@ Master Sky Subtraction
 Given the issues inherent in the sky background for wide-field slitless spectroscopy summarized above, the canonical approach to separating this signal from the astrophysical sources of interest is the use of a :term:`master-sky image`.  Here many science and calibration exposures have been combined in a way to remove the sources, and provide a clean image of the sky background.  Therefore the present task is to scale this sky image such that it matches the sky pixels in a :math:`{\chi}^2`-sense.  For a single sky image, this multiplicative scaling is given by:
 
 .. math::
-   \alpha = \frac{\sum_{x,y} w_{x,y} S_{x,y} B_{x,y}}{\sum_{x,y} w_{x,y} B_{x,y} B_{x,y}}
+   \alpha = \frac{\sum_{x,y} w_{x,y}\,S_{x,y}\,B_{x,y}}{\sum_{x,y} w_{x,y}\,B_{x,y}\,B_{x,y}}
 
 where :math:`(x,y)` refer to pixel positions, :math:`w_{x,y}`, :math:`I_{x,y}`, and :math:`B_{x,y}` represent the pixel weights (more on this below), wide-field slitless image, and master-sky image, respectively.  Therefore sky-subtracted slitless image will be given by
 
 .. math::
-   B'_{x,y} = \alpha B_{x,y}.
+   B'_{x,y} = \alpha\,B_{x,y}.
 
 For a Gaussian likelihood function, the pixel weight are given as the inverse of the uncertainties squared: :math:`w_{x,y}=U_{x,y}^{-2}`, but are modified for the presence of bad pixels encoded in the :term:`data-quality array` (DQA) or spectroscopic sources.  In the case of bad-pixel, the weights are set to zero for any pixel with a non-zero value in the DQA.  For the sources, the weights are multiplied by an object mask:
 
@@ -52,7 +52,7 @@ The `slitlessutils` algorithm for masking objects is:
 #. Flag pixels in the object weights by setting pixels in :math:`\Theta_{x,y}` with
    
    .. math::
-      \left|S_{x,y}-\alpha B_{x,y}\right| \geq n_{sig} U_{x,y}
+      \left|S_{x,y}-\alpha\,B_{x,y}\right| \geq n_{sig} \,U_{x,y}
     
    where :math:`n_{sig}` is a number of sigma for sources.
 
@@ -63,7 +63,7 @@ The `slitlessutils` algorithm for masking objects is:
    
    for iteration :math:`k`.  
 
-#. Use the optimized scaling parameter to compute the sky-subtracted science frame as :math:`S_{x,y}-\alpha B_{x,y}`.
+#. Use the optimized scaling parameter to compute the sky-subtracted science frame as :math:`S_{x,y}-\alpha\,B_{x,y}`.
 
 At this point there are two things worth mentioning.  Firstly, there are effectively two parameters that govern the master-sky subtraction: :math:`n_{sig}` and :math:`\epsilon` that control the sigma clipping for sources and convergence tolerance, respectively.  Secondly, while the foremost goal was to determine the sky background level, a useful byproduct is the updated object model :math:`\Theta_{x,y}`, which is saved by default to a file named :code:`f"{base}_src.fits"`.
 

@@ -11,12 +11,13 @@ Methodology
 The current implementation will *only* simulate the signal from the sources, but includes the Poisson noise from the source(s), sky background, and dark current and Gaussian noise from the read noise.  To create a noiseless WFSS image:
 
 
-#. Load :doc:`WFSSCollection <wfss>` and :doc:`sources <sources>`, 
+#. Load :doc:`WFSSCollection <wfss>` and :doc:`sources <sources>`,
 #. Tabulate the WFSS image with the :doc:`tabulation module <tabulation>`
 #. Initialize noiseless science as all zero: :math:`\tilde{S}_{x,y}=0` for all WFSS image pixels :math:`(x,y)`.
 #. For each detector in the WFSS file:
 
   * For each source in the source collection:
+  
     * For each :term:`direct imaging` pixel :math:`(x_d,y_d)` in the source:
 
       * load the PDT from the :class:`~slitlessutils.tables.PDTFile()`

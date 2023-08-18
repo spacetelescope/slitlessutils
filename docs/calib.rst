@@ -24,7 +24,7 @@ The :term:`spectral trace` describes the position of the spectrum on the detecto
 		\tilde{y}(t;x_0,y_0) &=& b_0(x_0,y_0) + b_1(x_0,y_0)\,t + b_2(x_0,y_0)\,t^2 + \ldots
 	\end{eqnarray}
 
-However, the spectral element may be rotated with respect to the calibration observations (by an angle :math:`\theta`; the default value is :math:`\theta=0^circ`), and therefore, requires introducing a small rotation matrix.  Now the position in the spectroscopic image will be:
+However, the spectral element may be rotated with respect to the calibration observations (by an angle :math:`\theta`; the default value is :math:`\theta=0^{\circ}`), and therefore, requires introducing a small rotation matrix.  Now the position in the spectroscopic image will be:
 
 .. math::
 	\begin{eqnarray}
@@ -62,7 +62,7 @@ Field-Dependence
 As noted above, the coefficients in the trace and dispersion polynomials can be polynomials of the undispersed positions:
 
 .. math::
-	\kappa(x_0,y_0) = \kappa_{0,0} + \kappa_{1,0}\,x_0 + \kappa_{0,1}\,y_0 + \kappa_{2,0}\,x_0^2 + \kappa_{1,1}\,x_0y_0 + \kappa_{0,2}\,y_0^2 + \ldots
+	\kappa(x_0,y_0) = \kappa_{0,0} + \kappa_{1,0}\,x_0 + \kappa_{0,1}\,y_0 + \kappa_{2,0}\,x_0^2 + \kappa_{1,1}\,x_0\,y_0 + \kappa_{0,2}\,y_0^2 + \ldots
 
 where :math:`\kappa` can be any of the elements of :math:`a, b, \alpha`, :math:`\beta`, or :math:`t^*`. These spatial polynomials are specified by :class:`~slitlessutils.core.wfss.config.SpatialPolynomial` and are of fixed total order :math:`n`.  This implies the number of any set of these coefficients will be a `triangular number <https://en.wikipedia.org/wiki/Triangular_number>`_ and serialized with `Cantor pairing <https://en.wikipedia.org/wiki/Pairing_function>`_.  
 
@@ -105,9 +105,9 @@ where
 
 and the parameters :math:`\lambda_0, \lambda_1` are the lower and upper bounds (respectively) for which the flat-field cube is defined.  See :numref:`flatfield` below for a schematic layout of this polynomial flat field.  Additionally, users may also specify a *gray flat* (typically derived from a direct image flat field, which is effectively just a single level in :numref:`flatfieldexample`) or a unity flat (effectively ignoring the flat-field correction entirely).  See:
 
-* Unity flat field: :class :`~slitlessutils.core.wfss.config.UnityFlatField()`
-* Gray flat field: :class :`~slitlessutils.core.wfss.config.ImageFlatField()`
-* Polynomial flat field: :class :`~slitlessutils.core.wfss.config.PolynomialFlatField()`
+* Unity flat field: :class:`~slitlessutils.core.wfss.config.UnityFlatField()`
+* Gray flat field: :class:`~slitlessutils.core.wfss.config.ImageFlatField()`
+* Polynomial flat field: :class:`~slitlessutils.core.wfss.config.PolynomialFlatField()`
 * factory function to load these: :func:`~slitlessutils.core.wfss.config.load_flatfield()`
 
 
