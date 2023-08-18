@@ -58,7 +58,7 @@ which is simplified by subsuming the WFSS uncertainties into the data and linear
       W_{\vartheta,\varphi} &\rightarrow& \frac{W_{\vartheta,\varphi}}{U_{\vartheta}}
    \end{eqnarray}
 
-so that now :math:`\chi^2 = ||I - W\,f||^2`.  Although this can be directly solved, the poor condition number of :math:`W` can amplify the input noise into the output result, which can be ameliorated by including a `regularization term <https://en.wikipedia.org/wiki/Ridge_regression>`_.  Additionally, for most WFSS observations, the linear operator :math:`W` will be extremely sparse, which permits specialized techniques to iteratively compute the unknown vector :math:`f_{\varphi}` without computing the pseudo-inverse of :math:`W`.  However, `Ryan, Casertano, & Pirzkal (2018) <https://ui.adsabs.harvard.edu/abs/>`_ reframe the regularization term so that the regularization parameter becomes dimensionless.
+so that now :math:`\chi^2 = ||I - W\,f||^2`.  Although this can be directly solved, the poor condition number of :math:`W` can amplify the input noise into the output result, which can be ameliorated by including a `regularization term <https://en.wikipedia.org/wiki/Ridge_regression>`_.  Additionally, for most WFSS observations, the linear operator :math:`W` will be extremely sparse, which permits specialized techniques to iteratively compute the unknown vector :math:`f_{\varphi}` without computing the pseudo-inverse of :math:`W`.  However, `Ryan, Casertano, & Pirzkal (2018) <https://ui.adsabs.harvard.edu/abs/2018PASP..130c4501R/abstract>`_ re-frame the regularization term so that the regularization parameter becomes dimensionless.
 
 .. math::
 
