@@ -77,14 +77,18 @@ Sparse Linear-Operator Construction
 
 
 
+.. _solutions:
 
 Sparse Least-Squares Solution
 -----------------------------
 
-`Paige & Saunders (1982) <https://dl.acm.org/doi/10.1145/355984.355989>`_
+There have been several algorithms devised to find the vector :math:`f_{\varph}` that minimizes the cost function for :math:`\psi^2`, and many have been implemented into the `scipy sparse solvers <https://docs.scipy.org/doc/scipy/reference/sparse.linalg.html#module-scipy.sparse.linalg>`_.  However, ``slitlessutils`` is only organized to work with the two most common methods:
+
+* LSQR: first presented by `Paige & Saunders (1982) <https://dl.acm.org/doi/10.1145/355984.355989>`_, is the 
+* LSMR: 
 
 
-`scipy sparse solvers <https://docs.scipy.org/doc/scipy/reference/sparse.linalg.html#module-scipy.sparse.linalg>`_
+
 
 
 
@@ -102,9 +106,7 @@ As discussed above, the regularized least-squares
    :align: center
    :alt: Example regularization plot.
 
-   The top panel shows the standard L-curve with the scaling factor of the `Frobenius norm <https://en.wikipedia.org/wiki/Matrix_norm>`_ to ensure that the regularization parameter :math:`\ell` is dimensionless, which is encoded in the color of the plot symbols (see colorbar at the very bottom).  The lower panel shows the `Menger curvature <https://en.wikipedia.org/wiki/Menger_curvature>`_ as a function of the logarithm (base 10) of the (dimensionless) regularization parameter. 
-
-
+   The top panel shows the standard L-curve with the scaling factor of the `Frobenius norm <https://en.wikipedia.org/wiki/Matrix_norm>`_ to ensure that the regularization parameter :math:`\ell` is dimensionless, which is encoded in the color of the plot symbols (see colorbar at the very bottom). 
 
 
 
