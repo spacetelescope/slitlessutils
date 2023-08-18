@@ -77,8 +77,8 @@ Detector Parameters
        | ``dtype``: a valid ``np.dtype``
    * - Noise properties
      - 
-     - | dark current in :math:`e^-/s`
-       | readnoise in :math:`e^-`
+     - | dark current :math:`D` in :math:`e^-/s`
+       | readnoise :math:`R` in :math:`e^-`
    * - Detector dimensionality
      - 
      - | ``naxis``: 2-element list of size of detector (must be ``int``)

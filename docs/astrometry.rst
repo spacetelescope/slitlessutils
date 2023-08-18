@@ -29,8 +29,8 @@ Here we find the affine transformation between any two WCSs from the direct imag
 
 .. math::
 	\mathrm{CD} = \left(\begin{array}{cc}
-			            \mathrm{CD}1_1 & \mathrm{CD}1_2 \\
-			   			\mathrm{CD}2_1 & \mathrm{CD}2_2 \end{array}\right)	
+			            \mathrm{CD}1\_1 & \mathrm{CD}1\_2 \\
+			   			\mathrm{CD}2\_1 & \mathrm{CD}2\_2 \end{array}\right)	
 
 If the initial and final ``CD``-matrices for the direct image are :math:`D_0` and :math:`D_1` (respectively), then the affine transformation matrix is given as:
 
@@ -51,12 +51,12 @@ Similarly, we must adjust the ``CRVAL`` keywords, which are loaded from the WCS 
 Again, if :math:`d_0` and :math:`d_1` refer to the ``CRVAL``-vectors for the initial and final WCS solution, then the perturbation is:
 
 .. math::
-	\Delta = d_1 - d_0
+	\Delta d= d_1 - d_0
 
 which can be applied to the ``CRVAL`` vector from the WFSS image with the same WCS key used to instantiate :math:`d_0`:
 
 .. math::
-	d_1' = d_0 + \Delta
+	d_1' = d_0 + \Delta d
 
 This affine tweaking can be derived from a direct image and applied to a WFSS image using ``slitlessutils``:
 

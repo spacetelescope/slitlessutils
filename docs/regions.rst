@@ -38,9 +38,9 @@ Example
 	sources = su.sources.SourceCollection(segfile, imgfile)
 
 	# instantiate the region module
-   reg = su.modules.Region(ncpu=1, close_size=12)
+	reg = su.modules.Region(ncpu=1, close_size=12)
 
-   # run the module
+	# run the module
 	regfiles = reg(data, sources)
 
 

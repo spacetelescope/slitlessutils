@@ -69,7 +69,7 @@ where :math:`B` and :math:`t` are the background and exposure time described in 
   
   \begin{eqnarray}
     S_{x,y} &=& \frac{p_{x,y}+g_{x,y}}{t} - B - D\\
-    U_{x,y} &=& \sqrt{\frac{\tilde{S}_{x,y} + B + D}{t}+ \left(\frac{R}{t}\right)^2}
+    U_{x,y} &=& \sqrt{\left(\frac{\tilde{S}_{x,y} + B + D}{t}\right)+ \left(\frac{R}{t}\right)^2}
   \end{eqnarray}  
 
 both in units of :math:`e^-/s`.  The background rate and dark current are subtracted here to produce an image equivalent to a :doc:`sky-subtracted WFSS image <background>`.
