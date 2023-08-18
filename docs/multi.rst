@@ -97,14 +97,17 @@ There have been several algorithms devised to find the vector :math:`f_{\varph}`
 Regularization Optimization
 ---------------------------
 
-As discussed above, the regularized least-squares 
+As discussed above, the regularized least-squares introduces a tunable parameter that trades between modeling the data (ie. the :math:`\chi^2`-term) and damping the high frequency noise present in inverse problems (ie. the :math:`\xi^2`-term).  However, there have been heuristic approaches at "optimizing" the damping parameter :math:`\ell`, and the most common method is to consider a plot of :math:`\xi^2` versus :math:`\chi^2`.  Often called the "L-curve" as when plotted as log-log, this will show a characteristic sharp 
 
+* Brute-force search: 
+* Single-value:
+* Golden-ratio search: 
 
 .. _lcurveexample:
 .. figure:: images/starfield_multi_lcv.pdf
    :align: center
    :alt: Example regularization plot.
 
-   The top panel shows the standard L-curve with the scaling factor of the `Frobenius norm <https://en.wikipedia.org/wiki/Matrix_norm>`_ to ensure that the regularization parameter 
+   The top panel shows the standard L-curve with the scaling factor of the Frobenius norm to ensure that the regularization parameter 
 
 
