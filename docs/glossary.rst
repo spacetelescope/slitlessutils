@@ -15,7 +15,7 @@ Since many terms may be used colloquially and/or have different definitions in o
 		A source that is decomposed into more than one :term:`dispersed region`.
 
 	contamination model
-		A model that describes the amount of light from an unrelated source that adversely affects the flux of the source in question.  These models are built on existing observations, usually broadband photometry, but can be spectroscopic data as well.  The concept of a *contamination model* only pertains to the :doc:`Single-Exposure Extraction <single>`, as the :doc:`Multi-Exposure Extraction <multi>` uses data at multiple position angles to mitigate contamination (see `Ryan, Casertano, & Pirzkal (2018) <https://ui.adsabs.harvard.edu/abs/2018PASP..130c4501R/abstract>`_).
+		A model that describes the amount of light from an unrelated source that adversely affects the flux of the source in question.  These models are built on existing observations, usually broadband photometry, but can be spectroscopic data as well.  The concept of a *contamination model* only pertains to the :doc:`Single-Exposure Extraction <single>`, as the :doc:`Multi-Exposure Extraction <multi>` uses data at multiple position angles to mitigate contamination (see `Ryan, Casertano, & Pirzkal (2018) <https://ui.adsabs.harvard.edu/abs/2018PASP..130c4501R/abstract>`_ for more information).
 
 	cosmic ray
 		A high energy particle that imparts a significant amount of charge.  Cosmic rays often appear as very sharp, discontinuous features that do not reappear in successive images.
