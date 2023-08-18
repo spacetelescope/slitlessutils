@@ -20,7 +20,7 @@ Although the formative effort was to break the degeneracy from contamination/con
 Mathematical Foundation
 -----------------------
 
-The *LINEAR* framework acknowledges that the flux in a WFSS image pixel is the sum of all sources and wavelengths, weighted by factors related to the sources (e.g. the cross-dispersion profiles) and the detector (e.g. :doc:`sensitivity curve, flat-field <calib>`, or :doc:'pixel-area map <simulation>`):
+The *LINEAR* framework acknowledges that the flux in a WFSS image pixel is the sum of all sources and wavelengths, weighted by factors related to the sources (e.g. the cross-dispersion profiles) and the detector (e.g. :doc:`sensitivity curve, flat-field <calib>`, or :doc:`pixel-area map <simulation>`):
 
 .. math::
 
@@ -74,7 +74,7 @@ where :math:`\ell` is the regularization parameter and :math:`\xi^2 = ||W||_F^2\
 Sparse Linear-Operator Construction
 -----------------------------------
 
-
+Coming soon.
 
 
 .. _solutions:
@@ -82,10 +82,10 @@ Sparse Linear-Operator Construction
 Sparse Least-Squares Solution
 -----------------------------
 
-There have been several algorithms devised to find the vector :math:`f_{\varph}` that minimizes the cost function for :math:`\psi^2`, and many have been implemented into the `scipy sparse solvers <https://docs.scipy.org/doc/scipy/reference/sparse.linalg.html#module-scipy.sparse.linalg>`_.  However, ``slitlessutils`` is only organized to work with the two most common methods:
+There have been several algorithms devised to find the vector :math:`f_{\varphi}` that minimizes the cost function for :math:`\psi^2`, and many have been implemented into the `scipy sparse solvers <https://docs.scipy.org/doc/scipy/reference/sparse.linalg.html#module-scipy.sparse.linalg>`_.  However, ``slitlessutils`` is only organized to work with the two most common methods:
 
-* LSQR: first presented by `Paige & Saunders (1982) <https://dl.acm.org/doi/10.1145/355984.355989>`_, is the standard tool for these types of linear systems. 
-* LSMR: later developed by `Fong & Saunders (2011) <https://arxiv.org/abs/1006.0758>`_, and improves upon LSQR by generally converging faster.  
+* **LSQR:** first presented by `Paige & Saunders (1982) <https://dl.acm.org/doi/10.1145/355984.355989>`_, is the standard tool for these types of linear systems.  See also the scipy implementation of `LSQR <https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.lsqr.html>`_
+* **LSMR:** later developed by `Fong & Saunders (2011) <https://arxiv.org/abs/1006.0758>`_, and improves upon LSQR by generally converging faster.  See also the scipy implementation of `LSMR <https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.lsmr.html>`_.
 
 
 .. warning::
@@ -97,19 +97,22 @@ There have been several algorithms devised to find the vector :math:`f_{\varph}`
 Regularization Optimization
 ---------------------------
 
-As discussed above, the regularized least-squares introduces a tunable parameter that trades between modeling the data (ie. the :math:`\chi^2`-term) and damping the high frequency noise present in inverse problems (ie. the :math:`\xi^2`-term).  However, there have been heuristic approaches at "optimizing" the damping parameter :math:`\ell`, and the most common method is to consider a plot of :math:`\xi^2` versus :math:`\chi^2`, which often called the "L-curve" as when plotted as log-log, this will show a characteristic sharp resembling a capital-L (see :numref:`lcurveexample`).  It is widely accepted that the vertex of the L is represents a good compromise, and so there are several techinques to honing in on this critical point.  
+As discussed above, the regularized least-squares introduces a tunable parameter that trades between modeling the data (ie. the :math:`\chi^2`-term) and damping the high frequency noise present in inverse problems (ie. the :math:`\xi^2`-term).  However, there have been heuristic approaches at "optimizing" the damping parameter :math:`\ell`, and the most common method is to consider a plot of :math:`\xi^2` versus :math:`\chi^2`, which often called the "L-curve" as when plotted as log-log, this will show a characteristic sharp resembling a capital-L (see :numref:`lcurveexample`).  It is widely accepted that the vertex of the L is represents a good compromise, and so there are several techinques to honing in on this critical point. In broad terms, these methods all rely on some aspect of the finding the point of maximum curvature (lower panel of :numref:`lcurveexample`) along the parametric curve (upper panel of :numref:`lcurveexample`).  ``Slitlessutils`` offers three options for identifying this critical point:
 
+#. **Single-value:** Accept a single value of the regularization parameter, and return the vector :math:`f_{\varphi}`.
+#. **Brute-force search:** Define a linear grid of :\math:`\ell`, compute the Menger curvature at all points, and return the value of :math:`f_{\varphi}` that is associated with the maximizing value of :math:`\ell`.
+#. **Golden-ratio search:** `Cultrerra & Callegaro <https://ui.adsabs.harvard.edu/abs/2020IOPSN...1b5004C/abstract>`_ present a method based on subdividing the search space by various factors of the `golden ratio <https://en.wikipedia.org/wiki/Golden_ratio>`_ to minimize unnecessary calls to the sparse least-squares solver and use fewer steps than a brute-force approach.  
 
-#. Single-value: Accept a single value of the regularization parameter, and return the vector :math:`f_{\varphi}`.
-#. Brute-force search: Define a linear grid of :\math:`\ell`, compute the Menger curvature at all points, and return the value of :math:`f_{\varphi}` that is associated with the maximizing value of :math:`\ell`.
-#. Golden-ratio search: 
+.. note::
+   The Golden search method converges the fastest and produces the best results, and so it is set as the default regularization optimizer.
+
 
 .. _lcurveexample:
 .. figure:: images/starfield_multi_lcv.pdf
    :align: center
    :alt: Example regularization plot.
 
-   The top panel shows the standard L-curve with the scaling factor of the Frobenius norm to ensure that the regularization parameter :math:`\ell` is dimensionless, which is encoded in the color of the plot symbols (see colorbar at the very bottom).  The lower panel shows the `Menger curvature <https://en.wikipedia.org/wiki/Menger_curvature>`_ as a function of the logarithm (base 10) of the (dimensionless) regularization parameter.  The clear peak at :math:`\log\ell\sim-1.9` represents the sharp vertex in the L-curve at :math:`\sim(2.1,3.6)`.  This point is adopted as it represents a roughly "equal" trade-off between modeling the data (ie. the parameter on the x-axis) and damping high-frequency structure (ie. the parameter on the y-axis).
+   The top panel shows the standard L-curve with the scaling factor of the Frobenius norm to ensure that the regularization parameter :math:`\ell` is dimensionless, which is encoded in the color of the plot symbols (see colorbar at the very bottom).  The lower panel shows the `Menger curvature <https://en.wikipedia.org/wiki/Menger_curvature>`_ as a function of the logarithm (base 10) of the (dimensionless) regularization parameter.  The clear peak at :math:`\log\ell\sim-1.9` represents the sharp vertex in the L-curve at :math:`\sim(2.1,3.6)`.  This point is adopted as it represents a roughly "equal" trade-off between modeling the data (ie. the parameter on the x-axis) and damping high-frequency structure (ie. the parameter on the y-axis).  This plot was made using the Golden-ratio search.
 
 
 
