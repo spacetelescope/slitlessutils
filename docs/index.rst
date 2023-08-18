@@ -1,5 +1,3 @@
-.. sectionauthor:: Russell Ryan <rryan@stsci.edu>
-.. codeauthor:: Russell Ryan <rryan@stsci.edu>
 
 *************
 Slitlessutils
