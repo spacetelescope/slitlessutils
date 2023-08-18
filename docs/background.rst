@@ -13,8 +13,7 @@ The background in a slitless spectroscopic image is generally far more complex t
    :align: center
    :alt: Example master sky image for HST/ACS G800L.
 
-   The smoothed master sky image for the Advanced Camera for Surveys (ACS)
-   G800L grating.
+   The smoothed master sky image for the Advanced Camera for Surveys (ACS) G800L grating.
 
 
 
