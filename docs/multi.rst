@@ -24,7 +24,7 @@ The *LINEAR* framework acknowledges that the flux in a WFSS image pixel is the s
 
 .. math::
 
-   S_{x,y,i} = \sum_{l}\sum{k=1}^{N_\mathrm{obj}} W_{x,y,i,l,k} f_{l,k}
+   S_{x,y,i} = \sum_{l}\sum_{k=1}^{N_\mathrm{obj}} W_{x,y,i,l,k}\, f_{l,k}
 
 
 The known and unknown indices are grouped together with `np.ravel_multi_index() <https://numpy.org/doc/stable/reference/generated/numpy.ravel_multi_index.html>`_ as:
@@ -36,11 +36,11 @@ The known and unknown indices are grouped together with `np.ravel_multi_index() 
       \varphi &=& l + n_l\,k
    \end{eqnarray}
 
-Now the above matrix-equation is recast as:
+respectively.  Now the above matrix-equation is recast as:
 
 .. math::
    
-   S_{\vartheta} = \sum_\varphi W_{\vartheta,\varphi} f_{\varphi}.
+   S_{\vartheta} = \sum_\varphi W_{\vartheta,\varphi}\, f_{\varphi}.
 
 But since this is an overconstrained problem, then the vector of unknowns :math:`f_{\varphi}` must be solved with optimization techniques:
 
@@ -61,10 +61,15 @@ so that now :math:`\chi^2(f) = ||I - W\,f||^2`.  Although this can be directly s
 
 .. math::
 
-   \psi^2 = \chi^2 + \ell\,\xi^2
+   \psi^2(f) = \chi^2(f) + \ell\,\xi^2(f)
 
-where :math:`\ell` is the :term:`regularization parameter` and :math:`\xi^2(f_\varphi) = ||W||_F^2\,\sum_\varphi\left(f_{\varphi}-f_{\varphi}^{(0)}\right)^2` with :math:`||W||_F` is the `Frobenius norm <https://en.wikipedia.org/wiki/Matrix_norm>`_ and :math:`f_{\varphi}^{(0)}` is the :term:`damping target`, which is initialized from the broadband data. 
+where :math:`\ell` is the :term:`regularization parameter` and the *regularization term* is
 
+.. math::
+
+   \xi^2(f_\varphi) = ||W||_F^2\,\sum_\varphi\left(f_{\varphi}-f_{\varphi}^{(0)}\right)^2
+
+with :math:`||W||_F` is the `Frobenius norm <https://en.wikipedia.org/wiki/Matrix_norm>`_ and :math:`f_{\varphi}^{(0)}` is the :term:`damping target`, which is initialized from the broadband data. 
 
 
 
@@ -99,7 +104,7 @@ Regularization Optimization
 As discussed above, the regularized least-squares introduces a tunable parameter that trades between modeling the data (ie. the :math:`\chi^2`-term) and damping the high frequency noise present in inverse problems (ie. the :math:`\xi^2`-term).  However, there have been heuristic approaches at "optimizing" the :term:`regularization parameter` :math:`\ell`, and the most common method is to consider a plot of :math:`\xi^2` versus :math:`\chi^2`, which often called the "L-curve" as when plotted as log-log, this will show a characteristic sharp resembling a capital-L (see :numref:`lcurveexample`).  It is widely accepted that the vertex of the L is represents a good compromise, and so there are several techinques to honing in on this critical point. In broad terms, these methods all rely on some aspect of the finding the point of maximum curvature [#curvefoot]_ (lower panel of :numref:`lcurveexample`) along the parametric curve (upper panel of :numref:`lcurveexample`).  ``Slitlessutils`` offers three options for identifying this critical point:
 
 #. **Single-value:** Accept a single value of the :term:`regularization parameter`, and return the vector :math:`f_{\varphi}`.
-#. **Brute-force search:** Define a linear grid of :\math:`\ell`, compute the curvature [#curvefoot]_ at all points, and return the value of :math:`f_{\varphi}` that is associated with the maximizing value of :math:`\ell`.
+#. **Brute-force search:** Define a linear grid of :math:`\ell`, compute the curvature [#curvefoot]_ at all points, and return the value of :math:`f_{\varphi}` that is associated with the maximizing value of :math:`\ell`.
 #. **Golden-ratio search:** `Cultrerra & Callegaro <https://ui.adsabs.harvard.edu/abs/2020IOPSN...1b5004C/abstract>`_ present a method based on subdividing the search space by various factors of the `golden ratio <https://en.wikipedia.org/wiki/Golden_ratio>`_ to minimize unnecessary calls to the sparse least-squares solver and use fewer steps than a brute-force approach.  
 
 .. note::
