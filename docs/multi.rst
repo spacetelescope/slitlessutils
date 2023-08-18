@@ -97,17 +97,20 @@ There have been several algorithms devised to find the vector :math:`f_{\varph}`
 Regularization Optimization
 ---------------------------
 
-As discussed above, the regularized least-squares introduces a tunable parameter that trades between modeling the data (ie. the :math:`\chi^2`-term) and damping the high frequency noise present in inverse problems (ie. the :math:`\xi^2`-term).  However, there have been heuristic approaches at "optimizing" the damping parameter :math:`\ell`, and the most common method is to consider a plot of :math:`\xi^2` versus :math:`\chi^2`.  Often called the "L-curve" as when plotted as log-log, this will show a characteristic sharp 
+As discussed above, the regularized least-squares introduces a tunable parameter that trades between modeling the data (ie. the :math:`\chi^2`-term) and damping the high frequency noise present in inverse problems (ie. the :math:`\xi^2`-term).  However, there have been heuristic approaches at "optimizing" the damping parameter :math:`\ell`, and the most common method is to consider a plot of :math:`\xi^2` versus :math:`\chi^2`, which often called the "L-curve" as when plotted as log-log, this will show a characteristic sharp resembling a capital-L (see :numref:`lcurveexample`).  It is widely accepted that the vertex of the L is represents a good compromise, and so there are several techinques to honing in on this critical point.  
 
-* Brute-force search: 
-* Single-value:
-* Golden-ratio search: 
+
+#. Single-value: Accept a single value of the regularization parameter, and return the vector :math:`f_{\varphi}`.
+#. Brute-force search: Define a linear grid of :\math:`\ell`, compute the Menger curvature at all points, and return the value of :math:`f_{\varphi}` that is associated with the maximizing value of :math:`\ell`.
+#. Golden-ratio search: 
 
 .. _lcurveexample:
 .. figure:: images/starfield_multi_lcv.pdf
    :align: center
    :alt: Example regularization plot.
 
-   The top panel shows the standard L-curve with the scaling factor of the Frobenius norm to ensure that the regularization parameter 
+   The top panel shows the standard L-curve with the scaling factor of the Frobenius norm to ensure that the regularization parameter :math:`\ell` is dimensionless, which is encoded in the color of the plot symbols (see colorbar at the very bottom).  The lower panel shows the `Menger curvature <https://en.wikipedia.org/wiki/Menger_curvature>`_ as a function of the logarithm (base 10) of the (dimensionless) regularization parameter.  The clear peak at :math:`\log\ell\sim-1.9` represents the sharp vertex in the L-curve at :math:`\sim(2.1,3.6)`.  This point is adopted as it represents a roughly "equal" trade-off between modeling the data (ie. the parameter on the x-axis) and damping high-frequency structure (ie. the parameter on the y-axis).
+
+
 
 
