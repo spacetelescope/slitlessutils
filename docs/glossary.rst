@@ -56,6 +56,9 @@ Since many terms may be used colloquially and/or have different definitions in o
 	prism
 		A transmissive and dispersive spectral element with a highly non-uniform rate of dispersion.  See :term:`grism` for the similarities/differences between the two.
 
+	regularization parameter
+		A tunable parameter that governs the relative importance of fitting the data and damping high-frequency noise.  In the literature this will often be denoted by :math:`\lambda`, but of obvious confusion with wavelength is given the symbol :math:`\ell` in the ``slitlessutils`` discussion.  This may also be referred to as the *damping parameter*.
+
 	segmentation map
 		An image that describes which :term:`direct imaging` pixels belong each object, which effectively sets the extraction/simulation apertures and is used to initialize the :term:`dispersed region` for the sources.
 

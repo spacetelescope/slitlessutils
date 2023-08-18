@@ -6,7 +6,7 @@ Spectroscopic Sources
 
 
 
-Source (`~slitlessutils.core.sources.Source()`)
+Source (`~slitlessutils.sources.Source()`)
 -----------------------------------------------
 
 
@@ -20,7 +20,12 @@ Source (`~slitlessutils.core.sources.Source()`)
 discuss segmaps 
 
 
-Dispersed Region
+
+
+
+Dispersed Region (`~slitlessutils.sources.DispersedRegion()`)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 separate wavelength settings
 talk about grism/prism dispersers
 
@@ -35,7 +40,7 @@ talk about grism/prism dispersers
 
 
 
-Source Collection (`~slitlessutils.core.sources.SourceCollection()`)
+Source Collection (`~slitlessutils.sources.SourceCollection()`)
 --------------------------------------------------------------------
 
 
