@@ -1,7 +1,6 @@
 .. _multi:
 
 
-
 Multi-Orient Extraction (`~slitlessutils.modules.extract.multi`)
 ================================================================
 
@@ -14,9 +13,8 @@ The multi-orient extraction was first developed by `Ryan, Casertano, & Pirzkal (
       :align: center
       :alt: Illustration of confusion
 
-      An illustration of spectral contamination or confusion (taken from `Ryan, Casertano, & Pirzkal 2018 <https://ui.adsabs.harvard.edu/abs/>`_).  Along the left side of each panel, they show a red and blue point source whose celestial positions are fixed (as shown the coordinate vane).  This shows that under certain orients (lower panel), the spectra will overlap leading to the spectral degeneracy.  However, if the telescope is reoriented, then the spectral traces separate, which provides the leverage to break this degeneracy.
-
-
+      An illustration of spectral contamination or confusion (taken from
+      
 Although the formative effort was to break the degeneracy from contamination/confusion, additional advantages were identified. Namely, the spectral resolution of a WFSS mode, is set by properties of the grating and the size of the source.  In analogy to the relationship between slit width and spectral resolution for long-slit spectroscopy, the size of the source projected along the dispersion axis set the resolution --- where the larger the source, the lower the resolution.  Therefore, simply averaging spectra extracted at separate orients (such as described in :doc:`single-orient extraction <single>`) will result in biases, where the resolutions are different.  Hence, one can either smooth all the data to a common resolution before averaging (which loses spectral resolution) or analyze the high-resolution data by itself (which loses signal-to-noise).  But `Ryan, Casertano, & Pirzkal (2018) <https://ui.adsabs.harvard.edu/abs/2018PASP..130c4501R/abstract>`_ find that the *LINEAR* method recovers the highest spectral resolution present in the data, at the cost of an increased computational resources and collecting data at multiple orients. 
 
 
