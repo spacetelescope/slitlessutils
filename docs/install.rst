@@ -1,4 +1,4 @@
-.. _installing:
+.. _install:
 
 Installing ``slitlessutils``
 ============================
@@ -44,41 +44,5 @@ There are several ways to install ``slitlessutils``:
 
   This approach is only somewhat more difficult than installing from PyPI,
   but is easier to make local modifcations and submit pull requests.
-
-
-Fetching Reference Data
------------------------
-
-There are a host of reference and configuration files needed by
-``slitlessutils``, which have been staged at
-`slitlessutils data <https://stsci.box.com/shared/static/fzlb7y36ofi18ziy6mkbyg710stmygjf.gz>`_.
-You should download the `.tar.gz` file for instrument of interest,
-copy it to the home directory, and unpack with:
-
-.. code-block:: bash
-
-   tar -xcvzf <FILENAME>.tar.gz
-
-This will create a directory in the home as :code:`.slitlessutils`
-
-
-
-Adjust Primary Defaults
------------------------
-
-The default configuration is in the file ``{$slitlessutils_config}defaults.cfg```
-
-.. code-block:: python
-
-   # load the config module
-   import slitlessutils as su
-   conf = su.config.Confing()
-
-   # adjust an existing parameter (two options)
-   conf.fluxscale = 2e-17
-   conf['fluxunit'] = 'erg/(s*cm**2*micron)'
-
-   # save config to disk
-   conf.write("myconf.cfg")
 
    

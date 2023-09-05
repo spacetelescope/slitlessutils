@@ -18,7 +18,7 @@ class Disperser:
         The name of the dispersive element
 
     blocking: str
-        The name of the blocking element
+        The name of the blocking elementx2
 
     wave0: float or int
         The starting wavelength.
@@ -34,6 +34,7 @@ class Disperser:
     blocking: str
     wave0: float
     wave1: float
+    dwave: float
     units: str
 
     def __post_init__(self):
@@ -84,7 +85,7 @@ class Disperser:
         # based on the type, add the "delta" like parameters
         if isinstance(self, Linear) and hasattr(specreg, 'dwave'):
             pars.dwave = specreg.dwave
-        elif isinstance(self, Geometric) and hasattr(specreg, 'scale'):
+        elif isinstance(self, Laurent) and hasattr(specreg, 'scale'):
             pars.scale = specreg.scale
 
         # use this to validate the settings
@@ -159,7 +160,7 @@ class Linear(Disperser):
 
     """
 
-    dwave: float
+    # dwave: float
 
     def __post_init__(self):
         """
@@ -217,8 +218,13 @@ class Linear(Disperser):
             The center of the wavelengths bins
         """
 
-        wav = np.arange(self.wave0, self.wave1+self.dwave/nsub,
-                        self.dwave/nsub, dtype=float)
+        d = 1./nsub
+        ind = np.arange(0, len(self)-1+d, d, dtype=float)
+        wav = self(ind)
+
+        # wav1 = np.arange(self.wave0, self.wave1+self.dwave/nsub,
+        #                  self.dwave/nsub, dtype=float)
+
         return wav
 
     def indices(self, wav):
@@ -236,7 +242,7 @@ class Linear(Disperser):
             The indices (will be integer dtype)
         """
 
-        ind = np.floor((wav-self.wave0)/self.dwave).astype(int)
+        ind = np.round((wav-self.wave0)/self.dwave).astype(int)
         return ind
 
     def limits(self, nsub=1):
@@ -253,10 +259,16 @@ class Linear(Disperser):
         lim : `np.ndarray`
             A float array that gives the edges of the bins
         """
-        dw2 = self.dwave/2.
-        dwn = self.dwave/float(nsub)
 
-        lim = np.arange(self.wave0-dw2, self.wave1+dw2+dwn, dwn)
+        # dw2 = self.dwave/2.
+        # dwn = self.dwave/float(nsub)
+        #
+        # lim2 = np.arange(self.wave0-dw2, self.wave1+dw2+dwn, dwn)
+
+        d = 1./nsub
+        ind = np.arange(-0.5, len(self)+d-0.5, d, dtype=float)
+        lim = self(ind)
+
         return lim
 
     def update_header(self, hdr):
@@ -275,7 +287,7 @@ class Linear(Disperser):
 
 
 @dataclass
-class Geometric(Disperser):
+class Laurent(Disperser):
     """
     Dataclass to enable geometric-dispersion spectral elements.
 
@@ -298,12 +310,15 @@ class Geometric(Disperser):
     units: str
         The units of the wavelength
 
-    scale : float or int
-        The multiplicative scale
+    alpha : float or int
+        The curvature to tune between a standard 1st order polynomial and
+        the equivalent Laurent polynomial.  Nota bene: the Laurent
+        polynomial becomes a standard polynomial for alpha >> N, where
+        N is the number of elements.
 
     """
 
-    scale: float
+    alpha: float
 
     def __post_init__(self):
         """
@@ -311,10 +326,11 @@ class Geometric(Disperser):
 
         Should never be directly called
         """
+        if np.isinf(self.alpha):
+            msg = 'Setting the curvature to infinity is same as linear.'
+            LOGGER.warning(msg)
 
-        assert (self.scale > 1), 'Must have an increasing scale factor'
         super().__post_init__()
-        self.scale = float(self.scale)
 
     def __len__(self):
         """
@@ -325,10 +341,15 @@ class Geometric(Disperser):
         nwav : int
             number of wavelength elements
         """
-        pass
+        DELTA = self.wave1-self.wave0
+
+        N = int(np.ceil(DELTA/(self.dwave + (DELTA-self.dwave)/self.alpha)))
+        return N+1
 
     def __call__(self, lam, nsub=1):
-        pass
+
+        wav = self.wave0 + self.dwave*lam*(1-self.alpha)/(lam-self.alpha)
+        return wav
 
     def wavelengths(self, nsub=1):
         """
@@ -344,7 +365,9 @@ class Geometric(Disperser):
         wav : `np.ndarray`
             The center of the wavelengths bins
         """
-        pass
+        ind = np.arange(len(self), dtype=int)
+        wav = self(ind)
+        return wav
 
     def indices(self, wav):
         """
@@ -360,7 +383,12 @@ class Geometric(Disperser):
         ind : int, `np.ndarray`
             The indices (will be integer dtype)
         """
-        pass
+
+        DELTAi = wav - self.wave0
+
+        ind = DELTAi/(self.dwave + (DELTAi-self.dwave)/self.alpha)
+        ind = np.round(ind).astype(int)
+        return ind
 
     def limits(self, nsub=1):
         """
@@ -377,7 +405,9 @@ class Geometric(Disperser):
             A float array that gives the edges of the bins
         """
 
-        pass
+        ind = np.arange(-0.5, len(self)+0.5, 1, dtype=float)
+        wav = self(ind)
+        return wav
 
     def update_header(self, hdr):
         """
@@ -390,19 +420,33 @@ class Geometric(Disperser):
         """
 
         super().update_header(hdr)
-        hdr.set('scale', value=self.scale, after='wave1',
-                comment='logarithmic sampling')
+        hdr.set('alpha', value=self.alpha, after='wave1',
+                comment='curvature parameter (dimensionless)')
 
 
-def load_disperser(name, blocking, **kwargs):
-    disptype = kwargs['disptype'].lower()
+# def load_disperser(name, blocking, **kwargs):
+def load_disperser(dic, **kwargs):
+
+    dic.update(kwargs)
+
+    disptype = dic['disptype'].lower()
+
     if disptype == 'grism':
-        disp = Linear(name, blocking, kwargs['wave0'], kwargs['wave1'],
-                      kwargs['units'], kwargs['dwave'])
+        disp = Linear(dic['name'], dic['blocking'], dic['wave0'],
+                      dic['wave1'], dic['dwave'], dic['units'])
     elif disptype == 'prism':
-        disp = Geometric(name, blocking, kwargs['wave0'], kwargs['wave1'],
-                         kwargs['units'], kwargs['scale'])
+        disp = Laurent(dic['name'], dic['blocking'], dic['wave0'],
+                       dic['wave1'], dic['dwave'], dic['units'], dic['alpha'])
     else:
-        raise NotImplementedError(f'Disperser type {disptype} is unknown.')
+        raise NotImplementedError(f'Disperser type ({disptype}) is unknown.')
+
+    # if disptype == 'grism':
+    #     disp = Linear(name, blocking, kwargs['wave0'], kwargs['wave1'],
+    #                   kwargs['units'], kwargs['dwave'])
+    # elif disptype == 'prism':
+    #     disp = Laurent(name, blocking, kwargs['wave0'], kwargs['wave1'],
+    #                      kwargs['units'], kwargs['scale'])
+    # else:
+    #     raise NotImplementedError(f'Disperser type {disptype} is unknown.')
 
     return disp

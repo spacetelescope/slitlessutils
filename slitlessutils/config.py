@@ -118,14 +118,23 @@ class Config(dict):
     # local path to store reference files
     REFROOT = os.path.join(Path.home(), '.slitlessutils')
 
+    # flag to timeout file downloading in seconds
+    TIMETOUT = 15
+
     # enable the singleton
     _instance = None
 
+    # a basic init method.  Seems necessary to implement kwargs
+    def __init__(self, *args, **kwargs):
+        pass
+
+    # the main
     def __new__(cls, conffile=None, **kwargs):
+
         if not cls._instance:
 
             # make a new config object
-            cls._instance = super().__new__(cls)
+            cls._instance = super(Config, cls).__new__(cls)
             cls._instance._refpath = os.getcwd()
 
             # first check if the refroot exists
@@ -152,6 +161,7 @@ class Config(dict):
                 cfg.update(custom)
 
             # load each keyword into the self
+            cls._instance._keys = tuple(cfg.keys())
             for k, v in cfg.items():
                 cls._instance[k] = Parameter.from_dict(v)
 
@@ -335,12 +345,18 @@ class Config(dict):
 
         # get manifest and print item by item
         man = self.retrieve_refmanifest()
+        if not man:
+            return
+
+        found = False
+        print('Reference File Manifest:\n')
         for vers, data in man.items():
 
             # get the version number, indentation, and format them
             vers = str(vers)
             if vers == self.refversion:
                 indent = used
+                found = True
             else:
                 indent = others
 
@@ -351,6 +367,10 @@ class Config(dict):
             for text in textwrap.wrap(data["notes"]):
                 print(f'{others}{text}')
             print()
+
+        if not found:
+            LOGGER.warning(
+                f"Manifest does not include current reference version: {self.refversion}")
 
     def retrieve_refmanifest(self, return_latest=False):
         """
@@ -373,8 +393,15 @@ class Config(dict):
             requested.
 
         """
+
         # download the manifest file
-        f = download_file(self.REFURL+self.REFDB, timeout=3)
+        timeout = 5.
+        try:
+            f = download_file(self.REFURL+self.REFDB, timeout=timeout,
+                              show_progress=False)
+        except TimeoutError:
+            LOGGER.warning(f'Retrieving manifest timed out in {timeout} s.')
+            return
 
         # open the manifest as a json file
         with open(f, 'r') as fp:
@@ -448,9 +475,12 @@ class Config(dict):
         # write the remote file into local file
         LOGGER.info(f'Retrieving remote file {remotefile} to {self.REFROOT}')
         try:
-            tmpfile = download_file(remotefile, timeout=30)
+            tmpfile = download_file(remotefile, timeout=self.TIMEOUT)
         except BaseException:
             LOGGER.warning(f"Unable to retrieve server file ({remotefile})")
+            return
+        except TimeoutError:
+            LOGGER.warning(f'Download timed-out in {self.TIMEOUT} s.')
             return
 
         # move the file from a tmp dir
@@ -472,7 +502,8 @@ class Config(dict):
         curpath = os.path.join(self.REFROOT, 'slitlessutils_config')
 
         # read the version number for this file
-        versdata = self.read_versfile(filename=os.path.join(curpath, self.VERSIONFILE))
+        versfile = os.path.join(curpath, self.VERSIONFILE)
+        versdata = self.read_versfile(filename=versfile)
         vers = versdata.get('version', '0.0.0')
 
         # get name of the new directory
@@ -490,6 +521,26 @@ class Config(dict):
             self.set_refpath(newpath)
 
         return remotefile
+
+    def __setitem__(self, k, v):
+        """
+        Method to override the dict-like access
+
+        Parameters
+        ----------
+        k : str
+            Name of the dict keyword
+
+        v : any type
+            The value of the attribute
+        """
+
+        if isinstance(v, Parameter):
+            super().__setitem__(k, v)
+        elif k in self._keys:
+            self[k].value = v
+        else:
+            pass
 
     def __getattr__(self, k):
         """

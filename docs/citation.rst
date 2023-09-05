@@ -1,2 +1,5 @@
-Citing Slitlessutils
---------------------
+.. _citation:
+
+.. include:: ../slitlessutils/CITATION.rst
+
+

@@ -10,6 +10,7 @@ from skimage.segmentation import expand_labels
 
 from .dispersedregion import DispersedRegion
 from ..utilities import headers, indices
+from ...logger import LOGGER
 
 
 class Source(list):
@@ -26,7 +27,8 @@ class Source(list):
 
     def __init__(self, segid, img, seg, hdr, reg=None, zeropoint=26., grpid=0,
                  local_back=True, backsize=5, nsig=(5, 5),
-                 whttype='pixels', profile='gaussian'):
+                 whttype='pixels', profile='gaussian', negfunc='positivity',
+                 epsilon=1e-9):
         """
         Initializer
 
@@ -79,11 +81,11 @@ class Source(list):
             gaussian:  will fit a 2d-Gaussian
             sersic:  will fit a 2d-Sersic
 
-        Default is 'gaussian'
-            NOTE: this functionality is not intended to provide reliable
-                  estimates for the profile's parameters, but only a
-                  smooth description of the source's spatial profile. As
-                  such, the parameters are not available for output.
+            Default is 'gaussian'
+              NOTE: this functionality is not intended to provide reliable
+                    estimates for the profile's parameters, but only a
+                    smooth description of the source's spatial profile. As
+                    such, the parameters are not available for output.
 
         zeropoint : float or int, optional
             The photometric zeropoint in the AB mag system for the direct
@@ -110,8 +112,8 @@ class Source(list):
         # record some things
         self.segid = segid  # hdr['SEGID']
         self.grpid = grpid
-        self.whttype = whttype
-        self.backsize = backsize
+        # self.whttype = whttype
+        self.backsize = max(backsize, 0)
         self.local_back = local_back
 
         # set the spectral parameters
@@ -126,21 +128,24 @@ class Source(list):
         # y, x = np.where((img > 0) & (seg == self.segid))
         y, x = np.where(seg == self.segid)
 
-        # check for a vlid image
+        # check for a valid image
         self.npixels = len(x)
         if self.npixels > 0:
 
-            # compute and subtract the local sky background:
-            if self.local_back and self.backsize > 0:
-                # get a bounding box
-                x0 = max(np.amin(x)-self.backsize, 0)
-                y0 = max(np.amin(y)-self.backsize, 0)
-                x1 = min(np.amax(x)+self.backsize, img.shape[1]-1)
-                y1 = min(np.amax(y)+self.backsize, img.shape[0]-1)
+            # crop the image
+            # get a bounding box
+            x0 = max(np.amin(x)-self.backsize, 0)
+            y0 = max(np.amin(y)-self.backsize, 0)
+            x1 = min(np.amax(x)+self.backsize, img.shape[1]-1)
+            y1 = min(np.amax(y)+self.backsize, img.shape[0]-1)
 
-                # cut out regions
-                subimg = img[y0:y1, x0:x1]
-                subseg = seg[y0:y1, x0:x1]
+            # cut out regions
+            subimg = img[y0:y1, x0:x1]
+            subseg = seg[y0:y1, x0:x1]
+            # subwht = wht[y0:y1, x0:x1]
+
+            # compute and subtract the local sky background:
+            if self.local_back:
 
                 # grow the region to find the local sky background
                 # but use a mask in case it results in empty array
@@ -154,52 +159,57 @@ class Source(list):
                     ave = 0.0
 
                 self.background = ave
+                subimg -= self.background
             else:
                 self.background = 0.0
-            img -= self.background
-            # ---------------------------------------------------------------
+
+            # convert the image into weights
+            w = self.compute_weights(subimg, x-x0, y-y0, whttype=whttype, profile=profile,
+                                     negfunc=negfunc, epsilon=1e-9)
 
             # process the pixels based on the whttype specified
-            if self.whttype == 'pixels':
-                w = np.abs(img[y, x])
-            elif self.whttype == 'fitprofile':
-                # get an estimate on the source's elliptical properties
-                subwht = (subseg == self.segid).astype(float)
-                xc, yc, a, b, theta = self.ellipse_parameters(subimg, subwht)
-                amplitude = np.amax(subimg[y, x])
-
-                # define the fitting algorithm
-                fitter = fitting.LevMarLSQFitter()
-
-                # determine the spatial profile to fit
-                self.profile = profile.lower()
-                if self.profile == 'gaussian':
-                    mod = models.Gaussian2D(amplitude=amplitude,
-                                            x_mean=xc, x_stddev=a,
-                                            y_mean=yc, y_stddev=b,
-                                            theta=theta)
-                elif self.profile == 'sersic':
-                    mod = models.Sersic2D(amplitude=amplitude,
-                                          x_0=xc, y_0=yc,
-                                          n=2.5, r_eff=a,
-                                          ellip=np.sqrt(1-(b/a)**2),
-                                          theta=theta)
-                else:
-                    msg = f'profile {profile} is not supported'
-                    raise NotImplementedError(msg)
-
-                # fit the data and compute the model
-                p = fitter(mod, x, y, img[y, x])
-                w = p(x, y)
-
-            else:
-                self.whttype = 'pixels'
-                w = np.abs(img[y, x])
+            # if self.whttype == 'pixels':
+            #    w = np.abs(img[y, x])
+            # elif self.whttype == 'constant':
+            #    w = np.full_like(x, 1./self.npixels, dtype=float)
+            # elif self.whttype == 'fitprofile':
+            #    # get an estimate on the source's elliptical properties
+            #    subwht = (subseg == self.segid).astype(float)
+            #    xc, yc, a, b, theta = self.ellipse_parameters(subimg, subwht)
+            #    amplitude = np.amax(subimg[y, x])
+            #
+            #   # define the fitting algorithm
+            #    fitter = fitting.LevMarLSQFitter()
+            #
+            #    # determine the spatial profile to fit
+            #    self.profile = profile.lower()
+            #    if self.profile == 'gaussian':
+            #        mod = models.Gaussian2D(amplitude=amplitude,
+            #                                x_mean=xc, x_stddev=a,
+            #                                y_mean=yc, y_stddev=b,
+            #                                theta=theta)
+            #    elif self.profile == 'sersic':
+            #        mod = models.Sersic2D(amplitude=amplitude,
+            #                              x_0=xc, y_0=yc,
+            #                              n=2.5, r_eff=a,
+            #                              ellip=np.sqrt(1-(b/a)**2),
+            #                              theta=theta)
+            #    else:
+            #        msg = f'profile {profile} is not supported'
+            #        raise NotImplementedError(msg)
+            #
+            #    # fit the data and compute the model
+            #    p = fitter(mod, x, y, img[y, x])
+            #    w = p(x, y)
+            #
+            # else:
+            #    self.whttype = 'pixels'
+            #    w = np.abs(img[y, x])
             # ---------------------------------------------------------------
-
+            #
             # normalize the weights
-            self.norm = np.sum(w)
-            w /= self.norm
+            # self.norm = np.sum(w)
+            # w /= self.norm
 
             # compute the centeroids
             xyc = (np.average(x, weights=w), np.average(y, weights=w))
@@ -244,7 +254,6 @@ class Source(list):
             # region image
             ri = indices.reverse(r, ignore=(0,))
             for regid, pixid in ri.items():
-
                 # pixels and weights for this region
                 xx = x[pixid]
                 yy = y[pixid]
@@ -281,6 +290,71 @@ class Source(list):
             #     self.append(DispersedRegion(x,y,w,self.segid,0,ltv=self.ltv))
             # else:
             #     LOGGER.warning(f"Ignoring {segid=}")
+
+    def compute_weights(self, subimg, x, y, whttype='pixels', profile='gaussian',
+                        negfunc='positivity', epsilon=1e-9):
+
+        # set some variables
+        self.profile = profile.lower()
+        self.whttype = whttype.lower()
+
+        # process the pixels based on the whttype specified
+        if self.whttype == 'pixels':
+            w = subimg[y, x]
+        elif self.whttype == 'constant':
+            w = np.ones_like(x, dtype=float)
+        elif self.whttype == 'fitprofile':
+            # get an estimate on the source's elliptical properties
+            xc, yc, a, b, theta = self.ellipse_parameters(subimg, x, y)
+            amplitude = np.amax(subimg[y, x])
+
+            # define the fitting algorithm
+            fitter = fitting.LevMarLSQFitter()
+
+            # determine the spatial profile to fit
+            if self.profile in ('gaussian', 'gauss'):
+                mod = models.Gaussian2D(amplitude=amplitude,
+                                        x_mean=xc, x_stddev=a,
+                                        y_mean=yc, y_stddev=b,
+                                        theta=theta)
+            elif self.profile == 'sersic':
+                mod = models.Sersic2D(amplitude=amplitude,
+                                      x_0=xc, y_0=yc,
+                                      n=2.5, r_eff=a,
+                                      ellip=np.sqrt(1-(b/a)**2),
+                                      theta=theta)
+            else:
+                msg = f'profile {profile} is not supported'
+                raise NotImplementedError(msg)
+
+            # fit the data and compute the model
+            p = fitter(mod, x, y, subimg[y, x])
+            w = p(x, y)
+        else:
+            self.whttype = 'pixels'
+            LOGGER.warning(f'WHTTYPE ({whttype}) not found, using {self.whttype}')
+            w = subimg[y, x]
+
+        # must remap the pixels into some positive weights
+        self.negfunc = negfunc.lower()
+        if self.negfunc == 'positivity':
+            v = 0.5*(w+np.sqrt(w*w+epsilon))
+        elif self.negfunc == 'abs':
+            v = np.abs(w)
+        elif self.negfunc == 'relu':
+            v = np.maximum(w, 0.)
+        elif self.negfunc == 'minimum':
+            v += np.amin(w)
+        else:
+            self.negfunc = 'positivity'
+            LOGGER.warning(
+                f'Negative pixel function ({negfunc.lower()}) not found, using {self.negfunc}')
+            v = 0.5*(w+np.sqrt(w*w+epsilon))
+
+        # normalize
+        v /= np.sum(v)
+
+        return v
 
     def __str__(self):
         return super().__str__()
@@ -655,7 +729,7 @@ class Source(list):
             region.sed.write_file(filename, **kwargs)
 
     @staticmethod
-    def ellipse_parameters(img, wht):
+    def ellipse_parameters(img, x, y):  # wht):
         """
         Staticmethod to compute the ellipse parameters from an image
 
@@ -692,17 +766,26 @@ class Source(list):
 
         """
 
-        # find the good points and normalize the weights
-        y, x = np.where(wht > 0)
-        w = img[y, x]*wht[y, x]
-        w /= np.sum(w)
+        weights = img[y, x]
 
+        # compute various moments
+        X = np.average(x, weights=weights)
+        Y = np.average(y, weights=weights)
+        X2 = np.average(x*x, weights=weights) - X*X
+        Y2 = np.average(y*y, weights=weights) - Y*Y
+        XY = np.average(x*y, weights=weights) - X*Y
+
+        # find the good points and normalize the weights
+        # y, x = np.where(wht > 0)
+        # w = img[y, x]*wht[y, x]
+        # w /= np.sum(w)
+        #
         # compute the various moments
-        X = np.sum(x*w)
-        Y = np.sum(y*w)
-        X2 = np.sum(x*x*w)-X*X
-        Y2 = np.sum(y*y*w)-Y*Y
-        XY = np.sum(x*y*w)-X*Y
+        # X = np.sum(x*w)
+        # Y = np.sum(y*w)
+        # X2 = np.sum(x*x*w)-X*X
+        # Y2 = np.sum(y*y*w)-Y*Y
+        # XY = np.sum(x*y*w)-X*Y
 
         # compute the difference and average of the 2nd order
         dif = (X2-Y2)/2.

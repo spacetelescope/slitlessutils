@@ -691,7 +691,7 @@ class WFSS(dict):
         return self.config.background_filename(key)
 
     @classmethod
-    def simulated(cls, telescope, instrument, dataset, ra, dec, orientat, disperser,
+    def simulated(cls, telescope, instrument, dataset, ra, dec, orientat, dispname,
                   **kwargs):
         """
         Classmethod to load simulated WFSS data
@@ -716,7 +716,7 @@ class WFSS(dict):
         orientat : float
             The rotation of the field in deg.  Angle is measured East of North
 
-        disperser : str
+        dispname : str
             The name of the dispersive element
 
         kwargs : dict, optional
@@ -731,7 +731,7 @@ class WFSS(dict):
              The WFSS data structure
 
         """
-        insconf = InstrumentConfig(telescope, instrument, disperser, **kwargs)
+        insconf = InstrumentConfig(telescope, instrument, dispname, **kwargs)
         obj = cls(insconf.make_filename(dataset), 'simulated', insconf)
 
         # compute somethings

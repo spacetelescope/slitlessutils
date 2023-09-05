@@ -175,7 +175,7 @@ def plot_spectra():
     plt.plot(l, ff*scl, label='Larsen et al. (smoothed)')
 
     # uncomment this to see the hi-res file.
-    # plt.plot(l,f,label='Larsen et al. (high-res)')
+    # plt.plot(l, f, label='Larsen et al. (high-res)')
 
     # label the axes
     plt.ylabel(r'$f_{\lambda}$ ($10^{-13}$ erg s$^{-1}$ cm$^{-2}$ $\mathrm{\AA}^{-1}$)')
