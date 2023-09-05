@@ -74,7 +74,7 @@ where :math:`\kappa` can be any of the elements of :math:`a, b, \alpha`, :math:`
 Usual Workflow
 ^^^^^^^^^^^^^^
 
-Since ``slitlessutils`` is largely predicated forward-modeling the WFSS data, the usual workflow begins with a known direct image position and assumed wavelength, then the WFSS image position can be found by:
+Since ``slitlessutils`` is largely predicated on forward-modeling the WFSS data, the usual workflow begins with a known direct image position and assumed wavelength, then the WFSS image position is given by:
 
 #. Use the :term:`world-coordinate system` (WCS) to transform from the direct image position to the *undispersed position* in the WFSS image.  
 #. Invert the spectral dispersion to find the parameter (:math:`t`).

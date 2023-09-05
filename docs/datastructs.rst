@@ -3,7 +3,7 @@
 
 Primary Data Structures
 =======================
-Although there many data structures used by ``slitlessutils``, however users are likely to only interact with two of these.  Both of these are classes that emulate a ``dict``-like behavior and collect other objects.  
+Although there many data structures used by ``slitlessutils``, users are likely to only interact with two of these.  Both of these are classes that emulate a ``dict``-like behavior and collect other objects.  
 
 
 .. toctree::
