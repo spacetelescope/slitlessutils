@@ -89,7 +89,7 @@ This will update the file in place, as the flag is set: :code:`inplace=True`, bu
 
 Column-Based Refinement
 -----------------------
-Not yet implemented.
+Coming soon.
 
 
 

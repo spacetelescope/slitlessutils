@@ -4,7 +4,7 @@
 Calibrations for WFSS
 =====================
 
-The calibration files for ``slitlessutils`` are staged on a centralized box repository, which can be accessed using the :class:`~slitlessutils.Config` object.  For more information, please see `the configuration documentation <configure>`_.  
+The calibration files for ``slitlessutils`` are staged on a centralized box repository, which can be accessed using the :class:`~slitlessutils.Config` object.  For more information, please see :doc:`the configuration documentation <configure>`_.  
 
 
 
@@ -68,8 +68,7 @@ where :math:`\kappa` can be any of the elements of :math:`a, b, \alpha`, :math:`
 
 
 .. note::
-	In all above cases, the coefficients :math:`{a}, {b}, {\alpha}` will be unique for each spectral order, 
-	must be determined from calibration observations, and 
+	In all above cases, the coefficients :math:`{a}, {b}, {\alpha}` will be unique for each spectral order and must be determined from calibration observations.
 
 
 Usual Workflow
@@ -90,7 +89,7 @@ Since ``slitlessutils`` is largely predicated forward-modeling the WFSS data, th
 Flat Field
 ----------
 
-The flat-field corrects for differences in the pixel-to-pixel sensitivity, and is derived by observing a suitably flat illumination pattern.  Importantly, this correction is wavelength-dependent, but the wavelength covered by a WFSS image pixel will depend on the *undispersed position* :math:`(x_0,y_0)`.  Therefore, the WFSS images are not flat-fielded by the calibration pipelines, and so it must be accounted for in the extraction/simulation processes.  ``Slitlessutils`` implements the wavelength-dependent flat field as a polynomial in wavelength:
+The flat-field corrects for differences in the pixel-to-pixel sensitivity, and is derived by observing a suitably flat illumination pattern.  Importantly, this correction is wavelength-dependent, but the wavelength covered by a WFSS image pixel will depend on the *undispersed position* :math:`(x_0,y_0)`.  Therefore, the WFSS images are not flat-fielded but the calibration pipelines, and so it must be accounted for in the extraction/simulation processes.  ``Slitlessutils`` implements the wavelength-dependent flat field as a polynomial in wavelength:
 
 .. math::
 	F_{x,y}(\lambda) = \sum_{k=0} F_{x,y}\,w(\lambda)^k

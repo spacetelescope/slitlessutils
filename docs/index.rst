@@ -12,7 +12,7 @@ Advanced Camera for Surveys (ACS) and Wide-Field Camera 3 (WFC3) on the
 .. important::
    If you use ``slitlessutils`` for a project that leads to a publication,
    whether directly or as a dependency of another package, then please
-   include an `acknowledgment and/or citation <citation>`_.
+   include an :doc:`acknowledgment and/or citation <citation>`_.
 
 
 Attribution
