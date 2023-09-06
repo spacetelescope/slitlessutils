@@ -4,7 +4,7 @@
 Calibrations for WFSS
 =====================
 
-The calibration files for ``slitlessutils`` are staged on a centralized box repository, which can be accessed using the :class:`~slitlessutils.Config` object.  For more information, please see :doc:`the configuration documentation <configure>`_.  
+The calibration files for ``slitlessutils`` are staged on a centralized box repository, which can be accessed using the :class:`~slitlessutils.Config()` object.  For more information, please see :doc:`the configuration documentation <configure>`.  
 
 
 
