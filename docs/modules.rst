@@ -9,6 +9,7 @@ Computational Modules (`~slitlessutils.modules.Module()`)
 It is unlikely that a user should ever need instantiate the parent `Module()` class directly, but there are three key keyword-arguments that control the multiprocessing and temporary tables (see :doc:`Tabulating Module <tabulation>`) that one might need to pass to the parent via any of the child Modules:
 
 . _modulekeys:
+
 .. list-table:: Module Keyword Arguments
   :widths: 15 10 75
   :header-rows: 1
