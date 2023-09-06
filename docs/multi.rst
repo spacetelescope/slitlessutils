@@ -78,7 +78,9 @@ with :math:`||W||_F` is the `Frobenius norm <https://en.wikipedia.org/wiki/Matri
 Sparse Linear-Operator Construction
 -----------------------------------
 
-Coming soon.
+Coming Soon.
+
+
 
 
 .. _solutions:

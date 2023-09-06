@@ -23,11 +23,13 @@ The current implementation will *only* simulate the signal from the sources, but
       * load the PDT from the :class:`~slitlessutils.tables.PDTFile()`
       * append to a list
 
-    * multiply the fractional pixel :math:`a_{x,y}` from the PDTs by :doc:`wavelength-dependent flat-field <calib>` :math:`F_{x,y}(\lambda)`, :doc:`sensitivity curve <calib>` :math:`T(\lambda)`, :term:`pixel-area map` :math:`A_{x,y}` (:ref:`see more below <pam>`), and the source spectrum :math:`f(\lambda)`
+    * multiply the fractional pixel :math:`a_{(x_d,y_d)\rightarrow(x,y)}` area between the direct and WFSS image (and tabulated in the PDTs), :doc:`wavelength-dependent flat-field <calib>` :math:`F_{x,y}(\lambda)`, :doc:`sensitivity curve <calib>` :math:`T(\lambda)`, :term:`pixel-area map` :math:`J_{x,y}` (:ref:`see more below <pam>`), and the source spectrum :math:`f_{x_d,y_d}(\lambda)` associated with this direct-image pixel:
 
     .. math::
 
-      s_{x,y,l} = a_{x,y}\,F_{x,y}(\lambda)\,T(\lambda)\,f(\lambda)\, A_{x,y}
+      s_{x,y,l} = a_{(x_d,y_d)\rightarrow(x,y)}\,\frac{I_{x_d,y_d}}{\sum\limits_{x_d,y_d} I_{x_d,y_d}}\,F_{x,y}(\lambda)\,T(\lambda)\,f_{x_d,y_d}(\lambda)\, J_{x,y}\,\delta\lambda   
+
+    where :math:`I_{x_d,y_d}` is the direct-image brightness and :math:`\delta\lambda` 
 
     * decimate the list of PDTs over the wavelength index (:math:`l`)
     * sum this decimated list into to noiseless science image:
@@ -132,6 +134,6 @@ where all of these partial derivatives are polynomials of :math:`(x,y)`.  Theref
 
 .. math::
 
-  A_{x,y} = \left|\frac{\partial a}{\partial x}\frac{\partial b}{\partial y} - \frac{\partial b}{\partial x}\frac{\partial a}{\partial y}\right|
+  J_{x,y} = \left|\frac{\partial a}{\partial x}\frac{\partial b}{\partial y} - \frac{\partial b}{\partial x}\frac{\partial a}{\partial y}\right|
 
 
