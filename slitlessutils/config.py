@@ -119,7 +119,7 @@ class Config(dict):
     REFROOT = os.path.join(Path.home(), '.slitlessutils')
 
     # flag to timeout file downloading in seconds
-    TIMETOUT = 15
+    TIMEOUT = 15
 
     # enable the singleton
     _instance = None
