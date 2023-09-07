@@ -348,7 +348,7 @@ class Config(dict):
         if not man:
             return
 
-        found = False
+        ref_version_found = False
         print('Reference File Manifest:\n')
         for vers, data in man.items():
 
