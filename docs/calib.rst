@@ -42,7 +42,7 @@ The :term:`spectral dispersion` describes the wavelength along the spectral trac
 .. math::
 	\lambda(t;x_0,y_0) = \alpha_0(x_0,y_0) + \alpha_1(x_0,y_0)\,t + \alpha_2(x_0,y_0)\,t^2 + \ldots
 
-which will be given by a :class:`~slitlessutils.core.wfss.config.StandardPolynomial`.  However, :term:`prism` elements often exhibit a dispersion that is highly non-linear (as a function of wavelength), which can be described as a `Laurent polynomial <https://mathworld.wolfram.com/LaurentPolynomial.html>`_ (e.g. `Bohlin et al 2000 <https://www.stsci.edu/files/live/sites/www/files/home/hst/instrumentation/acs/documentation/instrument-science-reports-isrs/_documents/isr0001.pdf>`_):
+which will be given by a :class:`~slitlessutils.core.wfss.config.StandardPolynomial`.  However, :term:`prism` elements often exhibit a dispersion that is highly non-linear (as a function of wavelength), which can be described as a `Laurent polynomial <https://mathworld.wolfram.com/LaurentPolynomial.html>`_ (e.g. `Bohlin et al 2000 <https://www.stsci.edu/files/live/sites/www/files/home/hst/instrumentation/acs/documentation/instrument-science-reports-isrs/_documents/isr0001.pdf>`_).  However Ryan et al. (2023) extended the normal description into the parametric form to comport with the `more generalized coordinate transformations <https://www.stsci.edu/files/live/sites/www/files/home/hst/instrumentation/wfc3/documentation/instrument-science-reports-isrs/_documents/2017/WFC3-2017-01.pdf>`_:
 
 .. math::
 	\lambda(t;x_0,y_0) = \beta_0(x_0,y_0) + \frac{\beta_1(x_0,y_0)}{(t-t^*(x_0,y_0))} + \frac{\beta_2(x_0,y_0)}{(t-t^*(x_0,y_0))^2} + \frac{\beta_3(x_0,y_0)}{(t-t^*(x_0,y_0))^3} + \ldots
