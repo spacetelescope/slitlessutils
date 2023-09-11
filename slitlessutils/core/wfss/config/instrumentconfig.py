@@ -2,11 +2,11 @@ import os
 from dataclasses import dataclass
 from datetime import datetime
 
+from astropy.io import fits
 import numpy as np
 import pypolyclip
 import pysiaf
 import yaml
-from astropy.io import fits
 
 from ....config import Config
 from ...utilities import headers
@@ -16,7 +16,7 @@ from .wfssconfig import WFSSConfig
 # MJD is defined as number of days since midnight on November 17, 1858
 MJDREF = datetime(1858, 11, 17, 0, 0, 0)
 
-
+# conversion table between strings and datatypes
 DTYPES = {'np.float16': np.float16,
           'np.float32': np.float32,
           'np.float64': np.float64,
@@ -565,31 +565,6 @@ class DetectorConfig:
         for i, s in enumerate(slices):
             lam[s] = i
 
-        # clip against the pixel grid
-        # x, y, area, indices = pypolyclip.multi(xg, yg, self.naxis)
-        #
-        # create wavelength indices
-        # lam=np.zeros_like(x,dtype=np.uint16)
-        #
-        # decompose as wavelength indices
-        # if x.any():
-        #    pi0=indices[:-1]
-        #    pi1=indices[+1:]
-        #    gi=np.where(i1 != i0)[0]
-        #    for g,i0,i1 in zip(gi,pi0,pi1):
-        #        lam[i0:i1]=g
-
-        # n=len(x)
-        # if n:
-        #    i0=indices[0:-1]
-        #    i1=indices[1:]
-        #    gg=np.where(i1 != i0)[0]
-        #    lam=np.empty(n,dtype=lamtype)
-        #    for g,a,b in zip(gg,i0[gg],i1[gg]):
-        #        lam[a:b]=g
-        # else:
-        #    lam=np.empty(shape=(0,),dtype=lamtype)
-
         return x, y, lam, area
 
 
@@ -656,7 +631,28 @@ class InstrumentConfig(dict):
             raise TypeError(f"disperser is invalid: {disperser}")
 
         d = data['dispersers'][disperser][blocking]
-        self.disperser = load_disperser(disperser, blocking, **d)
+        # d['name'] = disperser
+        # d['blocking'] = blocking
+
+        # DispKey = namedtuple("DispKey", "name blocking")
+        # if isinstance(disperser, str):
+        #     self.disperser = DispKey(disperser, None)
+        # elif isinstance(disperser, (tuple, list)) and len(disperser) == 2:
+        #     self.disperser = DispKey(*disperser)
+        # else:
+        #     raise TypeError(f'Disperser key ({disperser}) is invalid.')
+        # d = data['dispersers'][self.disperser.name][self.disperser.blocking]
+        # d['dispname'] = self.disperser.name
+        # d['blocking'] = self.disperser.blocking
+
+        # d = data['dispersers'][disperser][blocking]
+        # d['name'] = disperser
+        # d['blocking'] = blocking
+
+        self.disperser = load_disperser(d['extraction'], name=disperser, blocking=blocking)
+        self.tabulator = load_disperser(d['tabulation'], name=disperser, blocking=blocking)
+
+        # self.disperser = load_disperser(disperser, blocking, **d)
         self.backgrounds = d.get('background', {})
         for detname, detdata in data['detectors'].items():
             self[detname] = DetectorConfig(detname, detdata, self.disperser,

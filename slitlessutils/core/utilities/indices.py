@@ -264,7 +264,35 @@ def decimate(val, *indices, dims=None, unravel=True, return_factor=False):
     return ret
 
 
+def span(val, *indices, dims=None, unravel=True):
+    if dims is None:
+        dims = [np.amax(index)+1 for index in indices]
+    idx = np.ravel_multi_index(indices, dims, order='F')
+
+    out, uind, cnt = np.unique(idx, return_counts=True, return_inverse=True)
+    rev = np.split(np.argsort(uind), np.cumsum(cnt[:-1]))
+
+    v = np.zeros_like(indices[0], dtype=type(val))
+    for i, r in enumerate(rev):
+        v[i] = np.amax(val[r])-np.amin(val[r])
+
+    if unravel:
+        out = tuple(index[uind] for index in indices)
+        ret = (v, *out)
+    else:
+        ret = (v, out, dims)
+
+    return ret
+
+
 if __name__ == '__main__':
+
+    x = np.array([1, 2, 2, 2, 2, 2, 3], dtype=np.uint16)
+    y = np.array([1, 1, 2, 3, 2, 2, 3], dtype=np.uint16)
+    l = np.arange(len(x), dtype=int)
+
+    # l = np.array([1, 1, 2, 2, 2, 2, 3], dtype=np.uint16)  # noqa: E741
+    # v = np.array([1, 1, 2, 2, 2, 2, 3], dtype=np.float64)
 
     x = np.array([0, 0, 1, 1, 1, 2, 3, 3])
     y = np.array([1, 1, 0, 3, 2, 2, 3, 4])

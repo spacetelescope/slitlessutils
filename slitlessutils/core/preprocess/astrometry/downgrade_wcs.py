@@ -41,13 +41,14 @@ def downgrade_wcs(imgfile, key='A', newfile=None, inplace=False):
     mode = 'update' if inplace else 'readonly'
     with fits.open(imgfile, mode=mode) as hdul:
         # do some error checking
-        if hdul[0].header['OBSTYPE'] != 'IMAGING':
-            LOGGER.warning('direct image obstype is not imaging.')
+        obstype = hdul[0].header['OBSTYPE']
+        if obstype != 'IMAGING':
+            LOGGER.warning(f'direct image obstype ({obstype}) is not imaging.')
             return
 
         for ext, hdu in enumerate(hdul):
 
-            wcsname = hdu.get('WCSNAME')
+            wcsname = hdu.header.get('WCSNAME')
 
             if wcsname and (wcsname.lower().find('gaia') != -1):
 
@@ -93,7 +94,7 @@ def downgrade_wcs(imgfile, key='A', newfile=None, inplace=False):
             if newfile is None:
                 # get a new filename
                 base = os.path.splitext(os.path.basename(imgfile))[0]
-                newfile = f'{base}_twcs.fits'
+                newfile = f'{base}_WCSNAME{key}.fits'
             hdul.writeto(newfile, overwrite=True)
             outfile = newfile
     return outfile

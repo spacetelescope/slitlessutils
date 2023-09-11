@@ -151,7 +151,8 @@ class Tabulate(Module):
             return
 
         # create a wavelength grid with subsampling factor
-        disperser = data.disperser
+        disperser = data.config.tabulator
+
         # grating=data.grating
         # grating=insconf.parameters
         # wav=insconf.parameters.wavelengths(nsub=self.nsub)
@@ -226,6 +227,8 @@ class Tabulate(Module):
 
         # get some dimensionalities
         dims = (*detdata.naxis, nwav)
+        # x0 = y0=np.inf
+        # x1 = y1=0
 
         # process each pixel
         for x, y, w in source.pixels(applyltv=False, weights=True):
@@ -248,6 +251,11 @@ class Tabulate(Module):
             # drizzle this pixel
             xx, yy, ll, aa = detdata.config.drizzle(xg, yg, ordname, wav)
             if len(xx) > 0:
+                # x0=min(x0,np.amin(xx))
+                # x1=max(x1,np.amax(xx))
+                # y0=min(y0,np.amin(yy))
+                # y1=max(y1,np.amax(yy))
+
                 # decimate this pixel.
                 # in theory, this isn't needed, but if we have really small
                 # direct image pixels, and/or small bandwidth (ie. large
@@ -263,7 +271,6 @@ class Tabulate(Module):
                 pdt.extend(xx, yy, ll, aa*w*pixrat*dwav)
 
                 # save this PDT
-                # pdts[xyd]=pdt
                 pdts[(x, y)] = pdt
 
                 # if asked to save.  save it here
@@ -272,5 +279,4 @@ class Tabulate(Module):
                         pdt.write_hdf5(hdf5)
                     except BaseException:
                         pass
-
         return pdts

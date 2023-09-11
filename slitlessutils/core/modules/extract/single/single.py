@@ -148,7 +148,6 @@ class Single(Module):
 
         # get the flux funits
         config = Config()
-        # funits = f'{config.fluxscale} {config.fluxunits}'
 
         # make an output structure
         hdul = fits.HDUList()
@@ -156,11 +155,11 @@ class Single(Module):
         # make a primary header and fill it with useful info
         phdu = fits.PrimaryHDU()
         headers.add_preamble(phdu.header, **prekwargs)  # basic preamble
-        headers.add_software_log(phdu.header)         # about software
-        data.update_header(phdu.header)           # about WFSS images
-        sources.update_header(phdu.header)            # about the sources
-        config.update_header(phdu.header)             # global config info
-        self.contamination.update_header(phdu.header)  # about the contamination
+        headers.add_software_log(phdu.header)           # about software
+        data.update_header(phdu.header)                 # about WFSS images
+        sources.update_header(phdu.header)              # about the sources
+        config.update_header(phdu.header)               # global config info
+        self.contamination.update_header(phdu.header)   # about the contamination
 
         # if there is a sigma clipper
         phdu.header.set('SIGCLIP', value=hasattr(self, 'sigclip'),
@@ -210,7 +209,7 @@ class Single(Module):
 
             # make an output data structure
             out = np.zeros(nwave, dtype=self.DTYPE)
-            out['lamb'] = pars.wavelengths()
+            out['lamb'] = pars.wavelengths()           # PRISM CHANGE
             out['flam'] = np.nan
             out['func'] = np.nan
             out['cont'] = np.nan
@@ -219,7 +218,7 @@ class Single(Module):
             # compute weighted-averages over the bins
             for ind, g in ri.items():
                 val = flam[g]
-                wht = 1./func[g]**2
+                wht = 1./func[g]**2      # initialize weights as inverse variance
                 cnt = cont[g]
 
                 # update the weights with sigma clipping if requested
@@ -290,7 +289,7 @@ class Single(Module):
         fluxscale = Config().fluxscale
 
         # create a data structure to hold the results
-        results = {segid: {'wave': [], 'flam': [], 'func': [], 'cont': []} for segid in
+        results = {segid: {'wave': [], 'flam': [], 'func': [], 'cont': [], 'dwav': []} for segid in
                    sources.keys()}
 
         # contamination image
@@ -339,14 +338,21 @@ class Single(Module):
                     for segid, source in sources.items():
 
                         # load the object-profile table
-                        opt = h5.load_opt(source)
-                        if opt:
+                        # opt = h5.load_opt(source)
+                        # if opt:
+
+                        odt = h5.load_odt(source)
+                        if odt:
 
                             # get contents of the table
-                            xg = opt.get('x')
-                            yg = opt.get('y')
-                            val = opt.get('val')
-                            wav = opt.get('wav')
+                            # xg = opt.get('x')
+                            # yg = opt.get('y')
+                            # val = opt.get('val')
+                            # wav = opt.get('wav')
+                            xg = odt.get('x')
+                            yg = odt.get('y')
+                            val = odt.get('val')
+                            wav = odt.wavelengths()
 
                             # get the contamination model
                             # cnt=contmodel.weight(xg,yg)
@@ -355,6 +361,7 @@ class Single(Module):
                             # the average wavelength per pixel
                             vv, xx, yy = indices.decimate(val, xg, yg, dims=dims)
                             ww, _x, _y = indices.decimate(wav*val, xg, yg, dims=dims)
+                            dw, _x, _y = indices.span(wav, xg, yg, dims=dims)
 
                             # compute the average wavelngth in the pixel
                             ww /= vv
@@ -379,6 +386,7 @@ class Single(Module):
                                 yy = yy[g]
                                 vv = vv[g]
                                 ww = ww[g]
+                                dw = dw[g]
                                 den = den[g]
 
                                 # grab the science/uncertainty
@@ -417,6 +425,7 @@ class Single(Module):
                                 results[segid]['flam'].extend(s/den)
                                 results[segid]['func'].extend(u/den)
                                 results[segid]['wave'].extend(ww)
+                                results[segid]['dwav'].extend(dw)
                                 results[segid]['cont'].extend(c/den)
 
         if self.savecont:
