@@ -119,7 +119,7 @@ class Config(dict):
     REFROOT = os.path.join(Path.home(), '.slitlessutils')
 
     # flag to timeout file downloading in seconds
-    TIMETOUT = 15
+    TIMEOUT = 15
 
     # enable the singleton
     _instance = None
@@ -348,7 +348,7 @@ class Config(dict):
         if not man:
             return
 
-        found = False
+        ref_version_found = False
         print('Reference File Manifest:\n')
         for vers, data in man.items():
 
@@ -395,12 +395,11 @@ class Config(dict):
         """
 
         # download the manifest file
-        timeout = 5.
         try:
-            f = download_file(self.REFURL+self.REFDB, timeout=timeout,
+            f = download_file(self.REFURL+self.REFDB, timeout=self.TIMEOUT,
                               show_progress=False)
         except TimeoutError:
-            LOGGER.warning(f'Retrieving manifest timed out in {timeout} s.')
+            LOGGER.warning(f'Retrieving manifest timed out in {self.TIMEOUT} s.')
             return
 
         # open the manifest as a json file
