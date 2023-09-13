@@ -356,7 +356,7 @@ class Config(dict):
             vers = str(vers)
             if vers == self.refversion:
                 indent = used
-                found = True
+                ref_version_found = True
             else:
                 indent = others
 
@@ -368,7 +368,7 @@ class Config(dict):
                 print(f'{others}{text}')
             print()
 
-        if not found:
+        if not ref_version_found:
             LOGGER.warning(
                 f"Manifest does not include current reference version: {self.refversion}")
 
