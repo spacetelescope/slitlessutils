@@ -9,6 +9,7 @@ import pysiaf
 import yaml
 
 from ....config import Config
+from ....logger import LOGGER
 from ...utilities import headers
 from .disperser import Disperser, load_disperser
 from .wfssconfig import WFSSConfig
@@ -630,7 +631,22 @@ class InstrumentConfig(dict):
         else:
             raise TypeError(f"disperser is invalid: {disperser}")
 
-        d = data['dispersers'][disperser][blocking]
+        # make some more stable error checking
+        try:
+            dispdata = data['dispersers'][disperser]
+        except KeyError:
+            msg = f"disperser {disperser} is not found in reference manifest"
+            LOGGER.error(msg)
+            raise KeyError(msg)
+
+        try:
+            d = dispdata[blocking]
+        except KeyError:
+            msg = f"blocking {blocking} is not found in reference manifest"
+            LOGGER.error(msg)
+            raise KeyError(msg)
+
+        # d = data['dispersers'][disperser][blocking]
         # d['name'] = disperser
         # d['blocking'] = blocking
 
@@ -680,42 +696,45 @@ class InstrumentConfig(dict):
         with fits.open(filename, mode='readonly') as hdul:
             h0 = hdul[0].header
 
-            tel = h0['TELESCOP']
-            ins = h0['INSTRUME']
-            if ins == 'WFC3':
-                ins += h0['DETECTOR']
-                disperser = h0['FILTER']
+            # check that the OBSTYPE is a spectroscopic image
+            if h0['OBSTYPE'] == 'SPECTROSCOPIC':
+                tel = h0['TELESCOP']
+                ins = h0['INSTRUME']
+                if ins == 'WFC3':
+                    ins += h0['DETECTOR']
+                    disperser = h0['FILTER']
 
-            elif ins == 'ACS':
-                ins += h0['DETECTOR']
-                disperser = h0['FILTER1']
+                elif ins == 'ACS':
+                    ins += h0['DETECTOR']
+                    disperser = h0['FILTER1']
 
-            elif ins == 'NIRISS':
-                disperser = (h0['FILTER'], h0['PUPIL'])
-                kwargs['fwcpos'] = h0['FWCPOS']
+                elif ins == 'NIRISS':
+                    disperser = (h0['FILTER'], h0['PUPIL'])
+                    kwargs['fwcpos'] = h0['FWCPOS']
+                else:
+                    raise NotImplementedError(f"Unsupported: {tel = } {ins = }")
+
+                insconf = cls(tel, ins, disperser, **kwargs)
+
+                # update some things because subarrays
+                for detname in insconf.keys():
+                    ext = insconf[detname].extensions['science'].extension
+                    h = fits.getheader(filename, ext)
+
+                    if insconf[detname].naxis[0] != h['NAXIS1']:
+                        insconf[detname].naxis[0] = h['NAXIS1']
+                        insconf.subarray = True
+                    if insconf[detname].naxis[1] != h['NAXIS2']:
+                        insconf[detname].naxis[1] = h['NAXIS2']
+                        insconf.subarray = True
+                    if insconf[detname].crpix[0] != h['CRPIX1']:
+                        insconf[detname].crpix[0] = h['CRPIX1']
+                        insconf.subarray = True
+                    if insconf[detname].crpix[1] != h['CRPIX2']:
+                        insconf[detname].crpix[1] = h['CRPIX2']
+                        insconf.subarray = True
             else:
-                raise NotImplementedError(f"Unsupported: {tel = } {ins = }")
-
-            insconf = cls(tel, ins, disperser, **kwargs)
-
-            # update some things because subarrays
-            for detname in insconf.keys():
-                ext = insconf[detname].extensions['science'].extension
-                h = fits.getheader(filename, ext)
-
-                if insconf[detname].naxis[0] != h['NAXIS1']:
-                    insconf[detname].naxis[0] = h['NAXIS1']
-                    insconf.subarray = True
-                if insconf[detname].naxis[1] != h['NAXIS2']:
-                    insconf[detname].naxis[1] = h['NAXIS2']
-                    insconf.subarray = True
-                if insconf[detname].crpix[0] != h['CRPIX1']:
-                    insconf[detname].crpix[0] = h['CRPIX1']
-                    insconf.subarray = True
-                if insconf[detname].crpix[1] != h['CRPIX2']:
-                    insconf[detname].crpix[1] = h['CRPIX2']
-                    insconf.subarray = True
-
+                insconf = None
         return insconf
 
     def background_filename(self, key):

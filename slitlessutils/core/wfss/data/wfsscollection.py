@@ -1,10 +1,13 @@
 from dataclasses import dataclass
-import numpy as np
-from astropy.wcs import FITSFixedWarning
-import warnings
-import pandas as pd
-from io import StringIO
 from glob import glob
+from io import StringIO
+import warnings
+
+from astropy.io import fits
+from astropy.wcs import FITSFixedWarning
+from astropy.table import Table
+import numpy as np
+import pandas as pd
 
 from .wfss import WFSS
 from ..config import InstrumentConfig
@@ -270,7 +273,9 @@ class WFSSCollection(dict):
         return self.telescope is not None
 
     def __str__(self):
-        s = f'WFSS Collection: {len(self)}'
+        s = f'WFSS Collection: {len(self)}\n'
+        tab = self.as_table()
+        s += str(tab)
         return s
 
     def __setitem__(self, k, v):
@@ -304,6 +309,36 @@ class WFSSCollection(dict):
                 raise NotImplementedError(msg)
 
         super().__setitem__(k, v)
+
+    def as_table(self):
+        """
+        Method to output contents of a WFSSCollection as an `astropy.Table`
+
+        Parameters
+        ----------
+        None.
+
+        Returns
+        -------
+        tab : `astropy.tables.Table`
+            The astropy table
+        """
+
+        # a dict to hold the results as a start
+        cols = {'filename': [], 'visit': [], 'orbit': [], 'disperser': [], 'blocking': []}
+
+        # iterate over each datum and update cols dict
+        for dataset, data in self.items():
+            cols['filename'].append(dataset)
+            cols['visit'].append(data.visit)
+            cols['orbit'].append(data.orbit)
+            cols['disperser'].append(data.disperser.name)
+            cols['blocking'].append(data.disperser.blocking)
+
+        # repackage as a Table object
+        tab = Table(cols)
+
+        return tab
 
     def from_index(self, i):
         """
@@ -368,13 +403,50 @@ class WFSSCollection(dict):
         """
 
         LOGGER.info(f'Loading from glob: {glb}')
-        obj = cls(filetype='observed', filename='<glob>')
-        for f in glob(glb):
-            obj[f] = ObservedData(f)
+
+        filenames = glob(glb)
+        obj = cls.from_list(filenames, filename='<glob>')
+
         return obj
 
     @classmethod
-    def from_list(cls, filenames, filename='<LIST>'):
+    def from_file(cls, obsfile):
+        """
+        Classmethod to load a `WFSSCollection` from an ascii file
+
+        Parameters
+        ----------
+        obsfile : str
+            full path to an ascii file that contains a list of the input
+            images.  This file should contain one file per line and
+            valid comment cards are listed above.
+
+        Returns
+        -------
+        obj : `WFSSCollection`
+            The `WFSSCollection`
+
+        Notes
+        -----
+        Only loads `ObservedData`
+
+        """
+
+        LOGGER.info(f'Loading WFSS data from file list: {obsfile}')
+
+        filenames = []
+        with open(obsfile, 'r') as fp:
+            for line in fp:
+                line = line.strip()
+                if line and line[0] not in cls.COMMENTS:
+                    filenames.append(line)
+
+        obj = cls.from_list(filenames, filename=obsfile)
+
+        return obj
+
+    @classmethod
+    def from_list(cls, filenames, filename='<list>'):
         """
         Classmethod to load a `WFSSCollection` from a list
 
@@ -402,39 +474,17 @@ class WFSSCollection(dict):
 
         obj = cls(filetype='observed', filename=filename)
         for f in filenames:
-            obj[f] = ObservedData(f)
-        return obj
+            # do some quick error checking on the file type
+            try:
+                obstype = fits.getval(f, 'OBSTYPE', ext=0)
+            except KeyError:
+                obstype = None
 
-    @classmethod
-    def from_file(cls, obsfile):
-        """
-        Classmethod to load a `WFSSCollection` from an ascii file
-
-        Parameters
-        ----------
-        obsfile : str
-            full path to an ascii file that contains a list of the input
-            images.  This file should contain one file per line and
-            valid comment cards are listed above.
-
-        Returns
-        -------
-        obj : `WFSSCollection`
-            The `WFSSCollection`
-
-        Notes
-        -----
-        Only loads `ObservedData`
-
-        """
-
-        LOGGER.info(f'Loading WFSS data from file list: {obsfile}')
-        obj = cls(filename=obsfile, filetype='observed')
-        with open(obsfile, 'r') as fp:
-            for line in fp:
-                line = line.strip()
-                if line and line[0] not in cls.COMMENTS:
-                    obj[line] = ObservedData(line)
+            # require a spectroscopic image
+            if obstype == 'SPECTROSCOPIC':
+                obj[f] = ObservedData(f)
+            else:
+                LOGGER.warning(f'File {f} has OBSTYPE={obstype}, which is invalid.  Cannot load.')
         return obj
 
     @classmethod
@@ -495,15 +545,15 @@ class WFSSCollection(dict):
         LOGGER.info(f'Loading WFSS data from WCS csv file: {wcsfile}')
 
         # set some defaults (or constants)
-        defaults = {'telescope': kwargs.get('telescope', 'HST'),
-                    'instrument': kwargs.get('instrument', 'WFC3IR'),
-                    'disperser': kwargs.get('disperser', 'G102'),
-                    'blocking': kwargs.get('blocking', ''),
-                    'ra': kwargs.get('ra', 42.),                     # in deg
-                    'dec': kwargs.get('dec', 42.),                   # in deg
-                    'orientat': kwargs.get('orientat', 0.0),         # in deg
-                    'exptime': kwargs.get('exptime', 1000.),         # in sec
-                    'background': kwargs.get('background', 0.0)}     # in e/s
+        defaults = {'telescope': kwargs.get('telescope', 'HST'),       # do HST by default
+                    'instrument': kwargs.get('instrument', 'WFC3IR'),  # do WFC3/IR by default
+                    'disperser': kwargs.get('disperser', 'G102'),      # do G102 by default
+                    'blocking': kwargs.get('blocking', ''),            # no blocking filter
+                    'ra': kwargs.get('ra', 42.),                       # in deg
+                    'dec': kwargs.get('dec', 42.),                     # in deg
+                    'orientat': kwargs.get('orientat', 0.0),           # in deg
+                    'exptime': kwargs.get('exptime', 1000.),           # in sec
+                    'background': kwargs.get('background', 0.0)}       # in e-/s
 
         with open(wcsfile, 'r') as fp:
             dat = ''
@@ -516,7 +566,8 @@ class WFSSCollection(dict):
                     if len(tokens) == 2:
                         defaults[tokens[0]] = tokens[1]
                 else:
-                    dat += line
+                    # remove any white spaces before parsing to pandas
+                    dat += line.replace(' ', '')
 
         # use the defaults to get the datatypes of things
         converters = {k: type(v) for k, v in defaults.items()}
