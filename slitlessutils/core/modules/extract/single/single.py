@@ -1,3 +1,5 @@
+import os
+
 from astropy.io import fits
 from astropy.stats import SigmaClip
 import numpy as np
@@ -39,6 +41,21 @@ class Single(Module):
        The maximum number in the sigma clipping.  See also
        `astropy.stats.SigmaClip()` Default is 10.
 
+    root : str, optional
+        The output fits file root name, which is the primary output of 1d
+        spectra.  If this is set to None, then "slitlessutils" is used and
+        hence will be overwritten following subsequent runs, so it is advised
+        to set this.  Default is None.
+
+    outpath : str, optional
+        A path where output products will be written.  If set to None or invalid,
+        then CWD will be used.  If set to valid str, then path will be created
+        (if possible), then used.  If still not valid, then will use CWD.
+        Default is None.
+
+    writecsv : bool, optional
+        Flag to write light-weight boolean files.  Default is True.
+
     kwargs : dict, optional
        Dictionary of additional arguments passed to `su.core.modules.Module`
 
@@ -57,7 +74,7 @@ class Single(Module):
     parent class.
 
     >>> import slitlessutils as su  # doctest: +SKIP
-    >>> ext = su.modules.Single('+1', mskorders=None, root=ROOT)  # doctest: +SKIP
+    >>> ext = su.modules.Single('+1', mskorders=None, outroot=ROOT)  # doctest: +SKIP
     >>> res = ext(data,sources)  # doctest: +SKIP
 
     """
@@ -72,8 +89,8 @@ class Single(Module):
 
     FILETYPE = '1d spectra'
 
-    def __init__(self, extorders, mskorders='all', savecont=False,
-                 nsigmaclip=3, maxiters=10, **kwargs):
+    def __init__(self, extorders, mskorders='all', savecont=False, root=None,
+                 outpath=None, writecsv=True, nsigmaclip=3, maxiters=10, **kwargs):
         Module.__init__(self, self.extract, postfunc=self._combine, **kwargs)
 
         # self.extorders=as_iterable(extorders)
@@ -93,12 +110,71 @@ class Single(Module):
         if isinstance(nsigmaclip, (int, float)):
             self.sigclip = SigmaClip(sigma=nsigmaclip, maxiters=maxiters)
 
+        # set output file path
+        self.outpath = self.set_outpath(outpath)
+        self.writecsv = writecsv
+        if self.writecsv:
+            self.csvpath = self.outpath+'CSVFILES'+os.sep
+            try:
+                os.mkdir(self.csvpath)
+            except FileNotFoundError:
+                LOGGER.warning('Cannot make CSVPATH, so no CSV files will be written')
+                self.writecsv = False
+                self.csvpath = None
+
+        print(self.outpath, self.writecsv)
+
         # output file names
-        root = kwargs.get('root', __code__)
-        self.filename = f"{root}_{SUFFIXES[self.FILETYPE]}.fits"
+        if root is None:
+            root = __code__
+        self.filename = os.path.join(self.outpath, f"{root}_{SUFFIXES[self.FILETYPE]}.fits")
 
         if self.savecont:
             raise NotImplementedError("no support to write contam images yet")
+
+    @staticmethod
+    def set_outpath(path):
+        """
+        Static method to implement rules for setting output path.
+
+        The rules are:
+        1) if path is not a valid string, then use CWD
+        2) if path is valid string then
+            a) if path is an existing path
+                i) if path is writable, then return that
+                ii) if path is not writable, then return CWD
+            b) if path is not an existing path try making the dir.
+                i) if can make, then return that
+                ii) if cannot make, then return CWD
+
+        Parameters
+        ----------
+        path : str
+            Path to consider as the output path
+
+        Returns
+        -------
+        outpath : str
+            A qualified, valid path
+        """
+
+        outpath = os.getcwd()
+        if isinstance(path, str):
+            if os.path.isdir(path):
+                if os.access(path, os.W_OK):
+                    # if here, then has valid data type and a writable path
+                    outpath = path
+            else:
+                # passed a str, but not a valid path.  try making the dir?
+                try:
+                    os.mkdir(path)
+                    outpath = path
+                except FileNotFoundError:
+                    pass
+        if outpath[-1] != os.sep:
+            outpath += os.sep
+
+        return outpath
 
     def _combine(self, results, data, sources, **kwargs):
         """
@@ -128,7 +204,7 @@ class Single(Module):
                      'exttype': ('single', 'method for extraction'),
                      'savecont': (self.savecont, 'Was contamination saved?')}
 
-        # grab the default extraction parmaeters
+        # grab the default extraction parameters
         defpars = data.get_parameters()
 
         # the below may not work if a source isn't in the first result catalog?
@@ -235,24 +311,28 @@ class Single(Module):
                 #    frac=cnt[gc]/val[gc]
                 #    wht[gc]/=frac**2
 
-                # ave = np.average(val, weights=wht)
+                # weighted STDEV as the error?
                 # err = np.sqrt(np.average((val-ave)**2, weights=wht))
 
-                # compute sum of weights (used later)
-                wsum = np.sum(wht)
+                nwht = np.count_nonzero(wht)
+                if nwht > 0:
 
-                # save the results
-                out['flam'][ind] = np.sum(wht*val)/wsum
-                out['func'][ind] = 1./np.sqrt(np.sum(wht))
-                out['cont'][ind] = np.sum(wht*cnt)/wsum
-                out['npix'][ind] = np.count_nonzero(wht)
+                    # compute sum of weights (used later)
+                    wsum = np.sum(wht)
+
+                    # save the results
+                    out['flam'][ind] = np.sum(wht*val)/wsum
+                    out['func'][ind] = 1./np.sqrt(np.sum(wht))
+                    out['cont'][ind] = np.sum(wht*cnt)/wsum
+                    out['npix'][ind] = nwht
 
             # update the source
             source[0].sed.reset(out['lamb'], out['flam'], func=out['func'],
                                 cont=out['cont'], npix=out['npix'])
 
-            # write out 1d SEDs
-            source.write_seds(filetype='csv')
+            # write out 1d SEDs?
+            if self.writecsv:
+                source.write_seds(filetype='csv', path=self.csvpath)
 
             # store source in the OUTPUT file
             hdul.append(source.as_HDU())
