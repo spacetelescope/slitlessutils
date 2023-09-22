@@ -16,13 +16,27 @@ For much of the HST data, the direct imaging has been matched to some existing a
 The corrections can be either downgrading the astrometry in the direct image to match that in the WFSS, or upgrading the WFSS to match that of the direct image.
 
 
+.. note::
+	It is essential to verify that the WCS in the WFSS and direct image(s) are on the same astrometric reference, which is usually (but not always) answered by the ``WCSNAME`` keyword.  However, if the WCS solutions are inconsistent, then any subsequent spectral extraction or modeling will be assuredly incorrect.
+
+
 Downgrading WCS (`~slitlessutils.core.preprocess.astrometry.downgrade_wcs()`)
 -----------------------------------------------------------------------------
-Coming soon.
 
+Here we roll back the "active" WCS to an earlier version, which is meant to match that of the WFSS data.  This is usually the simpler option, but it will hamper using other (likely deeper) direct imaging for selecting the spectral traces for extraction.  In this case, we simply take the ``CRVAL`` and ``CD`` keywords from a previous WCS solution and replace them in the active solution, but there is a direct API for this:
 
+.. code:: python
 
-Upgrading WCS (`~slitlessutils.core.preprocess.astrometry.AffineTweak()`)
+	import slitlessutils as su
+
+	newfile = su.core.preprocess.astrometry.downgrade_wcs('a_wfss_file_flt.fits', key='A')
+
+will replace the WCS solution from ``WCSNAMEA`` into the active solution (ie. ``WCSNAME``), and return the name of the file that contains this WCS.  One can also pass a list of filenames to :func:`downgrade_wcs()`, which would then return a list of filenames.
+
+.. warning::
+	We expect this method will change as the astrometry description changes.
+
+Upgrading WCS (`~slitlessutils.core.preprocess.astrometry.upgrade_wcs()`)
 -------------------------------------------------------------------------
 
 Here we find the affine transformation between any two WCSs from the direct image, and apply it to the equivalent WCS in the grism image.  For this, ``slitlessutils`` loads the ``CD`` matrix from a `astropy WCS <https://docs.astropy.org/en/stable/api/astropy.wcs.WCS.html#astropy.wcs.WCS>`_ object as:
@@ -32,15 +46,15 @@ Here we find the affine transformation between any two WCSs from the direct imag
 			            \mathrm{CD}1\_1 & \mathrm{CD}1\_2 \\
 			   			\mathrm{CD}2\_1 & \mathrm{CD}2\_2 \end{array}\right)	
 
-If the initial and final ``CD``-matrices for the direct image are :math:`D_0` and :math:`D_1` (respectively), then the affine transformation matrix is given as:
+If the initial and final ``CD``-matrices for the reference image are :math:`CD_0` and :math:`CD_1` (respectively), then the affine transformation matrix is given as:
 
 .. math::
-	A = D_1 D^{-1}_0
+	A = CD_1 CD^{-1}_0
 
-This matrix is then applied to the ``CD`` matrix from the WFSS image with the same WCSKEY as used to instantiate :math:`D_0`:
+This transformation matrix is then applied to the ``CD`` matrix from the WFSS image (:math:`CD_0'`):
 
 .. math::
-	C_1' = A C_0
+	CD_1' = A CD_0'
 
 Similarly, we must adjust the ``CRVAL`` keywords, which are loaded from the WCS object as:
 
@@ -48,24 +62,27 @@ Similarly, we must adjust the ``CRVAL`` keywords, which are loaded from the WCS 
 	\mathrm{CRVAL} = \left(\begin{array}{c}\mathrm{CRVAL}1 \\ 
 					\mathrm{CRVAL}2\end{array}\right)
 
-Again, if :math:`d_0` and :math:`d_1` refer to the ``CRVAL``-vectors for the initial and final WCS solution, then the perturbation is:
+Again, if :math:`CRVAL_0` and :math:`CRVAL_1` refer to the ``CRVAL``-vectors for the initial and final WCS solution, then the perturbation is:
 
 .. math::
-	\Delta d= d_1 - d_0
+	\Delta CRVAL = CRVAL_1 - CRVAL_0
 
-which can be applied to the ``CRVAL`` vector from the WFSS image with the same WCS key used to instantiate :math:`d_0`:
+which can be applied to the ``CRVAL`` vector from the WFSS image with the same WCS key used to instantiate :math:`CRVAL_0'`:
 
 .. math::
-	d_1' = d_0 + \Delta d
+	CRVAL_1' = CRVAL_0' + \Delta CRVAL
 
-This affine tweaking can be derived from a direct image and applied to a WFSS image using ``slitlessutils``:
+This affine tweaking is implemented in the convenience function :func:`upgrade_wcs()`:
 
 .. code:: python
 	
 	import slitlessutils as su
 
-	tweak = su.core.preprocess.astrometry.AffineTweak(direct_image_filename)
+	newfile = su.core.preprocess.astrometry.upgrade_wcs('direct_image_reference_flt.fits', 'wfss_image_flt.fits')
 
-	updated_wfss_filename = tweak(wfss_filename, inplace=False, newfile='new_wfssfile.fits')
+This will compute the affine transformation between ``WCSNAME`` and ``WCSNAMEA`` from ``direct_image_reference_flt.fits`` and apply it to the ``WSCNAMEA`` astrometry in ``wfss_image_flt.fits``.  It writes the updated image to a new file, whose name is returned as ``newfile``.  The second argument can also be a list or tuple, and each of those images will be similarly tweaked, and in which case ``newfile`` will be a similar list.
+
+.. note::
+	In both above cases, a new file will be written if ``inplace==False`` and ``newfile==None``, and rules for generating this name are given in ``utils.py``.
 
 
