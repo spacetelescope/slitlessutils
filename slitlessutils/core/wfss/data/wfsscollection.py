@@ -336,9 +336,7 @@ class WFSSCollection(dict):
             cols['blocking'].append(data.disperser.blocking)
 
         # repackage as a Table object
-        tab = Table(cols)
-
-        return tab
+        return Table(cols)
 
     def from_index(self, i):
         """
