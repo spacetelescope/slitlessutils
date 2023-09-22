@@ -5,10 +5,10 @@ from ....logger import LOGGER
 def upgrade_wcs(reffile, inputs, key0='A', key1='', newfile=None, inplace=False):
     """
     Method to upgrade the WCS in one fits image to the equivalent in another
-    using an affine transformation.  For more information on this, see the 
+    using an affine transformation.  For more information on this, see the
     class ``AffineTweak`` for more information.  This is usually necessary for
     HST data, as at some point the WCS in the direct image was updated with
-    respect to Gaia, but the WFSS images were not.    
+    respect to Gaia, but the WFSS images were not.
 
     Parameters
     ----------

@@ -8,7 +8,7 @@ from . import utils
 class AffineTweak(dict):
     """
     Class to contain an affine perturbation to the Astrometry of a fits image
-    between two different WCS solutions present in a file.  
+    between two different WCS solutions present in a file.
 
     This assumes the "classic" astrometric formulation of a CD (or PC) matrix
     and a CRVAL vector.  The affine transformation is a simple vector difference
