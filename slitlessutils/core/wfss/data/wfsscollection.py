@@ -444,7 +444,7 @@ class WFSSCollection(dict):
         return obj
 
     @classmethod
-    def from_list(cls, filenames, filename='<list>'):
+    def from_list(cls, filenames, filename='<LIST>'):
         """
         Classmethod to load a `WFSSCollection` from a list
 
