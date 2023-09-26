@@ -174,8 +174,10 @@ class SourceCollection(dict):
         img = hdui[exten].data
         hdr = hdui[exten].header
 
-        assert (seg.shape == img.shape), \
-            f'Images have different dimensions: {seg.shape} {img.shape}'
+        if seg.shape != img.shape:
+            raise ValueError('Segmentation image must have the same shape '
+                             f'as the data. segm: {seg.shape} data: '
+                             f'{img.shape}')
 
         # just some numbers for easy access later
         ny, nx = img.shape

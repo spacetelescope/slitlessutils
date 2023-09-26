@@ -86,7 +86,8 @@ class GridSearch(Optimizer):
     ALGORITHM = 'grid'
 
     def __init__(self, logdamp):
-        assert (len(logdamp) == 3), 'Grid search requires a 3 element iterable'
+        if len(logdamp) != 3:
+            raise ValueError('Grid search requires a 3 element iterable')
         Optimizer.__init__(self, logdamp)
 
     def update_header(self, hdr):
@@ -158,9 +159,9 @@ class Single(Optimizer):
     ALGORITHM = 'single'
 
     def __init__(self, logdamp):
-        opt = (tuple, list, np.ndarray)
+        if isinstance(logdamp, (tuple, list, np.ndarray)):
+            raise ValueError('Single search requires a scalar')
 
-        assert not isinstance(logdamp, opt), 'Single search requires a scalar'
         Optimizer.__init__(self, logdamp)
 
     def update_header(self, hdr):
@@ -212,8 +213,8 @@ class Multiple(Optimizer):
     ALGORITHM = 'multiple'
 
     def __init__(self, logdamp):
-        opt = (tuple, list, np.ndarray)
-        assert isinstance(logdamp, opt), 'Multiple search requires an iterable'
+        if not isinstance(logdamp, (tuple, list, np.ndarray)):
+            raise ValueError('Multiple search requires an iterable')
 
         Optimizer.__init__(self, logdamp)
 
@@ -274,7 +275,8 @@ class Golden(Optimizer):
     PHI = (1+np.sqrt(5.))/2.
 
     def __init__(self, logdamp):
-        assert (len(logdamp) == 3), 'Golden search requires a 3 element iterable'
+        if len(logdamp) != 3:
+            raise ValueError('Golden search requires a 3 element iterable')
         Optimizer.__init__(self, logdamp)
 
     def update_header(self, hdr):

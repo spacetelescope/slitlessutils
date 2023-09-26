@@ -169,7 +169,8 @@ class Linear(Disperser):
         Should never be directly called
         """
 
-        assert (self.dwave > 0), 'Must have a positive wavelength sampling'
+        if self.dwave <= 0:
+            raise ValueError('Must have a positive wavelength sampling')
         super().__post_init__()
         self.dwave = float(self.dwave)
 

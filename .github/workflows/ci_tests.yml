@@ -82,8 +82,8 @@ jobs:
           - os: ubuntu-latest
             python: '3.11'
             tox_env: 'securityaudit'
-            allow_failure: true
-            prefix: '(Temp allowed failure)'
+            allow_failure: false
+            prefix: ''
 
           - os: ubuntu-latest
             python: '3.12-dev'
