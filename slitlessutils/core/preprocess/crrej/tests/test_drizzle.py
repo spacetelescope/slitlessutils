@@ -35,6 +35,7 @@ def mock_pas():
     return [42.13, 42.14, 80.0, 179.99, -179.98, 360.0, 0.01, 0.05, 0.09]
 
 
+@pytest.mark.remote_data
 def test_wr96_drizzle():
     """
     Runs the drizzle step embedded in the wr96 example
@@ -123,6 +124,7 @@ def test_group_by_pas(mock_files, mock_pas, monkeypatch):
     ]
 
 
+@pytest.mark.remote_data
 def test_drizzle_groups():
     files_to_dowload = {
         "icoi3adnq_flt.fits": "mast:HST/product/icoi3adnq_flt.fits",
