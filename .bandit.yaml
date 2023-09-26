@@ -1,2 +1,0 @@
-# skip warning about asserts - they are used as behavior checks not as code tools
-skips: ['B101']
