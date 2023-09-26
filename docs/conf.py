@@ -14,7 +14,7 @@
 
 import os
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 if sys.version_info < (3, 11):
@@ -69,7 +69,7 @@ master_doc = 'index'
 # General information about the project
 project = project_meta['name']
 author = project_meta['authors'][0]['name']
-year = datetime.utcnow().year
+year = datetime.now(tz=timezone.utc).year
 copyright = f'{year}, {author}'
 
 # The version info for the project you're documenting, acts as replacement for
