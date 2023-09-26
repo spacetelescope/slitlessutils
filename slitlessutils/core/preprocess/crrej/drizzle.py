@@ -49,7 +49,9 @@ def _angular_distance(angle1, angle2, degrees=True):
         circumference = 2 * math.pi
     arc_length = abs(angle2 - angle1)
     distance = min(arc_length, circumference - arc_length % circumference)
-    return distance
+
+    # input angles are len-1 arrays, but return distance must be a scalar
+    return distance[0]
 
 
 def drizzle(files, outdir=Path().absolute(), **kwargs):
