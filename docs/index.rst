@@ -12,17 +12,17 @@ Slitlessutils
 
 Attribution
 -----------
-This software was originally developed by the `ACS branch <https://www.stsci.edu/hst/instrumentation/acs>`_ of the Instruments Division (INS) at the `Space Telescope Science Institute (STScI) <http://www.stsci.edu>`_.
-   
+This software was originally developed by the `ACS branch <https://www.stsci.edu/hst/instrumentation/acs>`_ of the Instruments Division (INS) at the `Space Telescope Science Institute (STScI) <https://www.stsci.edu>`_.
+
 :Developers:
    Russell Ryan, Gagandeep Anand, Roberto Avila, Larry Bradley, Norman Grogin, Nimish Hathi, Hatice Karatay, Benjamin Kuhn, Duy Nguyen, Richard O'Steen, Camila Pacifici, Aidan Pidgeon, Lee Quick, Debopam Som, Megan Sosey
 
 
 
-   
 
 
-   
+
+
 
 User Documentation
 ==================
@@ -39,4 +39,4 @@ User Documentation
    calib.rst
    faq.rst
    citation.rst
-   glossary.rst   
+   glossary.rst
