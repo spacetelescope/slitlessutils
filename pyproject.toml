@@ -1,47 +1,141 @@
-[build-system]
-requires = ["setuptools", "setuptools-scm", "numpy>=1.22.3"]
-build-backend = "setuptools.build_meta"
-
 [project]
-name = "slitlessutils"
+name = 'slitlessutils'
+description = 'A compendium of tools to analyze slitless spectroscopy'
+readme = 'README.md'
+license = {file = 'LICENSE.rst'}
 authors = [
-    {name = "Russell Ryan", email = "rryan@stsci.edu"},
+    {name = 'Slitlessutils Developers', email = 'help@stsci.edu'},
 ]
-description = "A compendium of tools to analyze slitless spectroscopy"
-readme = "README.md"
-requires-python = ">=3.7"
-keywords = ["grism", "prism", "slitless spectroscopy", "HST", "WFC3", "UVIS", "IR", "ACS", "WFC", "SBC", "JWST", "NIRISS", "wide field"]
-license = {text = "BSD-3-Clause"}
+keywords = [
+    'grism',
+    'prism',
+    'slitless spectroscopy',
+    'HST',
+    'WFC3',
+    'UVIS',
+    'IR',
+    'ACS',
+    'WFC',
+    'SBC',
+    'JWST',
+    'NIRISS',
+    'wide field'
+]
 classifiers = [
-    "Intended Audience :: Science/Research",
-    "Topic :: Scientific/Engineering :: Astronomy",
-    "Programming Language :: Python :: 3",
+    'Intended Audience :: Science/Research',
+    'License :: OSI Approved :: BSD License',
+    'Natural Language :: English',
+    'Operating System :: OS Independent',
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3',
+    'Topic :: Scientific/Engineering :: Astronomy',
 ]
+dynamic = ['version']
+requires-python = '>=3.9'
 dependencies = [
-    "astropy>=5.0.4",
-    "astroquery",
-    "drizzlepac",
-    "h5py>=3.6.0",
-    "networkx>=2.6.3",
-    "numpy>=1.22.3,<1.25.0",
-    "matplotlib>=3.5.2",
-    "pandas>=1.4.2",
-    "psutil>=5.9.0",
-    "pypolyclip",
-    "pysiaf>=0.16.4",
-    "scikit-image>=0.19.2",
-    "scipy>=1.8.0",
-    "shapely>=1.8.2",
-    "tqdm>=4.64.0"
+    'astropy>=5.0.4',
+    'astroquery',
+    'drizzlepac',
+    'h5py>=3.6.0',
+    'networkx>=2.6.3',
+    'numpy>=1.22.3',
+    'matplotlib>=3.5.2',
+    'pandas>=1.4.2',
+    'psutil>=5.9.0',
+    'pypolyclip',
+    'pysiaf>=0.16.4',
+    'scikit-image>=0.19.2',
+    'scipy>=1.8.0',
+    'shapely>=1.8.2',
+    'tqdm>=4.64.0'
 ]
-dynamic = ["version"]
+
+[project.urls]
+Homepage = 'https://github.com/spacetelescope/slitlessutils'
+Documentation = 'https://slitlessutils.readthedocs.io/en/stable/'
 
 [project.optional-dependencies]
 test = [
-    "pytest",
-    "pytest-astropy"
+    'pytest-astropy>=0.10'
 ]
 docs = [
-    "sphinx-rtd-theme",
-    "sphinx-astropy"
+    'sphinx-astropy>=1.6',
+    'sphinx-rtd-theme',
+    'tomli; python_version < "3.11"',
+]
+
+[build-system]
+requires = [
+    'setuptools>=61.2',
+    'setuptools-scm>=6.2',
+    'numpy>=1.22.3'
+]
+build-backend = 'setuptools.build_meta'
+
+[tool.setuptools_scm]
+write_to = 'slitlessutils/version.py'
+
+[tool.setuptools]
+zip-safe = false
+include-package-data = false
+
+[tool.setuptools.packages.find]
+namespaces = false
+
+[tool.pytest.ini_options]
+minversion = 7.0
+testpaths = [
+    'slitlessutils',
+    'docs',
+]
+norecursedirs = [
+    'docs/_build',
+    'extern',
+]
+astropy_header = true
+doctest_plus = 'enabled'
+text_file_format = 'rst'
+addopts = '--color=yes --doctest-rst'
+xfail_strict = true
+remote_data_strict = true
+filterwarnings = [
+    'error',  # turn warnings into exceptions
+    'ignore:numpy.ufunc size changed:RuntimeWarning',
+    'ignore:numpy.ndarray size changed:RuntimeWarning',
+    # warning from drizzlepac
+    'ignore:unclosed file:ResourceWarning',
+    # remove after drizzlepac is updated
+    'ignore: `photutils.DAOStarFinder` is a deprecated alias:DeprecationWarning',
+    'ignore: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.:UserWarning',
+    # python 3.12 deprecation in matplotlib 3.9dev
+    'ignore:datetime.datetime.utcfromtimestamp\(\) is deprecated:DeprecationWarning',
+]
+
+[tool.coverage.run]
+omit = [
+    'slitlessutils/_astropy_init*',
+    'slitlessutils/conftest.py',
+    'slitlessutils/*setup_package*',
+    'slitlessutils/tests/*',
+    'slitlessutils/*/tests/*',
+    'slitlessutils/extern/*',
+    'slitlessutils/version*',
+    '*/slitlessutils/_astropy_init*',
+    '*/slitlessutils/conftest.py',
+    '*/slitlessutils/*setup_package*',
+    '*/slitlessutils/tests/*',
+    '*/slitlessutils/*/tests/*',
+    '*/slitlessutils/extern/*',
+    '*/slitlessutils/version*',
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    'pragma: no cover',
+    'except ImportError',
+    'raise AssertionError',
+    'raise NotImplementedError',
+    'def main\\(.*\\):',
+    'pragma: py{ignore_python_version}',
+    'def _ipython_key_completions_',
 ]
