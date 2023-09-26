@@ -120,8 +120,10 @@ class RangePOM(POM):
 
         """
 
-        assert len(xr) == 2, 'XR requires two-element array'
-        assert len(yr) == 2, 'YR requires two-element array'
+        if len(xr) != 2:
+            raise ValueError('XR requires a two-element array')
+        if len(yr) != 2:
+            raise ValueError('YR requires a two-element array')
 
         self.x0 = min(*xr)
         self.x1 = max(*xr)
@@ -194,8 +196,12 @@ class PolygonPOM(RangePOM):
         py : list, tuple, or `np.ndarray`
             An interable of the polygon y-coordinates
         """
-        assert (len(px) >= 3), 'Must have a x-polygon, which requires >=3 points'
-        assert (len(py) >= 3), 'Must have a y-polygon, which requires >=3 points'
+        if len(px) < 3:
+            raise ValueError('Must have a x-polygon, which requires >=3 '
+                             'points')
+        if len(py) < 3:
+            raise ValueError('Must have a y-polygon, which requires >=3 '
+                             'points')
 
         xr = (np.amin(px), np.amax(px))
         yr = (np.amin(py), np.amax(py))
