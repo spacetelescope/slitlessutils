@@ -6,7 +6,7 @@ If you use ``slitlessutils`` for a project that leads to a publication, whether 
 
 Russell Ryan
 Gagandeep Anand
-Roberto Avilax
+Roberto Avila
 Larry Bradley
 Norman Grogin
 Nimish Hathi
@@ -19,6 +19,3 @@ Aidan Pidgeon
 Lee Quick
 Debopam Som
 Megan Sosey
-
-
-
