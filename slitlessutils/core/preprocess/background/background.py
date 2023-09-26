@@ -227,7 +227,7 @@ class Background:
 
     @background_processing(mastersky=True)
     def master(self, sci, hdr, unc, mod, gpx, img):
-        """
+        r"""
         Function to fit a *single* master sky image to a WFSS image.
 
         The master-sky image is a two-dimensional model of the dispersed
@@ -243,7 +243,7 @@ class Background:
             and flag pixels that are
 
         .. math::
-           \\frac{{\cal I}-m}{{\cal U}} \leq n_{sig}
+           \frac{{\cal I}-m}{{\cal U}} \leq n_{sig}
 
         where :math:`{\cal I}` and :math:`{\cal U}` are the science and
         uncertainty images, respectively.
@@ -251,16 +251,16 @@ class Background:
         1) compute optimal scaling coefficient as
 
         .. math::
-           \\alpha = \\frac{F_{OT}}{F_{TT}}
+           \alpha = \frac{F_{OT}}{F_{TT}}
 
         where
 
         .. math::
            :nowrap:
            \begin{eqnarray}
-             F_{OO} & = & \sum_{x,y\in s} \left(\\frac{{\cal I}}{{\cal U}}\\right)^2\\
-             F_{OT} & = & \sum_{x,y\in s} \\frac{{\cal I}}{{\cal U}}\\frac{{\cal S}}{{\cal U}}\\
-             F_{TT} & = & \sum_{x,y\in s} \left(\\frac{{\cal S}}{{\cal U}}\\right)^2\\
+             F_{OO} & = & \sum_{x,y\in s} \left(\frac{{\cal I}}{{\cal U}}\right)^2\\
+             F_{OT} & = & \sum_{x,y\in s} \frac{{\cal I}}{{\cal U}}\frac{{\cal S}}{{\cal U}}\\
+             F_{TT} & = & \sum_{x,y\in s} \left(\frac{{\cal S}}{{\cal U}}\right)^2\\
            \end{eqnarray}
 
         and :math:`s` is the collection of pixels that are neither flagged in
@@ -268,14 +268,14 @@ class Background:
 
         2) redefine the non-background pixels by testing:
         .. math::
-           \\frac{{\cal I}-\\alpha{\cal S}}{{\cal U}} \leq n_{sig}
+           \frac{{\cal I}-\alpha{\cal S}}{{\cal U}} \leq n_{sig}
 
         3) go to step 1) until either the maximum number of iterations is
         reached or the fractional difference is less than the set tolerance
         (:math:`\epsilon`):
 
         .. math::
-          |\\alpha_{i-1} - \\alpha_i| \leq \epsilon |\\alpha_{i}|
+          |\alpha_{i-1} - \alpha_i| \leq \epsilon |\alpha_{i}|
 
         Parameters
         ----------
@@ -283,15 +283,11 @@ class Background:
            Either a string that is the full path to a WFSS file or a
            `wfss.WFSS`.
 
-
         Returns
         -------
         outfile : str
            The name of the master-sky subtracted file.
-
-
         """
-
         # do inverse-variance weighting:
         sci2 = sci/np.maximum(unc, self.MINUNC)
         img2 = img/np.maximum(unc, self.MINUNC)
@@ -352,7 +348,7 @@ class Background:
 
     @background_processing(mastersky=False)
     def poly1d(self, sci, hdr, unc, mod, gpx, degree=2, filtwindow=51, filtorder=1):
-        """
+        r"""
         Method to fit polynomials in the cross-dispersion axis and
         smooth with Savitzky-Golay in the dispersion axis.
 
@@ -390,7 +386,6 @@ class Background:
         Below we assume that :math:`\lambda` and :math:`\eta` are the
         dispersion and cross-dispersion axes, respectively.
         """
-
         sky = self.skypixels(sci, unc, mod)
         fitter = fitting.LinearLSQFitter()
         ofitter = fitting.FittingWithOutlierRemoval(fitter, sigma_clip,
