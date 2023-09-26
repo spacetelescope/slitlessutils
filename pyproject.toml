@@ -107,8 +107,6 @@ filterwarnings = [
     # remove after drizzlepac is updated
     'ignore: `photutils.DAOStarFinder` is a deprecated alias:DeprecationWarning',
     'ignore: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.:UserWarning',
-    # python 3.12 deprecation in matplotlib 3.9dev
-    'ignore:datetime.datetime.utcfromtimestamp\(\) is deprecated:DeprecationWarning',
 ]
 
 [tool.coverage.run]
