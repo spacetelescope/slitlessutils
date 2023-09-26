@@ -1,9 +1,13 @@
-__code__ = 'slitlessutils'
+
+try:
+    from .version import version as __version__
+except ImportError:
+    __version__ = ''
 
 from importlib.metadata import metadata
 
-d = metadata(__code__)
+__code__ = 'slitlessutils'
+package_info = metadata(__code__)
 
-__author__ = d['Author']
-__email__ = d['Email']
-__version__ = d['Version']
+__author__, __email__ = package_info['Author-email'].split(' <')
+__email__ = __email__.replace('>', '')
