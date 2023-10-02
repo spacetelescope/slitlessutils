@@ -74,7 +74,7 @@ class Single(Module):
     parent class.
 
     >>> import slitlessutils as su  # doctest: +SKIP
-    >>> ext = su.modules.Single('+1', mskorders=None, outroot=ROOT)  # doctest: +SKIP
+    >>> ext = su.modules.Single('+1', mskorders=None, root=ROOT)  # doctest: +SKIP
     >>> res = ext(data,sources)  # doctest: +SKIP
 
     """
