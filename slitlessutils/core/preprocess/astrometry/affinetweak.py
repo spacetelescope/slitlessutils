@@ -61,8 +61,8 @@ class AffineTweak(dict):
     the perturbations.  Then apply those perturbations to a grism image
     that has not been similarly updated.
 
-    >>> tweak = AffineTweak('directimage_flt.fits')
-    >>> newfile = tweak('grismimage_flt.fits')
+    >>> tweak = AffineTweak('directimage_flt.fits') # doctest: +SKIP
+    >>> newfile = tweak('grismimage_flt.fits') # doctest: +SKIP
 
     """
 
