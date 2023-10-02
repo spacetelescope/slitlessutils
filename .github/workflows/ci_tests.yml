@@ -30,11 +30,11 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: Code style checks
-            os: ubuntu-latest
+          - os: ubuntu-latest
             python: 3.x
             toxenv: codestyle
             allow_failure: false
+            prefix: 'Codestyle Checks'
 
           - os: ubuntu-latest
             python: '3.9'
