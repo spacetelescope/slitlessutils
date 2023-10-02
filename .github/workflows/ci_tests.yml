@@ -30,6 +30,12 @@ jobs:
     strategy:
       matrix:
         include:
+          - name: Code style checks
+            os: ubuntu-latest
+            python: 3.x
+            toxenv: codestyle
+            allow_failure: false
+
           - os: ubuntu-latest
             python: '3.9'
             tox_env: 'py39-test'
