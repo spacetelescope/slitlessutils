@@ -5,14 +5,14 @@ from . import utils
 
 
 def _downgrade_wcs(imgfile, key, mode, newfile, inplace):
-    “”"
-    Helper function to actually execute the downgrading.
-    
+    """
+    Helper function to actually execute the downgrading
+
     Parameters
     ----------
     imgfile : str
         Path to a file to downgrade
-    
+
     key : str
         WCS key to downgrade from.  Will replace the current solutions
 
@@ -34,7 +34,7 @@ def _downgrade_wcs(imgfile, key, mode, newfile, inplace):
     -----
     It is not expected for one to directly call this function, though nothing prohibits it.
 
-    “”"
+    """
 
     if not isinstance(imgfile, str):
         LOGGER.warning('imgfile must be a string')
@@ -55,7 +55,7 @@ def _downgrade_wcs(imgfile, key, mode, newfile, inplace):
             wcsname2 = hdu.header[f'WCSNAME{key}']
             crval2 = utils.get_crval(hdu.header, key)
             cd2 = utils.get_cd(hdu.header, key)
-            
+
             # swap the WCSs
             hdul[ext].header['WCSNAME'] = wcsname2
             utils.set_crval(hdul[ext].header, crval2)
