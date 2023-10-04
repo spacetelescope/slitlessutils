@@ -1,9 +1,11 @@
 .. _instrumentfiles:
 
-Instrument Files :file:`$HOME/.slitlessutils/instruments/`
-==========================================================
+Instrument Configuration Files 
+==============================
 
-Most of these parameters are the subject of considerable calibration efforts, and as such, should probably not be adjusted if the results are to be trusted.  
+
+
+Most of these parameters are the subject of considerable calibration efforts, and as such, should probably not be adjusted if the results are to be trusted.  These files are obtained with the :doc:`configuration module <configure>` and are stored in :file:`$HOME/.slitlessutils/instruments/`
 
 
 Instrument-Wide Settings
@@ -31,9 +33,9 @@ Instrument-Wide Settings
      - | The :math:`(v_2,v_3)` position of the reference point 
        | and :math:`v_{3y}` angle with respect the :math:`v_3`-axis.
 
+
 Instrument-Wide Grating/Blocking Parameters
 -------------------------------------------
-
 
 .. list-table:: Instrument-Wide Grating/Blocking [#gbnote]_
    :widths: 25 25 50
