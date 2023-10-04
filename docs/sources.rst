@@ -15,7 +15,7 @@ A :term:`source` is a single region on the sky that will be considered for proce
 
 The direct image establishes weights that will be used for the cross-dispersion profile and metadata for the source (e.g. barycenter, brightness [including local-sky subtraction], etc.).  While these images may be determined from any filter, the best results will be when it is from the same camera and its transmission is contained within the spectroscopic bandpass (e.g. as F140W is to G141 for WFC3/IR).  
 
-In addition to the metadata mentioned above, a source also describes the spectrum that is either the assumed or measured, in the case of :doc:`simulation <simulation>` or :doc:`extraction <extraction>`, respectively.  However, in either case, **source may contain multiple spectra** by decomposing a source into multiple :term:`dispersed regions` (more below).  A dispersed region is a unique subset of the source pixels (denoted as :math:`\mathbb{S}_i` for the :math:`i^\mathrm{th}` dispersed region) and has a unique spectrum associated with it.  Obviously, the union of all dispersed regions is the same as the source set (:math:`\mathbb{S}=\bigcup_i\mathbb{S}_i`).  If a source contains a single dispersed region it is said to be a :term:`simple source`, which is contrast to a :term:`compound source` that contains many distinct spectral regions. 
+In addition to the metadata mentioned above, a source also describes the spectrum that is either the assumed or measured, in the case of :doc:`simulation <simulation>` or :doc:`extraction <extraction>`, respectively.  However, in either case, **source may contain multiple spectra** by decomposing a source into multiple :term:`dispersed region`s (more below).  A dispersed region is a unique subset of the source pixels (denoted as :math:`\mathbb{S}_i` for the :math:`i^\mathrm{th}` dispersed region) and has a unique spectrum associated with it.  Obviously, the union of all dispersed regions is the same as the source set (:math:`\mathbb{S}=\bigcup_i\mathbb{S}_i`).  If a source contains a single dispersed region it is said to be a :term:`simple source`, which is contrast to a :term:`compound source` that contains many distinct spectral regions. 
 
 .. note::
 	Given increased (self-)contamination associated with a compound source, it can only be extracted if multiple orients are available and the :func:`sliltessutils.core.modules.extract.multi.Multi()` is used.  Additionally, care should be taken to avoid overly subdividing a source such that there are more "unknowns" than "knowns".
@@ -57,9 +57,9 @@ EXAMPLE
 
 
 
-These definitions establish a *hierarchy*, where a ``SourceCollection`` (likely) contains many ``Source``s that (potentially) contain many ``DispersedRegion``s that (typically) contain many spectral elements (ie. wavelengths, fluxes, and uncertainties).  This hierarchy is show schematically in :numref:`hierarchy`, with the any :term:`compound source` highlighted in gray.  
+These definitions establish a *hierarchy*, where a ``SourceCollection`` (likely) contains many ``Source``s that (potentially) contain many ``DispersedRegion``s that (typically) contain many spectral elements (ie. wavelengths, fluxes, and uncertainties).  This hierarchy is show schematically in :numref:`hierarchy`, with the any :term:`compound source` highlighted in gray.
 
-.. _hierarchy
+.. _hierarchy:
 .. figure:: images/sourcecollection.png
 	:align: center
 	:alt: Schematic of source/spectra hierarchy
