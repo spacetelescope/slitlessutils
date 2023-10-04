@@ -6,7 +6,7 @@ Spectroscopic Sources
 
 
 Source (`~slitlessutils.sources.Source()`)
------------------------------------------------
+------------------------------------------
 
 A :term:`source` is a single region on the sky that will be considered for processing.  A source can only be instantiated from two-dimensional images that describe the direct image and segmentation map.  The segmentation map describes the direct-image pixels that belong to the source, and so in the most basic terms, a source is the set of direct-image pixels:
 
@@ -33,10 +33,10 @@ talk about grism/prism dispersers
 Dispersed Region (`~slitlessutils.sources.DispersedRegion()`)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-As stated above, a :term:`dispersed region` is defined as the unique subset of direct-image pixels that have the same spectrum, which is stored as an ``slitlessutils.core.photometry.SED`` object.  Importantly, the ``SED`` object contains the data one expects for a spectrum (e.g. wavelength, flux, uncertainty, etc.), the ``DispersedRegion`` object must contain additional metadata, including the direct-image pixels, the :term:`source ID`, and the :term:`region ID`.  By construction, every source has a unique :term:`source ID`: ``segid``, but each of its constituent ``DispersedRegion``s will be assigned a :term:`region ID`: ``regid``.  However, the ``regid`` always counts from 0 for each source, therefore the tuple ``(segid, regid)`` uniquely specifies an :term:``sed ID``.
+As stated above, a :term:`dispersed region` is defined as the unique subset of direct-image pixels that have the same spectrum, which is stored as an ``slitlessutils.core.photometry.SED`` object.  Importantly, the ``SED`` object contains the data one expects for a spectrum (e.g. wavelength, flux, uncertainty, etc.), the ``DispersedRegion`` object must contain additional metadata, including the direct-image pixels, the :term:`source ID`, and the :term:`region ID`.  By construction, every source has a unique :term:`source ID`: ``segid``, but each of its constituent ``DispersedRegion``\s will be assigned a :term:`region ID`: ``regid``.  However, the ``regid`` always counts from 0 for each source, therefore the tuple ``(segid, regid)`` uniquely specifies an :term:`sed ID`.
 
 Source Collection (`~slitlessutils.sources.SourceCollection()`)
---------------------------------------------------------------------
+---------------------------------------------------------------
 
 This is the primary data structure that users will interact with, which is meant to mimic the structure of the
 
@@ -64,13 +64,13 @@ These definitions establish a *hierarchy*, where a ``SourceCollection`` (likely)
 	:align: center
 	:alt: Schematic of source/spectra hierarchy
 
-	Schematic representation of the source/spectra hierarchy with the primary inputs (segmentation map and direct image) shown.  A ``SourceCollection`` (purple box) is the primary way to instantiate a ``Source`` (blue circles), which contain any number of ``DispersedRegion``s (orange hexagons) that each contain one ``SED`` (red cylinder).  A :term:`compound source` is highlighted in gray.  
+	Schematic representation of the source/spectra hierarchy with the primary inputs (segmentation map and direct image) shown.  A ``SourceCollection`` (purple box) is the primary way to instantiate a ``Source`` (blue circles), which contain any number of ``DispersedRegion``\s (orange hexagons) that each contain one ``SED`` (red cylinder).  A :term:`compound source` is highlighted in gray.  
 
 
 
 
 Notes on Extraction Parameters
-------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The default extraction parameters are specified in the :doc:`instrument YAML files <instrumentfiles>`.  However, they can be programmatically changed at any of the level of the above hierarchy, and will be propagated to all of its children levels.
 
