@@ -28,7 +28,7 @@ Since many terms may be used colloquially and/or have different definitions in o
 
 	direct imaging
 		Data collected in a standard broadband imaging filter contemporaneously with the WFSS data.  These data are often used to improve the astrometric information in the WFSS data, but may have utility in other ways (such as determining the cross-dispersion profile weights, specifying the extraction apertures, or estimating contamination via broadband colors).  See also :term:`post-imaging` or :term:`pre-imaging`.
-
+    
 	dispersed region
 		A subset of a source that has a single spectrum.  If a source has a single dispersed region, then it is said to be a :term:`simple source`.  Alternatively, a source that is decomposed into a many dispersed then it is a :term:`compound source`.
 
@@ -57,7 +57,7 @@ Since many terms may be used colloquially and/or have different definitions in o
 		A transmissive and dispersive spectral element with a highly non-uniform rate of dispersion.  See :term:`grism` for the similarities/differences between the two.
 
 	region ID
-		A identification number for a :term:`dispersed region` within a source.  Since there may be multiple :term:`compound source`s, this number alone is not unique, but rather the ``tuple`` of (source ID, region ID) is the unique identifier: :term:`sed ID`.
+		A identification number for a :term:`dispersed region` within a source.  Since there may be multiple :term:`compound sources<compound source>`, this number alone is not unique, but rather the ``tuple`` of (source ID, region ID) is the unique identifier: :term:`sed ID`.
 
 	regularization parameter
 		A tunable parameter that governs the relative importance of fitting the data and damping high-frequency noise.  In the literature this will often be denoted by :math:`\lambda`, but of obvious confusion with wavelength is given the symbol :math:`\ell` in the ``slitlessutils`` discussion.  This may also be referred to as the *damping parameter*.
