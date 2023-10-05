@@ -23,13 +23,6 @@ In addition to the metadata mentioned above, a source also describes the spectru
 Since a source may contain multiple dispersed regions, the :func:`slitlessutils.core.sources.Source()` inherits from ``list``, which iterates over the dispersed regions. 
 
 
-separate wavelength settings
-talk about grism/prism dispersers
-
-
-
-
-
 Dispersed Region (`~slitlessutils.sources.DispersedRegion()`)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -38,11 +31,56 @@ As stated above, a :term:`dispersed region` is defined as the unique subset of d
 Source Collection (`~slitlessutils.sources.SourceCollection()`)
 ---------------------------------------------------------------
 
-This is the primary data structure that users will interact with, which is meant to mimic the structure of the
+This is the primary data structure that users will interact with, which is meant to mimic the structure of the ``WFSSCollection`` (see the :doc:`spectroscopy page <wfss>`), that inherits from ``dict`` where the keys will be the :term:`source ID` and the values will be instances of the ``Source``.  In typical usage, one will instantiate a single ``SourceCollection``, which will be passed to any of the :doc:`computational modules <modules>`.  The primary inputs are a :term:`direct image` and :term:`segmentation map`, and :numref:`segmapexample` shows an example of these data, however there are several keyword-arguments that control aspects of the source instantiation.  
+
+.. list-table:: Keyword Arguments
+   :widths: 25 25 50
+   :header-rows: 1
+
+   * - Keyword
+     - Datatype
+     - Description
+   * - ``maglim``
+     - ``float`` or ``int``
+     - The magnitude limit for valid sources, which must be *brighter* than this.  Default is ``np.inf``.
+   * - ``minpix``
+     - ``int``
+     - The minimum number of direct-image pixels for a source to be consider valid.  Default is 0.
+   * - ``zeropoint``
+     - ``float`` or ``int``
+     - The magnitude AB zeropoint for the :term:`direct image`.
+   * - 
+
+The keywords ``maglim`` and ``minpix`` are used to eliminate spurious sources before they are added to the collection.  The final two keyword arguments (``throughput`` and ``sedfile``) are used when simulating a scene to establish the throughput curve associated with the direct image and a file that contains the SEDs to be associated with each ``DispersedRegion``, respectively.  
 
 
-Inputs are segmentation maps
+additional settings must be considered: a means of describing the spectrum for each ``DispersedRegion`` and the system throughput curve (to ensure that the normalization of each spectrum is consistent with the :term:`direct image` brightness).  The ``throughput`` keyword
 
+
+
+
+
+.. note::
+	Currently only flat-segmentation maps are supported, therefore all instantiated sources will be :term:`simple sources`.  This will be remediated soon.
+
+
+SED File (`~slitlessutils.sources.SEDFile()`)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+This is a 
+
+.. list-table:: Additional Keyword Arguments for :doc:`Simulation <simulation>`
+   :widths: 25 25 50
+   :header-rows: 1
+
+   * - Keyword
+     - Datatype
+     - Description
+   * - ``throughput``
+     - ``float`` or ``int``
+     - The magnitude AB zeropoint for the :term:`direct image`.
+   * - ``zeropoint``
+     - ``float`` or ``int``
+     - The magnitude AB zeropoint for the :term:`direct image`.
 
 
 .. _segmapexample:
@@ -50,11 +88,17 @@ Inputs are segmentation maps
 	:align: center
 	:alt: Animation of direct image and segmentation map
 
-	Illustration of the direct image and (classic) segmentation map.
+	Illustration of the direct image and segmentation map.  The colored regions indicate different sources, which would all be instantiated in the ``SourceCollection`` object.  
 
 
-EXAMPLE
+Example
+~~~~~~~
+.. code:: python
+	
+	import slitlessutils as su
 
+	# parse segmentation map and direct image into sources in a source collection
+	sources = su.sources.SourceCollection(segmentation_filename, directimage_filename)
 
 
 These definitions establish a *hierarchy*, where a ``SourceCollection`` (likely) contains many ``Source``\s that (potentially) contain many ``DispersedRegion``\s that (typically) contain many spectral elements (ie. wavelengths, fluxes, and uncertainties).  This hierarchy is show schematically in :numref:`hierarchy`, with the any :term:`compound source` highlighted in gray.
@@ -72,10 +116,17 @@ These definitions establish a *hierarchy*, where a ``SourceCollection`` (likely)
 Notes on Extraction Parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The default extraction parameters are specified in the :doc:`instrument YAML files <instrumentfiles>`.  However, they can be programmatically changed at any of the level of the above hierarchy, and will be propagated to all of its children levels.
+The default extraction parameters are specified in the :doc:`instrument YAML files <instrumentfiles>`, which will differ between a :term:`grism` and :term:`prism`.  However, they can be programmatically changed at any of the level of the above hierarchy, and will be propagated to all of its children levels.
 
-EXAMPLE
+Example
+~~~~~~~
+.. code:: python
+	
+	# reset the extraction parameters for all sources
+	sources.set_spectral_parameters(lamb0=9000., lamb1=12000.)
 
+	# or adjust for a single source
+	sources[1].set_spectral_parameters(lamb0=5000.)
 
 
 
