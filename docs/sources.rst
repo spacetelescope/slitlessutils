@@ -50,7 +50,8 @@ This is the primary data structure that users will interact with, which is meant
      - ``float`` or ``int``
      - The magnitude AB zeropoint for the :term:`direct image<direct imaging>`.
    * - ``throughput``
-     - ``None``, ``str``, or ``slitlessutils.core.photometry.Throughput``
+     - | ``None``, ``str``, or 
+       | ``slitlessutils.core.photometry.Throughput``
      - A description of the filter curve (more below).
    * - ``sedfile``
      - ``str``
@@ -59,7 +60,7 @@ This is the primary data structure that users will interact with, which is meant
 The keywords ``maglim`` and ``minpix`` are used to eliminate spurious sources before they are added to the collection.  The final two keyword arguments (``throughput`` and ``sedfile``) are used when simulating a scene to establish the throughput curve associated with the direct image and a file that contains the SEDs to be associated with each ``DispersedRegion``, respectively.  
 
 Rules for Ascribing the ``Throughput``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``throughput`` variable described in the above table is needed to normalize the SEDs to match the aperture photometry derived from the direct image, therefore it is **essential that this curve overlap with the spectral element**.  Additionally, the ``throughput`` variable can take many different types, which affect how the object will be loaded:
 
@@ -75,7 +76,7 @@ If the ``throughput`` is a:
 	If loading a user-specified, ascii-formatted throughput curve, then it is assumed to be space-delimited columns of wavelength and transmission, which are units of angstroms and dimensionless, respectively.
 
 Notes on the Photometric Zeropoint
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The AB magnitude zeropoint for two reasons.  Firstly, ``slitlessutils`` measures the aperture magnitude with a simple, local background subtraction, which allows the user to reject sources that are too faint.  Secondly, when simulating, the source spectra are normalized to match these aperture magnitudes.
 
