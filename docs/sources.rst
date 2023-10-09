@@ -49,12 +49,59 @@ This is the primary data structure that users will interact with, which is meant
    * - ``zeropoint``
      - ``float`` or ``int``
      - The magnitude AB zeropoint for the :term:`direct image`.
-   * - 
+   * - ``throughput``
+     - ``None``, ``str``, or ``slitlessutils.core.photometry.Throughput``
+     - A description of the filter curve (more below).
+   * - ``sedfile``
+   	 - ``str``
+   	 - The filename to an multi-extension fits file that contains the SEDs (more below).
 
 The keywords ``maglim`` and ``minpix`` are used to eliminate spurious sources before they are added to the collection.  The final two keyword arguments (``throughput`` and ``sedfile``) are used when simulating a scene to establish the throughput curve associated with the direct image and a file that contains the SEDs to be associated with each ``DispersedRegion``, respectively.  
 
+Rules for Ascribing the ``Throughput``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-additional settings must be considered: a means of describing the spectrum for each ``DispersedRegion`` and the system throughput curve (to ensure that the normalization of each spectrum is consistent with the :term:`direct image` brightness).  The ``throughput`` keyword
+The ``throughput`` variable described in the above table is needed to normalize the SEDs to match the aperture photometry derived from the direct image, therefore it is **essential that this curve overlap with the spectral element**.  Additionally, the ``throughput`` variable can take many different types, which affect how the object will be loaded:
+
+If the ``throughput`` is a:
+	* ``slitlessutils.core.photometry.Throughput``: return that;
+	* ``str``: assume this is the full path to the throughput file, so load that;
+	* any other type:
+		* if ``FILTFILE`` is in the header, load that;
+		* if keywords ``TELESCOP``, ``INSTRUME``, and ``FILTER`` exist and indicate a valid throughput file in the :file:`$HOME/.slitlessutils/<VERSION>/bandpasses/` directory, which contains several common bandpasses used with the WFC3 and ACS instruments.  These files are also fits files and have the name: ``<TELESCOP>_<INSTURME>_<FILTER>.fits``.  These files can also contain the zeropoint, based on the header keyword ``ZERO``.  
+
+
+.. note:: Ascii-Formatted Throughput Curves
+	If loading a user-specified, ascii-formatted throughput curve, then it is assumed to be space-delimited columns of wavelength and transmission, which are units of angstroms and dimensionless, respectively.
+
+Notes on the Photometric Zeropoint
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The AB magnitude zeropoint for two reasons.  Firstly, ``slitlessutils`` measures the aperture magnitude with a simple, local background subtraction, which allows the user to reject sources that are too faint.  Secondly, when simulating, the source spectra are normalized to match these aperture magnitudes.
+
+
+
+
+Description of the ``sedfile``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``sedfile`` is a ``str`` that is the full path to a multi-extension fits (MEF) file that contains either the one-dimensional spectra or the filename (and path) to the spectra.   Since a MEF file, each extension refers to a different spectrum, which is encoded by the ``EXTNAME`` and ``EXTVER`` keywords for the ``SEGID`` and ``REGID``, respectively.  If the extension is a valid ``astropy.io.fits.BinTableHDU``, then the ``data`` attribute is used to load the spectrum.  If not, then the full path to a spectrum is looked in the ``FILENAME`` header keyword.  The ``sedfile`` variable instantiates a ``slitlessutils.core.sources.SEDFile()`` object, which behaves like a file object (to facilitate file-context management) and a ``dict`` (to facilitate object indexing):
+
+.. code:: python
+	
+	import slitlessutils as su
+
+	with su.core.sources.SEDFile(sedfile) as seds:
+
+		# load the spectrum for (segid,regid)=(3,1)
+		this_sed = seds[3]
+
+		# load the spectrum for (segid,regid) = (4,2)
+		new_sed = seds[(4,2)]
+
+In both cases, ``this_sed`` and ``new_sed`` in the previous example will be ``slitlessutils.core.photometry.SED`` objects.  The indices will be either a single ``int`` to load a single spectrum for the ``regid==1`` (the default for a :term:`simple source`) or a ``tuple`` to load a given combination of (segid,regid).   Lastly, the if the header for a given extension contains the keyword ``REDSHIFT``, then the spectra will be redshifted by adjusting the wavelength elements: :math:`\lambda\rightarrow\lambda\,(1+z)`.  
+
+
 
 
 
@@ -63,24 +110,6 @@ additional settings must be considered: a means of describing the spectrum for e
 .. note::
 	Currently only flat-segmentation maps are supported, therefore all instantiated sources will be :term:`simple sources`.  This will be remediated soon.
 
-
-SED File (`~slitlessutils.sources.SEDFile()`)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-This is a 
-
-.. list-table:: Additional Keyword Arguments for :doc:`Simulation <simulation>`
-   :widths: 25 25 50
-   :header-rows: 1
-
-   * - Keyword
-     - Datatype
-     - Description
-   * - ``throughput``
-     - ``float`` or ``int``
-     - The magnitude AB zeropoint for the :term:`direct image`.
-   * - ``zeropoint``
-     - ``float`` or ``int``
-     - The magnitude AB zeropoint for the :term:`direct image`.
 
 
 .. _segmapexample:

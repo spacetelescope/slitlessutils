@@ -124,10 +124,11 @@ class SourceCollection(dict):
                 LOGGER.warning(msg)
                 return
 
-            # get the ZEROPOINT and THROUGHPUT
-            self.zeropoint = self.get_zeropoint(hdud, zeropoint=zeropoint)
-            self.throughput = self.get_throughput(hdud, throughput=throughput,
-                                                  **kwargs)
+            # get the throughput curve
+            self.throughput = self.get_throughput(hdud, throughput, **kwargs)
+
+            # set the zeropoint to the throughput
+            self.throughput.zeropoint = self.get_zeropoint(hdud, zeropoint)
 
             # is it an MEF?
             self.mef = nhdus > 1
@@ -285,7 +286,7 @@ class SourceCollection(dict):
             img, seg, hdr = self.preprocessor(img, seg, hdr)
 
         source = Source(segid, img, seg, hdr, reg=reg,
-                        zeropoint=self.zeropoint, **kwargs)
+                        zeropoint=self.throughput.zeropoint, **kwargs)
         if source and source.mag < self.maglim and source.npixels > self.minpix:
 
             # put in flat level to SED
@@ -296,7 +297,6 @@ class SourceCollection(dict):
                 # region.sed.set_sed([wave],[flam])
                 region.sed.append(wave, flam)
 
-            # self[hdr['SEGID']]=source
             self[source.segid] = source
 
     def set_spectral_parameters(self, **kwargs):
@@ -351,10 +351,9 @@ class SourceCollection(dict):
         if self.preprocessor is not None:
             self.preprocessor.update_header(hdr)
 
-    def get_zeropoint(self, hdul, zeropoint=None, exten=0):  # ,**kwargs):
+    def get_zeropoint(self, hdul, zeropoint, exten=0):
         """
         Helper method to get AB zeropoint from the header
-
 
         Parameters
         ----------
@@ -363,7 +362,7 @@ class SourceCollection(dict):
            to grab the header infor from a particular extension (as passed
            by `exten` keyword).
 
-        zeropoint : float or `None`, optional
+        zeropoint : float or `None`
            This is a default AB zeropoint to use.  This is likely to not be
            directly used.  Default is 26
 
@@ -393,33 +392,32 @@ class SourceCollection(dict):
            a warning is issued.
         """
 
-        if zeropoint:
+        if isinstance(zeropoint, (float, int)):
+            # if pass a numeric, then use it
             return zeropoint
+        elif zeropoint is None:
+            # if not a numeric, then parse the header looking for info
+            tel = hdul[exten].header.get('TELESCOP', '')
 
-        tel = hdul[exten].header.get('TELESCOP', '')
-
-        if tel == 'JWST':
-            w = WCS(hdul[exten].header, relax=True)
-            pixarea = wcsutils.proj_plane_pixel_area(w)
-            zeropoint = -2.5*np.log10((1e6/3631)*(np.pi/180)**2*pixarea)
-
-        elif tel == 'HST':
-
-            for k in ('ABZERO', 'ZEROPT', 'MAGZERO', 'ZERO', 'ZPT'):
-                if k in hdul[0].header:
-                    zeropoint = hdul[exten].header[k]
-                    break
+            if tel == 'JWST':
+                # JWST images are MJy/sr, so parse that
+                w = WCS(hdul[exten].header, relax=True)
+                pixarea = wcsutils.proj_plane_pixel_area(w)
+                zeropoint = -2.5*np.log10((1e6/3631)*(np.pi/180)**2*pixarea)
+                return zeropoint
+            elif tel == 'HST':
+                for k in ('ABZERO', 'ZEROPT', 'MAGZERO', 'ZERO', 'ZPT'):
+                    if k in hdul[0].header:
+                        zeropoint = hdul[exten].header[k]
+                        return zeropoint
+                else:
+                    LOGGER.warning(f'Zeropoint properties not found, using default: {self.DEFZERO}')
+                    return self.DEFZERO
         else:
-            pass
+            LOGGER.warning(f'Zeropoint properties not found, using default: {self.DEFZERO}')
+            return self.DEFZERO
 
-        if not zeropoint:
-            msg = f"No zeropoint was loaded, using default: {self.DEFZERO}"
-            LOGGER.warn(msg)
-            zeropoint = self.DEFZERO
-
-        return zeropoint
-
-    def get_throughput(self, hdul, throughput=None, exten=0, **kwargs):
+    def get_throughput(self, hdul, throughput, exten=0, **kwargs):
         """
         Helper method to read a throughput curve based the header info
 
@@ -430,7 +428,7 @@ class SourceCollection(dict):
            to grab the header infor from a particular extension (as passed
            by `exten` keyword).
 
-        throughput : None or `slitlessutls.core.photometry.Throughput`, optioanl
+        throughput : None, `slitlessutls.core.photometry.Throughput`, or str
            The default throughput to use.
 
 
@@ -450,24 +448,25 @@ class SourceCollection(dict):
            `None` and issue a warning.
         """
 
-        if throughput:
+        if isinstance(throughput, Throughput):
+            # passed an actual throughput, so use it
             return throughput
-
-        if 'FILTFILE' in hdul[exten].header:
-            filtfile = kwargs.get('filtfile', hdul[exten].header['FILTFILE'])
-            throughput = Throughput.from_file(filtfile)
-        elif all(k in hdul[exten].header for k in ('TELESCOP', 'INSTRUME', 'FILTER')):
-            tel = kwargs.get('telescope', hdul[exten].header['TELESCOP']).lower()
-            ins = kwargs.get('instrument', hdul[exten].header['INSTRUME']).lower()
-            fil = kwargs.get('filter', hdul[exten].header['FILTER']).lower()
-
-            thru = Throughput.from_keys(tel, ins, fil)
-
+        elif isinstance(throughput, str):
+            # passed a string, so use a string to load
+            return Throughput.from_file(throughput)
         else:
-            LOGGER.warning("Unable to load any throughput curve")
-            thru = None
+            if 'FILTFILE' in hdul[exten].header:
+                filtfile = kwargs.get('filtfile', hdul[exten].header['FILTFILE'])
+                return Throughput.from_file(filtfile)
+            elif all(k in hdul[exten].header for k in ('TELESCOP', 'INSTRUME', 'FILTER')):
+                tel = kwargs.get('telescope', hdul[exten].header['TELESCOP']).lower()
+                ins = kwargs.get('instrument', hdul[exten].header['INSTRUME']).lower()
+                fil = kwargs.get('filter', hdul[exten].header['FILTER']).lower()
 
-        return thru
+                return Throughput.from_keys(tel, ins, fil)
+            else:
+                LOGGER.warning("Unable to load any throughput curve")
+                return None
 
     def load_sedlib(self, sedfile):
         """

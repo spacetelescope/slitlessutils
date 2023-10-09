@@ -109,6 +109,10 @@ class Disperser:
         else:
             return self.name
 
+    @property
+    def n(self):
+        return (self.wave1-self.wave0)/self.dwave + 1
+
     def update_header(self, hdr):
         """
         Method to update a fits header
@@ -160,8 +164,6 @@ class Linear(Disperser):
 
     """
 
-    # dwave: float
-
     def __post_init__(self):
         """
         Method to check a few things
@@ -184,7 +186,7 @@ class Linear(Disperser):
             number of wavelength elements
         """
 
-        nwav = int(np.ceil((self.wave1-self.wave0)/self.dwave)) + 1
+        nwav = int(np.ceil(self.n))
         return nwav
 
     def __call__(self, lam, nsub=1):
@@ -222,9 +224,6 @@ class Linear(Disperser):
         d = 1./nsub
         ind = np.arange(0, len(self)-1+d, d, dtype=float)
         wav = self(ind)
-
-        # wav1 = np.arange(self.wave0, self.wave1+self.dwave/nsub,
-        #                  self.dwave/nsub, dtype=float)
 
         return wav
 
@@ -313,9 +312,12 @@ class Laurent(Disperser):
 
     alpha : float or int
         The curvature to tune between a standard 1st order polynomial and
-        the equivalent Laurent polynomial.  Nota bene: the Laurent
-        polynomial becomes a standard polynomial for alpha >> N, where
-        N is the number of elements.
+        the equivalent Laurent polynomial.  This form has several limiting
+        behaviors of note:
+
+        * alpha >> (wave1-wave0)/dwave, yields a linear function
+        * alpha = 0, yields a single wavelength element (ie. like an
+          imaging filter)
 
     """
 
@@ -342,14 +344,15 @@ class Laurent(Disperser):
         nwav : int
             number of wavelength elements
         """
-        DELTA = self.wave1-self.wave0
 
-        N = int(np.ceil(DELTA/(self.dwave + (DELTA-self.dwave)/self.alpha)))
-        return N+1
+        n = self.n
+        num = (n-2)+self.alpha*n
+        den = (n-2)+self.alpha
+        return int(np.ceil(num/den))
 
     def __call__(self, lam, nsub=1):
 
-        wav = self.wave0 + self.dwave*lam*(1-self.alpha)/(lam-self.alpha)
+        wav = self.wave0 + self.dwave*lam*(self.alpha-1)/(self.alpha-lam)
         return wav
 
     def wavelengths(self, nsub=1):
@@ -425,7 +428,6 @@ class Laurent(Disperser):
                 comment='curvature parameter (dimensionless)')
 
 
-# def load_disperser(name, blocking, **kwargs):
 def load_disperser(dic, **kwargs):
 
     dic.update(kwargs)
@@ -440,14 +442,5 @@ def load_disperser(dic, **kwargs):
                        dic['wave1'], dic['dwave'], dic['units'], dic['alpha'])
     else:
         raise NotImplementedError(f'Disperser type ({disptype}) is unknown.')
-
-    # if disptype == 'grism':
-    #     disp = Linear(name, blocking, kwargs['wave0'], kwargs['wave1'],
-    #                   kwargs['units'], kwargs['dwave'])
-    # elif disptype == 'prism':
-    #     disp = Laurent(name, blocking, kwargs['wave0'], kwargs['wave1'],
-    #                      kwargs['units'], kwargs['scale'])
-    # else:
-    #     raise NotImplementedError(f'Disperser type {disptype} is unknown.')
 
     return disp

@@ -78,7 +78,7 @@ where :math:`B` and :math:`t` are the background and exposure time described in 
 both in units of :math:`e^-/s`.  The background rate and dark current are subtracted here to produce an image equivalent to a :doc:`sky-subtracted WFSS image <background>`.
 
 .. important::
-  Some detectors (e.g. WFC3/IR) record the images in :math:`e^-/s`, while others (e.g WFC3/UVIS, ACS/WFC, ACS/SBC) use :math:`e^-`.  This information is encoded in the instrument-specific ``yaml`` files in :file:`$HOME/.slitlessutils/instruments` (but see also :doc:`instrument tables <instrumentfiles>`), which will modify the definitions for the final, noised images :math:`S_{x,y}` and :math:`U_{x,y}`.
+  Some detectors (e.g. WFC3/IR) record the images in :math:`e^-/s`, while others (e.g WFC3/UVIS, ACS/WFC, ACS/SBC) use :math:`e^-`.  This information is encoded in the instrument-specific ``yaml`` files in :file:`$HOME/.slitlessutils/<VERSION>/instruments` (but see also :doc:`instrument tables <instrumentfiles>`), which will modify the definitions for the final, noised images :math:`S_{x,y}` and :math:`U_{x,y}`.
 
 
 
@@ -90,7 +90,7 @@ A full simulation is fairly involved, so please see the function :file:`slitless
 
 Additional Instrument Settings
 ------------------------------
-However, there are many other parameters required to simulate a WFSS image, and these are stored in ``yaml`` files in the configuration directory in :file:`{$HOME}/.slitlessutils`.   However, there are several YAML files that describe the instrumental configuration, and modifying these files is highly discouraged 
+However, there are many other parameters required to simulate a WFSS image, and these are stored in ``yaml`` files in the configuration directory in :file:`{$HOME}/.slitlessutils/<VERSION>/instruments/`.   However, there are several YAML files that describe the instrumental configuration, and modifying these files is highly discouraged 
 
 .. toctree::
   :titlesonly:

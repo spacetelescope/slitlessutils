@@ -187,8 +187,8 @@ def simulate_grisms():
     sources.write_seds(path=SEDPATH)
 
     # project the sources onto the grism images
-    # tab = su.modules.Tabulate(ncpu=NCPU)
-    # pdtfiles = tab(data, sources)
+    tab = su.modules.Tabulate(ncpu=NCPU)
+    _ = tab(data, sources)
 
     # use the projection tables and the SEDs to simulate grism images
     sim = su.modules.Simulate(ncpu=NCPU)
