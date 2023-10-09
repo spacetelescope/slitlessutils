@@ -33,9 +33,12 @@ Source Collection (`~slitlessutils.sources.SourceCollection()`)
 
 This is the primary data structure that users will interact with, which is meant to mimic the structure of the ``WFSSCollection`` (see the :doc:`spectroscopy page <wfss>`), that inherits from ``dict`` where the keys will be the :term:`source ID` and the values will be instances of the ``Source``.  In typical usage, one will instantiate a single ``SourceCollection``, which will be passed to any of the :doc:`computational modules <modules>`.  The primary inputs are a :term:`direct image<direct imaging>` and :term:`segmentation map`, and :numref:`segmapexample` shows an example of these data, however there are several keyword-arguments that control aspects of the source instantiation.  
 
+.. _sourcekwargs:
 .. list-table:: Keyword Arguments
    :widths: 25 25 50
    :header-rows: 1
+   :stub-columns: 0
+   :width: 600
 
    * - Keyword
      - Datatype
