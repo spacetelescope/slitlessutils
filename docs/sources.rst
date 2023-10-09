@@ -48,7 +48,7 @@ This is the primary data structure that users will interact with, which is meant
      - The minimum number of direct-image pixels for a source to be consider valid.  Default is 0.
    * - ``zeropoint``
      - ``float`` or ``int``
-     - The magnitude AB zeropoint for the :term:`direct image`.
+     - The magnitude AB zeropoint for the :term:`direct image<direct imaging>`.
    * - ``throughput``
      - ``None``, ``str``, or ``slitlessutils.core.photometry.Throughput``
      - A description of the filter curve (more below).
