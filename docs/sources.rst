@@ -133,6 +133,13 @@ In both cases, ``this_sed`` and ``new_sed`` in the previous example will be ``sl
 	Currently only flat-segmentation maps are supported, therefore all instantiated sources will be :term:`simple sources<simple source>`.  This will be remediated soon.
 
 
+Notes on Extraction Parameters
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The default extraction parameters are specified in the :doc:`instrument YAML files <instrumentfiles>`, which will differ between a :term:`grism` and :term:`prism`.  However, they can be programmatically changed at any of the level of the above hierarchy, and will be propagated to all of its children levels.
+
+
+
 Example
 ^^^^^^^
 .. code:: python
@@ -142,24 +149,12 @@ Example
 	# parse segmentation map and direct image into sources in a source collection
 	sources = su.sources.SourceCollection(segmentation_filename, directimage_filename)
 
-Again, there are several keyword arguments that control key aspects of the source initialization (see :numref:`sourcekwargs`).  
-
-
-
-Notes on Extraction Parameters
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The default extraction parameters are specified in the :doc:`instrument YAML files <instrumentfiles>`, which will differ between a :term:`grism` and :term:`prism`.  However, they can be programmatically changed at any of the level of the above hierarchy, and will be propagated to all of its children levels.
-
-Example
-~~~~~~~
-.. code:: python
-	
 	# reset the extraction parameters for all sources
 	sources.set_spectral_parameters(lamb0=9000., lamb1=12000.)
 
 	# or adjust for a single source
 	sources[1].set_spectral_parameters(lamb0=5000.)
 
+Again, there are several keyword arguments that control key aspects of the source initialization (see :numref:`sourcekwargs`).  
 
 
