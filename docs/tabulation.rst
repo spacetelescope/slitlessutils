@@ -31,7 +31,7 @@ To tabulate all the pixel transformations for a WFSS image and create a PDT, the
 	.. math::
 		\lambda(l) = \lambda_0 + \left(\lambda_1-\lambda_0\right)\left(\frac{l}{N-1}\right)
 
-	where :math:`N = \mathrm{ceil}\left(\frac{\lambda_1-\lambda_0}{\delta\lambda}\right)+1`, :math:`l\in(0,1,2,3,\ldots, N-1)` is the wavelength index, and :math:`\delta\lambda` is the sampling bandwidth.  The parameters :math:`(\lambda_0, \lambda_1, \delta\lambda)` are set the ``yaml`` files in the calibration directory: :file:`{$HOME}/.slitlessutils`.
+	where :math:`N = \mathrm{ceil}\left(\frac{\lambda_1-\lambda_0}{\delta\lambda}\right)+1`, :math:`l\in(0,1,2,3,\ldots, N-1)` is the wavelength index, and :math:`\delta\lambda` is the sampling bandwidth.  The parameters :math:`(\lambda_0, \lambda_1, \delta\lambda)` are set the ``yaml`` files in the calibration directory: :file:`{$HOME}/.slitlessutils/<VERSION>/instruments/`.
 
 
 .. _animatedpixel:
