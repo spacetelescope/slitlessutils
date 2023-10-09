@@ -52,7 +52,7 @@ This is the primary data structure that users will interact with, which is meant
    * - ``throughput``
      - ``None``, ``str``, or ``slitlessutils.core.photometry.Throughput``
      - A description of the filter curve (more below).
-   * -``sedfile``
+   * - ``sedfile``
      - ``str``
      - The filename to an multi-extension fits file that contains the SEDs (more below).
 
