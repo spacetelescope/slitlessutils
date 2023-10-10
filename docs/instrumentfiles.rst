@@ -63,7 +63,7 @@ Instrument-Wide Grating/Blocking Parameters
 Details on Extraction Settings
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The extraction parameters for a :term:`grism` and :term:`prism` will be different, owing to the non-linear dispersion in a prism.  Here are the formulae for the :math:`i^\mathrm{th}` extraction wavelength (:math:`\lambda_i`) and the number of wavelength elements (:math:`N`).  Since a grism is linear, the formulae are:
+The extraction parameters for a :term:`grism` and :term:`prism` will be different, owing to the non-linear dispersion in a prism.  Since a grism is linear, the formulae for the :math:`i^\mathrm{th}` extraction wavelength (:math:`\lambda_i`) and the number of wavelength elements (:math:`N`) are:
 
 .. math::
   \begin{eqnarray}
