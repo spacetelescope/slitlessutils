@@ -90,7 +90,7 @@ A full simulation is fairly involved, so please see the function :file:`slitless
 
 Additional Instrument Settings
 ------------------------------
-However, there are many other parameters required to simulate a WFSS image, and these are stored in ``yaml`` files in the configuration directory in :file:`{$HOME}/.slitlessutils/<VERSION>/instruments/`.   However, there are several YAML files that describe the instrumental configuration, and modifying these files is highly discouraged 
+There are many other parameters required to simulate a WFSS image, and these are stored in several ``yaml`` files in the configuration directory in :file:`{$HOME}/.slitlessutils/<VERSION>/instruments/`. Modifying these files is highly discouraged.
 
 .. toctree::
   :titlesonly:
