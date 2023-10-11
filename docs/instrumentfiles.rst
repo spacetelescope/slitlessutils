@@ -1,9 +1,11 @@
 .. _instrumentfiles:
 
-Instrument Files :file:`$HOME/.slitlessutils/instruments/`
-==========================================================
+Instrument Configuration Files 
+==============================
 
-Most of these parameters are the subject of considerable calibration efforts, and as such, should probably not be adjusted if the results are to be trusted.  
+
+
+Most of these parameters are the subject of considerable calibration efforts, and as such, should probably not be adjusted if the results are to be trusted.  These files are obtained with the :doc:`configuration module <configure>` and are stored in :file:`$HOME/.slitlessutils/<VERSION>/instruments/`
 
 
 Instrument-Wide Settings
@@ -31,9 +33,9 @@ Instrument-Wide Settings
      - | The :math:`(v_2,v_3)` position of the reference point 
        | and :math:`v_{3y}` angle with respect the :math:`v_3`-axis.
 
+
 Instrument-Wide Grating/Blocking Parameters
 -------------------------------------------
-
 
 .. list-table:: Instrument-Wide Grating/Blocking [#gbnote]_
    :widths: 25 25 50
@@ -48,13 +50,41 @@ Instrument-Wide Grating/Blocking Parameters
    * - Tabulation Parameters
      - ``dict``
      - | This contains the starting wavelength (``wave0``), ending 
-       | wavelength (``wave1``), sampling frequency (``dwave``), 
-       | units (usually ``angstrom``), and disptype.  
+       | wavelength (``wave1``), sampling rate (``dwave``), 
+       | units (usually ``angstrom``), and ``disptype`` (which is
+       | always "grism").  
    * - Extraction Parameters [#extnote]_
      - ``dict``
      - | This contains the starting wavelength (``wave0``), ending 
-       | wavelength (``wave1``), sampling frequency (``dwave``), 
-       | units (usually ``angstrom``), and disptype.  
+       | wavelength (``wave1``), sampling rate (``dwave``), 
+       | units (usually ``angstrom``), ``disptype``, and if 
+       | ``alpha`` for prisms.  
+
+Details on Extraction Settings
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The extraction parameters for a :term:`grism` and :term:`prism` will be different, owing to the non-linear dispersion in a prism.  Since a grism is linear, the formulae for the :math:`i^\mathrm{th}` extraction wavelength (:math:`\lambda_i`) and the number of wavelength elements (:math:`N`) are:
+
+.. math::
+  \begin{eqnarray}
+    \lambda_i &=& \lambda_0 + \delta\lambda\,i\\
+    n &=& \frac{\lambda_1-\lambda_0}{\delta\lambda}+1\\
+    N &=& \lceil n \rceil
+  \end{eqnarray}
+
+where :math:`\lambda_0`, :math:`\lambda_1`, and :math:`\delta\lambda` are the starting wavelength (``wave0``), ending wavelength (``wave``), and sampling rate (``dwave``), respectively.  The notation :math:`\lceil x \rceil` refers to the ceiling function of x.  For the prisms, which are highly nonlinear, the same two equations become:
+
+.. math::
+  \begin{eqnarray}
+    \lambda_i &=& \lambda_0 + \delta\lambda\,i\,\frac{\alpha-1}{\alpha-i}\\
+    N &=& \lceil\frac{n-2+\alpha n}{n-2 + \alpha}\rceil
+  \end{eqnarray}
+
+where :math:`\Delta\lambda\!=\!(\lambda_1-\lambda_0)` and :math:`\alpha` is a *curvature* parameter that adjust the degree of non-linearity.  This form has several limiting forms worth mentioning. If :math:`\alpha=0`, then there will be a single wavelength element (:math:`N=1`), emulating the photometry from an imaging mode.  Second, if :math:`\alpha\gg n`, then the prism function approaches the linear form for a grism.
+
+.. note::
+  In general, users are discouraged from adjusting these settings in the reference files, and are recommended to instead use the interface (see :doc:`sources <sources>`).  Extraordinary care should be taken regarding the curvature parameter.  
+
 
 Detector Parameters
 -------------------

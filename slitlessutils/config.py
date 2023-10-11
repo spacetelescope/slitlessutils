@@ -296,8 +296,11 @@ class Config(dict):
                 # check all the paths and take the highest version
                 for path in paths:
                     basepath = os.path.basename(path[:-1])
-                    vers = version.parse(basepath)
-                    if vers >= bestvers:
+                    try:
+                        vers = version.parse(basepath)
+                    except version.InvalidVersion:
+                        vers = None
+                    if vers and (vers >= bestvers):
                         bestvers = vers
                         bestpath = os.path.join(self.REFROOT, path)
 

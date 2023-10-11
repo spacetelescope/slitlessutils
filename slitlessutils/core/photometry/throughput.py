@@ -1,8 +1,8 @@
-from astropy.io import fits
-from scipy.constants import c
-
-
 import os
+
+from astropy.io import fits
+import numpy as np
+from scipy.constants import c
 
 from .band import Band
 from ...logger import LOGGER
@@ -66,13 +66,15 @@ class Throughput(Band):
         tokens = os.path.splitext(filename)
         ext = tokens[-1][1:]
         if ext == 'fits':
+            LOGGER.info('reading filter curve from fits file')
             data, header = fits.getdata(filename, exten=1, header=True)
             obj = cls(data['wavelength'], data['transmission'],
                       unit=header.get('TUNIT1', ''))
 
         elif ext in ('dat', 'txt', 'filt', 'ascii'):
-            LOGGER.debug("read ascii filt file")
-
+            LOGGER.info("reading filter curve from ascii file")
+            wave, tran = np.loadtxt(filename, usecols=(0, 1), unpack=True)
+            obj = cls(wave, tran, unit='angstroms')
         else:
             LOGGER.warning(f"File extension {ext} is unknown")
             return

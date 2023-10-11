@@ -23,13 +23,13 @@ The current implementation will *only* simulate the signal from the sources, but
       * load the PDT from the :class:`~slitlessutils.tables.PDTFile()`
       * append to a list
 
-    * multiply the fractional pixel :math:`a_{(x_d,y_d)\rightarrow(x,y)}` area between the direct and WFSS image (and tabulated in the PDTs), :doc:`wavelength-dependent flat-field <calib>` :math:`F_{x,y}(\lambda)`, :doc:`sensitivity curve <calib>` :math:`T(\lambda)`, :term:`pixel-area map` :math:`J_{x,y}` (:ref:`see more below <pam>`), and the source spectrum :math:`f_{x_d,y_d}(\lambda)` associated with this direct-image pixel:
+    * multiply the fractional pixel :math:`a_{(x_d,y_d)\rightarrow(x,y)}` area between the direct and WFSS image (and tabulated in the PDTs), :doc:`wavelength-dependent flat-field <calib>` :math:`F_{x,y}(\lambda)`, :doc:`sensitivity curve <calib>` :math:`T(\lambda)`, :term:`pixel-area map` :math:`P_{x,y}` (:ref:`see more below <pam>`), and the source spectrum :math:`f_{x_d,y_d}(\lambda)` associated with this direct-image pixel:
 
     .. math::
 
-      s_{x,y,l} = a_{(x_d,y_d)\rightarrow(x,y)}\,\frac{I_{x_d,y_d}}{\sum\limits_{x_d,y_d} I_{x_d,y_d}}\,F_{x,y}(\lambda)\,T(\lambda)\,f_{x_d,y_d}(\lambda)\, J_{x,y}\,\delta\lambda   
+      s_{x,y,l} = a_{(x_d,y_d)\rightarrow(x,y)}\,\frac{I_{x_d,y_d}}{\sum\limits_{\mathbb{S}} I_{x_d,y_d}}\,F_{x,y}(\lambda)\,T(\lambda)\,f_{x_d,y_d}(\lambda)\, P_{x,y}\,\delta\lambda   
 
-    where :math:`I_{x_d,y_d}` is the direct-image brightness and :math:`\delta\lambda` 
+    where :math:`I_{x_d,y_d}` is the direct-image brightness, :math:`\mathbb{S}` is the collection of direct-imaging pixels associated with this source (see :doc:`source description <sources>`), and :math:`\delta\lambda` is the tabulation bandwidth.
 
     * decimate the list of PDTs over the wavelength index (:math:`l`)
     * sum this decimated list into to noiseless science image:
@@ -78,23 +78,19 @@ where :math:`B` and :math:`t` are the background and exposure time described in 
 both in units of :math:`e^-/s`.  The background rate and dark current are subtracted here to produce an image equivalent to a :doc:`sky-subtracted WFSS image <background>`.
 
 .. important::
-  Some detectors (e.g. WFC3/IR) record the images in :math:`e^-/s`, while others (e.g WFC3/UVIS, ACS/WFC, ACS/SBC) use :math:`e^-`.  This information is encoded in the instrument-specific ``yaml`` files in :file:`$HOME/.slitlessutils/instruments` (but see also :doc:`instrument tables <instrumentfiles>`), which will modify the definitions for the final, noised images :math:`S_{x,y}` and :math:`U_{x,y}`.
+  Some detectors (e.g. WFC3/IR) record the images in :math:`e^-/s`, while others (e.g WFC3/UVIS, ACS/WFC, ACS/SBC) use :math:`e^-`.  This information is encoded in the instrument-specific ``yaml`` files in :file:`$HOME/.slitlessutils/<VERSION>/instruments` (but see also :doc:`instrument tables <instrumentfiles>`), which will modify the definitions for the final, noised images :math:`S_{x,y}` and :math:`U_{x,y}`.
 
 
 
 Example
 ^^^^^^^
 
-.. code:: python
-
-  import slitlessutils as su
-
-
+A full simulation is fairly involved, so please see the function :file:`slitlessutils.examples.starfield.py`, specifically the functions :func:`slitlessutils.examples.starfield.simulate_grisms()` and :func:`slitlessutils.examples.starfield.make_scene()`.  
 
 
 Additional Instrument Settings
 ------------------------------
-However, there are many other parameters required to simulate a WFSS image, and these are stored in ``yaml`` files in the configuration directory in :file:`{$HOME}/.slitlessutils`. 
+There are many other parameters required to simulate a WFSS image, and these are stored in several ``yaml`` files in the configuration directory in :file:`{$HOME}/.slitlessutils/<VERSION>/instruments/`. Modifying these files is highly discouraged.
 
 .. toctree::
   :titlesonly:
@@ -123,17 +119,19 @@ The simulations provided by ``slitlessutils`` make several simplifying assumptio
 An Aside on Pixel-Area Maps
 ---------------------------
 
-The :term:`pixel-area map` (PAM) describes the relative pixel size due to distortions in the detector, which is given by the absolute value of the determinant of the Jacobian matrix.  In principle, the distortion can be described in many ways (e.g. look-up table), but ``slitlessutils`` currently assumes this will be described as `Simple-Imaging Polynomials (SIP) <https://docs.astropy.org/en/stable/wcs/note_sip.html>`_.  In which case, the Jacobian is simply:
+The :term:`pixel-area map` (PAM) describes the relative pixel size due to distortions in the detector, which is given by the absolute value of the determinant of the Jacobian matrix.  In principle, the distortion can be described in many ways (e.g. look-up table), but ``slitlessutils`` currently assumes this will be described by `Simple-Imaging Polynomials (SIP) <https://docs.astropy.org/en/stable/wcs/note_sip.html>`_.  In which case, the Jacobian is simply:
 
 .. math::
    
     J = \left(\begin{array}{cc} \partial a/\partial x & \partial a/\partial y\\
       \partial b/\partial x & \partial b/\partial y\end{array}\right)
 
-where all of these partial derivatives are polynomials of :math:`(x,y)`.  Therefore, the pixel-area map becomes:
+where all of these partial derivatives are (by definition) polynomials of :math:`(x,y)`.  Therefore, the PAM becomes:
 
 .. math::
 
-  J_{x,y} = \left|\frac{\partial a}{\partial x}\frac{\partial b}{\partial y} - \frac{\partial b}{\partial x}\frac{\partial a}{\partial y}\right|
-
+  \begin{eqnarray}
+    P_{x,y} &=& \left|\det(J)\right|\\
+            &=& \left|\frac{\partial a}{\partial x}\frac{\partial b}{\partial y} - \frac{\partial b}{\partial x}\frac{\partial a}{\partial y}\right|
+  \end{eqnarray}
 

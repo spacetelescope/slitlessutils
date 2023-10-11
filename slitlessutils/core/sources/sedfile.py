@@ -8,7 +8,7 @@ class SEDFile:
     """
     A class to load SEDs used for simulating WFSS images.
 
-    Instatiates a variable that operates like a dictionary, whose keywords
+    Instantiates a variable that operates like a dictionary, whose keywords
     refer to the ``EXTNAME`` and ``EXTVER``, which denote the ``SEGID``
     and ``REGID``, respectively.  Therefore there are two possible
     options for the keyword:

@@ -56,8 +56,14 @@ Since many terms may be used colloquially and/or have different definitions in o
 	prism
 		A transmissive and dispersive spectral element with a highly non-uniform rate of dispersion.  See :term:`grism` for the similarities/differences between the two.
 
+	region ID
+		An identification number for a :term:`dispersed region` within a source.  Since there may be multiple :term:`compound sources<compound source>`, this number alone is not unique, but rather the ``tuple`` of (source ID, region ID) is the unique identifier: :term:`sed ID`.
+
 	regularization parameter
 		A tunable parameter that governs the relative importance of fitting the data and damping high-frequency noise.  In the literature this will often be denoted by :math:`\lambda`, but of obvious confusion with wavelength is given the symbol :math:`\ell` in the ``slitlessutils`` discussion.  This may also be referred to as the *damping parameter*.
+
+	sed ID
+		The tuple of (source ID, region ID) that specifies a unique index for each spectrum to be extracted or simulated.
 
 	segmentation map
 		An image that describes which :term:`direct imaging` pixels belong each object, which effectively sets the extraction/simulation apertures and is used to initialize the :term:`dispersed region` for the sources.
@@ -70,6 +76,12 @@ Since many terms may be used colloquially and/or have different definitions in o
 
 	simple source
 		A source that has a single :term:`dispersed region`.
+
+	source
+		A region on the sky that will be considered for processing (typically the :doc:`extraction <extraction>` or :doc:`simulation <simulation>` modules).  A source will have some metadata (e.g. brightness, barycenter, set of direct-image pixels, etc.) and may have a single spectrum (see :term:`simple source`) or multiple spectra (see :term:`compound source`).
+
+	source ID
+		The unique identification number associated with a given :term:`source`.
 
 	spectral dispersion
 		The parametric curve governing the wavelength along the :term:`spectral trace`.  Sometimes called the *wavelength solution*.  
