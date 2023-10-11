@@ -125,10 +125,10 @@ class SourceCollection(dict):
                 return
 
             # get the throughput curve
-            self.throughput = self.get_throughput(hdud, throughput, **kwargs)
+            self.throughput = self._get_throughput(hdud, throughput, **kwargs)
 
             # set the zeropoint to the throughput
-            self.throughput.zeropoint = self.get_zeropoint(hdud, zeropoint)
+            self.throughput.zeropoint = self._get_zeropoint(hdud, zeropoint)
 
             # is it an MEF?
             self.mef = nhdus > 1
@@ -351,7 +351,7 @@ class SourceCollection(dict):
         if self.preprocessor is not None:
             self.preprocessor.update_header(hdr)
 
-    def get_zeropoint(self, hdul, zeropoint, exten=0):
+    def _get_zeropoint(self, hdul, zeropoint, exten=0):
         """
         Helper method to get AB zeropoint from the header
 
@@ -414,10 +414,10 @@ class SourceCollection(dict):
                     LOGGER.warning(f'Zeropoint properties not found, using default: {self.DEFZERO}')
                     return self.DEFZERO
         else:
-            LOGGER.warning(f'Zeropoint properties not found, using default: {self.DEFZERO}')
+            LOGGER.warning(f'Unsupported zeropoint data type ({type(zeropoint)}), using default: {self.DEFZERO}')
             return self.DEFZERO
 
-    def get_throughput(self, hdul, throughput, exten=0, **kwargs):
+    def _get_throughput(self, hdul, throughput, exten=0, **kwargs):
         """
         Helper method to read a throughput curve based the header info
 
