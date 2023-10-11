@@ -414,7 +414,8 @@ class SourceCollection(dict):
                     LOGGER.warning(f'Zeropoint properties not found, using default: {self.DEFZERO}')
                     return self.DEFZERO
         else:
-            LOGGER.warning(f'Unsupported zeropoint data type ({type(zeropoint)}), using default: {self.DEFZERO}')
+           LOGGER.warning(f'Unsupported zeropoint data type ({type(zeropoint)}),'
+                          f' using default: {self.DEFZERO}')
             return self.DEFZERO
 
     def _get_throughput(self, hdul, throughput, exten=0, **kwargs):
