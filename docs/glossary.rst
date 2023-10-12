@@ -18,7 +18,7 @@ Since many terms may be used colloquially and/or have different definitions in o
 		A model that describes the amount of light from an unrelated source that adversely affects the flux of the source in question.  These models are built on existing observations, usually broadband photometry, but can be spectroscopic data as well.  The concept of a *contamination model* only pertains to the :doc:`Single-Exposure Extraction <single>`, as the :doc:`Multi-Exposure Extraction <multi>` uses data at multiple position angles to mitigate contamination (see `Ryan, Casertano, & Pirzkal (2018) <https://ui.adsabs.harvard.edu/abs/2018PASP..130c4501R/abstract>`_ for more information).
 
 	cosmic ray
-		A high energy particle that imparts a significant amount of charge resulting in a very sharp, bright, and  discontinuous profile.  Since cosmic rays are stochastic in nature, they do not reappear in successive images that do not reappear in successive images.  Further, they are unrelated to the sources of interest and render their pixels unusable for science, therefore they must be flagged before any type of analysis.
+		A high energy particle that imparts a significant amount of charge resulting in a very sharp, bright, and  discontinuous profile.  Since cosmic rays are stochastic in nature, they do not reappear in successive images.  Further, they are unrelated to the sources of interest and render their pixels unusable for science, therefore they must be flagged before any type of analysis.
 
 	damping target
 		The vector of spectra that the sparse-least squares solutions will tend to minimize high-frequency noise.  See scipy implementation of the `LSQR <https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.lsqr.html>`_ algorithm.
