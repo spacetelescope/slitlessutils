@@ -59,7 +59,7 @@ where :math:`K_{3a}` is the kernel for the approximation [#f1]_.  After convolvi
 .. math::
    \left|\nabla^2 I\right| \geq n\, U
 
-These candidate pixels are grouped based on their connectivity (see `skimage.measure.label()`) and only groups with a minimum number of pixels are kept.  Finally, the remaining groups can be grown using standard dilation operations (see `skimage.morphology.dilation() <https://scikit-image.org/docs/stable/api/skimage.morphology.html#skimage.morphology.dilation>`_), and several different footprints (`square`, `rectangle`, `diamond`, `disk`, `octagon`, and `star` --- see the respective functions in `skimage.morphology`).
+These candidate pixels are grouped based on their connectivity (see `skimage.measure.label() <https://scikit-image.org/docs/stable/api/skimage.morphology.html#skimage.morphology.label>`_) and only groups with a minimum number of pixels are kept.  Finally, the remaining groups can be grown using standard dilation operations (see `skimage.morphology.dilation() <https://scikit-image.org/docs/stable/api/skimage.morphology.html#skimage.morphology.dilation>`_), and several different footprints (`square`, `rectangle`, `diamond`, `disk`, `octagon`, and `star` --- see the respective functions in `skimage.morphology <https://scikit-image.org/docs/stable/api/skimage.morphology.html>`_).
 
 
 
