@@ -83,7 +83,7 @@ where :math:`\lambda_0`, :math:`\lambda_1`, and :math:`\delta\lambda` are the st
 where :math:`\Delta\lambda\!=\!(\lambda_1-\lambda_0)` and :math:`\alpha` is a *curvature* parameter that adjust the degree of non-linearity.  This form has several limiting forms worth mentioning. If :math:`\alpha=0`, then there will be a single wavelength element (:math:`N=1`), emulating the photometry from an imaging mode.  Second, if :math:`\alpha\gg n`, then the prism function approaches the linear form for a grism.
 
 .. note::
-  In general, users are discouraged from adjusting these settings in the reference files, and are recommended to instead use the interface (see :doc:`sources <sources>`).  Extraordinary care should be taken regarding the curvature parameter.  
+  In general, users are discouraged from adjusting these settings in the reference files, and are recommended to instead use the API (see :doc:`sources <sources>`).  Extraordinary care should be taken regarding the curvature parameter.  
 
 
 Detector Parameters

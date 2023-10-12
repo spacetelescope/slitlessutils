@@ -18,7 +18,7 @@ Since many terms may be used colloquially and/or have different definitions in o
 		A model that describes the amount of light from an unrelated source that adversely affects the flux of the source in question.  These models are built on existing observations, usually broadband photometry, but can be spectroscopic data as well.  The concept of a *contamination model* only pertains to the :doc:`Single-Exposure Extraction <single>`, as the :doc:`Multi-Exposure Extraction <multi>` uses data at multiple position angles to mitigate contamination (see `Ryan, Casertano, & Pirzkal (2018) <https://ui.adsabs.harvard.edu/abs/2018PASP..130c4501R/abstract>`_ for more information).
 
 	cosmic ray
-		A high energy particle that imparts a significant amount of charge.  Cosmic rays often appear as very sharp, discontinuous features that do not reappear in successive images.
+		A high energy particle that imparts a significant amount of charge resulting in a very sharp, bright, and  discontinuous profile.  Since cosmic rays are stochastic in nature, they do not reappear in successive images that do not reappear in successive images.  Further, they are unrelated to the sources of interest and render their pixels unusable for science, therefore they must be flagged before any type of analysis.
 
 	damping target
 		The vector of spectra that the sparse-least squares solutions will tend to minimize high-frequency noise.  See scipy implementation of the `LSQR <https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.lsqr.html>`_ algorithm.
@@ -31,6 +31,9 @@ Since many terms may be used colloquially and/or have different definitions in o
 
 	dispersed region
 		A subset of a source that has a single spectrum.  If a source has a single dispersed region, then it is said to be a :term:`simple source`.  Alternatively, a source that is decomposed into a many dispersed then it is a :term:`compound source`.
+
+	drizzle
+		A method for combining multiple images while correcting for image distortion.  See the `drizzlepac <https://drizzlepac.readthedocs.io/en/latest/>`_ documentation.
 
 	grism
 	    A transmissive and dispersive spectral element that often has a (nearly) constant rate of dispersion.  A grism differs from a :term:`prism` by having an additional diffractive surface on one side, which results in the constant dispersion, little spatial offset between the :term:`spectral trace` and :term:`undispersed position`, and multiple spectral orders.  See also :term:`prism`.
