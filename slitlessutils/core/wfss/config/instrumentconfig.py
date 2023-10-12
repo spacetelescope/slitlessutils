@@ -4,7 +4,7 @@ from datetime import datetime
 
 from astropy.io import fits
 import numpy as np
-import pypolyclip
+from pypolyclip import clip_multi
 import pysiaf
 import yaml
 
@@ -559,7 +559,7 @@ class DetectorConfig:
         yg = np.clip(yg, 0, self.naxis[1])
 
         # clip against the pixel grid
-        x, y, area, slices = pypolyclip.multi(xg, yg, self.naxis)
+        x, y, area, slices = clip_multi(xg, yg, self.naxis)
 
         # make wavelength indices
         lam = np.empty_like(x, dtype=np.uint16)
