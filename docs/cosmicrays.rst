@@ -110,6 +110,7 @@ Examples
 ~~~~~~~~
 
 .. code:: python
+
    import slitlessutils as su
 
    # the filenames of entire collection of WFSS images
@@ -120,10 +121,10 @@ Examples
       su.core.preprocess.background.mastersky(wfssfile, inplace=True)
 
    # group images by VISIT before processing
-   su.core.prepreprocess.crrej.drizzle_grouped_files(wfssfiles, grouping='visit')
+   su.core.preprocess.crrej.drizzle_grouped_files(wfssfiles, grouping='visit')
 
    # group images by POSITION ANGLE before processing
-   su.core.prepreprocess.crrej.drizzle_grouped_files(wfssfiles, grouping='position_angle')
+   su.core.preprocess.crrej.drizzle_grouped_files(wfssfiles, grouping='position_angle')
 
 
 .. rubric:: Footnotes
