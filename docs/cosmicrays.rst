@@ -86,7 +86,7 @@ This will update the file in place, as the flag is set: :code:`inplace=True`.  S
    :width: 600
    :alt: Example for cosmic ray flagging and interpolation from convolution from a Laplacian kernel.
 
-   Example of cosmic-ray flagging from convolution from a Laplacian kernel and bilinear interpolation to highlight the differences.
+   Example of cosmic ray flagging from convolution from a Laplacian kernel and bilinear interpolation to highlight the differences.
 
       
 AstroDrizzle Cosmic Ray flagging
