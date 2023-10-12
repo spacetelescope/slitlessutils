@@ -76,8 +76,8 @@ where :math:`\lambda_0`, :math:`\lambda_1`, and :math:`\delta\lambda` are the st
 
 .. math::
   \begin{eqnarray}
-    \lambda_i &=& \lambda_0 + \delta\lambda\,i\,\frac{\alpha-1}{\alpha-i}\\
-    N &=& \lceil\frac{n-2+\alpha n}{n-2 + \alpha}\rceil
+    \lambda_i &=& \lambda_0 + \delta\lambda\,\left(\frac{\alpha-1}{\alpha-i}\right)\,i\\
+    N &=& \left\lceil\frac{n-2+\alpha n}{n-2 + \alpha}\right\rceil
   \end{eqnarray}
 
 where :math:`\Delta\lambda\!=\!(\lambda_1-\lambda_0)` and :math:`\alpha` is a *curvature* parameter that adjust the degree of non-linearity.  This form has several limiting forms worth mentioning. If :math:`\alpha=0`, then there will be a single wavelength element (:math:`N=1`), emulating the photometry from an imaging mode.  Second, if :math:`\alpha\gg n`, then the prism function approaches the linear form for a grism.

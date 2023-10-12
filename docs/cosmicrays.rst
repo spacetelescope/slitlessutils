@@ -66,7 +66,7 @@ These candidate pixels are grouped based on their connectivity (see `skimage.mea
 Example
 ~~~~~~~
     
-This are the kernels and can be envoked by the subscript, for example
+This are the kernels and can be controlled by the subscript, for example
 
 .. code:: python
    	  
@@ -128,6 +128,6 @@ Examples
 
 
 .. rubric:: Footnotes
-.. [#f1] It is worth mentioning that Laplacian kernels must share the
+.. [#f1] It is worth noting that Laplacian kernels must share the
 	 property that :math:`\sum_{i,j}K_{i,j}=0`.
 
