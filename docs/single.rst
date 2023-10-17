@@ -68,6 +68,7 @@ The :term:`contamination model` processes through the exact same steps in :ref:`
 
 Example
 -------
-Coming Soon.
+
+See :file:`slitlessutils.examples.starfield` for a working example
 
 
