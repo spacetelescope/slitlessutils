@@ -315,7 +315,7 @@ class Source(list):
 
         # normalize
         v /= np.sum(v)
-      
+
         return v
 
     def __str__(self):

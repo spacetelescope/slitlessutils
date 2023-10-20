@@ -37,21 +37,28 @@ class BaseFormatter(logging.Formatter):
         fmt = logging.Formatter.format(self, record)
         return fmt
 
+
 class STDOUTFormatter(BaseFormatter):
     """
     Class to log to stdout, which enables fancy color printing
     """
 
-    FORMATS = {logging.NOTSET: '%(message)s',
-               logging.DEBUG: ("\033[34;1;3mDEBUG (%(module)s:%(lineno)s)> "
-                               "\033[00m\033[34;3m%(message)s\033[00m"),
-                logging.INFO: "\033[32;1mINFO %(processName)s> \033[00m\033[32m%(message)s\033[00m",
-                KNOWNISSUE: f"\n\033[36;1mKNOWN ISSUE (%(module)s:%(lineno)s)> \033[00m\033[36m%(message)s\nSee: \033[04m{RTD}\033[00m\n",
-                logging.WARNING: ("\033[93;1mWARNING %(processName)s> "
-                                 "\033[00m\033[93m%(message)s\033[00m"),
-                logging.ERROR: ("\033[91;5;1mERROR %(processName)s>\033[00m"
-                              "\033[91m %(message)s\033[00m"),
-                logging.CRITICAL: "\033[91;1;5;7mCRITICAL %(processName)s> %(message)s\033[00m"}
+    FORMATS = {
+        logging.NOTSET: '%(message)s',
+        logging.DEBUG: (
+            "\033[34;1;3mDEBUG (%(module)s:%(lineno)s)> "
+            "\033[00m\033[34;3m%(message)s\033[00m"),
+        logging.INFO: "\033[32;1mINFO %(processName)s> \033[00m\033[32m%(message)s\033[00m",
+        KNOWNISSUE: "\n\033[36;1mKNOWN ISSUE (%(module)s:%(lineno)s)> \033[00m" +
+                    f"\033[36m%(message)s\nSee: \033[04m{RTD}\033[00m\n",
+        logging.WARNING: (
+            "\033[93;1mWARNING %(processName)s> "
+            "\033[00m\033[93m%(message)s\033[00m"),
+        logging.ERROR: (
+                "\033[91;5;1mERROR %(processName)s>\033[00m"
+                "\033[91m %(message)s\033[00m"),
+        logging.CRITICAL: "\033[91;1;5;7mCRITICAL %(processName)s> %(message)s\033[00m"}
+
 
 class FileFormatter(BaseFormatter):
     """
@@ -59,18 +66,18 @@ class FileFormatter(BaseFormatter):
     """
 
     FORMATS = {logging.NOTSET: "%(message)s",
-                logging.DEBUG: "   DEBUG (%(module)s:%(lineno)s)> %(message)s",
-                logging.INFO: "    INFO> %(message)s",
-                KNOWNISSUE: f"\nKNOWNISSUE (%(module)s:%(lineno)s)> %(message)s\nSee: {RTD}\n",
-                logging.WARNING: " WARNING> %(message)s",
-                logging.ERROR: "   ERROR> %(message)s",
-                logging.CRITICAL: "CRITICAL> %(message)s"}
+               logging.DEBUG: "   DEBUG (%(module)s:%(lineno)s)> %(message)s",
+               logging.INFO: "    INFO> %(message)s",
+               KNOWNISSUE: f"\nKNOWNISSUE (%(module)s:%(lineno)s)> %(message)s\nSee: {RTD}\n",
+               logging.WARNING: " WARNING> %(message)s",
+               logging.ERROR: "   ERROR> %(message)s",
+               logging.CRITICAL: "CRITICAL> %(message)s"}
 
 
 def setLevel(level, logger=None):
     """
     Helper function to set the logging level of all the handlers
-    
+
     Parameters
     ----------
     level : int
@@ -78,12 +85,12 @@ def setLevel(level, logger=None):
 
     logger : `logging.Logger()`, optional
         A logger to set the level for, if None, then use the __code__ variable.
-        Default is None.    
+        Default is None.
     """
 
     if logger is None:
         logger = logging.getLogger(LOGGERNAME)
-    
+
     logger.setLevel(level)
     for handler in logger.handlers:
         handler.setLevel(level)
@@ -120,8 +127,10 @@ def initialize(level=10, asciilog=True, stdout=True, stderr=False):
         return log
 
     # make a function for known issues
-    log.knownissue = lambda msg, *args, **kwargs: log._log(KNOWNISSUE, msg, args, **kwargs) if log.isEnabledFor(KNOWNISSUE) else None
-                
+    log.knownissue = lambda msg, * \
+        args, **kwargs: log._log(KNOWNISSUE, msg, args, **kwargs) if \
+        log.isEnabledFor(KNOWNISSUE) else None
+
     # create a file handler
     if asciilog:
 
@@ -131,7 +140,7 @@ def initialize(level=10, asciilog=True, stdout=True, stderr=False):
             logfile = f'{LOGGERNAME}.log'
         else:
             logfile = f'{LOGGERNAME}-{procname}.log'
-            
+
         # zap a current file
         if os.path.exists(logfile):
             os.remove(logfile)
@@ -146,7 +155,7 @@ def initialize(level=10, asciilog=True, stdout=True, stderr=False):
         stdouthandler = logging.StreamHandler(sys.stdout)
         stdouthandler.setFormatter(STDOUTFormatter())
         log.addHandler(stdouthandler)
-        
+
     # create a stderr handler
     if stderr:
         stderrhandler = logging.StreamHandler(sys.stderr)
@@ -161,12 +170,13 @@ def initialize(level=10, asciilog=True, stdout=True, stderr=False):
 
     return log
 
+
 LOGGER = initialize()
 
-#if __name__=='__main__':        
-#    
+# if __name__=='__main__':
+#
 #    LOGGER = initialize()
 #    q=LOGGER.info('test')
 #    a=LOGGER.knownissue('known issue')
-#    
+#
 #    print(q,a)
