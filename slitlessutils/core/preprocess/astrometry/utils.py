@@ -1,3 +1,4 @@
+import datetime
 import os
 
 import numpy as np
@@ -42,6 +43,26 @@ def new_filename(imgfile, newfile=None, inplace=False, suffix='wcs'):
         outfile = newfile
 
     return outfile
+
+def update_wcshistory(hdr, wcstype):
+   """
+   Function to update the WCS history in the header
+
+   Parameters
+   ----------
+   hdr : `astropy.io.fits.Header()`
+      The header to update
+
+   wcstype : str
+      The name of the WCS type
+      
+   """
+   
+   now = datetime.datetime.now()
+   hdr.set('WCSTWEAK', value=True, comment='WCS tweaked by slitlessutils')
+   hdr.set('WCSTYPE', value=wcstype)
+   hdr.add_history(f'WCS updated by slitlessutils on {now.isoformat()}."')
+
 
 
 def get_cd(hdr, key):

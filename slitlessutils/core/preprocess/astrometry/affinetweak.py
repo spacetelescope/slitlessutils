@@ -135,6 +135,7 @@ class AffineTweak(dict):
                 cd = np.dot(data['A'], cd)
                 crval = crval+data['d']
 
+                hdul[ext].header.set('WCSNAME', data['wcsname1'])
                 utils.set_cd(hdul[ext].header, cd, self.key1)
                 utils.set_crval(hdul[ext].header, crval, self.key1)
 
@@ -147,9 +148,10 @@ class AffineTweak(dict):
                 hdul[ext].header.set('A2_2', value=data['A'][1, 1])
 
                 # add some more to header
-                hdul[ext].header.set('WCSTWEAK', value=True,
-                                     comment='Affine tweaked by slitlessutils')
-                hdul[ext].header.set('WCSTYPE', value='affine upgrade')
+                utils.update_wcshistory(hdul[ext].header, 'affine upgrade')
+                # hdul[ext].header.set('WCSTWEAK', value=True,
+                #                      comment='Affine tweaked by slitlessutils')
+                # hdul[ext].header.set('WCSTYPE', value='affine upgrade')
 
             hdul[0].header.add_history('Affine tweaked astrometry')
 

@@ -115,14 +115,13 @@ class Single(Module):
         self.writecsv = writecsv
         if self.writecsv:
             self.csvpath = self.outpath+'CSVFILES'+os.sep
-            try:
-                os.mkdir(self.csvpath)
-            except FileNotFoundError:
-                LOGGER.warning('Cannot make CSVPATH, so no CSV files will be written')
-                self.writecsv = False
-                self.csvpath = None
-
-        print(self.outpath, self.writecsv)
+            if not os.path.exists(self.csvpath):
+                try:
+                    os.mkdir(self.csvpath)
+                except FileNotFoundError:
+                    LOGGER.warning('Cannot make CSVPATH, so no CSV files will be written')
+                    self.writecsv = False
+                    self.csvpath = None
 
         # output file names
         if root is None:
@@ -347,8 +346,8 @@ class Single(Module):
 
         Parameters
         ----------
-        data : `su.core.wfss.WFSSCollection`
-            The collection of WFSS images
+        data : `su.core.wfss.WFSS`
+            A WFSS image to extract
 
         sources : `su.core.sources.SourceColection`
             The collection of sources
@@ -425,10 +424,6 @@ class Single(Module):
                         if odt:
 
                             # get contents of the table
-                            # xg = opt.get('x')
-                            # yg = opt.get('y')
-                            # val = opt.get('val')
-                            # wav = opt.get('wav')
                             xg = odt.get('x')
                             yg = odt.get('y')
                             val = odt.get('val')
@@ -443,7 +438,7 @@ class Single(Module):
                             ww, _x, _y = indices.decimate(wav*val, xg, yg, dims=dims)
                             dw, _x, _y = indices.span(wav, xg, yg, dims=dims)
 
-                            # compute the average wavelngth in the pixel
+                            # compute the average wavelength in the pixel
                             ww /= vv
 
                             # get data quality

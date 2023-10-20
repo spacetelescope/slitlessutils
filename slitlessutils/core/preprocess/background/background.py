@@ -52,8 +52,8 @@ def background_processing(mastersky=False):
                 # which CCD/detector is the subarray on?  This affects the primary
                 # for-loop over the HDUL.  This shouldn't be too hard.
                 if mastersky and phdr.get('SUBARRAY', False):
-                    msg = f'The image {filename} is a subarray, master sky is not supported.'
-                    LOGGER.warning(msg)
+                    msg = f"Master-sky subtraction is not supported for subarrays: {filename}"
+                    LOGGER.knownissue(msg)
                     return
 
                 # look at each HDU

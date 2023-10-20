@@ -646,25 +646,6 @@ class InstrumentConfig(dict):
             LOGGER.error(msg)
             raise KeyError(msg)
 
-        # d = data['dispersers'][disperser][blocking]
-        # d['name'] = disperser
-        # d['blocking'] = blocking
-
-        # DispKey = namedtuple("DispKey", "name blocking")
-        # if isinstance(disperser, str):
-        #     self.disperser = DispKey(disperser, None)
-        # elif isinstance(disperser, (tuple, list)) and len(disperser) == 2:
-        #     self.disperser = DispKey(*disperser)
-        # else:
-        #     raise TypeError(f'Disperser key ({disperser}) is invalid.')
-        # d = data['dispersers'][self.disperser.name][self.disperser.blocking]
-        # d['dispname'] = self.disperser.name
-        # d['blocking'] = self.disperser.blocking
-
-        # d = data['dispersers'][disperser][blocking]
-        # d['name'] = disperser
-        # d['blocking'] = blocking
-
         self.disperser = load_disperser(d['extraction'], name=disperser, blocking=blocking)
         self.tabulator = load_disperser(d['tabulation'], name=disperser, blocking=blocking)
 
@@ -721,9 +702,6 @@ class InstrumentConfig(dict):
                 insconf = cls(tel, ins, disperser, subarray=subarray, **kwargs)
 
                 # update some things because subarrays
-
-                # first delete non-existent
-
                 detnames = list(insconf.keys())
                 for detname in detnames:
                     ext = insconf[detname].extensions['science'].extension
