@@ -171,7 +171,6 @@ class Source(list):
             self.npixels = len(g)
             if self.npixels == 0:
                 return
-            print(w[g])
             x = x[g]
             y = y[g]
             w = w[g]
