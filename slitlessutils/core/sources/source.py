@@ -167,11 +167,14 @@ class Source(list):
                                      negfunc=negfunc, epsilon=1e-9)
 
             # remove pixels with zero weights
-            g = np.where(w <= 0)[0]
-            if g:
-                x = x[g]
-                y = y[g]
-                w = w[g]
+            g = np.where(w > 0)[0]
+            self.npixels = len(g)
+            if self.npixels == 0:
+                return
+            print(w[g])
+            x = x[g]
+            y = y[g]
+            w = w[g]
 
             # compute the centeroids
             xyc = (np.average(x, weights=w), np.average(y, weights=w))
