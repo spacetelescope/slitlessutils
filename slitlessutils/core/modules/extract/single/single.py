@@ -119,7 +119,8 @@ class Single(Module):
                 try:
                     os.mkdir(self.csvpath)
                 except FileNotFoundError:
-                    LOGGER.warning('Cannot make CSVPATH, so no CSV files will be written')
+                    LOGGER.warning(f'Cannot make CSVPATH {self.csvpath},'
+                                   ' so no CSV files will be written')
                     self.writecsv = False
                     self.csvpath = None
 
