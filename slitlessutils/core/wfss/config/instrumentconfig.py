@@ -577,7 +577,7 @@ class InstrumentConfig(dict):
     name and the `DetectorConfig` object
     """
 
-    def __init__(self, telescope, instrument, disperser, **kwargs):
+    def __init__(self, telescope, instrument, disperser, subarray=False, **kwargs):
         """
         Initializer
 
@@ -618,7 +618,7 @@ class InstrumentConfig(dict):
         self.instrument = data['instrument']
         self.bunit = data['bunit']
         self.suffix = data['suffix']
-        self.subarray = False
+        self.subarray = subarray
 
         self.path = data['path']
         self.header = data.get('header', {})
@@ -645,25 +645,6 @@ class InstrumentConfig(dict):
             msg = f"blocking {blocking} is not found in reference manifest"
             LOGGER.error(msg)
             raise KeyError(msg)
-
-        # d = data['dispersers'][disperser][blocking]
-        # d['name'] = disperser
-        # d['blocking'] = blocking
-
-        # DispKey = namedtuple("DispKey", "name blocking")
-        # if isinstance(disperser, str):
-        #     self.disperser = DispKey(disperser, None)
-        # elif isinstance(disperser, (tuple, list)) and len(disperser) == 2:
-        #     self.disperser = DispKey(*disperser)
-        # else:
-        #     raise TypeError(f'Disperser key ({disperser}) is invalid.')
-        # d = data['dispersers'][self.disperser.name][self.disperser.blocking]
-        # d['dispname'] = self.disperser.name
-        # d['blocking'] = self.disperser.blocking
-
-        # d = data['dispersers'][disperser][blocking]
-        # d['name'] = disperser
-        # d['blocking'] = blocking
 
         self.disperser = load_disperser(d['extraction'], name=disperser, blocking=blocking)
         self.tabulator = load_disperser(d['tabulation'], name=disperser, blocking=blocking)
@@ -700,6 +681,9 @@ class InstrumentConfig(dict):
             if h0['OBSTYPE'] == 'SPECTROSCOPIC':
                 tel = h0['TELESCOP']
                 ins = h0['INSTRUME']
+                subarray = h0.get('SUBARRAY', False)
+
+                # do something special when loading each type of instrument
                 if ins == 'WFC3':
                     ins += h0['DETECTOR']
                     disperser = h0['FILTER']
@@ -714,25 +698,34 @@ class InstrumentConfig(dict):
                 else:
                     raise NotImplementedError(f"Unsupported: {tel = } {ins = }")
 
-                insconf = cls(tel, ins, disperser, **kwargs)
+                # instantiate the object
+                insconf = cls(tel, ins, disperser, subarray=subarray, **kwargs)
 
                 # update some things because subarrays
-                for detname in insconf.keys():
+                detnames = list(insconf.keys())
+                for detname in detnames:
                     ext = insconf[detname].extensions['science'].extension
-                    h = fits.getheader(filename, ext)
 
-                    if insconf[detname].naxis[0] != h['NAXIS1']:
-                        insconf[detname].naxis[0] = h['NAXIS1']
-                        insconf.subarray = True
-                    if insconf[detname].naxis[1] != h['NAXIS2']:
-                        insconf[detname].naxis[1] = h['NAXIS2']
-                        insconf.subarray = True
-                    if insconf[detname].crpix[0] != h['CRPIX1']:
-                        insconf[detname].crpix[0] = h['CRPIX1']
-                        insconf.subarray = True
-                    if insconf[detname].crpix[1] != h['CRPIX2']:
-                        insconf[detname].crpix[1] = h['CRPIX2']
-                        insconf.subarray = True
+                    # gotta check this to deal with subarrays with instruments that
+                    # have multiple detectors (like ACS/WFC or WFC3/UVIS)
+                    if ext in hdul:
+                        h = fits.getheader(filename, ext)
+
+                        if subarray:
+                            # if this is a subarray-ed image, then update dimensions
+                            if insconf[detname].naxis[0] != h['NAXIS1']:
+                                insconf[detname].naxis[0] = h['NAXIS1']
+                            if insconf[detname].naxis[1] != h['NAXIS2']:
+                                insconf[detname].naxis[1] = h['NAXIS2']
+                            if insconf[detname].crpix[0] != h['CRPIX1']:
+                                insconf[detname].crpix[0] = h['CRPIX1']
+                            if insconf[detname].crpix[1] != h['CRPIX2']:
+                                insconf[detname].crpix[1] = h['CRPIX2']
+
+                    else:
+                        # remove extensions for a subarray
+                        del insconf[detname]
+
             else:
                 insconf = None
         return insconf

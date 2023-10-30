@@ -574,6 +574,7 @@ class WFSS(dict):
 
         self.visit = ''
         self.orbit = 1
+        self.subarray = False
 
     def __str__(self):
         s = [f' WFSS file: {self.filename}',
@@ -773,20 +774,26 @@ class WFSS(dict):
 
                 det.set_wcs(wcs)
 
-        # parse the zeroth header to get the VISIT
+        # parse the zeroth header to get some global data
         phdr = fits.getheader(obj.filename, ext=0)
         tel = phdr.get('TELESCOP')
         if tel == 'HST':
+
+            # test for SUBARRAY
+            obj.subarray = phdr.get('SUBARRAY', False)
+            if obj.subarray:
+                LOGGER.knownissue(f'Slitlessutils does not fully support subarray data: {filename}')
+
+            # get the VISIT info
             line = phdr.get('LINENUM')
-            if line is not None:
+            if line:
                 s = line.split('.')
                 obj.visit = s[0]
                 obj.orbit = int(s[1])
         elif tel == 'JWST':
-            raise NotImplementedError('gotta get VISIT/ORBIT number from JWST')
+            raise NotImplementedError('gotta get VISIT, ORBIT, SUBARRAY for JWST')
         else:
-            msg = f'Telescope ({tel}) is not found to get visit'
-            LOGGER.error(msg)
+            LOGGER.error(f'Telescope ({tel}) is not found to get visit')
 
         return obj
 

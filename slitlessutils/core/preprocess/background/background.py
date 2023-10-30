@@ -39,6 +39,24 @@ def background_processing(mastersky=False):
             with fits.open(filename, mode=mode) as hdul:
                 # will need the primary header below
                 phdr = hdul[0].header
+
+                # check that this is spectroscopic.
+                if phdr.get('OBSTYPE') != 'SPECTROSCOPIC':
+                    msg = f'The image {filename} is not a spectroscopic image.'
+                    LOGGER.warning(msg)
+                    return
+
+                # check that this is *NOT* a subarray.  Eventually, we can excise
+                # the master sky image(s) and this check can be removed, but that is
+                # going to take a little more care.  Specifically, the concerns will be
+                # which CCD/detector is the subarray on?  This affects the primary
+                # for-loop over the HDUL.  This shouldn't be too hard.
+                if mastersky and phdr.get('SUBARRAY', False):
+                    msg = f"Master-sky subtraction is not supported for subarrays: {filename}"
+                    LOGGER.knownissue(msg)
+                    return
+
+                # look at each HDU
                 for hdu in hdul:
 
                     # only work on SCI images

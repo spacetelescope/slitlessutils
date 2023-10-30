@@ -125,7 +125,6 @@ class Source(list):
         self.nsig = nsig
 
         # find the pixels for this segmentation
-        # y, x = np.where((img > 0) & (seg == self.segid))
         y, x = np.where(seg == self.segid)
 
         # check for a valid image
@@ -167,49 +166,14 @@ class Source(list):
             w = self.compute_weights(subimg, x-x0, y-y0, whttype=whttype, profile=profile,
                                      negfunc=negfunc, epsilon=1e-9)
 
-            # process the pixels based on the whttype specified
-            # if self.whttype == 'pixels':
-            #    w = np.abs(img[y, x])
-            # elif self.whttype == 'constant':
-            #    w = np.full_like(x, 1./self.npixels, dtype=float)
-            # elif self.whttype == 'fitprofile':
-            #    # get an estimate on the source's elliptical properties
-            #    subwht = (subseg == self.segid).astype(float)
-            #    xc, yc, a, b, theta = self.ellipse_parameters(subimg, subwht)
-            #    amplitude = np.amax(subimg[y, x])
-            #
-            #   # define the fitting algorithm
-            #    fitter = fitting.LevMarLSQFitter()
-            #
-            #    # determine the spatial profile to fit
-            #    self.profile = profile.lower()
-            #    if self.profile == 'gaussian':
-            #        mod = models.Gaussian2D(amplitude=amplitude,
-            #                                x_mean=xc, x_stddev=a,
-            #                                y_mean=yc, y_stddev=b,
-            #                                theta=theta)
-            #    elif self.profile == 'sersic':
-            #        mod = models.Sersic2D(amplitude=amplitude,
-            #                              x_0=xc, y_0=yc,
-            #                              n=2.5, r_eff=a,
-            #                              ellip=np.sqrt(1-(b/a)**2),
-            #                              theta=theta)
-            #    else:
-            #        msg = f'profile {profile} is not supported'
-            #        raise NotImplementedError(msg)
-            #
-            #    # fit the data and compute the model
-            #    p = fitter(mod, x, y, img[y, x])
-            #    w = p(x, y)
-            #
-            # else:
-            #    self.whttype = 'pixels'
-            #    w = np.abs(img[y, x])
-            # ---------------------------------------------------------------
-            #
-            # normalize the weights
-            # self.norm = np.sum(w)
-            # w /= self.norm
+            # remove pixels with zero weights
+            g = np.where(w > 0)[0]
+            self.npixels = len(g)
+            if self.npixels == 0:
+                return
+            x = x[g]
+            y = y[g]
+            w = w[g]
 
             # compute the centeroids
             xyc = (np.average(x, weights=w), np.average(y, weights=w))
@@ -232,7 +196,7 @@ class Source(list):
             self.flux = np.sum(img[y, x])
             self.fnu = self.flux*10.**(-0.4*(zeropoint+48.6))
             if self.flux < 0:
-                self.mag = np.nan  # 99.
+                self.mag = np.nan
             else:
                 self.mag = -2.5*np.log10(self.flux)+zeropoint
 
@@ -502,8 +466,8 @@ class Source(list):
 
         Notes
         -----
-        The EXTNAME kwyord will be a string-version of the segid.
-        If the source is compound, then it wil be written with 3-dimensional
+        The EXTNAME keyword will be a string-version of the segid.
+        If the source is compound, then it will be written with 3-dimensional
             WCS.
         """
         hdr = fits.Header()
@@ -729,7 +693,7 @@ class Source(list):
             region.sed.write_file(filename, **kwargs)
 
     @staticmethod
-    def ellipse_parameters(img, x, y):  # wht):
+    def ellipse_parameters(img, x, y):
         """
         Staticmethod to compute the ellipse parameters from an image
 
@@ -774,18 +738,6 @@ class Source(list):
         X2 = np.average(x*x, weights=weights) - X*X
         Y2 = np.average(y*y, weights=weights) - Y*Y
         XY = np.average(x*y, weights=weights) - X*Y
-
-        # find the good points and normalize the weights
-        # y, x = np.where(wht > 0)
-        # w = img[y, x]*wht[y, x]
-        # w /= np.sum(w)
-        #
-        # compute the various moments
-        # X = np.sum(x*w)
-        # Y = np.sum(y*w)
-        # X2 = np.sum(x*x*w)-X*X
-        # Y2 = np.sum(y*y*w)-Y*Y
-        # XY = np.sum(x*y*w)-X*Y
 
         # compute the difference and average of the 2nd order
         dif = (X2-Y2)/2.

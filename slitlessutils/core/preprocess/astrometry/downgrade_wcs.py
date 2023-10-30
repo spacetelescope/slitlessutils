@@ -45,30 +45,33 @@ def _downgrade_wcs(imgfile, key, mode, newfile, inplace):
 
         for ext, hdu in enumerate(hdul):
 
-            wcsname = hdu.header.get('WCSNAME')
+            extname = hdu.header.get('EXTNAME')
+            if extname == 'SCI':
 
-            # get the current WCS
-            crval = utils.get_crval(hdu.header, '')
-            cd = utils.get_cd(hdu.header, '')
+                # get the current WCS
+                wcsname = hdu.header.get('WCSNAME')
+                crval = utils.get_crval(hdu.header, '')
+                cd = utils.get_cd(hdu.header, '')
 
-            # get the old WCS
-            wcsname2 = hdu.header[f'WCSNAME{key}']
-            crval2 = utils.get_crval(hdu.header, key)
-            cd2 = utils.get_cd(hdu.header, key)
+                # get the old WCS
+                wcsname2 = hdu.header.get(f'WCSNAME{key}')
+                crval2 = utils.get_crval(hdu.header, key)
+                cd2 = utils.get_cd(hdu.header, key)
 
-            # swap the WCSs
-            hdul[ext].header['WCSNAME'] = wcsname2
-            utils.set_crval(hdul[ext].header, crval2)
-            utils.set_cd(hdul[ext].header, cd2)
+                # swap the WCSs
+                hdul[ext].header['WCSNAME'] = wcsname2
+                utils.set_crval(hdul[ext].header, crval2, '')
+                utils.set_cd(hdul[ext].header, cd2, '')
 
-            hdul[ext].header['WCSNAME'] = wcsname
-            utils.set_crval(hdul[ext].header, crval)
-            utils.set_cd(hdul[ext].header, cd)
+                hdul[ext].header[f'WCSNAME{key}'] = wcsname
+                utils.set_crval(hdul[ext].header, crval, key)
+                utils.set_cd(hdul[ext].header, cd, key)
 
-            # update with some comments
-            hdul[ext].header.set('WCSTWEAK', value=True,
-                                 comment='WCS tweaked by slitlessutils')
-            hdul[ext].header.set('WCSTYPE', value='downgrade')
+                # update with some comments
+                utils.update_wcshistory(hdul[ext].header, 'downgrade')
+                # hdul[ext].header.set('WCSTWEAK', value=True,
+                #                      comment='WCS tweaked by slitlessutils')
+                # hdul[ext].header.set('WCSTYPE', value='downgrade')
 
         hdul[0].header.add_history('Downgraded astrometry')
 

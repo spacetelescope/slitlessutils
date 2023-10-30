@@ -8,7 +8,7 @@ from scipy.spatial import distance
 from scipy.cluster.hierarchy import fcluster, linkage
 
 from slitlessutils.core.wfss import WFSSCollection
-from slitlessutils import LOGGER
+from slitlessutils.logger import LOGGER
 
 
 def _get_instrument_defaults(file):

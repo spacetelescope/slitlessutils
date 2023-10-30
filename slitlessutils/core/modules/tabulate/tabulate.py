@@ -146,6 +146,9 @@ class Tabulate(Module):
 
         """
 
+        if data.subarray:
+            LOGGER.knownissue(f"Subarray is not fully supported: {data.filename}")
+
         if self._tabfunc is None:
             LOGGER.error("No function set for tabulating")
             return

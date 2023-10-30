@@ -192,7 +192,6 @@ def plot_spectra():
 
 
 def run_all(plot=True):
-    su.start_logging()
     download()
     preprocess_grism()
     preprocess_direct()
