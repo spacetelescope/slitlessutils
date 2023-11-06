@@ -110,7 +110,7 @@ filterwarnings = [
     # Ignore warning from astropy.io
     'ignore: Card is too long, comment will be truncated.',
     # Ignore cast warning in drizzle
-    'ignore: RuntimeWarning: invalid value encountered in cast'
+    'ignore: invalid value encountered in cast'
 ]
 
 [tool.coverage.run]
