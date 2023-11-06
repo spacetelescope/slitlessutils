@@ -60,7 +60,7 @@ def test_wr96_drizzle():
         # Check that our temp folder is indeed empty
         assert len(list(mosaic_dir.iterdir())) == 0
         # Actually perform drizzle
-        drizzle(rawdata_filepaths, outdir=mosaic_dir)
+        drizzle(rawdata_filepaths, outdir=mosaic_dir, num_cores=1)
         # Confirm we have our output mosaics
         assert len(list(mosaic_dir.iterdir())) > 0
 
