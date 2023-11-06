@@ -108,9 +108,9 @@ filterwarnings = [
     'ignore: `photutils.DAOStarFinder` is a deprecated alias:DeprecationWarning',
     'ignore: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.:UserWarning',
     # Ignore warning from astropy.io
-    'ignore: Card is too long, comment will be truncated.',
+    'ignore: Card is too long, comment will be truncated.:VerifyWarning',
     # Ignore cast warning in drizzle
-    'ignore: invalid value encountered in cast'
+    'ignore: invalid value encountered in cast:RuntimeWarning'
 ]
 
 [tool.coverage.run]
