@@ -42,7 +42,7 @@ dependencies = [
     'matplotlib>=3.5.2',
     'pandas>=1.4.2',
     'psutil>=5.9.0',
-    'pypolyclip',
+    'pypolyclip>=1.0.0',
     'pysiaf>=0.16.4',
     'scikit-image>=0.19.2',
     'scipy>=1.8.0',
