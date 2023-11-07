@@ -60,7 +60,7 @@ def test_wr96_drizzle():
         # Check that our temp folder is indeed empty
         assert len(list(mosaic_dir.iterdir())) == 0
         # Actually perform drizzle
-        drizzle(rawdata_filepaths, outdir=mosaic_dir)
+        drizzle(rawdata_filepaths, outdir=mosaic_dir, num_cores=1)
         # Confirm we have our output mosaics
         assert len(list(mosaic_dir.iterdir())) > 0
 
@@ -149,10 +149,10 @@ def test_drizzle_groups():
             )
         rawdata_filepaths = [str(filepath) for filepath in rawdata_dir.iterdir()]
         drizzled_files_by_visit = drizzle_grouped_files(
-            rawdata_filepaths, grouping="visit"
+            rawdata_filepaths, grouping="visit", num_cores=1
         )
         drizzled_files_by_pa = drizzle_grouped_files(
-            rawdata_filepaths, grouping="position_angle"
+            rawdata_filepaths, grouping="position_angle", num_cores=1
         )
         assert len(drizzled_files_by_pa) == len(files_to_dowload)
         assert len(drizzled_files_by_visit) == len(files_to_dowload)
