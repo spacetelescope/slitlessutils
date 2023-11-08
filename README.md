@@ -4,7 +4,7 @@ Slitlessutils is a package for simulating and extracting wide-field slitless spe
 
 
 ## Early Development Software Warning
-Slitlessutils is under active development software and subject to change. 
+Slitlessutils is under active development software and subject to change.
 
 
 ## Quickstart

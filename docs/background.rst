@@ -35,13 +35,13 @@ For a Gaussian likelihood function, the pixel weight are given as the inverse of
 .. math::
    w_{x,y} = \frac{1-\Theta_{x,y}}{U_{x,y}^2}
 
-which is initialized to all zero: :math:`\Theta_{x,y}=0`.  
+which is initialized to all zero: :math:`\Theta_{x,y}=0`.
 
 Updating the Object Mask
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 The presence of the spectra from astrophysical sources complicates the estimation of the scaling parameter, and so they must be masked [#f1]_.  In principle, the automatic detection and masking of source spectra could be done in a number of ways, but `slitlessutils` implements an iterative approach of comparing between a notional scaled background
-image and the data. 
+image and the data.
 
 The `slitlessutils` algorithm for masking objects is:
 
@@ -50,18 +50,18 @@ The `slitlessutils` algorithm for masking objects is:
 #. Estimate the optimal scaling parameter :math:`\alpha` from the above expression.
 
 #. Flag pixels in the object weights by setting pixels in :math:`\Theta_{x,y}` with
-   
+
    .. math::
       \left|S_{x,y}-\alpha\,B_{x,y}\right| \geq n_{sig} \,U_{x,y}
-    
+
    where :math:`n_{sig}` is a number of sigma for sources.
 
 #. Go to step 2, and repeat until either a maximum number of iterations is reached or the fractional change in :math:`\alpha` is below a convergence threshold :math:`\epsilon`:
-   
+
    .. math::
       \left|\alpha^{(k)} - \alpha^{(k-1)}\right| \leq \epsilon \alpha^{(k)}
-   
-   for iteration :math:`k`.  
+
+   for iteration :math:`k`.
 
 #. Use the optimized scaling parameter to compute the sky-subtracted science frame as :math:`S_{x,y}-\alpha\,B_{x,y}`.
 
@@ -71,11 +71,11 @@ At this point there are two things worth mentioning.  Firstly, there are effecti
 
 Example
 ^^^^^^^
-   
+
 Here we show a quick example to use the master-sky subtraction for a single grism exposure given by the filename :code:`grismfile`:
 
 .. code:: python
-	  
+
    import slitlessutils as su
 
    # not totally necessary, but this will engage the slitlessutils logger
@@ -101,10 +101,4 @@ The above description is for a single-component sky-background spectrum.  Howeve
 
 
 .. rubric:: Footnotes
-.. [#f1] For our present purposes, we do not need to distinguish between genuine astrophysical sources or spectral traces and cosmic rays.  However for future analyses (such as spectral extraction), this distinction will become important.  See :doc:`the documentation on cosmic rays <cosmicrays>` for more information.	 
-
-
-
-
-
-
+.. [#f1] For our present purposes, we do not need to distinguish between genuine astrophysical sources or spectral traces and cosmic rays.  However for future analyses (such as spectral extraction), this distinction will become important.  See :doc:`the documentation on cosmic rays <cosmicrays>` for more information.

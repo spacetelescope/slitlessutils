@@ -3,7 +3,7 @@
 Configuring ``slitlessutils``
 =============================
 
-Many of the functions and classes within ``slitlessutils`` expose their individual default settings, however in some cases it is important to define *global* variables that govern calibration files or large-scale aspects of the package.  Consequently, ``slitlessutils`` establishes these settings in a singleton class :class:`~slitlessutils.config.Config()` that generally acts like a standard Python dictionary.  
+Many of the functions and classes within ``slitlessutils`` expose their individual default settings, however in some cases it is important to define *global* variables that govern calibration files or large-scale aspects of the package.  Consequently, ``slitlessutils`` establishes these settings in a singleton class :class:`~slitlessutils.config.Config()` that generally acts like a standard Python dictionary.
 
 
 ``Slitlessutils`` Calibration Files
@@ -28,7 +28,7 @@ The :code:`update=True` flag will use these versions for the remainder of this s
 
 
 .. code-block:: python
-   
+
    # print all config files available
    cfg.help_refmanifest()
 
@@ -57,19 +57,19 @@ To ensure consistency between several major subcomponents of ``slitlessutils``, 
      - Purpose
    * - fluxscale
      - ``float``
-     - | The numeric scale of the spectral elements.  This is important to 
+     - | The numeric scale of the spectral elements.  This is important to
        | avoid numeric underflow errors (in some cases).
    * - fluxunits
      - ``str``
      - The physical units of the spectral elements.
    * - compression
      - ``str``
-     - | The type of data compression used in the HDF5 files as implemented 
-       | by `h5py <https://pypi.org/project/h5py/>`_. 
+     - | The type of data compression used in the HDF5 files as implemented
+       | by `h5py <https://pypi.org/project/h5py/>`_.
    * - compression_opts
      - ``int``
-     - | The compression level used in the HDF5 files as implemented by 
-       | `h5py <https://pypi.org/project/h5py/>`_. 
+     - | The compression level used in the HDF5 files as implemented by
+       | `h5py <https://pypi.org/project/h5py/>`_.
 
 
 

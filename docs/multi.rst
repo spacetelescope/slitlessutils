@@ -4,7 +4,7 @@
 Multi-Orient Extraction (`~slitlessutils.modules.extract.multi`)
 ================================================================
 
-The multi-orient extraction was first developed by `Ryan, Casertano, & Pirzkal (2018) <https://ui.adsabs.harvard.edu/abs/2018PASP..130c4501R/abstract>`_ and referred to as *LINEAR*.  This method was founded to address the contamination (or confusion) from overlapping spectral traces, where the detector records a weighted sum of the the spectra (see :numref:`confusion` below).  Therefore, this represents a fundamental degeneracy, which can only be broken with additional data.  The :doc:`single-orient extraction <single>` formalism uses the broadband data to inform the contamination model, whereas the *LINEAR* uses data at multiple orients provide a self-consistent, spectroscopic model for the entire scene.  
+The multi-orient extraction was first developed by `Ryan, Casertano, & Pirzkal (2018) <https://ui.adsabs.harvard.edu/abs/2018PASP..130c4501R/abstract>`_ and referred to as *LINEAR*.  This method was founded to address the contamination (or confusion) from overlapping spectral traces, where the detector records a weighted sum of the the spectra (see :numref:`confusion` below).  Therefore, this represents a fundamental degeneracy, which can only be broken with additional data.  The :doc:`single-orient extraction <single>` formalism uses the broadband data to inform the contamination model, whereas the *LINEAR* uses data at multiple orients provide a self-consistent, spectroscopic model for the entire scene.
 
 .. _confusion:
 .. figure:: images/confusion.png
@@ -14,7 +14,7 @@ The multi-orient extraction was first developed by `Ryan, Casertano, & Pirzkal (
    An illustration of spectral contamination or confusion (taken from `Ryan, Casertano, & Pirzkal 2018 <https://ui.adsabs.harvard.edu/abs/2018PASP..130c4501R/abstract>`_).  Along the left side of each panel, they show a red and blue point source whose celestial positions are fixed (as shown the coordinate vane).  This shows that under certain orients (lower panel), the spectra will overlap leading to the spectral degeneracy.  However, if the telescope is reoriented, then the spectral traces separate, which provides the leverage to break this degeneracy.
 
 
-Although the formative effort was to break the degeneracy from contamination/confusion, additional advantages were identified. Namely, the spectral resolution of a WFSS mode, is set by properties of the grating and the size of the source.  In analogy to the relationship between slit width and spectral resolution for long-slit spectroscopy, the size of the source projected along the dispersion axis set the resolution --- where the larger the source, the lower the resolution.  Therefore, simply averaging spectra extracted at separate orients (such as described in :doc:`single-orient extraction <single>`) will result in biases, where the resolutions are different.  Hence, one can either smooth all the data to a common resolution before averaging (which loses spectral resolution) or analyze the high-resolution data by itself (which loses signal-to-noise).  But `Ryan, Casertano, & Pirzkal (2018) <https://ui.adsabs.harvard.edu/abs/2018PASP..130c4501R/abstract>`_ find that the *LINEAR* method recovers the highest spectral resolution present in the data, at the cost of an increased computational resources and collecting data at multiple orients. 
+Although the formative effort was to break the degeneracy from contamination/confusion, additional advantages were identified. Namely, the spectral resolution of a WFSS mode, is set by properties of the grating and the size of the source.  In analogy to the relationship between slit width and spectral resolution for long-slit spectroscopy, the size of the source projected along the dispersion axis set the resolution --- where the larger the source, the lower the resolution.  Therefore, simply averaging spectra extracted at separate orients (such as described in :doc:`single-orient extraction <single>`) will result in biases, where the resolutions are different.  Hence, one can either smooth all the data to a common resolution before averaging (which loses spectral resolution) or analyze the high-resolution data by itself (which loses signal-to-noise).  But `Ryan, Casertano, & Pirzkal (2018) <https://ui.adsabs.harvard.edu/abs/2018PASP..130c4501R/abstract>`_ find that the *LINEAR* method recovers the highest spectral resolution present in the data, at the cost of an increased computational resources and collecting data at multiple orients.
 
 
 Mathematical Foundation
@@ -39,7 +39,7 @@ The known and unknown indices are grouped together with `np.ravel_multi_index() 
 respectively.  Now the above matrix-equation is recast as:
 
 .. math::
-   
+
    S_{\vartheta} = \sum_\varphi W_{\vartheta,\varphi}\, f_{\varphi}.
 
 But since this is an overconstrained problem, then the vector of unknowns :math:`f_{\varphi}` must be solved with optimization techniques:
@@ -69,7 +69,7 @@ where :math:`\ell` is the :term:`regularization parameter` and the *regularizati
 
    \xi^2(f_\varphi) = ||W||_F^2\,\sum_\varphi\left(f_{\varphi}-f_{\varphi}^{(0)}\right)^2
 
-with :math:`||W||_F` is the `Frobenius norm <https://en.wikipedia.org/wiki/Matrix_norm>`_ and :math:`f_{\varphi}^{(0)}` is the :term:`damping target`, which is initialized from the broadband data. 
+with :math:`||W||_F` is the `Frobenius norm <https://en.wikipedia.org/wiki/Matrix_norm>`_ and :math:`f_{\varphi}^{(0)}` is the :term:`damping target`, which is initialized from the broadband data.
 
 
 
@@ -107,7 +107,7 @@ As discussed above, the regularized least-squares introduces a tunable parameter
 
 #. **Single-value:** Accept a single value of the :term:`regularization parameter`, and return the vector :math:`f_{\varphi}`.
 #. **Brute-force search:** Define a linear grid of :math:`\ell`, compute the curvature [#curvefoot]_ at all points, and return the value of :math:`f_{\varphi}` that is associated with the maximizing value of :math:`\ell`.
-#. **Golden-ratio search:** `Cultrerra & Callegaro <https://ui.adsabs.harvard.edu/abs/2020IOPSN...1b5004C/abstract>`_ present a method based on subdividing the search space by various factors of the `golden ratio <https://en.wikipedia.org/wiki/Golden_ratio>`_ to minimize unnecessary calls to the sparse least-squares solver and use fewer steps than a brute-force approach.  
+#. **Golden-ratio search:** `Cultrerra & Callegaro <https://ui.adsabs.harvard.edu/abs/2020IOPSN...1b5004C/abstract>`_ present a method based on subdividing the search space by various factors of the `golden ratio <https://en.wikipedia.org/wiki/Golden_ratio>`_ to minimize unnecessary calls to the sparse least-squares solver and use fewer steps than a brute-force approach.
 
 .. note::
    The Golden search method converges the fastest and produces the best results, and so it is set as the default regularization optimizer.
@@ -138,5 +138,3 @@ Coming Soon.
 
 .. rubric:: Footnotes
 .. [#curvefoot] The curvature is adopted as the `Menger curvature <https://en.wikipedia.org/wiki/Menger_curvature>`_.
-
-

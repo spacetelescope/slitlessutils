@@ -16,7 +16,7 @@ A light weight object that describes a single WFSS image.  This object will emul
 
 * :func:`~slitlessutils.wfss.WFSS.simulated()`: load the WFSS for simulation.
 
-* :func:`~slitlessutils.wfss.WFSS.observed()`: load the WFSS as an observed file. 
+* :func:`~slitlessutils.wfss.WFSS.observed()`: load the WFSS as an observed file.
 
 
 
@@ -28,10 +28,10 @@ While one can instantiate a single WFSS file using the above, it is generally mo
 
 
 
-Observed Data (`~slitlessutils.wfss.data.wfsscollection.ObservedData()`) 
+Observed Data (`~slitlessutils.wfss.data.wfsscollection.ObservedData()`)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To load observed fits files, there are three classmethods 
+To load observed fits files, there are three classmethods
 
 * :func:`~slitlessutils.wfss.WFSSCollection.from_glob()`:  Load an observed ``WFSSCollection`` from a glob token.
 
@@ -43,7 +43,7 @@ To load observed fits files, there are three classmethods
 Example
 ~~~~~~~
 .. code:: python
-	
+
 	import slitlessutils as su
 
 	# load as a glob string
@@ -57,7 +57,7 @@ Example
 	data3 = su.wfss.WFSSCollection.from_file(filelist)
 
 
-Simulated data (`~slitlessutils.wfss.data.wfsscollection.SimulatedData()`) 
+Simulated data (`~slitlessutils.wfss.data.wfsscollection.SimulatedData()`)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To load simulated fits files, there are two classmethods
@@ -100,13 +100,11 @@ To load simulated fits files, there are two classmethods
    * - blocking
      - ``str``
      - | the name of the blocking filter.  For HST instruments, this is to be left blank,
-       | or set to ``None``, but is reserved for future development to support JWST 
+       | or set to ``None``, but is reserved for future development to support JWST
        | instruments or ACS spectro-polarimetry.
 
 
 Example WCS File (in csv format)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. include:: include/wcs.csv
-	:literal: 
-
-
+	:literal:

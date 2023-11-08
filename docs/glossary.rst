@@ -7,7 +7,7 @@ Since many terms may be used colloquially and/or have different definitions in o
 
 
 .. glossary::
-	
+
 	attitude
 		This may have many definitions, but in this context it refers to the direction and orientation that the telescope is pointed.  It is largely set by the CRVAL-keywords and the position angle, which is encoded in either the CD- or PC-matrices.  Here, this is considered synonymous with *pointing*.
 
@@ -42,7 +42,7 @@ Since many terms may be used colloquially and/or have different definitions in o
 		A model of the sky background for a WFSS image.  In principle, one should have a separate master-sky image for each spectral component present in the sky background.  However, only the HST/WFC3-IR detector has multiple-components measured (see `WFC3_back_sub <https://github.com/NorPirzkal/WFC3_Back_Sub>`_).
 
 	pick-off mirror
-	    An optical element that redirects the light to the instrument in question. 
+	    An optical element that redirects the light to the instrument in question.
 
 	pixel-area map
 		The relative area of each pixel with respect to the area of the reference pixel, which is given by the absolute value of the determinant of the Jacobian matrix.  This arises due to geometric distortion, and in the case of a SIP distortion model is a polynomial in the pixel coordinates.  Also called PAM.
@@ -72,7 +72,7 @@ Since many terms may be used colloquially and/or have different definitions in o
 		An image that describes which :term:`direct imaging` pixels belong each object, which effectively sets the extraction/simulation apertures and is used to initialize the :term:`dispersed region` for the sources.
 
 	sensitivity curve
-		The conversion between instrumental units (usually :math:`e^-/s`) to physical units (usually :math:`erg/s/cm^2/Å`), which is necessarily a function of wavelength.  
+		The conversion between instrumental units (usually :math:`e^-/s`) to physical units (usually :math:`erg/s/cm^2/Å`), which is necessarily a function of wavelength.
 
 	signal-to-noise
 		An empirical estimate of the quality of the data by comparing the measurement (the signal) to its corresponding uncertainty (the noise).  This may also be referred to as S/N or quoted as a *number of sigma* (:math:`n_{sig}`).
@@ -87,10 +87,10 @@ Since many terms may be used colloquially and/or have different definitions in o
 		The unique identification number associated with a given :term:`source`.
 
 	spectral dispersion
-		The parametric curve governing the wavelength along the :term:`spectral trace`.  Sometimes called the *wavelength solution*.  
+		The parametric curve governing the wavelength along the :term:`spectral trace`.  Sometimes called the *wavelength solution*.
 
 	spectral trace
-		The observed position of the two-dimensional spectra on the detector.  
+		The observed position of the two-dimensional spectra on the detector.
 
 	undispersed position
 	    The position a source would have in the absence of the spectral grating: :math:`(x_0,y_0)`.  Importantly, this is **not** equivalent to the zeroth-order spectral trace.

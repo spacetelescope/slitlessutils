@@ -12,5 +12,3 @@ Although there many data structures used by ``slitlessutils``, users are likely 
 	sources.rst
 	wfss.rst
 	
-
-
