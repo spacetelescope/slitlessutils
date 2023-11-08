@@ -36,7 +36,7 @@ with (Path(__file__).parents[1] / 'pyproject.toml').open('rb') as fh:
 #     'scipy': ('https://docs.scipy.org/doc/scipy/reference/',
 #               (None, 'http://data.astropy.org/intersphinx/scipy.inv')),
 #     'matplotlib': ('https://matplotlib.org/',
-#                    (None, 'http://data.astropy.org/intersphinx/matplotlib.inv')),  # noqa
+#                    (None, 'http://data.astropy.org/intersphinx/matplotlib.inv')),
 #     'astropy': ('https://docs.astropy.org/en/stable/', None)}
 
 # Add any Sphinx extension module names here, as strings. They can be

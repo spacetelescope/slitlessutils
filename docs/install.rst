@@ -43,4 +43,4 @@ There are several ways to install ``slitlessutils``:
     pip install .
 
   This approach is only somewhat more difficult than installing from PyPI,
-  but is easier to make local modifcations and submit pull requests.
+  but is easier to make local modifications and submit pull requests.

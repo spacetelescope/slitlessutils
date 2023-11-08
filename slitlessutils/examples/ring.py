@@ -85,7 +85,7 @@ def make_scene():
     # read the filter
     band = su.photometry.Throughput.from_keys(TELESCOPE, INSTRUMENT, FILTER)
 
-    # emmision line spectrum (assumed as a Gaussian)
+    # emission line spectrum (assumed as a Gaussian)
     emmflam = np.exp(-0.5 * ((contsed.lamb - clam) / slam)**2)
     emmflam /= np.sqrt(2 * np.pi * slam * slam)
     emmsed = su.photometry.SED(contsed.lamb, emmflam)
@@ -97,7 +97,7 @@ def make_scene():
 
     # make a total image as a sum ofer components, weighted by their
     # bandpass-weighted flux.  Note: the `emm_fact` is the relative
-    # caling between continuum and emission line
+    # scaling between continuum and emission line
     gal = contnorm * fcnt + emmnorm * femm * emm_fact
 
     # now only take the points inside an aperture

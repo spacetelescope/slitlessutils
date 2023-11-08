@@ -14,4 +14,4 @@ from .info import __author__, __email__, __version__  # noqa: F401
 from .linearregion import Line, Projection, Segment, Vector  # noqa: F401
 from .onedregion import Point, Text  # noqa: F401
 
-# from .pandaregion import CircularPanda,EllipticalPanda,BoxPanda  # noqa: F401
+# from .pandaregion import CircularPanda,EllipticalPanda,BoxPanda

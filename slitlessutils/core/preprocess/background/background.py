@@ -415,11 +415,11 @@ class Background:
         # set some slice objects
         # TODO: change these from lambdas to defs
         if self.dispaxis == 1:
-            loopdisp = lambda lam: (slice(None, None, None), lam)  # noqa
-            loopcross = lambda eta: (eta, slice(None, None, None))  # noqa
+            loopdisp = lambda lam: (slice(None, None, None), lam)  # noqa: E731
+            loopcross = lambda eta: (eta, slice(None, None, None))  # noqa: E731
         elif self.dispaxis == 0:
-            loopcross = lambda lam: (slice(None, None, None), lam)  # noqa
-            loopdisp = lambda eta: (eta, slice(None, None, None))  # noqa
+            loopcross = lambda lam: (slice(None, None, None), lam)  # noqa: E731
+            loopdisp = lambda eta: (eta, slice(None, None, None))  # noqa: E731
 
         # set up the iteration
         npix = np.count_nonzero(sky)

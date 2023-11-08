@@ -291,12 +291,12 @@ if __name__ == '__main__':
     y = np.array([1, 1, 2, 3, 2, 2, 3], dtype=np.uint16)
     l = np.arange(len(x), dtype=int)
 
-    # l = np.array([1, 1, 2, 2, 2, 2, 3], dtype=np.uint16)  # noqa: E741
+    # l = np.array([1, 1, 2, 2, 2, 2, 3], dtype=np.uint16)
     # v = np.array([1, 1, 2, 2, 2, 2, 3], dtype=np.float64)
 
     x = np.array([0, 0, 1, 1, 1, 2, 3, 3])
     y = np.array([1, 1, 0, 3, 2, 2, 3, 4])
-    l = np.array([0, 0, 1, 1, 6, 6, 3, 4])  # noqa: E741
+    l = np.array([0, 0, 1, 1, 6, 6, 3, 4])
     ri = reverse(l)
 
     for ll, g in ri.items():
@@ -311,7 +311,7 @@ if __name__ == '__main__':
 
     x = np.array([1, 1, 2, 2, 2, 2, 3], dtype=np.uint16)
     y = np.array([1, 1, 2, 2, 2, 2, 3], dtype=np.uint16)
-    l = np.array([1, 1, 2, 2, 2, 2, 3], dtype=np.uint16)  # noqa: E741
+    l = np.array([1, 1, 2, 2, 2, 2, 3], dtype=np.uint16)
     v = np.array([1, 1, 2, 2, 2, 2, 3], dtype=np.float64)
 
     # x=np.array([],dtype=np.uint16)
