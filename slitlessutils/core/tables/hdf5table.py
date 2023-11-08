@@ -158,7 +158,7 @@ class HDF5Table(HDF5Columns):
         Returns
         -------
         wav : `np.ndarray` dtype=float
-           The floating-point wavelength valudes
+           The floating-point wavelength values
         """
 
         if 'wav0' in self.attrs and 'dwav' in self.attrs:
@@ -389,7 +389,7 @@ class HDF5Table(HDF5Columns):
         size : int, optional
            The fontsize in the ds9 region.  Default is 12
 
-        width : int, optinal
+        width : int, optional
            The width of the ds9 region.  Default is 3
 
         kwargs : dict, optional

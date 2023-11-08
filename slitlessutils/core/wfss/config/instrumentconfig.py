@@ -667,7 +667,7 @@ class InstrumentConfig(dict):
             Full path to the fits file
 
         kwargs : dict, optional
-            Variables that are passed to the intializer
+            Variables that are passed to the initializer
 
         Returns
         -------

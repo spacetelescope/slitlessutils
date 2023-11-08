@@ -154,7 +154,7 @@ def group_by_position_angle(files, degrees=True, max_pa_diff=0.05, **kwargs):
     degrees : bool, optional
         Set to False if PA is in radians instead of degrees.
     max_pa_diff : float, optional
-        The maximium difference between PAs for two files to be considered
+        The maximum difference between PAs for two files to be considered
         part of the same group.
     '''
     data_collection = WFSSCollection.from_list(files)

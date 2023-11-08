@@ -9,7 +9,7 @@ A series of routines for configuring the WFSS data.  In general, many of these a
 
 This configures the spectrscopic setup.  This is equivalent to ```grismconf``` or ```aXeConfig```, and will act as a ```dict``` where the keys are the spectral-order names and the values are from the ```order.py```.  The spectroscopic orders contain the primary trace and dispersion objects, 
 
-- ```dispx``` and ```dispy``` represent the $x$ and $y$ coordinates of the spectral trace (respectively), and are enocded as ```StandardPolynomial``` objects in the ```parametricpolynomial.py``` file.  A "standard polynomial" is given as:
+- ```dispx``` and ```dispy``` represent the $x$ and $y$ coordinates of the spectral trace (respectively), and are encoded as ```StandardPolynomial``` objects in the ```parametricpolynomial.py``` file.  A "standard polynomial" is given as:
 $$x(t;x_0,y_0) = a_0(x_0,y_0) + a_1(x_0,y_0) t + a_2(x_0,y_0)t^2 ...$$
 $$y(t;x_0,y_0) = b_0(x_0,y_0) + b_1(x_0,y_0) t + b_2(x_0,y_0)t^2 ...$$
 where the functions $\{a(x_0,y_0)\}$ and $\{b(x_0,y_0)\}$ are given as ```SpatialPolynomial```s:

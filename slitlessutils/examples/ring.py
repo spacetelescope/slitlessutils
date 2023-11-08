@@ -85,19 +85,19 @@ def make_scene():
     # read the filter
     band = su.photometry.Throughput.from_keys(TELESCOPE, INSTRUMENT, FILTER)
 
-    # emmision line spectrum (assumed as a Gaussian)
+    # emission line spectrum (assumed as a Gaussian)
     emmflam = np.exp(-0.5*((contsed.lamb-clam)/slam)**2)
     emmflam /= np.sqrt(2*np.pi*slam*slam)
     emmsed = su.photometry.SED(contsed.lamb, emmflam)
 
     # compute bandpass averaged integrals over continuum and
-    # emmission line spectra
+    # emission line spectra
     fcnt = su.photometry.avefnu(contsed, band)
     femm = su.photometry.avefnu(emmsed, band)
 
     # make a total image as a sum ofer components, weighted by their
     # bandpass-weighted flux.  Note: the `emm_fact` is the relative
-    # caling between continuum and emission line
+    # scaling between continuum and emission line
     gal = contnorm*fcnt+emmnorm*femm*emm_fact
 
     # now only take the points inside an aperture
@@ -153,7 +153,7 @@ def make_scene():
 
 def simulate_grisms():
 
-    # write a "WCS" file to disk that contains properites of
+    # write a "WCS" file to disk that contains properties of
     # the images to emulate an observers setup
     with open(f'{ROOT}_wcs.csv', 'w') as fp:
         print('dataset,ra,dec,orientat,telescope,instrument,disperser,blocking', file=fp)

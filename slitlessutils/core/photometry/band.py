@@ -97,7 +97,7 @@ class Band:
 
     def __mul__(self, a):
         """
-        Overide something to multiple a sensitivity curve by a scalar
+        Override something to multiple a sensitivity curve by a scalar
 
         Parameters
         ----------

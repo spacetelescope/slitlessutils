@@ -213,7 +213,7 @@ class Background:
         unc : `np.ndarray`
            The uncertainty image for sigma-thresholding
 
-        mod : float or `nd.ndarray`
+        mod : float or `np.ndarray`
            The model sky image.  Must be broadcastable to the shape
            of `sci` and `unc`.
 
@@ -256,7 +256,7 @@ class Background:
         persistence or any type of bad pixels).  The masking is implemented
         via an iterative approach:
 
-        0) initalize the background model as the 3-sigma clipped median
+        0) initialize the background model as the 3-sigma clipped median
            (:math:`m`) of the pixels not flagged in the data-quality array
             and flag pixels that are
 
@@ -324,16 +324,16 @@ class Background:
             s2 = sci2[g]
             i2 = img2[g]
 
-            # compute some auxillary variables for linear fitting
-            # Foo = np.sum(s2*s2)
-            Fot = np.sum(s2*i2)
-            Ftt = np.sum(i2*i2)
+            # compute some auxiliary variables for linear fitting
+            # f_oo = np.sum(s2*s2)
+            f_ot = np.sum(s2*i2)
+            f_tt = np.sum(i2*i2)
 
             # the scale facto
-            alpha = Fot/Ftt
+            alpha = f_ot/f_tt
 
             # the chi2 and best model
-            # chi2 = Foo-alpha*Fot
+            # chi2 = F_oo-alpha*F_ot
             out = alpha*img
 
             # update the sky pixel mask

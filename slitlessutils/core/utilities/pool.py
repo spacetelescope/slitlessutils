@@ -26,7 +26,7 @@ class Pool:
             will be computed, but leave 1 CPU unused.  Default is None
 
         desc : str, optional
-            The name to preceed the `tqdm.tqdm()` progress bar.  Default
+            The name to precede the `tqdm.tqdm()` progress bar.  Default
             is ''
 
         """

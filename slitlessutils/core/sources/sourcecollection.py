@@ -160,7 +160,7 @@ class SourceCollection(dict):
              Specifier to which extension to use
 
         kwargs : dict, optional
-             The optional keywards
+             The optional keywords
 
         Notes
         -----
@@ -248,7 +248,7 @@ class SourceCollection(dict):
              A list of HDUs for the direct image
 
         kwargs : dict, optional
-             The optional keywards
+             The optional keywords
 
         Notes
         -----
@@ -360,7 +360,7 @@ class SourceCollection(dict):
         ----------
         hdul : astropy.io.fits.HDUList
            an HDUList opened from `astropy.io.fits.open()`.  This is used
-           to grab the header infor from a particular extension (as passed
+           to grab the header info from a particular extension (as passed
            by `exten` keyword).
 
         zeropoint : float or `None`
@@ -427,7 +427,7 @@ class SourceCollection(dict):
         ----------
         hdul : `astropy.io.fits.HDUList`
            an HDUList opened from `astropy.io.fits.open()`.  This is used
-           to grab the header infor from a particular extension (as passed
+           to grab the header info from a particular extension (as passed
            by `exten` keyword).
 
         throughput : None, `slitlessutls.core.photometry.Throughput`, or str

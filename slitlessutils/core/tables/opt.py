@@ -88,7 +88,7 @@ class OPT(HDF5Table):
                 # ok... let's just save some space
                 self.pdts.clear()
 
-                # chagne datatypes
+                # change datatypes
                 x = np.array(x, dtype=int)
                 y = np.array(y, dtype=int)
                 wav = np.array(wav, dtype=float)

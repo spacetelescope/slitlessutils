@@ -77,7 +77,7 @@ class Contamination(dict):
         key = (segid, ordname)
         poly = self[key]
 
-        # get teh bounds
+        # get the bounds
         bounds = poly.bounds
         x0 = np.maximum(int(np.floor(bounds[0]))-1, 0)
         y0 = np.maximum(int(np.floor(bounds[1]))-1, 0)
@@ -105,7 +105,7 @@ class Contamination(dict):
         hdr['CRPIX1'] -= x0
         hdr['CRPIX2'] -= y0
 
-        # give the LTV keywords for physical and image coordiantes
+        # give the LTV keywords for physical and image coordinates
         hdr['LTV1'] = (-x0, 'x-offset between phys. and image')
         hdr['LTV2'] = (-y0, 'y-offset between phys. and image')
 

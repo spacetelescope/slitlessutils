@@ -35,7 +35,7 @@ def load(h5, key, ptype=None):
            else) return the float value
         3) if none of these, then return the value as is
 
-        The ptype funciton applied as it was being returned
+        The ptype function applied as it was being returned
 
     Return
     ------

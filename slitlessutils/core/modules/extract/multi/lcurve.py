@@ -320,7 +320,7 @@ class LCurve:
         filename : str
            the filename to write.  The type of file is taken from the
            extension in this file.  Extensions of: txt, ascii, dat, lcv,
-           and/or lcurve are interpeted as ascii files, see
+           and/or lcurve are interpreted as ascii files, see
            `self.write_ascii()` for more information.  Extensions of
            fit or fits are fits files, see `self.write_fits()`
 

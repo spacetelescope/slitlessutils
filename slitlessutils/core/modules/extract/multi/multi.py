@@ -97,7 +97,7 @@ class Multi(Module):
 
         """
 
-        # outputing structure
+        # outputting structure
         hdul1 = fits.HDUList()     # simple extractions
         hdul3 = fits.HDUList()     # compound extractions
         hdulL = fits.HDUList()     # L-curve data
@@ -157,7 +157,7 @@ class Multi(Module):
                     else:
                         pars = self.matrix.defpars
 
-                    # variables for outputing
+                    # variables for outputting
                     wave = pars.wavelengths()
                     flam = np.full_like(wave, np.nan, dtype=float)
                     func = np.full_like(wave, np.nan, dtype=float)
@@ -175,7 +175,7 @@ class Multi(Module):
                     func[lamid] = unc[lid]      # from matrix elements
                     # func[lamid]=res.lo[lid]   # from matrix inversion (wrong!)
 
-                    # update the outputting sturctures
+                    # update the outputting structures
                     sources[segid].grpid = grpid
                     # sources[segid].spectralregions[regid].sed.reset(wave,flam,
                     sources[segid][regid].sed.reset(wave, flam, func=func)
@@ -210,7 +210,7 @@ class Multi(Module):
 #            else:
 #                pars=self.matrix.defpars
 #
-#            # variables for outputing
+#            # variables for outputting
 #            wave=pars.wavelengths()
 #            flam=np.full_like(wave,np.nan,dtype=float)
 #            func=np.full_like(wave,np.nan,dtype=float)
@@ -220,7 +220,7 @@ class Multi(Module):
 #            flam[lamid]=res.x[lid]
 #            func[lamid]=res.lo[lid]
 #
-#            # update the outputting sturctures
+#            # update the outputting structures
 #            sources[segid].spectralregions[regid].sed.reset(wave,flam,func=func#)
 #
 #            # output ascii spectrum

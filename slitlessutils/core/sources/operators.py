@@ -59,7 +59,7 @@ class Operator:
 
 class OperatorCollection(Operator, list):
     """
-    Class to chain together mutliple operators
+    Class to chain together multiple operators
     """
 
     def __str__(self):

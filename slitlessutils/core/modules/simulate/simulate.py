@@ -69,7 +69,7 @@ class Simulate(Module):
            The sources to simulate
 
         kwargs : dict, optional
-           Addtional keywords used for the flat fielding
+           Additional keywords used for the flat fielding
 
         Returns
         -------
