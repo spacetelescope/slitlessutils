@@ -53,7 +53,7 @@ class Simulate(Module):
         self.orders = orders
 
     def __str__(self):
-        s = 'Simulation Module: \n'+super().__str__()
+        s = 'Simulation Module: \n' + super().__str__()
         return s
 
     def simulate(self, data, sources, **kwargs):
@@ -185,7 +185,7 @@ class Simulate(Module):
 
                                     # apply the corrections to the weights
                                     # val *= (sens*flat*area*flam)
-                                    val *= (sens*flat*flam)
+                                    val *= (sens * flat * flam)
 
                                     # sum over wavelengths
                                     vv, yy, xx = indices.decimate(val, yg, xg,
@@ -221,7 +221,7 @@ class Simulate(Module):
 
         # record the end time
         t1 = datetime.now()
-        dt = t1-t0
+        dt = t1 - t0
 
         # put some times into the header
         phdu.header.set('ORIGIN', value=f'{__code__} v{__version__}',

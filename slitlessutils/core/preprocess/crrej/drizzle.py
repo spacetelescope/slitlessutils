@@ -173,7 +173,7 @@ def group_by_position_angle(files, degrees=True, max_pa_diff=0.05, **kwargs):
     # Return list of grouped filenames
     grouped_files = []
     files = np.array(files)
-    for i in range(1, np.max(labels)+1):
+    for i in range(1, np.max(labels) + 1):
         members = files[np.where(labels == i)]
         if len(members) == 1:
             LOGGER.warning(f"The file: {members[0]} was not grouped with any others.")

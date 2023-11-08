@@ -142,8 +142,8 @@ class Group(Module):
                     inter = thispoly.intersection(testpoly)
 
                     # is the intersection a positive region?
-                    if (inter.area > self.minarea*testpoly.area) and \
-                       (inter.area > self.minarea*thispoly.area):
+                    if (inter.area > self.minarea * testpoly.area) and \
+                       (inter.area > self.minarea * thispoly.area):
 
                         # remove the test polygon, glue the test polygon and
                         # segIDs to the primary polygon and list
@@ -157,7 +157,7 @@ class Group(Module):
             # iterate until we've cycled thru everything
             N = len(data)
             data = groups
-            nnew = ndata-N
+            nnew = ndata - N
             ndata = N
         return data
 
@@ -191,7 +191,7 @@ class Group(Module):
                 new.append(this)
             data = new
             n = len(data)
-            nnew = ndata-n
+            nnew = ndata - n
             ndata = n
         return data
 

@@ -192,7 +192,7 @@ def laplace(filename, inplace=True, newfile=None, bitvalue=None,
                 # convolve with a Laplacian and weight by uncertainty
                 sci = hdul[('SCI', extver)].data
                 con = ndimage.convolve(sci, kern)
-                s2n = np.abs(con)/hdul[('ERR', extver)].data
+                s2n = np.abs(con) / hdul[('ERR', extver)].data
 
                 # consider zooming?
                 # zoom=3.
@@ -237,10 +237,10 @@ def laplace(filename, inplace=True, newfile=None, bitvalue=None,
                         crs = indices.reverse(measure.label(bpx))
                         for idx, (y, x) in crs.items():
                             if idx > 0:
-                                y0 = max(np.amin(y)-3, 0)
-                                x0 = max(np.amin(x)-3, 0)
-                                y1 = min(np.amax(y)+3, sci.shape[0]-1)
-                                x1 = min(np.amax(x)+3, sci.shape[1]-1)
+                                y0 = max(np.amin(y) - 3, 0)
+                                x0 = max(np.amin(x) - 3, 0)
+                                y1 = min(np.amax(y) + 3, sci.shape[0] - 1)
+                                x1 = min(np.amax(x) + 3, sci.shape[1] - 1)
 
                                 subsci = sci[y0:y1, x0:x1]
                                 subgpx = gpx[y0:y1, x0:x1]
@@ -254,7 +254,7 @@ def laplace(filename, inplace=True, newfile=None, bitvalue=None,
                                                                            subsci[subgpx],
                                                                            s=1e6, kx=1, ky=1)
 
-                                hdul[('SCI', extver)].data[by+y0, bx+x0] = spline(subx[subbpx],
+                                hdul[('SCI', extver)].data[by + y0, bx + x0] = spline(subx[subbpx],
                                                                                   suby[subbpx],
                                                                                   grid=False)
 

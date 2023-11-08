@@ -278,7 +278,7 @@ class Config(dict):
             bestpath = None
 
             # get the paths in the root dir
-            glob_token = os.path.join(self.REFROOT, '*'+os.sep)
+            glob_token = os.path.join(self.REFROOT, '*' + os.sep)
             paths = glob.glob(glob_token)
 
             # check for empty paths
@@ -398,7 +398,7 @@ class Config(dict):
 
         # download the manifest file
         try:
-            f = download_file(self.REFURL+self.REFDB, timeout=self.TIMEOUT,
+            f = download_file(self.REFURL + self.REFDB, timeout=self.TIMEOUT,
                               show_progress=False)
         except TimeoutError:
             LOGGER.warning(f'Retrieving manifest timed out in {self.TIMEOUT} s.')
@@ -470,7 +470,7 @@ class Config(dict):
                 return
 
         # get the name of the files
-        remotefile = self.REFURL+reffile
+        remotefile = self.REFURL + reffile
         localfile = os.path.join(self.REFROOT, reffile)
 
         # write the remote file into local file

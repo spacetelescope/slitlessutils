@@ -113,7 +113,7 @@ class StandardPolynomial(ParametricPolynomial):
             The value of the polynomial
         """
 
-        return sum(p.evaluate(x, y)*t**i for i, p in enumerate(self))
+        return sum(p.evaluate(x, y) * t**i for i, p in enumerate(self))
 
     def deriv(self, x, y, t):
         """
@@ -137,7 +137,7 @@ class StandardPolynomial(ParametricPolynomial):
             The value of the derivative of the polynomial
         """
 
-        return sum(p.evaluate(x, y)*i*t**(i-1) for i, p in enumerate(self[1:], start=1))
+        return sum(p.evaluate(x, y) * i * t**(i - 1) for i, p in enumerate(self[1:], start=1))
 
     def _first(self, x, y, f):
         """
@@ -161,7 +161,7 @@ class StandardPolynomial(ParametricPolynomial):
         """
 
         coefs = self.coefs(x, y)
-        return (f-coefs[0])/coefs[1]
+        return (f - coefs[0]) / coefs[1]
 
     def _nth(self, x, y, f):
         """
@@ -210,14 +210,14 @@ class StandardPolynomial(ParametricPolynomial):
             deriv = dpdt(t)
 
             # A Newton-Raphson step
-            dt = (funct-f)/deriv
+            dt = (funct - f) / deriv
 
             # A Halley update
             second = d2pdt2(t)
-            dt /= (1-0.5*dt*(second/deriv))
+            dt /= (1 - 0.5 * dt * (second / deriv))
 
             # apply the step and force range
-            t = np.clip(t-dt, 0., 1.)
+            t = np.clip(t - dt, 0., 1.)
 
             # check for early convergence
             if np.amax(np.abs(dt)) < self.threshold:
@@ -264,8 +264,8 @@ class ReciprocalPolynomial(ParametricPolynomial):
         """
 
         tstar = self.tstar.evaluate(x, y)
-        omega = 1./(t-tstar)
-        return sum(p.evaluate(x, y)*omega**i for i, p in enumerate(self))
+        omega = 1. / (t - tstar)
+        return sum(p.evaluate(x, y) * omega**i for i, p in enumerate(self))
 
     def deriv(self, x, y, t):
         """
@@ -290,8 +290,8 @@ class ReciprocalPolynomial(ParametricPolynomial):
         """
 
         tstar = self.tstar.evaluate(x, y)
-        omega = 1./(t-tstar)
-        return -sum(p.evaluate(x, y)*i*omega**(i+1) for i, p in enumerate(self[1:], start=1))
+        omega = 1. / (t - tstar)
+        return -sum(p.evaluate(x, y) * i * omega**(i + 1) for i, p in enumerate(self[1:], start=1))
 
     def _first(self, x, y, f):
         """
@@ -316,7 +316,7 @@ class ReciprocalPolynomial(ParametricPolynomial):
 
         coefs = self.coefs(x, y)
 
-        t = coefs[1]/(f-coefs[0])+self.tstar.evaluate(x, y)
+        t = coefs[1] / (f - coefs[0]) + self.tstar.evaluate(x, y)
         return t
 
     def _nth(self, x, y, f):
@@ -346,8 +346,8 @@ class ReciprocalPolynomial(ParametricPolynomial):
 
         # compute the derivative coeffs
         i = np.arange(-self.order, 0)                    # for recip
-        dcoefs = coefs[:-1]*i
-        d2coefs = dcoefs*(i-1)
+        dcoefs = coefs[:-1] * i
+        d2coefs = dcoefs * (i - 1)
 
         # compute the bias
         tstar = self.tstar.evaluate(x, y)                # for recip
@@ -357,19 +357,19 @@ class ReciprocalPolynomial(ParametricPolynomial):
         for itn in range(self.maxiter):
 
             # prepare for a NR step
-            omega = 1./(t-tstar)                        # for recip
+            omega = 1. / (t - tstar)                        # for recip
             funct = np.polyval(coefs, omega)             # for recip
-            deriv = np.polyval(dcoefs, omega)*omega**2   # for recip
+            deriv = np.polyval(dcoefs, omega) * omega**2   # for recip
 
             # A Newton-Raphson step
-            dt = (funct-f)/deriv
+            dt = (funct - f) / deriv
 
             # A Halley update
-            second = np.polyval(d2coefs, omega)*omega**3
-            dt /= (1-0.5*dt*(second/deriv))
+            second = np.polyval(d2coefs, omega) * omega**3
+            dt /= (1 - 0.5 * dt * (second / deriv))
 
             # apply the step and force range
-            t = np.clip(t-dt, 0., 1.)
+            t = np.clip(t - dt, 0., 1.)
 
             # check for early convergence
             if np.amax(np.abs(dt)) < self.threshold:

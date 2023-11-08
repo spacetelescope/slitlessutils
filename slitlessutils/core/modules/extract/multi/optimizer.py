@@ -123,14 +123,14 @@ class GridSearch(Optimizer):
         """
 
         # compute a grid of log damping
-        logdamp = np.arange(self.logdamp[0], self.logdamp[1]+self.logdamp[2],
+        logdamp = np.arange(self.logdamp[0], self.logdamp[1] + self.logdamp[2],
                             self.logdamp[2])
 
         maxcurv = -np.inf
         state0 = matrix.invert(logdamp[0])
         state = state1 = matrix.invert(logdamp[1])
-        for i in range(1, len(logdamp)-1):
-            state2 = matrix.invert(logdamp[i+1])
+        for i in range(1, len(logdamp) - 1):
+            state2 = matrix.invert(logdamp[i + 1])
 
             curv = menger(state0.xy, state1.xy, state2.xy)
             if curv > maxcurv:
@@ -271,7 +271,7 @@ class Golden(Optimizer):
 
     OPTIMIZED = True
     ALGORITHM = 'golden'
-    PHI = (1+np.sqrt(5.))/2.
+    PHI = (1 + np.sqrt(5.)) / 2.
 
     def __init__(self, logdamp):
         if len(logdamp) != 3:
@@ -312,12 +312,12 @@ class Golden(Optimizer):
         """
 
         x1, x4, eps = self.logdamp[0], self.logdamp[1], self.logdamp[2]
-        x2 = (x4+self.PHI*x1)/(1+self.PHI)
-        x3 = x1+(x4-x2)
+        x2 = (x4 + self.PHI * x1) / (1 + self.PHI)
+        x3 = x1 + (x4 - x2)
         state = [matrix.invert(x) for x in (x1, x2, x3, x4)]
 
         # start the Cultrera algorithm
-        while (state[3].damp-state[0].damp) > eps*state[3].damp:
+        while (state[3].damp - state[0].damp) > eps * state[3].damp:
 
             # compute curvatures
             c2 = menger(state[0].xy, state[1].xy, state[2].xy)
@@ -331,7 +331,7 @@ class Golden(Optimizer):
                 state[2] = state[1]
 
                 # select a new damping value and compute a new state
-                x2 = (state[3].logdamp+self.PHI*state[0].logdamp)/(1+self.PHI)
+                x2 = (state[3].logdamp + self.PHI * state[0].logdamp) / (1 + self.PHI)
                 state[1] = matrix.invert(x2)
 
                 # compute new curvature
@@ -346,7 +346,7 @@ class Golden(Optimizer):
                 state[2] = state[1]
 
                 # compute new damping and state
-                x2 = (state[3].logdamp+self.PHI*state[0].logdamp)/(1+self.PHI)
+                x2 = (state[3].logdamp + self.PHI * state[0].logdamp) / (1 + self.PHI)
                 state[1] = matrix.invert(x2)
 
             else:
@@ -357,7 +357,7 @@ class Golden(Optimizer):
                 state[1] = state[2]
 
                 # compute new damping and state
-                x3 = state[0].logdamp+(state[3].logdamp-state[1].logdamp)
+                x3 = state[0].logdamp + (state[3].logdamp - state[1].logdamp)
                 state[2] = matrix.invert(x3)
 
         # return the optimal value

@@ -140,8 +140,8 @@ class DispersedRegion:
         not matter.  The output coordinates will have that shape.
         """
 
-        xx = x-self.ltv[0]
-        yy = y-self.ltv[1]
+        xx = x - self.ltv[0]
+        yy = y - self.ltv[1]
         if dtype is not None:
             xx = xx.astype(dtype, copy=False)
             yy = yy.astype(dtype, copy=False)

@@ -52,42 +52,42 @@ def make_scene():
     slam = 10.       # sigma of Gaussian Emission line (A)
 
     # make a grid for the images
-    d = NPIX/2
+    d = NPIX / 2
 
     # establish a Cartesian grid
-    y, x = np.mgrid[-d:d+1:1, -d:d+1:1]
+    y, x = np.mgrid[-d:d + 1:1, -d:d + 1:1]
     # extent=(-d,d,-d,d)           # define the extent of the image
 
     # rotate the coordinates
     theta = np.radians(pa)
     sn = np.sin(theta)
     cs = np.cos(theta)
-    xx = +x*cs+y*sn
-    yy = -x*sn+y*cs
+    xx = +x * cs + y * sn
+    yy = -x * sn + y * cs
 
     # transform to elliptical coordinates
-    rad = np.hypot(xx, yy/q)
+    rad = np.hypot(xx, yy / q)
 
     # make images that describe relative contribution of continuum
     # and emission line
 
     # Sersic value
-    bn = gammaincinv(2.*n, 0.5)
+    bn = gammaincinv(2. * n, 0.5)
 
     # normalization of the continuum image
-    contnorm = np.exp(-bn*((rad/Re)**(1./n)-1.))
+    contnorm = np.exp(-bn * ((rad / Re)**(1. / n) - 1.))
     contnorm /= np.sum(contnorm)
 
     # normalization of the emission line image
-    emmnorm = np.exp(-0.5*((rad-emm_rad)/emm_sig)**2)
+    emmnorm = np.exp(-0.5 * ((rad - emm_rad) / emm_sig)**2)
     emmnorm /= np.sum(emmnorm)
 
     # read the filter
     band = su.photometry.Throughput.from_keys(TELESCOPE, INSTRUMENT, FILTER)
 
-    # emission line spectrum (assumed as a Gaussian)
-    emmflam = np.exp(-0.5*((contsed.lamb-clam)/slam)**2)
-    emmflam /= np.sqrt(2*np.pi*slam*slam)
+    # emmision line spectrum (assumed as a Gaussian)
+    emmflam = np.exp(-0.5 * ((contsed.lamb - clam) / slam)**2)
+    emmflam /= np.sqrt(2 * np.pi * slam * slam)
     emmsed = su.photometry.SED(contsed.lamb, emmflam)
 
     # compute bandpass averaged integrals over continuum and
@@ -97,8 +97,8 @@ def make_scene():
 
     # make a total image as a sum ofer components, weighted by their
     # bandpass-weighted flux.  Note: the `emm_fact` is the relative
-    # scaling between continuum and emission line
-    gal = contnorm*fcnt+emmnorm*femm*emm_fact
+    # caling between continuum and emission line
+    gal = contnorm * fcnt + emmnorm * femm * emm_fact
 
     # now only take the points inside an aperture
     g = np.where(rad < R)
@@ -107,16 +107,16 @@ def make_scene():
     # fout=np.sum(gal[b])
     # ftot=fint+fout
 
-    scl = 10**(-0.4*(mag+48.6))/fint    # scale factor to shift fluxes
+    scl = 10**(-0.4 * (mag + 48.6)) / fint    # scale factor to shift fluxes
 
     # apply scale factor to images and shift units to e-
     # units=(2.998e10/band.photplam)*(1e8/band.photplam)/band.photflam
 
-    cntimg = contnorm*fcnt*scl/band.photfnu
-    emmimg = emmnorm*femm*scl/band.photfnu
+    cntimg = contnorm * fcnt * scl / band.photfnu
+    emmimg = emmnorm * femm * scl / band.photfnu
 
     # the final galaxy image is a sum over the spectral components
-    galimg = cntimg+emmimg
+    galimg = cntimg + emmimg
 
     # make a segimage
     segimg = np.zeros_like(galimg, dtype=int)
@@ -125,7 +125,7 @@ def make_scene():
     # make an SED file
     hdul = fits.HDUList()
     for regid, (y, x) in enumerate(zip(*g)):
-        sed = contsed*fcnt*contnorm[y, x]+emmsed*femm*emmnorm[y, x]*emm_fact
+        sed = contsed * fcnt * contnorm[y, x] + emmsed * femm * emmnorm[y, x] * emm_fact
         hdu = sed.as_HDU(extname=str(SEGID), extver=regid,
                          segid=SEGID, regid=regid, x=x, y=y)
 
@@ -137,7 +137,7 @@ def make_scene():
     w.wcs.crpix = [d, d]
     w.wcs.crval = [RA, DEC]
     w.wcs.ctype = ['RA---TAN', 'DEC--TAN']
-    w.wcs.cd = [[-PIXSCL/3600., 0.], [0., PIXSCL/3600.]]
+    w.wcs.cd = [[-PIXSCL / 3600., 0.], [0., PIXSCL / 3600.]]
     h = w.to_header()
 
     # add some info to the file
@@ -162,9 +162,9 @@ def simulate_grisms():
 
         # put each WFSS exposure in the canon
         for i, dset in enumerate(DATASETS):
-            orientat = i*(180./n)
-            line = ','.join((dset+'_'+ROOT, str(RA), str(DEC), str(orientat),
-                             TELESCOPE, INSTRUMENT+DETECTOR, DISPERSER, BLOCKING))
+            orientat = i * (180. / n)
+            line = ','.join((dset + '_' + ROOT, str(RA), str(DEC), str(orientat),
+                             TELESCOPE, INSTRUMENT + DETECTOR, DISPERSER, BLOCKING))
             print(line, file=fp)
 
     # load the grism images

@@ -51,7 +51,7 @@ class Band:
         else:
             LOGGER.warning(f'Unknown wavelength units {self.unit}. Assuming A')
 
-        self.freq = (c/self.wave)*1e10
+        self.freq = (c / self.wave) * 1e10
 
         # set ranges
         self.wmin = np.amin(self.wave[where])
@@ -62,15 +62,15 @@ class Band:
         # den=np.trapz(self.tran[where]/self.wave[where]**2,x=self.wave[where])
         # self.photplam=np.sqrt(num/den)
 
-        num = np.trapz(self.tran[where]*self.wave[where], x=self.wave[where])
-        den = np.trapz(self.tran[where]/self.wave[where], x=self.wave[where])
-        self.photplam = np.sqrt(num/den)
+        num = np.trapz(self.tran[where] * self.wave[where], x=self.wave[where])
+        den = np.trapz(self.tran[where] / self.wave[where], x=self.wave[where])
+        self.photplam = np.sqrt(num / den)
 
         # compute the max value
         self.tmax = np.amax(self.tran)
 
         # compute normalization
-        self.fnunorm = np.trapz(self.tran/self.freq, x=self.freq)
+        self.fnunorm = np.trapz(self.tran / self.freq, x=self.freq)
 
     def __call__(self, l, left=0., right=0.):
         """

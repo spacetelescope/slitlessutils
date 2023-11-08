@@ -156,11 +156,11 @@ class SED:
             return
 
         if abmag:
-            num = 10.0**(-0.4*(flux+48.6))
+            num = 10.0**(-0.4 * (flux + 48.6))
         else:
             num = flux
 
-        self *= (num/den)
+        self *= (num / den)
 
     def reset(self, *args, n=100, **kwargs):
         """
@@ -182,7 +182,7 @@ class SED:
 
         self.count = 0
         if len(args) == 2 and np.shape(args[0]) == np.shape(args[1]):
-            self.data = np.zeros(self.GROW*len(args[0]), dtype=self.DTYPE)
+            self.data = np.zeros(self.GROW * len(args[0]), dtype=self.DTYPE)
             self.append(*args, **kwargs)
         else:
             self.data = np.zeros(n, dtype=self.DTYPE)
@@ -229,9 +229,9 @@ class SED:
         length = len(self._data)
 
         # check to grow the array
-        nneed = nadd-length-self.count
+        nneed = nadd - length - self.count
         if nneed > 0:    # grow the array
-            data = np.zeros(length+self.GROW*nneed, dtype=self.DTYPE)
+            data = np.zeros(length + self.GROW * nneed, dtype=self.DTYPE)
             data[:self.count] = np.copy(self.data)
             self._data = np.copy(data)
 
@@ -244,11 +244,11 @@ class SED:
             npix = np.zeros_like(lamb, dtype=int)
 
         # put data in array
-        self._data['lamb'][self.count:self.count+nadd] = lamb
-        self._data['flam'][self.count:self.count+nadd] = flam
-        self._data['func'][self.count:self.count+nadd] = func
-        self._data['cont'][self.count:self.count+nadd] = cont
-        self._data['npix'][self.count:self.count+nadd] = npix
+        self._data['lamb'][self.count:self.count + nadd] = lamb
+        self._data['flam'][self.count:self.count + nadd] = flam
+        self._data['func'][self.count:self.count + nadd] = func
+        self._data['cont'][self.count:self.count + nadd] = cont
+        self._data['npix'][self.count:self.count + nadd] = npix
         self.count += nadd
 
     def __bool__(self):
@@ -398,7 +398,7 @@ class SED:
 
         """
 
-        self['lamb'] *= (1+z)
+        self['lamb'] *= (1 + z)
 
     @property
     def wmin(self):
@@ -497,7 +497,7 @@ class SED:
         #               left=self.flam[g[0]],right=self.flam[g[-1]])
 
         if fnu:
-            flux *= ((wave/c)*(wave/1e10))
+            flux *= ((wave / c) * (wave / 1e10))
 
         return flux
 
@@ -540,9 +540,9 @@ class SED:
         # adjust units of flux density
         units = hdu.header.get("TUNIT2", '').lower()
         if units in ('fnu',):
-            const = (c/lamb)*(1e10/lamb)
-            flam = flux*const
-            flamunc = func*const
+            const = (c / lamb) * (1e10 / lamb)
+            flam = flux * const
+            flamunc = func * const
         elif units in ('flam', 'erg/(s*cm**2*aa)'):
             flam = np.copy(flux)
             flamunc = np.copy(func)
@@ -780,5 +780,5 @@ if __name__ == '__main__':
     l = np.arange(50)
     f = np.arange(1, 51)
     x.append(l, f)
-    y = x*2.
+    y = x * 2.
     print(y.data)

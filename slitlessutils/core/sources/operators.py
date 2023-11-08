@@ -65,9 +65,9 @@ class OperatorCollection(Operator, list):
     def __str__(self):
         s = 'Collection of morphological operators: '
         if len(self) == 0:
-            return s+'<EMPTY>'
+            return s + '<EMPTY>'
         else:
-            return s+'\n'.join(str(s) for s in self)
+            return s + '\n'.join(str(s) for s in self)
 
     def __call__(self, *args):
         """
@@ -343,7 +343,7 @@ class Smooth(Operator):
             W = np.ones_like(img)
             W[bad] = 0
             WW = filt(W, self.smthsize)
-            new = VV/np.maximum(WW, 1e-5)
+            new = VV / np.maximum(WW, 1e-5)
 
             # fig,axes=plt.subplots(2,2)
             # axes[0][0].imshow(img,origin='lower')
@@ -421,8 +421,8 @@ class Rebin(Operator):
         if binfact > 1 and self.binfun in self.__funcs:
 
             dim = img.shape
-            new = [(dim[0]+1)//binfact, (dim[1]+1)//binfact]
-            bins = np.arange(dim[0]*dim[1]).reshape(dim)+1
+            new = [(dim[0] + 1) // binfact, (dim[1] + 1) // binfact]
+            bins = np.arange(dim[0] * dim[1]).reshape(dim) + 1
             ones = np.ones((binfact, binfact), dtype=np.int)
             bins = np.kron(bins, ones)[:dim[0], :dim[1]]
             b = np.unique(bins)
@@ -434,8 +434,8 @@ class Rebin(Operator):
             newhdr['NAXIS1'] = newimg.shape[1]
             newhdr['NAXIS2'] = newimg.shape[0]
 
-            newhdr['CRPIX1'] = (newhdr['CRPIX1']+0.5)/binfact + 0.5
-            newhdr['CRPIX2'] = (newhdr['CRPIX2']+0.5)/binfact + 0.5
+            newhdr['CRPIX1'] = (newhdr['CRPIX1'] + 0.5) / binfact + 0.5
+            newhdr['CRPIX2'] = (newhdr['CRPIX2'] + 0.5) / binfact + 0.5
 
             if all(k in newhdr for k in self.CDMAT):
                 newhdr['CD1_1'] *= binfact

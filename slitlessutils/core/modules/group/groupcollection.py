@@ -27,7 +27,7 @@ class GroupCollection(list):
 
     def __str__(self):
         if self:
-            s = "Extraction Groups:\n" + '\n'.join('  '+str(g) for g in self)
+            s = "Extraction Groups:\n" + '\n'.join('  ' + str(g) for g in self)
         else:
             s = 'Extraction Groups (None)'
         return s

@@ -115,22 +115,22 @@ def make_scene():
         dim = func(xim, yim)
 
         # get the expected total flux given the requested AB mag
-        ftot = 10.**(-0.4*(m-band.zeropoint))
+        ftot = 10.**(-0.4 * (m - band.zeropoint))
 
         # scale the delta image and add into the image
-        img += (dim*(ftot/np.sum(dim)))
+        img += (dim * (ftot / np.sum(dim)))
 
         # compute the aperture flux
-        rim = np.hypot(xim-x, yim-y)
-        g = np.where(rim < APERRAD/PIXSCL)
+        rim = np.hypot(xim - x, yim - y)
+        g = np.where(rim < APERRAD / PIXSCL)
         seg[g] = segid
 
     # make header for the direct and segmentation image
     w = WCS(naxis=2)
-    w.wcs.crpix = [NPIX/2., NPIX/2.]
+    w.wcs.crpix = [NPIX / 2., NPIX / 2.]
     w.wcs.crval = [RA, DEC]
     w.wcs.ctype = ['RA---TAN', 'DEC--TAN']
-    w.wcs.cd = [[-PIXSCL/3600., 0.], [0., PIXSCL/3600.]]
+    w.wcs.cd = [[-PIXSCL / 3600., 0.], [0., PIXSCL / 3600.]]
     h = w.to_header()
 
     # add some info to the file
@@ -169,9 +169,9 @@ def simulate_grisms():
 
         # put each WFSS exposure in the canon
         for i, dset in enumerate(DATASETS):
-            orientat = i*(180./n)
-            line = ','.join((dset+'_'+ROOT, str(RA), str(DEC), str(orientat),
-                             TELESCOPE, INSTRUMENT+DETECTOR, DISPERSER, BLOCKING))
+            orientat = i * (180. / n)
+            line = ','.join((dset + '_' + ROOT, str(RA), str(DEC), str(orientat),
+                             TELESCOPE, INSTRUMENT + DETECTOR, DISPERSER, BLOCKING))
             print(line, file=fp)
 
     # load the grism images
@@ -249,7 +249,7 @@ def extract_multi():
 
     # run the multi-orient extraction
     ext = su.modules.Multi('+1', (-3., 1., 0.1), algorithm='grid')
-    res = ext(data, sources, root=ROOT+'_multi')
+    res = ext(data, sources, root=ROOT + '_multi')
 
     return res
 
@@ -286,7 +286,7 @@ def extract_group():
 
     # pass the groups to the multi-extract
     ext = su.modules.Multi('+1', (-3., 1., 0.1), algorithm='grid')
-    res = ext(data, sources, root=ROOT+'_group', groups=groups)
+    res = ext(data, sources, root=ROOT + '_group', groups=groups)
 
     return res
 
@@ -332,9 +332,9 @@ def compare(nsig=1.):
     """
 
     n = len(SOURCES)
-    m = 2*n
-    aspect = 4./3.
-    fig, axes = plt.subplots(n, 1, figsize=(m, m*aspect), sharex=True)
+    m = 2 * n
+    aspect = 4. / 3.
+    fig, axes = plt.subplots(n, 1, figsize=(m, m * aspect), sharex=True)
 
     regid = 0
     for ax, (segid, (x, y, mag, sedfile)) in zip(axes, SOURCES.items()):
@@ -344,7 +344,7 @@ def compare(nsig=1.):
 
         g = np.where((WRANGE[0] <= l) & (l <= WRANGE[1]))
 
-        ylim = (np.amin(f[g])*0.9, np.amax(f[g])*1.1)
+        ylim = (np.amin(f[g]) * 0.9, np.amax(f[g]) * 1.1)
         ax.set_ylim(*ylim)
         ax.set_xlim(*WRANGE)
         model = ax.plot(l, f, label='input spectrum', color='black')
@@ -364,8 +364,8 @@ def compare(nsig=1.):
                     s = str(segid)
                     if s in hdul:
                         hdu = hdul[s]
-                        lo = hdu.data['flam']-nsig*hdu.data['func']
-                        hi = hdu.data['flam']+nsig*hdu.data['func']
+                        lo = hdu.data['flam'] - nsig * hdu.data['func']
+                        hi = hdu.data['flam'] + nsig * hdu.data['func']
 
                         patch = ax.fill_between(hdu.data['lamb'], lo, hi,
                                                 color=c, alpha=0.2)

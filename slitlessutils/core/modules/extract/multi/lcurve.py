@@ -89,9 +89,9 @@ class LCurve:
         """
 
         self.data.sort('logchi2')
-        for j in range(1, len(self.data)-1):
-            i = j-1
-            k = j+1
+        for j in range(1, len(self.data) - 1):
+            i = j - 1
+            k = j + 1
 
             pi = (self.data['logchi2'][i], self.data['lognorm'][i])
             pj = (self.data['logchi2'][j], self.data['lognorm'][j])
@@ -170,7 +170,7 @@ class LCurve:
 
         # get the colormap and lighten it
         cmap = plt.cm.get_cmap(colormap)
-        cmap = self.remap_cmap(lambda x: lighten*(1.+x), cmap)
+        cmap = self.remap_cmap(lambda x: lighten * (1. + x), cmap)
 
         # compute curvatures
         self.compute_curvature()
@@ -242,7 +242,7 @@ class LCurve:
         # set the xrange
         if lmax == lmin:
             if np.isfinite(lmax):
-                ax2.set_xlim([lmin-0.5, lmax+0.5])
+                ax2.set_xlim([lmin - 0.5, lmax + 0.5])
             else:
                 ax2.set_xlim([-5, 0])
         else:

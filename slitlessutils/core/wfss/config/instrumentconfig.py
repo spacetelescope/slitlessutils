@@ -91,7 +91,7 @@ class SIAF:
             The position angle of the v3 axis
         """
 
-        pav3 = (orientat-self.v3y) % 360
+        pav3 = (orientat - self.v3y) % 360
 
         return pav3
 
@@ -135,7 +135,7 @@ class SIAF:
             # local_roll=-orientat-self.v3y
             # is essentially that.  Higher order will require more coding.
             # local_roll=-orientat-self.v3y
-            local_roll = orientat-self.v3y
+            local_roll = orientat - self.v3y
             A = pysiaf.rotations.attitude(refsiaf.v2, refsiaf.v3,
                                           ra, dec, local_roll)
 
@@ -333,13 +333,13 @@ class Noise:
         image.
         """
 
-        pvars = sci*self.time
-        pvarb = (self.dark+self.back)*self.time
-        new = np.random.poisson(lam=pvars+pvarb, size=sci.shape)-pvarb
+        pvars = sci * self.time
+        pvarb = (self.dark + self.back) * self.time
+        new = np.random.poisson(lam=pvars + pvarb, size=sci.shape) - pvarb
 
         gvar = self.read**2
-        new = np.random.normal(loc=new, scale=np.sqrt(gvar))/self.time
-        unc = np.sqrt(pvars+pvarb+gvar)/self.time
+        new = np.random.normal(loc=new, scale=np.sqrt(gvar)) / self.time
+        unc = np.sqrt(pvars + pvarb + gvar) / self.time
 
         return new, unc
 
@@ -446,7 +446,7 @@ class DetectorConfig:
             i.append(int(ii))
             j.append(int(jj))
             v.append(float(val))
-        n = np.maximum(np.amax(i), np.amax(j))+1
+        n = np.maximum(np.amax(i), np.amax(j)) + 1
         sip = np.zeros((n, n), dtype=float)
         sip[j, i] = v
         return sip
@@ -863,7 +863,7 @@ class InstrumentConfig(dict):
                            before='TELESCOP')
 
         if not isinstance(targname, str):
-            targname = ' '*8
+            targname = ' ' * 8
         phdr['TARGNAME'] = (targname, "proposer's target name")
         headers.add_stanza(phdr, 'Target Information', before='TARGNAME')
 
@@ -871,9 +871,9 @@ class InstrumentConfig(dict):
         dt = datetime.now()
 
         exptime = self[list(self.keys())[0]].noise.time
-        delta = dt-MJDREF
-        mjd0 = delta.days+(delta.seconds+delta.microseconds/1e6)/86400.
-        mjd1 = mjd0+exptime/86400.
+        delta = dt - MJDREF
+        mjd0 = delta.days + (delta.seconds + delta.microseconds / 1e6) / 86400.
+        mjd1 = mjd0 + exptime / 86400.
 
         phdr['DATE-OBS'] = (dt.strftime('%Y-%m-%d'), 'UT date of start of observation (yyyy-mm-dd)')
         phdr['TIME-OBS'] = (dt.strftime('%H:%M:%S'), 'UT time of start of observation (hh:mm:ss)')

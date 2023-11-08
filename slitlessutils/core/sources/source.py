@@ -134,10 +134,10 @@ class Source(list):
 
             # crop the image
             # get a bounding box
-            x0 = max(np.amin(x)-self.backsize, 0)
-            y0 = max(np.amin(y)-self.backsize, 0)
-            x1 = min(np.amax(x)+self.backsize, img.shape[1]-1)
-            y1 = min(np.amax(y)+self.backsize, img.shape[0]-1)
+            x0 = max(np.amin(x) - self.backsize, 0)
+            y0 = max(np.amin(y) - self.backsize, 0)
+            x1 = min(np.amax(x) + self.backsize, img.shape[1] - 1)
+            y1 = min(np.amax(y) + self.backsize, img.shape[0] - 1)
 
             # cut out regions
             subimg = img[y0:y1, x0:x1]
@@ -164,7 +164,7 @@ class Source(list):
                 self.background = 0.0
 
             # convert the image into weights
-            w = self.compute_weights(subimg, x-x0, y-y0, whttype=whttype, profile=profile,
+            w = self.compute_weights(subimg, x - x0, y - y0, whttype=whttype, profile=profile,
                                      negfunc=negfunc, epsilon=1e-9)
 
             # remove pixels with zero weights
@@ -183,7 +183,7 @@ class Source(list):
             self.adc = (float(adc[0]), float(adc[1]))
 
             # compute the area of the object
-            self.area = self.npixels*self.pixelarea
+            self.area = self.npixels * self.pixelarea
 
             #
             # compute some fluxes:
@@ -195,11 +195,11 @@ class Source(list):
             #            whttype=='pixels', else they'll be similar
             #
             self.flux = np.sum(img[y, x])
-            self.fnu = self.flux*10.**(-0.4*(zeropoint+48.6))
+            self.fnu = self.flux * 10.**(-0.4 * (zeropoint + 48.6))
             if self.flux < 0:
                 self.mag = np.nan
             else:
-                self.mag = -2.5*np.log10(self.flux)+zeropoint
+                self.mag = -2.5 * np.log10(self.flux) + zeropoint
 
             # put coordinates back on original footprint
             # x,y=self.image_coordinates(x,y,dtype=np.int)
@@ -210,7 +210,7 @@ class Source(list):
                 r = reg[y, x].astype(int)
             elif self.segid < 0:
                 # a negative SEGID means checkerboard REGION
-                r = np.arange(1, len(x)+1, dtype=int)
+                r = np.arange(1, len(x) + 1, dtype=int)
             else:
                 # if everything is invalid, then set to a single value
                 r = np.ones_like(x, dtype=int)
@@ -286,7 +286,7 @@ class Source(list):
                 mod = models.Sersic2D(amplitude=amplitude,
                                       x_0=xc, y_0=yc,
                                       n=2.5, r_eff=a,
-                                      ellip=np.sqrt(1-(b/a)**2),
+                                      ellip =np.sqrt(1 - (b / a)**2),
                                       theta=theta)
             else:
                 msg = f'profile {profile} is not supported'
@@ -303,7 +303,7 @@ class Source(list):
         # must remap the pixels into some positive weights
         self.negfunc = negfunc.lower()
         if self.negfunc == 'positivity':
-            v = 0.5*(w+np.sqrt(w*w+epsilon))
+            v = 0.5 * (w + np.sqrt(w * w + epsilon))
         elif self.negfunc == 'abs':
             v = np.abs(w)
         elif self.negfunc == 'relu':
@@ -314,7 +314,7 @@ class Source(list):
             self.negfunc = 'positivity'
             LOGGER.warning(
                 f'Negative pixel function ({negfunc.lower()}) not found, using {self.negfunc}')
-            v = 0.5*(w+np.sqrt(w*w+epsilon))
+            v = 0.5 * (w + np.sqrt(w * w + epsilon))
 
         # normalize
         v /= np.sum(v)
@@ -488,7 +488,7 @@ class Source(list):
         if self.whttype == 'fitprofile':
             hdr['WHTPROF'] = (self.profile, 'The analytic profile for the weights')
         hdr['NREGIONS'] = (self.nregions, 'number of spectral regions')
-        hdr['AREA'] = (self.npixels*self.pixelarea, 'source area (arcsec2)')
+        hdr['AREA'] = (self.npixels * self.pixelarea, 'source area (arcsec2)')
         headers.add_stanza(hdr, 'Source Properties', before='SEGID')
 
         hdr['BCKSUB'] = (self.local_back, 'Was local background in direct image subtracted')
@@ -574,8 +574,8 @@ class Source(list):
         not matter.  The output coordinates will have that shape.
         """
 
-        xx = x-self.ltv[0]
-        yy = y-self.ltv[1]
+        xx = x - self.ltv[0]
+        yy = y - self.ltv[1]
         if dtype is not None:
             xx = xx.astype(dtype)
             yy = yy.astype(dtype)
@@ -632,7 +632,7 @@ class Source(list):
             sed = sedlib[regkey]
 
             if sed and throughput:
-                sed.normalize(throughput, self.fnu*np.sum(region.w))
+                sed.normalize(throughput, self.fnu * np.sum(region.w))
 
             region.sed = sed
 
@@ -660,7 +660,7 @@ class Source(list):
         for regkey, region in self.items():
 
             # region.sed.set_sed(waves,flam*np.sum(region.w))
-            region.sed.append(waves, flam*np.sum(region.w))
+            region.sed.append(waves, flam * np.sum(region.w))
 
     def write_seds(self, filetype='sed', path=None, **kwargs):
         """
@@ -736,23 +736,23 @@ class Source(list):
         # compute various moments
         X = np.average(x, weights=weights)
         Y = np.average(y, weights=weights)
-        X2 = np.average(x*x, weights=weights) - X*X
-        Y2 = np.average(y*y, weights=weights) - Y*Y
-        XY = np.average(x*y, weights=weights) - X*Y
+        X2 = np.average(x * x, weights=weights) - X * X
+        Y2 = np.average(y * y, weights=weights) - Y * Y
+        XY = np.average(x * y, weights=weights) - X * Y
 
         # compute the difference and average of the 2nd order
-        dif = (X2-Y2)/2.
-        ave = (X2+Y2)/2.
+        dif = (X2 - Y2) / 2.
+        ave = (X2 + Y2) / 2.
 
         # compute the main radical
-        rad = np.sqrt(dif**2+XY**2)
+        rad = np.sqrt(dif**2 + XY**2)
 
         # compute axes
-        a = np.sqrt(ave+rad)
-        b = np.sqrt(ave-rad)
+        a = np.sqrt(ave + rad)
+        b = np.sqrt(ave - rad)
 
         # compute the position angle (in radians)
-        theta = 0.5*np.arctan2(XY, dif)
+        theta = 0.5 * np.arctan2(XY, dif)
 
         return X, Y, a, b, theta
 
@@ -774,7 +774,7 @@ class Source(list):
             x.extend(region.x)
             y.extend(region.y)
             w.extend(region.w)
-            r.extend([regid]*len(region))
+            r.extend([regid] * len(region))
 
         x = np.array(x)
         y = np.array(y)
@@ -783,7 +783,7 @@ class Source(list):
 
         x0, x1 = np.amin(x), np.amax(x)
         y0, y1 = np.amin(y), np.amax(y)
-        shape = (y1-y0+1, x1-x0+1)
+        shape = (y1 - y0 + 1, x1 - x0 + 1)
 
         wht = np.full(shape, np.nan)
         reg = np.full(shape, np.nan)

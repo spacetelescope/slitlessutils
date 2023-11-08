@@ -112,8 +112,8 @@ def preprocess_direct():
 
     xx, yy = np.meshgrid(np.arange(hdr['NAXIS1']),
                          np.arange(hdr['NAXIS2']))
-    rr = np.hypot(xx-x, yy-y)
-    seg = rr < (RAD/SCALE)
+    rr = np.hypot(xx - x, yy - y)
+    seg = rr < (RAD / SCALE)
 
     # add some things for SU
     hdr['TELESCOP'] = TELESCOPE
@@ -160,19 +160,19 @@ def plot_spectra():
 
     # load the data and change the units
     dat, hdr = fits.getdata(f'{ROOT}_x1d.fits', header=True)
-    dat['flam'] *= cfg.fluxscale/1e-13
-    dat['func'] *= cfg.fluxscale/1e-13
+    dat['flam'] *= cfg.fluxscale / 1e-13
+    dat['func'] *= cfg.fluxscale / 1e-13
 
     # get a good range of points to compute a (variance-weighted) scale factor
     g = np.where((dat['lamb'] > 5800) & (dat['lamb'] < 9900))[0]
     ff2 = np.interp(dat['lamb'], l, ff)
-    num = np.sum((dat['flam'][g]/dat['func'][g])**2)
-    den = np.sum((ff2[g]/dat['func'][g])*(dat['flam'][g]/dat['func'][g]))
-    scl = num/den
+    num = np.sum((dat['flam'][g] / dat['func'][g])**2)
+    den = np.sum((ff2[g] / dat['func'][g]) * (dat['flam'][g] / dat['func'][g]))
+    scl = num / den
 
     # plot the SU spectrum
     plt.plot(dat['lamb'], dat['flam'], label=GRATING)
-    plt.plot(l, ff*scl, label='Larsen et al. (smoothed)')
+    plt.plot(l, ff * scl, label='Larsen et al. (smoothed)')
 
     # uncomment this to see the hi-res file.
     # plt.plot(l, f, label='Larsen et al. (high-res)')

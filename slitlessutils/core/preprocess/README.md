@@ -8,4 +8,3 @@ There are a few pre-processing steps that often have to be carried out before an
    - Laplace edge detection (**laplace.py**): this utlizes the fact that cosmic-ray events produce sharp features and are undispersed.  Therefore, their second derivatives will be uncharacteristically large, and can be used to flag sources.
 
    - astrodrizzle comparison ```raise NotImplementedError('currently working on this')```
->>>>>>> 86ea891 (Misc code fixes)

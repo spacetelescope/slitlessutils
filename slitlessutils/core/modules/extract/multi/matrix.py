@@ -128,7 +128,7 @@ class Matrix:
                 nw = nwave
 
             for sedkey, sedreg in source.items():
-                self.cumlam.append(self.cumlam[-1]+nw)
+                self.cumlam.append(self.cumlam[-1] + nw)
                 self.sedkeys.append(sedkey)
         self.cumlam = np.array(self.cumlam, dtype=int)
 
@@ -229,7 +229,7 @@ class Matrix:
 
                         # grab the observations and weight by uncertainty
                         # (basically just the signal-to-noise)
-                        bi = sci[yg, xg]/np.maximum(unc[yg, xg], self.minunc)
+                        bi = sci[yg, xg] / np.maximum(unc[yg, xg], self.minunc)
 
                         # save the results
                         self.bi.extend(bi)
@@ -259,7 +259,7 @@ class Matrix:
         dim = np.array([self.npix, self.npar], int)   # dimensionality of matrix
 
         # do a sanity check
-        if np.amax(self.icomp) != len(self.bi)-1:
+        if np.amax(self.icomp) != len(self.bi) - 1:
             msg = f'Matrix has invalid dimensionlity: ({self.npix}\u00d7{self.npar})'
             LOGGER.error(msg)
             raise RuntimeError(msg)
@@ -279,10 +279,10 @@ class Matrix:
         if self.nsources == 1:
             extind = np.zeros(self.npar, dtype=self.juniq.dtype)
         else:
-            extind = np.digitize(self.juniq, self.cumlam)-1
+            extind = np.digitize(self.juniq, self.cumlam) - 1
 
         try:
-            self.lamids = self.juniq-self.cumlam[extind]
+            self.lamids = self.juniq - self.cumlam[extind]
 
         except BaseException:
             LOGGER.debug(self.npix, self.npar, self.nsources)
@@ -292,7 +292,7 @@ class Matrix:
         self.ri = indices.reverse(extind)
 
         # compute the density of the matrix
-        self.density = float(len(self.aij))/float(dim[0]*dim[1])
+        self.density = float(len(self.aij)) / float(dim[0] * dim[1])
 
         # ok ok ok... NOW make a matrix
         self.A = coo_matrix((self.aij, (self.icomp, self.jcomp)), shape=dim)
@@ -383,32 +383,32 @@ class Matrix:
         # 2) flat field
         # 3) pixel-area map (PAM)
         # 4) uncertainty
-        sens = detdata.config[ordname].sensitivity(wav)*self.fluxscale
+        sens = detdata.config[ordname].sensitivity(wav) * self.fluxscale
         flat = flatfield(x, y, wav)
         area = detdata.relative_pixelarea(x, y)
         uval = np.maximum(unc[y, x], self.minunc)     # set the uncertaint floor
 
         # rescale the tables' values
-        val *= (sens*flat*area/uval)
+        val *= (sens * flat * area / uval)
 
         # group the wavelength indices according to the extraction settings
         # NB: the -1 is because digitize is 1-indexed, but arrays are
         #     0-indexed, so gotta shift it back
         if hasattr(source, 'extpars'):
-            ll = np.digitize(wav, source.extpars.limits())-1
+            ll = np.digitize(wav, source.extpars.limits()) - 1
         else:
-            ll = np.digitize(wav, self.defpars.limits())-1
+            ll = np.digitize(wav, self.defpars.limits()) - 1
 
         # compute the knowns index (called 'i' above).  First compute a
         # i-index offset based on number of pixels to add it here, but
         # will need to subtract it off below.
-        ii0 = detdata.npixels()*self.detindex
-        ii = np.ravel_multi_index((x, y), dims=detdata.naxis, order='F')+ii0
+        ii0 = detdata.npixels() * self.detindex
+        ii = np.ravel_multi_index((x, y), dims=detdata.naxis, order='F') + ii0
 
         # compute the unknowns index (called 'j' above), but gotta take
         # extra care here if there a different number of wavelength
         # elements per source.
-        jj = ll+self.cumlam[self.srcindex]
+        jj = ll + self.cumlam[self.srcindex]
 
         # decimate over the matrix coordinates --- meaning, sum over
         # repeated matrix indices (ii,jj).  This will leave only the
@@ -416,7 +416,7 @@ class Matrix:
         vu, iu, ju = indices.decimate(val, ii, jj, dims=(self.nknowns, self.nunknowns))
 
         # get the grism-pixel coordinates (subtracting the offset as promised)
-        xygu = indices.uniq(iu-ii0)
+        xygu = indices.uniq(iu - ii0)
 
         # save all these values and increment a global counter
         self.i.extend(list(iu))
@@ -461,7 +461,7 @@ class Matrix:
 
             bi = self.A.matvec(xj)
 
-            npix = self.imgdim[0]*self.imgdim[1]
+            npix = self.imgdim[0] * self.imgdim[1]
 
             imgindices, pixindices = np.divmod(self.iuniq, npix)
 
@@ -492,7 +492,7 @@ class Matrix:
 
         """
         if self:
-            self.target = target/self.fluxscale
+            self.target = target / self.fluxscale
             self.bi -= self.A.matvec(self.target)
         else:
             LOGGER.warning("Cannot set damping target until matrix is built")
@@ -635,7 +635,7 @@ class Matrix:
         (x, istop, itn, norm, arnorm, anorm, acond, xnorm) = linalg.lsmr(self.A, self.bi,
                                                                          damp=damp, **kwargs)
         r1norm = arnorm
-        r2norm = np.sqrt(arnorm**2+(damp*xnorm)**2)
+        r2norm = np.sqrt(arnorm**2 + (damp * xnorm)**2)
         unc = np.full_like(x, np.nan)
         r = Result('LSMR', x, istop, itn, r1norm, r2norm, anorm, acond, arnorm, xnorm,
                    unc, damp)
@@ -658,7 +658,7 @@ class Matrix:
         """
         LOGGER.warning("Uncertainties are not exact in `matrix.py`")
 
-        aij2, j = indices.decimate(self.A.A.data*self.A.A.data,
+        aij2, j = indices.decimate(self.A.A.data * self.A.A.data,
                                    self.juniq[self.jcomp])
 
         # these two lines to avoid divide-by-zero errors
@@ -691,7 +691,7 @@ class Matrix:
 
         hdr['NPIX'] = (self.npix, 'number of pixels analyzed (ie. knowns)')
         hdr['NPAR'] = (self.npar, 'number of parameters measured (ie. unknowns)')
-        hdr['NDOF'] = (self.npix-self.npar, 'number of degrees of freedom')
+        hdr['NDOF'] = (self.npix - self.npar, 'number of degrees of freedom')
         hdr['DENSITY'] = (self.density, 'fraction of non-zero elements')
         hdr['FROBNORM'] = (self.frob, 'Frobenius norm')
 

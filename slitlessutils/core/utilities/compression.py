@@ -37,7 +37,7 @@ def compress(filename, comptype='gz', keeporig=False):
         LOGGER.warning(f'Unsupported compression type: {comptype}')
         return None
 
-    zipfile = filename+'.'+comptype
+    zipfile = filename + '.' + comptype
 
     with open(filename, 'rb') as new_file:
         if comptype in ('gz', 'gzip'):

@@ -34,8 +34,8 @@ class Pool:
         # get some settings for the processing
         ncpus = ps.cpu_count(logical=False)
         ncores = ps.cpu_count(logical=True)
-        nthreads = ncores//ncpus
-        nmax = ncpus-nthreads
+        nthreads = ncores // ncpus
+        nmax = ncpus - nthreads
 
         # set a default to the max
         if ncpu is None or ncpu <= 0:

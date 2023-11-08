@@ -50,6 +50,6 @@ def avefnu(sed, band):
 
         fnu = sed(band.wave, fnu=True)
 
-        ave = np.trapz(fnu*band.tran/band.freq, x=band.freq)/band.fnunorm
+        ave = np.trapz(fnu * band.tran / band.freq, x=band.freq) / band.fnunorm
 
     return ave
