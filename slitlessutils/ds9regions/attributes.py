@@ -1,4 +1,4 @@
-class Font(object):
+class Font:
     def __init__(self, face='helvetica', size=10, bold=False, italic=False):
         if face not in ('times', 'helvetica', 'courier'):
             face = 'helvetica'

@@ -4,14 +4,14 @@
 Calibrations for WFSS
 =====================
 
-The calibration files for ``slitlessutils`` are staged on a centralized box repository, which can be accessed using the :class:`~slitlessutils.Config()` object.  For more information, please see :doc:`the configuration documentation <configure>`.  
+The calibration files for ``slitlessutils`` are staged on a centralized box repository, which can be accessed using the :class:`~slitlessutils.Config()` object.  For more information, please see :doc:`the configuration documentation <configure>`.
 
 
 
 Spectral Specification
 ----------------------
 
-To extract or simulate WFSS data, we must specify the `Spectral Trace`_  and the `Spectral Dispersion`_, which are each given as parametric curves (as described in `Pirzkal and Ryan 2017 <https://www.stsci.edu/files/live/sites/www/files/home/hst/instrumentation/wfc3/documentation/instrument-science-reports-isrs/_documents/2017/WFC3-2017-01.pdf>`_). In brief, here a parameter: :math:`0 \leq t \leq 1` describes the :math:`(x(t), y(t),\lambda(t))`.  However, these functions can vary within the field-of-view, which is parametrized by the :term:`undispersed position` :math:`(x_0,y_0)`.  
+To extract or simulate WFSS data, we must specify the `Spectral Trace`_  and the `Spectral Dispersion`_, which are each given as parametric curves (as described in `Pirzkal and Ryan 2017 <https://www.stsci.edu/files/live/sites/www/files/home/hst/instrumentation/wfc3/documentation/instrument-science-reports-isrs/_documents/2017/WFC3-2017-01.pdf>`_). In brief, here a parameter: :math:`0 \leq t \leq 1` describes the :math:`(x(t), y(t),\lambda(t))`.  However, these functions can vary within the field-of-view, which is parametrized by the :term:`undispersed position` :math:`(x_0,y_0)`.
 
 
 Spectral Trace
@@ -52,7 +52,7 @@ This introduces an additional parameter :math:`t^*` that effectively modulates t
 
 
 .. note::
-	This formulation of the spectral trace and dispersion differs from what was used by `aXe <https://hstaxe.readthedocs.io/en/latest/>`_, which effectively employed the path length along the trace as the parameter.  However, this formulation is more computationally efficient with no loss in accuracy.  
+	This formulation of the spectral trace and dispersion differs from what was used by `aXe <https://hstaxe.readthedocs.io/en/latest/>`_, which effectively employed the path length along the trace as the parameter.  However, this formulation is more computationally efficient with no loss in accuracy.
 
 
 
@@ -64,7 +64,7 @@ As noted above, the coefficients in the trace and dispersion polynomials can be 
 .. math::
 	\kappa(x_0,y_0) = \kappa_{0,0} + \kappa_{1,0}\,x_0 + \kappa_{0,1}\,y_0 + \kappa_{2,0}\,x_0^2 + \kappa_{1,1}\,x_0\,y_0 + \kappa_{0,2}\,y_0^2 + \ldots
 
-where :math:`\kappa` can be any of the elements of :math:`a, b, \alpha`, :math:`\beta`, or :math:`t^*`. These spatial polynomials are specified by :class:`~slitlessutils.core.wfss.config.SpatialPolynomial` and are of fixed total order :math:`n`.  This implies the number of any set of these coefficients will be a `triangular number <https://en.wikipedia.org/wiki/Triangular_number>`_ and serialized with `Cantor pairing <https://en.wikipedia.org/wiki/Pairing_function>`_.  
+where :math:`\kappa` can be any of the elements of :math:`a, b, \alpha`, :math:`\beta`, or :math:`t^*`. These spatial polynomials are specified by :class:`~slitlessutils.core.wfss.config.SpatialPolynomial` and are of fixed total order :math:`n`.  This implies the number of any set of these coefficients will be a `triangular number <https://en.wikipedia.org/wiki/Triangular_number>`_ and serialized with `Cantor pairing <https://en.wikipedia.org/wiki/Pairing_function>`_.
 
 
 .. note::
@@ -76,7 +76,7 @@ Usual Workflow
 
 Since ``slitlessutils`` is largely predicated on forward-modeling the WFSS data, the usual workflow begins with a known direct image position and assumed wavelength, then the WFSS image position is given by:
 
-#. Use the :term:`world-coordinate system` (WCS) to transform from the direct image position to the *undispersed position* in the WFSS image.  
+#. Use the :term:`world-coordinate system` (WCS) to transform from the direct image position to the *undispersed position* in the WFSS image.
 #. Invert the spectral dispersion to find the parameter (:math:`t`).
 #. Evaluate the spectral trace with the parameter (:math:`t`).
 
@@ -94,7 +94,7 @@ The flat-field corrects for differences in the pixel-to-pixel sensitivity, and i
 .. math::
 	F_{x,y}(\lambda) = \sum_{k=0} F_{x,y}\,w(\lambda)^k
 
-where 
+where
 
 .. math::
 	w(\lambda) = \left\{\begin{array}{ll}
@@ -128,7 +128,7 @@ Sensitivity Curves
 The :term:`sensitivity curve` provides the conversion between detector units (usually :math:`e^-/s`) to physical units (usually :math:`erg/s/cm^2/Å`), which depends on spectral order by **NOT** on spatial extent as that is addressed by the :ref:`flat-field <flatfield>`. This can be thought of as a wavelength-dependent :term:`zeropoint` in flux units.  :numref:`senscurves` shows the sensitivity curves for several :term:`grism` and :term:`prism` modes for several HST instruments.
 
 .. note::
-	Although the sensitivity curves have explicit units, they are adjusted by the :doc:`configurable parameters <configure>`: ``fluxscale`` and ``fluxunits``.  
+	Although the sensitivity curves have explicit units, they are adjusted by the :doc:`configurable parameters <configure>`: ``fluxscale`` and ``fluxunits``.
 
 
 .. _senscurves:
@@ -137,4 +137,3 @@ The :term:`sensitivity curve` provides the conversion between detector units (us
    :alt: The sensitivity curves for HST ACS and WFC3.
 
    The sensitivity curves for the ACS/WFC, WFC3/IR, and ACS/SBC instruments.
-

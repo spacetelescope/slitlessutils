@@ -1,6 +1,6 @@
 .. _instrumentfiles:
 
-Instrument Configuration Files 
+Instrument Configuration Files
 ==============================
 
 
@@ -26,11 +26,11 @@ Instrument-Wide Settings
      - The file suffix in the HST parlance for without and with the CTE corrections.
    * - Path
      - ``str``
-     - | The relative path from the ``yaml`` file where the files for this 
+     - | The relative path from the ``yaml`` file where the files for this
        | instrument are stored.
    * - Focal-plane position
      - 3-elements
-     - | The :math:`(v_2,v_3)` position of the reference point 
+     - | The :math:`(v_2,v_3)` position of the reference point
        | and :math:`v_{3y}` angle with respect the :math:`v_3`-axis.
 
 
@@ -45,20 +45,20 @@ Instrument-Wide Grating/Blocking Parameters
      - Unit
      - Description
    * - Master-Sky Image
-     - 
+     -
      - The name of the master-sky image.
    * - Tabulation Parameters
      - ``dict``
-     - | This contains the starting wavelength (``wave0``), ending 
-       | wavelength (``wave1``), sampling rate (``dwave``), 
+     - | This contains the starting wavelength (``wave0``), ending
+       | wavelength (``wave1``), sampling rate (``dwave``),
        | units (usually ``angstrom``), and ``disptype`` (which is
-       | always "grism").  
+       | always "grism").
    * - Extraction Parameters [#extnote]_
      - ``dict``
-     - | This contains the starting wavelength (``wave0``), ending 
-       | wavelength (``wave1``), sampling rate (``dwave``), 
-       | units (usually ``angstrom``), ``disptype``, and if 
-       | ``alpha`` for prisms.  
+     - | This contains the starting wavelength (``wave0``), ending
+       | wavelength (``wave1``), sampling rate (``dwave``),
+       | units (usually ``angstrom``), ``disptype``, and if
+       | ``alpha`` for prisms.
 
 Details on Extraction Settings
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -83,7 +83,7 @@ where :math:`\lambda_0`, :math:`\lambda_1`, and :math:`\delta\lambda` are the st
 where :math:`\Delta\lambda\!=\!(\lambda_1-\lambda_0)` and :math:`\alpha` is a *curvature* parameter that adjust the degree of non-linearity.  This form has several limiting forms worth mentioning. If :math:`\alpha=0`, then there will be a single wavelength element (:math:`N=1`), emulating the photometry from an imaging mode.  Second, if :math:`\alpha\gg n`, then the prism function approaches the linear form for a grism.
 
 .. note::
-  In general, users are discouraged from adjusting these settings in the reference files, and are recommended to instead use the API (see :doc:`sources <sources>`).  Extraordinary care should be taken regarding the curvature parameter.  
+  In general, users are discouraged from adjusting these settings in the reference files, and are recommended to instead use the API (see :doc:`sources <sources>`).  Extraordinary care should be taken regarding the curvature parameter.
 
 
 Detector Parameters
@@ -98,27 +98,27 @@ Detector Parameters
      - Description
    * - Focal-plane position
      - 3-elements
-     - | :math:`(v_2,v_3)` position of the reference point 
+     - | :math:`(v_2,v_3)` position of the reference point
        | :math:`v_{3y}` angle with respect the :math:`v_3`-axis
    * - Extension properties
-     - 
+     -
      - | ``name``: the name of the extension (must be ``str``)
        | ``ver``: the version of the extension (must be ``int``)
        | ``dtype``: a valid ``np.dtype``
    * - Noise properties
-     - 
+     -
      - | dark current :math:`D` in :math:`e^-/s`
        | readnoise :math:`R` in :math:`e^-`
    * - Detector dimensionality
-     - 
+     -
      - | ``naxis``: 2-element list of size of detector (must be ``int``)
        | ``crpix``: 2-element list for reference position (can be ``float``)
        | ``scale``: 2-element list for pixel scale (can be ``float``)
    * - Distortion model
-     - 
+     -
      - `SIP coefficients <https://docs.astropy.org/en/stable/wcs/note_sip.html>`_ should be a ``dict``
    * - Configuration files
-     - 
+     -
      - The file name for each grating/blocking combination
 
 
@@ -126,4 +126,3 @@ Detector Parameters
 .. [#gbnote] These settings are set for each grating/blocking combination, and if no blocking filter exists, then it is set as the ``null`` variable in ``yaml``.
 .. [#extnote] The extraction and tabulation settings need-not be the same.  Indeed, to encapsulate the non-linearity in the prism modes they will **NOT** be the same.
 .. [#detnote] There should be a separate stanza like this for each detector in the instrument (e.g. such as the two CCDs in ACS-WFC).
-

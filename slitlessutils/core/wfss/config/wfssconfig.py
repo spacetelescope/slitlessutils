@@ -88,7 +88,7 @@ class WFSSConfig(dict):
         -------
         None
         """
-        self.set_rotation(fwcpos-self.data['FWCPOS_REF'])
+        self.set_rotation(fwcpos - self.data['FWCPOS_REF'])
 
     def set_rotation(self, theta):
         """
@@ -120,7 +120,7 @@ class WFSSConfig(dict):
         -------
         None
         """
-        self.set_rotation(self.theta+np.radians(dtheta))
+        self.set_rotation(self.theta + np.radians(dtheta))
 
     def set_shift(self, dx, dy):
         """
@@ -250,8 +250,8 @@ class WFSSConfig(dict):
 
         dx, dy = self[order].deltas(x0, y0, wav)
 
-        x = x0+self.xshift+self.cos*dx+self.sin*dy
-        y = y0+self.yshift-self.sin*dx+self.cos*dy
+        x = x0 + self.xshift + self.cos * dx + self.sin * dy
+        y = y0 + self.yshift - self.sin * dx + self.cos * dy
 
         return x, y
 
@@ -304,7 +304,7 @@ class WFSSConfig(dict):
         data = {}
 
         # open the file
-        with open(conffile, 'r') as fp:
+        with open(conffile) as fp:
 
             # parse the file, line-by-line and look for commented lines
             for line in fp:

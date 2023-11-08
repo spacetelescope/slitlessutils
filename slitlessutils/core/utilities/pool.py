@@ -34,8 +34,8 @@ class Pool:
         # get some settings for the processing
         ncpus = ps.cpu_count(logical=False)
         ncores = ps.cpu_count(logical=True)
-        nthreads = ncores//ncpus
-        nmax = ncpus-nthreads
+        nthreads = ncores // ncpus
+        nmax = ncpus - nthreads
 
         # set a default to the max
         if ncpu is None or ncpu <= 0:
@@ -87,8 +87,8 @@ class Pool:
 
     def __str__(self):
         lines = ['Pool object with:',
-                 'NCPU = {}'.format(self.ncpu),
-                 'FUNC = {}'.format(self.func)]
+                 f'NCPU = {self.ncpu}',
+                 f'FUNC = {self.func}']
         return '\n'.join(lines)
 
     def __call__(self, itrs, *args, total=None, **kwargs):

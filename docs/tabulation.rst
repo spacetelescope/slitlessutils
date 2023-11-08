@@ -5,7 +5,7 @@ Tabulation in ``slitlessutils`` (`~slitlessutils.modules.Tabulate()`)
 =====================================================================
 
 
-The most computationally expensive aspect of extracting or simulating WFSS observations comes from the forward-modeling every (relevant) pixel in the :term:`direct imaging`.  Therefore, ``slitlessutils`` only performs these calculations when requested and stores these intermediate results as a :term:`pixel-dispersion table` (PDT).  These PDTs will be written to a subdirectory :file:`tables/`, which can be 
+The most computationally expensive aspect of extracting or simulating WFSS observations comes from the forward-modeling every (relevant) pixel in the :term:`direct imaging`.  Therefore, ``slitlessutils`` only performs these calculations when requested and stores these intermediate results as a :term:`pixel-dispersion table` (PDT).  These PDTs will be written to a subdirectory :file:`tables/`, which can be
 
 
 Tabulation Algorithm
@@ -39,15 +39,15 @@ To tabulate all the pixel transformations for a WFSS image and create a PDT, the
    :align: center
    :alt: fractional pixel animation
 
-   Dispersed pixel and fractional area calculations.  ``Slitlessutils`` uses `pypolyclip <https://github.com/spacetelescope/pypolyclip>`_ to compute fractional pixel area on a dispersed image pixel grid (shown by colored polygons).  The known area of the input polygon (shown in blue outline) is :math:`0.64 \mathrm{pix}^2`.  
+   Dispersed pixel and fractional area calculations.  ``Slitlessutils`` uses `pypolyclip <https://github.com/spacetelescope/pypolyclip>`_ to compute fractional pixel area on a dispersed image pixel grid (shown by colored polygons).  The known area of the input polygon (shown in blue outline) is :math:`0.64 \mathrm{pix}^2`.
 
 
-Given the hierarchical nature outlined in the above algorithm, the PDTs are stored as `hierarchical data-format 5 (HDF5) <https://www.hdfgroup.org/solutions/hdf5/>`_ and the can be viewed or manually edited with standard tools (e.g. `HDFView <https://www.hdfgroup.org/downloads/hdfview/>`_).  
+Given the hierarchical nature outlined in the above algorithm, the PDTs are stored as `hierarchical data-format 5 (HDF5) <https://www.hdfgroup.org/solutions/hdf5/>`_ and the can be viewed or manually edited with standard tools (e.g. `HDFView <https://www.hdfgroup.org/downloads/hdfview/>`_).
 
 Example
 ^^^^^^^
 
-This example loads :doc:`sources <sources>` and :doc:`WFSS data <wfss>`, instantiates the tabulation module, and returns the names of the PDT files.  
+This example loads :doc:`sources <sources>` and :doc:`WFSS data <wfss>`, instantiates the tabulation module, and returns the names of the PDT files.
 
 .. code:: python
 
@@ -69,14 +69,13 @@ This example loads :doc:`sources <sources>` and :doc:`WFSS data <wfss>`, instant
 Use Cases
 ---------
 
-The working philosophy of ``slitlessutils`` is to compute these tables *once* at the outset, and use them for all downstream analyses, as they only contain the geometry of the astrophysical scene and the instrument/detector layout.  The primary use within ``slitlessutils`` begins with aggregating the PDTs from the appropriate :term:`direct imaging` pixels and spectral order, and summing over unique triplets :math:`(x,y,l)`.  These indices are combined into a single, unique index by `np.ravel_multi_index <https://numpy.org/doc/stable/reference/generated/numpy.ravel_multi_index.html>`_ following: 
+The working philosophy of ``slitlessutils`` is to compute these tables *once* at the outset, and use them for all downstream analyses, as they only contain the geometry of the astrophysical scene and the instrument/detector layout.  The primary use within ``slitlessutils`` begins with aggregating the PDTs from the appropriate :term:`direct imaging` pixels and spectral order, and summing over unique triplets :math:`(x,y,l)`.  These indices are combined into a single, unique index by `np.ravel_multi_index <https://numpy.org/doc/stable/reference/generated/numpy.ravel_multi_index.html>`_ following:
 
-.. math:: 
+.. math::
 	i = x + n_x\,y + n_x\,n_y\,l
 
-where :math:`(n_x,n_y)` represents the dimensionality of the WFSS image.  This computation and summation is carried out by :func:`~slitlessutils.utilities.indices.decimate()`.   
+where :math:`(n_x,n_y)` represents the dimensionality of the WFSS image.  This computation and summation is carried out by :func:`~slitlessutils.utilities.indices.decimate()`.
 
 
 .. note::
 	For users who wish to work directly with these files, then the files can be viewed or manually edited with standard/free tools, such as `HDFView <https://www.hdfgroup.org/downloads/hdfview/>`_.
-

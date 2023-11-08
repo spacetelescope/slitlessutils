@@ -25,14 +25,14 @@ RuntimeError related to ``freeze_support()``
 
 Specifically, the error is:
 
-    RuntimeError: 
+    RuntimeError:
     An attempt has been made to start a new process before the
     current process has finished its bootstrapping phase.
 
     This probably means that you are not using fork to start your
     child processes and you have forgotten to use the proper idiom
     in the main module:
-    
+
     if __name__ == '__main__':
         freeze_support()
 
@@ -44,7 +44,7 @@ Specifically, the error is:
 This is because you are running some script in the ``__main__`` of the file.  Try putting the commands inside a function declaration:
 
 .. code: python
-    
+
     def my_commands_here():  # doctest: +SKIP
         pass                 # doctest: +SKIP
 
@@ -62,4 +62,3 @@ get a the same logging message printed multiple times?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This is likely because there are multiple instances of the logger running for the separate threads.
-

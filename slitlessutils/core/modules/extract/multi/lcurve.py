@@ -89,9 +89,9 @@ class LCurve:
         """
 
         self.data.sort('logchi2')
-        for j in range(1, len(self.data)-1):
-            i = j-1
-            k = j+1
+        for j in range(1, len(self.data) - 1):
+            i = j - 1
+            k = j + 1
 
             pi = (self.data['logchi2'][i], self.data['lognorm'][i])
             pj = (self.data['logchi2'][j], self.data['lognorm'][j])
@@ -170,7 +170,7 @@ class LCurve:
 
         # get the colormap and lighten it
         cmap = plt.cm.get_cmap(colormap)
-        cmap = self.remap_cmap(lambda x: lighten*(1.+x), cmap)
+        cmap = self.remap_cmap(lambda x: lighten * (1. + x), cmap)
 
         # compute curvatures
         self.compute_curvature()
@@ -206,7 +206,7 @@ class LCurve:
         # put the frobenius norm in the plot
         # if self.norm is not None:
         if rescale:
-            ax1.text(0.67, 0.88, r'$\log\ ||W||_F=${0:+.3f}'.format(self.norm),
+            ax1.text(0.67, 0.88, fr'$\log\ ||W||_F=${self.norm:+.3f}',
                      horizontalalignment='left', transform=ax1.transAxes,
                      bbox=dict(facecolor='white', edgecolor='white'))
             ylabel = r'$\log\ ||W||_F^2\,||f||^2$'
@@ -242,7 +242,7 @@ class LCurve:
         # set the xrange
         if lmax == lmin:
             if np.isfinite(lmax):
-                ax2.set_xlim([lmin-0.5, lmax+0.5])
+                ax2.set_xlim([lmin - 0.5, lmax + 0.5])
             else:
                 ax2.set_xlim([-5, 0])
         else:

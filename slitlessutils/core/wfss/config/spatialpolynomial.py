@@ -46,13 +46,13 @@ class SpatialPolynomial(dict):
 
             n = self.triangular(len(values))
             if n:
-                self.order = n-1
+                self.order = n - 1
 
                 # old way of decoding cantor pairing
                 i = 0
                 for j in range(n):
-                    for k in range(j+1):
-                        self[(j-k, k)] = values[i]
+                    for k in range(j + 1):
+                        self[(j - k, k)] = values[i]
                         i += 1
             else:
                 msg = "Input must be an array whose length is a triangular number"
@@ -81,9 +81,9 @@ class SpatialPolynomial(dict):
                 dp += f'*y{self.EXP[j]}'
 
             if first and sign == '+':
-                s += ' '+dp
+                s += ' ' + dp
             else:
-                s += ' '+sign+' '+dp
+                s += ' ' + sign + ' ' + dp
             first = False
 
         # p=[f'{cij} x{self.EXP[i]} y{self.EXP[j]}' for (i,j),cij in self.items()]
@@ -104,7 +104,7 @@ class SpatialPolynomial(dict):
         n : int or None
             Return the triangular length if valid or None if not
         """
-        n = (np.sqrt(1+8*N)-1)/2
+        n = (np.sqrt(1 + 8 * N) - 1) / 2
         if n.is_integer():
             return int(n)
 
@@ -123,6 +123,6 @@ class SpatialPolynomial(dict):
         p : float, `np.ndarray`
             The value of the polynomial
         """
-        p = sum(coef*x0**i*y0**j for (i, j), coef in self.items())
+        p = sum(coef * x0**i * y0**j for (i, j), coef in self.items())
         # p=sum(coef*xy[0]**i*xy[1]**j for (i,j),coef in self.items())
         return p

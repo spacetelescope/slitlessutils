@@ -248,7 +248,7 @@ class PolynomialFlatField(FlatField):
 
         with fits.open(obj.filename, mode='readonly') as hdul:
             obj.data = [hdu.data for hdu in hdul if hdu.data is not None]
-        obj.order = len(obj.data)-1
+        obj.order = len(obj.data) - 1
 
         if obj.order == -1:
             LOGGER.warning("Polynomial flat is invalid, using unity")
@@ -284,8 +284,8 @@ class PolynomialFlatField(FlatField):
            The value of the flat field.
         """
 
-        ll = (l-self.wmin)/(self.wmax-self.wmin)
-        return sum(f[y, x]*ll**i for i, f in enumerate(self.data))
+        ll = (l - self.wmin) / (self.wmax - self.wmin)
+        return sum(f[y, x] * ll**i for i, f in enumerate(self.data))
 
     # def update_header(self,hdr):
     #    super().update_header(hdr)

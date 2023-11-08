@@ -18,12 +18,12 @@ class Throughput(Band):
 
     @property
     def photflam(self):
-        return self.photfnu*(c/self.photplam)*(1e8/self.photplam)*100
+        return self.photfnu * (c / self.photplam) * (1e8 / self.photplam) * 100
         # return 10.**(-0.4*(self.zeropoint+2.408))/self.photplam**2
 
     @property
     def photfnu(self):
-        return 10.**(-0.4*(self.zeropoint+48.6))
+        return 10.**(-0.4 * (self.zeropoint + 48.6))
 
     @classmethod
     def from_keys(cls, telescope, instrument, band):

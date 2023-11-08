@@ -80,7 +80,7 @@ def background_processing(mastersky=False):
                             mod = fits.getdata(backfile, ('SKY', vers))
 
                             a, m, s = sigma_clipped_stats(mod)
-                            if np.abs(a-1) > 1e-3:
+                            if np.abs(a - 1) > 1e-3:
                                 msg = (f'The master sky image ({backfile}) is '
                                        'unnormalized. Results will be fine, '
                                        'but the units will not make sense.')
@@ -92,14 +92,14 @@ def background_processing(mastersky=False):
                                 y0 = -int(hdr.get('LTV2', 0))
                                 nx = hdr['NAXIS1']
                                 ny = hdr['NAXIS2']
-                                mod = mod[y0:ny+y0, x0:nx+x0]
+                                mod = mod[y0:ny + y0, x0:nx + x0]
 
                             ret, src = func(self, sci, hdr, unc, med, gpx, mod, **kwargs)
                         else:
                             ret, src = func(self, sci, hdr, unc, med, gpx, **kwargs)
 
                         # have the model now, so subtract it
-                        hdul[('SCI', vers)].data = sci-ret
+                        hdul[('SCI', vers)].data = sci - ret
                         hdul[('SCI', vers)].header = hdr
 
                 # do something for each type of inplace writing, but always
@@ -167,9 +167,9 @@ class Background:
         kernlen = 50
 
         # make a convolution kernel
-        L = 4*kernsig
+        L = 4 * kernsig
         x = np.linspace(-L, L, 31, endpoint=True)
-        kernel = np.tile(np.exp(-0.5*(x/kernsig)**2), (kernlen, 1))
+        kernel = np.tile(np.exp(-0.5 * (x / kernsig)**2), (kernlen, 1))
         kernel /= np.sum(kernel)
 
         self._dispaxis = dispaxis
@@ -181,7 +181,7 @@ class Background:
             self.dispaxis = 0
             self.kernel = kernel
             self.footprint = None
-        self.crossaxis = 1-self.dispaxis
+        self.crossaxis = 1 - self.dispaxis
 
         self.skysigma = skysigma
         self.srcsigma = srcsigma
@@ -230,7 +230,7 @@ class Background:
             con = sci
 
         # sigma thresholding for sources (ie. pix brighter than some limit)
-        src = (con-mod) > (self.srcsigma*unc)
+        src = (con - mod) > (self.srcsigma * unc)
 
         # remove small objects
         if self.remove_small:
@@ -307,8 +307,8 @@ class Background:
            The name of the master-sky subtracted file.
         """
         # do inverse-variance weighting:
-        sci2 = sci/np.maximum(unc, self.MINUNC)
-        img2 = img/np.maximum(unc, self.MINUNC)
+        sci2 = sci / np.maximum(unc, self.MINUNC)
+        img2 = img / np.maximum(unc, self.MINUNC)
 
         # find the sky pixels
         sky = self.skypixels(sci, unc, mod)
@@ -325,16 +325,16 @@ class Background:
             i2 = img2[g]
 
             # compute some auxiliary variables for linear fitting
-            # f_oo = np.sum(s2*s2)
-            f_ot = np.sum(s2*i2)
-            f_tt = np.sum(i2*i2)
+            # f_oo = np.sum(s2 * s2)
+            f_ot = np.sum(s2 * i2)
+            f_tt = np.sum(i2 * i2)
 
             # the scale facto
-            alpha = f_ot/f_tt
+            alpha = f_ot / f_tt
 
             # the chi2 and best model
-            # chi2 = F_oo-alpha*F_ot
-            out = alpha*img
+            # chi2 = F_oo-alpha * F_ot
+            out = alpha * img
 
             # update the sky pixel mask
             sky = self.skypixels(sci, unc, out)
@@ -415,11 +415,11 @@ class Background:
         # set some slice objects
         # TODO: change these from lambdas to defs
         if self.dispaxis == 1:
-            loopdisp = lambda lam: (slice(None, None, None), lam)  # noqa
-            loopcross = lambda eta: (eta, slice(None, None, None))  # noqa
+            loopdisp = lambda lam: (slice(None, None, None), lam)  # noqa: E731
+            loopcross = lambda eta: (eta, slice(None, None, None))  # noqa: E731
         elif self.dispaxis == 0:
-            loopcross = lambda lam: (slice(None, None, None), lam)  # noqa
-            loopdisp = lambda eta: (eta, slice(None, None, None))  # noqa
+            loopcross = lambda lam: (slice(None, None, None), lam)  # noqa: E731
+            loopdisp = lambda eta: (eta, slice(None, None, None))  # noqa: E731
 
         # set up the iteration
         npix = np.count_nonzero(sky)
@@ -435,7 +435,7 @@ class Background:
                 xy = loopdisp(lam)
 
                 # compute weights and do a fit
-                w = np.logical_and(sky[xy], gpx[xy])/unc[xy]**2
+                w = np.logical_and(sky[xy], gpx[xy]) / unc[xy]**2
                 pars, mask = ofitter(model, eta, sci[xy], weights=w)
 
                 # update the model

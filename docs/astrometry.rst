@@ -8,7 +8,7 @@ To make full use of the WFSS data, it is necessary to take contemporaneous data 
 The standard tools for updating the WCS keywords (ie. `drizzlepac and tweakreg <https://drizzlepac.readthedocs.io/en/latest/>`_) record previous WCS solutions in the `WCSNAME*` keywords, where `WCSNAME` refers to the *active* solution and earlier solutions are encoded with alphabetic characters (e.g. `WCSNAMEA`).  This last token is referred to as the *key*, and so one must specify the starting (``key0``) and the ending (``key``) key.
 
 
-For much of the HST data, the direct imaging has been matched to some existing astrometric catalog (often Gaia dr3), but the WFSS data is left at a less-refined state.  
+For much of the HST data, the direct imaging has been matched to some existing astrometric catalog (often Gaia dr3), but the WFSS data is left at a less-refined state.
 
 .. important::
 	**Astrometric corrections for the WFSS data from HST are almost always needed.**
@@ -44,7 +44,7 @@ Here we find the affine transformation between any two WCSs from the direct imag
 .. math::
 	\mathrm{CD} = \left(\begin{array}{cc}
 			            \mathrm{CD}1\_1 & \mathrm{CD}1\_2 \\
-			   			\mathrm{CD}2\_1 & \mathrm{CD}2\_2 \end{array}\right)	
+			   			\mathrm{CD}2\_1 & \mathrm{CD}2\_2 \end{array}\right)
 
 If the initial and final ``CD``-matrices for the reference image are :math:`CD_0` and :math:`CD_1` (respectively), then the affine transformation matrix is given as:
 
@@ -59,7 +59,7 @@ This transformation matrix is then applied to the ``CD`` matrix from the WFSS im
 Similarly, we must adjust the ``CRVAL`` keywords, which are loaded from the WCS object as:
 
 .. math::
-	\mathrm{CRVAL} = \left(\begin{array}{c}\mathrm{CRVAL}1 \\ 
+	\mathrm{CRVAL} = \left(\begin{array}{c}\mathrm{CRVAL}1 \\
 					\mathrm{CRVAL}2\end{array}\right)
 
 Again, if :math:`CRVAL_0` and :math:`CRVAL_1` refer to the ``CRVAL``-vectors for the initial and final WCS solution, then the perturbation is:
@@ -75,7 +75,7 @@ which can be applied to the ``CRVAL`` vector from the WFSS image with the same W
 This affine tweaking is implemented in the convenience function :func:`upgrade_wcs()`:
 
 .. code:: python
-	
+
 	import slitlessutils as su
 
 	newfile = su.core.preprocess.astrometry.upgrade_wcs('direct_image_reference_flt.fits', 'wfss_image_flt.fits')
@@ -84,5 +84,3 @@ This will compute the affine transformation between ``WCSNAME`` and ``WCSNAMEA``
 
 .. note::
 	In both above cases, a new file will be written if ``inplace==False`` and ``newfile==None``, and rules for generating this name are given in ``utils.py``.
-
-

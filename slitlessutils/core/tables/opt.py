@@ -96,7 +96,7 @@ class OPT(HDF5Table):
 
                 # do the summations
                 prof, x1, y1 = indices.decimate(val, x, y, dims=self.dims)
-                wave, x2, y2 = indices.decimate(val*wav, x, y, dims=self.dims)
+                wave, x2, y2 = indices.decimate(val * wav, x, y, dims=self.dims)
                 wave /= prof
 
                 if np.array_equal(x1, x2) and np.array_equal(y1, y2):
@@ -137,8 +137,8 @@ class OPT(HDF5Table):
         x0, x1 = np.amin(x), np.amax(x)
         y0, y1 = np.amin(y), np.amax(y)
 
-        dx = x1-x0+1
-        dy = y1-y0+1
+        dx = x1 - x0 + 1
+        dy = y1 - y0 + 1
 
         prof = np.full((dy, dx), np.nan, dtype=float)
         wave = np.full((dy, dx), np.nan, dtype=float)

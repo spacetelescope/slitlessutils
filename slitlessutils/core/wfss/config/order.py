@@ -107,7 +107,7 @@ class Order:
         dldt = self.displ.deriv(x0, y0, t)
 
         # return the dispersion
-        dldr = dldt/np.sqrt(dxdt*dxdt+dydt*dydt)
+        dldr = dldt / np.sqrt(dxdt * dxdt + dydt * dydt)
         return dldr
 
     def deltas(self, x0, y0, wav):

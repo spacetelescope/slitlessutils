@@ -32,7 +32,7 @@ There are several ways to install ``slitlessutils``:
 
     pip install git+https://github.com/spacetelescope/slitlessutils.git
 
-  
+
 * **Clone from GitHub:** the development version can also be cloned directly
   from GitHub:
 
@@ -44,5 +44,3 @@ There are several ways to install ``slitlessutils``:
 
   This approach is only somewhat more difficult than installing from PyPI,
   but is easier to make local modifications and submit pull requests.
-
-   

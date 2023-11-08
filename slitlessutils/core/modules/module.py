@@ -172,5 +172,5 @@ class Module:
             try:
                 out = set(data)
             except BaseException:
-                out = set((data,))
+                out = {data}
         return out

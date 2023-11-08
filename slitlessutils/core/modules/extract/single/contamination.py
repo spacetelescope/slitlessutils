@@ -79,14 +79,14 @@ class Contamination(dict):
 
         # get the bounds
         bounds = poly.bounds
-        x0 = np.maximum(int(np.floor(bounds[0]))-1, 0)
-        y0 = np.maximum(int(np.floor(bounds[1]))-1, 0)
-        x1 = np.minimum(int(np.ceil(bounds[2]))+1, detdata.naxis[0]-1)
-        y1 = np.minimum(int(np.ceil(bounds[3]))+1, detdata.naxis[1]-1)
+        x0 = np.maximum(int(np.floor(bounds[0])) - 1, 0)
+        y0 = np.maximum(int(np.floor(bounds[1])) - 1, 0)
+        x1 = np.minimum(int(np.ceil(bounds[2])) + 1, detdata.naxis[0] - 1)
+        y1 = np.minimum(int(np.ceil(bounds[3])) + 1, detdata.naxis[1] - 1)
 
         # create an image of all zeros
-        dx = x1-x0+1
-        dy = y1-y0+1
+        dx = x1 - x0 + 1
+        dy = y1 - y0 + 1
         img = np.zeros((dy, dx), dtype=float)
 
         # get a header and fill it
@@ -144,7 +144,7 @@ class Contamination(dict):
                             # weighted-average for the wavelength
                             vv, yy, xx = indices.decimate(val, yg, xg,
                                                           dims=detdata.shape)
-                            ww, _y, _x = indices.decimate(val*wav, yg, xg,
+                            ww, _y, _x = indices.decimate(val * wav, yg, xg,
                                                           dims=detdata.shape)
                             ww /= vv
 
@@ -152,7 +152,7 @@ class Contamination(dict):
                             flat = flatfield(xx, yy, ww)
                             sens = detdata.config[ordname].sensitivity(ww)
                             flam = region.sed(ww, fnu=False)
-                            vv *= (flat*sens*flam)
+                            vv *= (flat * sens * flam)
 
                             # flat=flatfield(xg,yg,wav)
                             # sens=detdata.config[ordname].sensitivity(wav)
@@ -163,8 +163,8 @@ class Contamination(dict):
                             #                          dims=detdata.shape)
 
                             # only work with pixels that are inside the cutout
-                            g = np.where((x0 <= xx) & (xx < x1+1) &
-                                         (y0 <= yy) & (yy < y1+1))[0]
+                            g = np.where((x0 <= xx) & (xx < x1 + 1) &
+                                         (y0 <= yy) & (yy < y1 + 1))[0]
 
                             if g.size > 0:
                                 xx = xx[g]
@@ -178,7 +178,7 @@ class Contamination(dict):
                                 vv = np.where(vv > self.threshold, vv, 0.0)
 
                                 # sum in to the image
-                                img[yy-y0, xx-x0] += vv
+                                img[yy - y0, xx - x0] += vv
 
         # return the data as fits.ImageHDU so we can do stuff later
         return fits.ImageHDU(data=img, header=hdr)

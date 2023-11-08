@@ -41,7 +41,7 @@ def compress(indices):
     """
 
     unique_indices = np.unique(indices)
-    compressed_indices = np.digitize(indices, unique_indices)-1
+    compressed_indices = np.digitize(indices, unique_indices) - 1
     return compressed_indices, unique_indices
 
 
@@ -242,7 +242,7 @@ def decimate(val, *indices, dims=None, unravel=True, return_factor=False):
     # If we don't pass dimensions, then grab that from the max value
     # of the dimension.  Passing dimensions will be faster.
     if dims is None:
-        dims = [np.amax(index)+1 for index in indices]
+        dims = [np.amax(index) + 1 for index in indices]
     idx = np.ravel_multi_index(indices, dims, order='F')
 
     # find the unique indices and unique inverses
@@ -259,14 +259,14 @@ def decimate(val, *indices, dims=None, unravel=True, return_factor=False):
         ret = (vv, out, dims)
 
     if return_factor:
-        factor = float(len(val))/float(len(vv))
+        factor = float(len(val)) / float(len(vv))
         ret += (factor,)
     return ret
 
 
 def span(val, *indices, dims=None, unravel=True):
     if dims is None:
-        dims = [np.amax(index)+1 for index in indices]
+        dims = [np.amax(index) + 1 for index in indices]
     idx = np.ravel_multi_index(indices, dims, order='F')
 
     out, uind, cnt = np.unique(idx, return_counts=True, return_inverse=True)
@@ -274,7 +274,7 @@ def span(val, *indices, dims=None, unravel=True):
 
     v = np.zeros_like(indices[0], dtype=type(val))
     for i, r in enumerate(rev):
-        v[i] = np.amax(val[r])-np.amin(val[r])
+        v[i] = np.amax(val[r]) - np.amin(val[r])
 
     if unravel:
         out = tuple(index[uind] for index in indices)
@@ -291,12 +291,12 @@ if __name__ == '__main__':
     y = np.array([1, 1, 2, 3, 2, 2, 3], dtype=np.uint16)
     l = np.arange(len(x), dtype=int)
 
-    # l = np.array([1, 1, 2, 2, 2, 2, 3], dtype=np.uint16)  # noqa: E741
+    # l = np.array([1, 1, 2, 2, 2, 2, 3], dtype=np.uint16)
     # v = np.array([1, 1, 2, 2, 2, 2, 3], dtype=np.float64)
 
     x = np.array([0, 0, 1, 1, 1, 2, 3, 3])
     y = np.array([1, 1, 0, 3, 2, 2, 3, 4])
-    l = np.array([0, 0, 1, 1, 6, 6, 3, 4])  # noqa: E741
+    l = np.array([0, 0, 1, 1, 6, 6, 3, 4])
     ri = reverse(l)
 
     for ll, g in ri.items():
@@ -311,7 +311,7 @@ if __name__ == '__main__':
 
     x = np.array([1, 1, 2, 2, 2, 2, 3], dtype=np.uint16)
     y = np.array([1, 1, 2, 2, 2, 2, 3], dtype=np.uint16)
-    l = np.array([1, 1, 2, 2, 2, 2, 3], dtype=np.uint16)  # noqa: E741
+    l = np.array([1, 1, 2, 2, 2, 2, 3], dtype=np.uint16)
     v = np.array([1, 1, 2, 2, 2, 2, 3], dtype=np.float64)
 
     # x=np.array([],dtype=np.uint16)

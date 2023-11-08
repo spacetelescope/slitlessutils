@@ -1,4 +1,3 @@
-
 import getpass
 
 import numpy as np

@@ -133,7 +133,7 @@ class Config(dict):
         if not cls._instance:
 
             # make a new config object
-            cls._instance = super(Config, cls).__new__(cls)
+            cls._instance = super().__new__(cls)
             cls._instance._refpath = os.getcwd()
 
             # first check if the refroot exists
@@ -148,14 +148,14 @@ class Config(dict):
 
             # read the defaults as json
             if os.path.exists(deffile):
-                with open(deffile, 'r') as f:
+                with open(deffile) as f:
                     cfg = json.load(f)
             else:
                 cfg = {}
 
             # if a conffile is given, read and update with that
             if conffile:
-                with open(conffile, 'r') as f:
+                with open(conffile) as f:
                     custom = json.load(f)
                 cfg.update(custom)
 
@@ -244,7 +244,7 @@ class Config(dict):
         # check if the file exists
         if os.path.exists(filename):
             # open file as a json
-            with open(filename, 'r') as fp:
+            with open(filename) as fp:
                 data = json.load(fp)
 
         else:
@@ -278,7 +278,7 @@ class Config(dict):
             bestpath = None
 
             # get the paths in the root dir
-            glob_token = os.path.join(self.REFROOT, '*'+os.sep)
+            glob_token = os.path.join(self.REFROOT, '*' + os.sep)
             paths = glob.glob(glob_token)
 
             # check for empty paths
@@ -398,14 +398,14 @@ class Config(dict):
 
         # download the manifest file
         try:
-            f = download_file(self.REFURL+self.REFDB, timeout=self.TIMEOUT,
+            f = download_file(self.REFURL + self.REFDB, timeout=self.TIMEOUT,
                               show_progress=False)
         except TimeoutError:
             LOGGER.warning(f'Retrieving manifest timed out in {self.TIMEOUT} s.')
             return
 
         # open the manifest as a json file
-        with open(f, 'r') as fp:
+        with open(f) as fp:
             data = json.load(fp)
 
         # output variables:
@@ -470,7 +470,7 @@ class Config(dict):
                 return
 
         # get the name of the files
-        remotefile = self.REFURL+reffile
+        remotefile = self.REFURL + reffile
         localfile = os.path.join(self.REFROOT, reffile)
 
         # write the remote file into local file
@@ -564,7 +564,7 @@ class Config(dict):
         else:
             try:
                 # return the actual value
-                return super(Config, self).__getattribute__(k)
+                return super().__getattribute__(k)
             except AttributeError:
                 LOGGER.warning(f"Attribute {k} not found.")
                 return
@@ -589,7 +589,7 @@ class Config(dict):
             self[k].value = v
         else:
             # deal with normal attribute setting
-            super(Config, self).__setattr__(k, v)
+            super().__setattr__(k, v)
 
     def update_header(self, hdr):
         """

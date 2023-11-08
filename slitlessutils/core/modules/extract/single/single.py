@@ -114,7 +114,7 @@ class Single(Module):
         self.outpath = self.set_outpath(outpath)
         self.writecsv = writecsv
         if self.writecsv:
-            self.csvpath = self.outpath+'CSVFILES'+os.sep
+            self.csvpath = self.outpath + 'CSVFILES' + os.sep
             if not os.path.exists(self.csvpath):
                 try:
                     os.mkdir(self.csvpath)
@@ -294,13 +294,13 @@ class Single(Module):
             # compute weighted-averages over the bins
             for ind, g in ri.items():
                 val = flam[g]
-                wht = 1./func[g]**2      # initialize weights as inverse variance
+                wht = 1. / func[g]**2      # initialize weights as inverse variance
                 cnt = cont[g]
 
                 # update the weights with sigma clipping if requested
                 if hasattr(self, 'sigclip'):
                     masked = self.sigclip(val, masked=True, copy=True)
-                    wht *= (1-np.ma.getmask(masked).astype(float))
+                    wht *= (1 - np.ma.getmask(masked).astype(float))
 
                 # if a pixel has an infinite cont, then ignore it
                 # wht=np.where(np.isinf(cnt),0.,wht)
@@ -321,9 +321,9 @@ class Single(Module):
                     wsum = np.sum(wht)
 
                     # save the results
-                    out['flam'][ind] = np.sum(wht*val)/wsum
-                    out['func'][ind] = 1./np.sqrt(np.sum(wht))
-                    out['cont'][ind] = np.sum(wht*cnt)/wsum
+                    out['flam'][ind] = np.sum(wht * val) / wsum
+                    out['func'][ind] = 1. / np.sqrt(np.sum(wht))
+                    out['cont'][ind] = np.sum(wht * cnt) / wsum
                     out['npix'][ind] = nwht
 
             # update the source
@@ -436,7 +436,7 @@ class Single(Module):
                             # find the unique grism-image pixels and compute
                             # the average wavelength per pixel
                             vv, xx, yy = indices.decimate(val, xg, yg, dims=dims)
-                            ww, _x, _y = indices.decimate(wav*val, xg, yg, dims=dims)
+                            ww, _x, _y = indices.decimate(wav * val, xg, yg, dims=dims)
                             dw, _x, _y = indices.span(wav, xg, yg, dims=dims)
 
                             # compute the average wavelength in the pixel
@@ -453,8 +453,8 @@ class Single(Module):
                             area = detdata.relative_pixelarea(xx, yy)
 
                             # aggregate factors
-                            den = vv*sens*flat*area*fluxscale
-                            g = np.where((den > 0))[0]
+                            den = vv * sens * flat * area * fluxscale
+                            g = np.where(den > 0)[0]
 
                             # only keep terms that are strictly positive
                             if g.size > 0:
@@ -491,18 +491,18 @@ class Single(Module):
                                     ny = hdu.header['NAXIS2']
 
                                     # only work with pixels in this subimage
-                                    gg = np.where((x0 < xx) & (xx <= x0+nx) &
-                                                  (y0 < yy) & (yy <= y0+ny))[0]
+                                    gg = np.where((x0 < xx) & (xx <= x0 + nx) &
+                                                  (y0 < yy) & (yy <= y0 + ny))[0]
                                     if gg.size > 0:
                                         # save the contamination
-                                        c[gg] = hdu.data[yy[gg]-y0, xx[gg]-x0]
+                                        c[gg] = hdu.data[yy[gg] - y0, xx[gg] - x0]
 
                                 # store the results
-                                results[segid]['flam'].extend(s/den)
-                                results[segid]['func'].extend(u/den)
+                                results[segid]['flam'].extend(s / den)
+                                results[segid]['func'].extend(u / den)
                                 results[segid]['wave'].extend(ww)
                                 results[segid]['dwav'].extend(dw)
-                                results[segid]['cont'].extend(c/den)
+                                results[segid]['cont'].extend(c / den)
 
         if self.savecont:
             hdul.writeto(f'{data.dataset}_cont.fits', overwrite=True)

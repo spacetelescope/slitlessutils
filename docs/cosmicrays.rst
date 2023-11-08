@@ -34,7 +34,7 @@ For a pixelated light distribution, the Laplacian must be extended for finite di
 and for :math:`h=1`, this expression is concisely given as a simple image convolution :math:`\nabla^2 I \approx K \ast I`.  `slitlessutils` offers several forms for the Laplacian covolution kernel:
 
 .. math::
-   
+
    K_{3a} = \left(\begin{array}{rrr}  0 & -1 &  0 \\
    -1 & +4 & -1 \\
     0 & -1 &  0 \end{array}\right)
@@ -65,11 +65,11 @@ These candidate pixels are grouped based on their connectivity (see `skimage.mea
 
 Example
 ~~~~~~~
-    
+
 This are the kernels and can be controlled by the subscript, for example
 
 .. code:: python
-   	  
+
    import slitlessutils as su
 
    # not totally necessary, but this will engage the slitlessutils logger
@@ -88,7 +88,7 @@ This will update the file in place, as the flag is set: :code:`inplace=True`.  S
 
    Example of cosmic ray flagging from convolution from a Laplacian kernel and bilinear interpolation to highlight the differences.
 
-      
+
 AstroDrizzle Cosmic Ray flagging
 --------------------------------
 
@@ -130,4 +130,3 @@ Examples
 .. rubric:: Footnotes
 .. [#f1] It is worth noting that Laplacian kernels must share the
 	 property that :math:`\sum_{i,j}K_{i,j}=0`.
-

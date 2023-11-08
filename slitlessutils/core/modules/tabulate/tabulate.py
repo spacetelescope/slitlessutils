@@ -62,7 +62,7 @@ class Tabulate(Module):
         self.orders = as_iterable(orders)
 
     def __str__(self):
-        s = 'Tabulation Module: \n'+super().__str__()
+        s = 'Tabulation Module: \n' + super().__str__()
         return s
 
     @property
@@ -217,7 +217,7 @@ class Tabulate(Module):
         wav0 = np.amin(wav)
         wav1 = np.amax(wav)
         nwav = len(wav)
-        dwav = (wav1-wav0)/(nwav-1)
+        dwav = (wav1 - wav0) / (nwav - 1)
 
         # get the order property
         # ordconf=detconf[ordname]
@@ -226,7 +226,7 @@ class Tabulate(Module):
         pdts = {}
 
         # the relative pixel area
-        pixrat = (detdata.pixelarea/source.pixelarea)/self.pixfrac
+        pixrat = (detdata.pixelarea / source.pixelarea) / self.pixfrac
 
         # get some dimensionalities
         dims = (*detdata.naxis, nwav)
@@ -249,7 +249,7 @@ class Tabulate(Module):
                       units=disperser.units, **kwargs)
 
             # transform the pixel position and apply footprint
-            xg, yg = detdata.xy2xy(x+self.DX, y+self.DY, source.wcs, forward=False)
+            xg, yg = detdata.xy2xy(x + self.DX, y + self.DY, source.wcs, forward=False)
 
             # drizzle this pixel
             xx, yy, ll, aa = detdata.config.drizzle(xg, yg, ordname, wav)
@@ -271,7 +271,7 @@ class Tabulate(Module):
                 # 1. direct image weight (w)
                 # 2. ratio of pixel areas between direct and grism (pixrat)
                 # 3. wavelength sampling for integrals (dwav)
-                pdt.extend(xx, yy, ll, aa*w*pixrat*dwav)
+                pdt.extend(xx, yy, ll, aa * w * pixrat * dwav)
 
                 # save this PDT
                 pdts[(x, y)] = pdt

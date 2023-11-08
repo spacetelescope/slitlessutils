@@ -3,7 +3,7 @@
 Regions Files for ``ds9`` (`~slitlessutils.modules.Region()`)
 =============================================================
 
-It is occasionally useful to render the two-dimensional WFSS image with spectral traces marked.  For this, ``slitlessutils`` has the ability to distill the PDT files into a `ds9 <https://sites.google.com/cfa.harvard.edu/saoimageds9>`_ region file using the module :class:`slitlessutils.modules.Region()`.  
+It is occasionally useful to render the two-dimensional WFSS image with spectral traces marked.  For this, ``slitlessutils`` has the ability to distill the PDT files into a `ds9 <https://sites.google.com/cfa.harvard.edu/saoimageds9>`_ region file using the module :class:`slitlessutils.modules.Region()`.
 
 To determine the outline of a spectral source in a WFSS image, ``slitlessutils``:
 
@@ -18,7 +18,7 @@ To determine the outline of a spectral source in a WFSS image, ``slitlessutils``
 				#. Find the contours for a highly-connected binary image using `scikit-image <https://scikit-image.org/docs/stable/api/skimage.measure.html#skimage.measure.find_contours>`_ as a closed polygon.
 				#. Write the polygon into the region file as a ``ds9`` `polygon regions <https://ds9.si.edu/doc/ref/region.html>`_
 	* Write the region file to disk.
-* Output a separate ``ds9`` regions file for each WFSS file and detector combination.  
+* Output a separate ``ds9`` regions file for each WFSS file and detector combination.
 
 The resulting regions will have their title as the segmentation ID and the spectral order will encoded by the color of the region.  ``Slitlessutils`` assumes the ``tab20`` colormap from `matplotlib <https://matplotlib.org/stable/tutorials/colors/colormaps.html>`_, where the bold colors are for positive orders, pastel colors are for negative orders, and the zeroth order will be white.
 
@@ -50,6 +50,3 @@ Example
    :alt: Example region image with ds9.
 
    The grayscale image shows the ``slitlessutils`` simulation of three Gaussian point sources observed with the ACS/SBC (PR130L).  The blue polygons show the regions derived for this scene using ``slitlessutils``.
-
-
-

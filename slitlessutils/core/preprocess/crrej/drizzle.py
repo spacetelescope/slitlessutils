@@ -80,7 +80,7 @@ def drizzle(files, outdir=Path().absolute(), **kwargs):
     if isinstance(files, list):
         file_to_check = files[0]
     elif isinstance(files, str):
-        with open(files, "r") as f:
+        with open(files) as f:
             file_to_check = f.readline()
     drizzle_kwargs.update(_get_instrument_defaults(file_to_check))
     # Finally override any args with the ones the user supplied
@@ -173,7 +173,7 @@ def group_by_position_angle(files, degrees=True, max_pa_diff=0.05, **kwargs):
     # Return list of grouped filenames
     grouped_files = []
     files = np.array(files)
-    for i in range(1, np.max(labels)+1):
+    for i in range(1, np.max(labels) + 1):
         members = files[np.where(labels == i)]
         if len(members) == 1:
             LOGGER.warning(f"The file: {members[0]} was not grouped with any others.")

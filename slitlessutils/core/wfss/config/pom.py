@@ -244,14 +244,14 @@ class PolygonPOM(RangePOM):
         g = np.where(super().__call__(x, y))[0]
         if len(g) > 0:
 
-            dx1 = self.px1-x[g, np.newaxis]
-            dy1 = self.py1-y[g, np.newaxis]
+            dx1 = self.px1 - x[g, np.newaxis]
+            dy1 = self.py1 - y[g, np.newaxis]
 
-            dx2 = self.px2-x[g, np.newaxis]
-            dy2 = self.py2-y[g, np.newaxis]
+            dx2 = self.px2 - x[g, np.newaxis]
+            dy2 = self.py2 - y[g, np.newaxis]
 
-            ang = np.arctan2(dx1*dy2-dy1*dx2,
-                             dx1*dx2+dy1*dy2)
+            ang = np.arctan2(dx1 * dy2 - dy1 * dx2,
+                             dx1 * dx2 + dy1 * dy2)
 
             tot = np.abs(np.sum(ang, axis=1))
 
@@ -299,7 +299,7 @@ class ImagePOM(RangePOM):
         self.filename = filename
         self.data = fits.getdata(self.filename, **kwargs)
         ny, nx = self.data.shape
-        RangePOM.__init__(self, (0, nx-1), (0, ny-1))
+        RangePOM.__init__(self, (0, nx - 1), (0, ny - 1))
 
         self.threshold = threshold
 
@@ -355,8 +355,8 @@ class ImagePOM(RangePOM):
         super().update_header(h)
         h.set('POMFILE', value=self.filename, comment='filename of the POM')
         h.set('POMTHR', value=self.threshold, comment='threshold for valid')
-        h.set('POMNX', value=self.x1+1, comment='size in x')
-        h.set('POMNY', value=self.y1+1, comment='size in y')
+        h.set('POMNX', value=self.x1 + 1, comment='size in x')
+        h.set('POMNY', value=self.y1 + 1, comment='size in y')
 
 
 def load_pom(**kwargs):

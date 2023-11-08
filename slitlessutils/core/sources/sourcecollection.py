@@ -191,16 +191,16 @@ class SourceCollection(dict):
         if isfloat:
             seg, reg = np.divmod(seg, 1)
             seg = seg.astype(int)
-            reg = np.floor(reg*Source.MAXSPECREG).astype(int)
+            reg = np.floor(reg * Source.MAXSPECREG).astype(int)
 
         # find pixels for each object
         ri = indices.reverse(seg, ignore=(0,))
         for segid, (y, x) in ri.items():
             # get a bounding box
-            x0 = np.maximum(np.amin(x)-self.PAD, 0)
-            x1 = np.minimum(np.amax(x)+self.PAD+1, nx-1)
-            y0 = np.maximum(np.amin(y)-self.PAD, 0)
-            y1 = np.minimum(np.amax(y)+self.PAD+1, ny-1)
+            x0 = np.maximum(np.amin(x) - self.PAD, 0)
+            x1 = np.minimum(np.amax(x) + self.PAD + 1, nx - 1)
+            y0 = np.maximum(np.amin(y) - self.PAD, 0)
+            y1 = np.minimum(np.amax(y) + self.PAD + 1, ny - 1)
 
             # excise the image
             subseg = seg[y0:y1, x0:x1]
@@ -212,8 +212,8 @@ class SourceCollection(dict):
             subhdr['NAXIS2'] = subimg.shape[0]
             subhdr['CRPIX1'] -= x0
             subhdr['CRPIX2'] -= y0
-            subhdr['LTV1'] = hdr.get("LTV1", 0.)-x0
-            subhdr['LTV2'] = hdr.get("LTV2", 0.)-y0
+            subhdr['LTV1'] = hdr.get("LTV1", 0.) - x0
+            subhdr['LTV2'] = hdr.get("LTV2", 0.) - y0
 
             # make a region id
             if isfloat:
@@ -225,7 +225,7 @@ class SourceCollection(dict):
                 subreg = np.zeros_like(subseg, dtype=int)
                 if segid < 0:
                     # make checkerboard disp region
-                    subreg[gy, gx] = np.arange(1, len(gx)+1, dtype=int)
+                    subreg[gy, gx] = np.arange(1, len(gx) + 1, dtype=int)
                 else:
                     # make a flat disp region
                     subreg[gy, gx] = 1
@@ -293,8 +293,8 @@ class SourceCollection(dict):
             # put in flat level to SED
             wave = self.throughput.photplam
             for region in source:
-                fnu = source.fnu*np.sum(region.w)
-                flam = fnu*(2.99e10/wave)*(1e8/wave)  # /Config().fluxscale
+                fnu = source.fnu * np.sum(region.w)
+                flam = fnu * (2.99e10 / wave) * (1e8 / wave)  # /Config().fluxscale
                 # region.sed.set_sed([wave],[flam])
                 region.sed.append(wave, flam)
 
@@ -404,7 +404,7 @@ class SourceCollection(dict):
                 # JWST images are MJy/sr, so parse that
                 w = WCS(hdul[exten].header, relax=True)
                 pixarea = wcsutils.proj_plane_pixel_area(w)
-                zeropoint = -2.5*np.log10((1e6/3631)*(np.pi/180)**2*pixarea)
+                zeropoint = -2.5 * np.log10((1e6 / 3631) * (np.pi / 180)**2 * pixarea)
                 return zeropoint
             elif tel == 'HST':
                 for k in ('ABZERO', 'ZEROPT', 'MAGZERO', 'ZERO', 'ZPT'):
@@ -541,7 +541,7 @@ class SourceCollection(dict):
         LOGGER.info(f'loading SEDs from sedcat: {sedcat}')
         self.sedstype = 'sedcat'
         self.sedcat = sedcat
-        with open(self.sedcat, 'r') as f:
+        with open(self.sedcat) as f:
             for line in f:
                 line = line.strip()
                 if line.startswith('#'):
@@ -549,7 +549,7 @@ class SourceCollection(dict):
                     tokens = line[1:].strip().split(',')
                     waves = np.array([float(t) for t in tokens], dtype=float)
                     nfilt = len(waves)
-                    ncol = nfilt+1
+                    ncol = nfilt + 1
                     s = np.argsort(waves)
                     waves = waves[s]
                 else:
@@ -561,7 +561,7 @@ class SourceCollection(dict):
 
                             # convert from uJy to flam
                             fnu = np.array(tokens, dtype=float)[s]
-                            flam = fnu*1e-29*(2.998e10/waves)*(1e8/waves)
+                            flam = fnu * 1e-29 * (2.998e10 / waves) * (1e8 / waves)
 
                             # put this in source.load_seds()
                             self[segid].load_sedarray(waves, flam)

@@ -49,7 +49,7 @@ class WFSSDetector:
 
         # record the CRPIX & CDELT
         self.wcs.wcs.crpix = detconf.crpix
-        self.wcs.wcs.cdelt = detconf.scale/3600.
+        self.wcs.wcs.cdelt = detconf.scale / 3600.
 
         # save the config object
         self.config = detconf
@@ -79,13 +79,13 @@ class WFSSDetector:
         sgn = np.sign(np.linalg.det(self.wcs.wcs.piximg_matrix))
 
         # compute the two angles (+y to N and -x to E)
-        angx = np.arctan2(sgn*self.wcs.wcs.piximg_matrix[0, 1],
-                          sgn*self.wcs.wcs.piximg_matrix[0, 0])
+        angx = np.arctan2(sgn * self.wcs.wcs.piximg_matrix[0, 1],
+                          sgn * self.wcs.wcs.piximg_matrix[0, 0])
         angy = np.arctan2(-self.wcs.wcs.piximg_matrix[1, 0],
                           +self.wcs.wcs.piximg_matrix[1, 1])
 
         # check the angular difference, mindful of the wrapping at on [0,2pi)
-        dang = (angx-angy+np.pi) % (2*np.pi)-np.pi
+        dang = (angx - angy + np.pi) % (2 * np.pi) - np.pi
 
         # issue a quick warning
         if np.abs(dang) < np.radians(limit):
@@ -123,8 +123,8 @@ class WFSSDetector:
         c2 = self.wcs.wcs.piximg_matrix**2
 
         # the pixel scales
-        px = sgn*np.sqrt(np.sum(c2[:, 0]))*3600.
-        py = np.sqrt(np.sum(c2[:, 1]))*3600.
+        px = sgn * np.sqrt(np.sum(c2[:, 0])) * 3600.
+        py = np.sqrt(np.sum(c2[:, 1])) * 3600.
 
         return px, py
 
@@ -164,7 +164,7 @@ class WFSSDetector:
         npix : str
            number of pixels
         """
-        npix = self.wcs._naxis[0]*self.wcs._naxis[1]
+        npix = self.wcs._naxis[0] * self.wcs._naxis[1]
         return npix
 
     def relative_pixelarea(self, x, y):
@@ -199,8 +199,8 @@ class WFSSDetector:
 
         if self.wcs.sip:
             # if SIP is present, then compute the Jacobian
-            dx = x-(self.wcs.wcs.crpix[0]-1)
-            dy = y-(self.wcs.wcs.crpix[1]-1)
+            dx = x - (self.wcs.wcs.crpix[0] - 1)
+            dy = y - (self.wcs.wcs.crpix[1] - 1)
 
             # Uggh...computing these derivatives is ugly, because
             # things are stored as 2d matrices.
@@ -210,18 +210,18 @@ class WFSSDetector:
             dady = np.zeros_like(dx, dtype=float)
             for i, j in zip(*np.where(self.wcs.sip.a != 0)):
                 if i > 0:
-                    dadx += self.wcs.sip.a[i, j]*i*dx**(i-1)*dy**j
+                    dadx += self.wcs.sip.a[i, j] * i * dx**(i - 1) * dy**j
                 if j > 0:
-                    dady += self.wcs.sip.a[i, j]*j*dx**i*dy**(j-1)
+                    dady += self.wcs.sip.a[i, j] * j * dx**i * dy**(j - 1)
 
             # compute the derivatives w.r.t. the B
             dbdx = np.zeros_like(dx, dtype=float)
             dbdy = np.ones_like(dx, dtype=float)
             for i, j in zip(*np.where(self.wcs.sip.b != 0)):
                 if i > 0:
-                    dbdx += self.wcs.sip.b[i, j]*i*dx**(i-1)*dy**j
+                    dbdx += self.wcs.sip.b[i, j] * i * dx**(i - 1) * dy**j
                 if j > 0:
-                    dbdy += self.wcs.sip.b[i, j]*j*dx**i*dy**(j-1)
+                    dbdy += self.wcs.sip.b[i, j] * j * dx**i * dy**(j - 1)
 
             # compute the jacobian:
             area = np.abs(dadx * dbdy - dady * dbdx)

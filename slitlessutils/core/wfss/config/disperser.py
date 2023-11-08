@@ -111,7 +111,7 @@ class Disperser:
 
     @property
     def n(self):
-        return (self.wave1-self.wave0)/self.dwave + 1
+        return (self.wave1 - self.wave0) / self.dwave + 1
 
     def update_header(self, hdr):
         """
@@ -204,7 +204,7 @@ class Linear(Disperser):
            The wavelengths
         """
 
-        return self.wave0+lam*self.dwave/nsub
+        return self.wave0 + lam * self.dwave / nsub
 
     def wavelengths(self, nsub=1):
         """
@@ -221,8 +221,8 @@ class Linear(Disperser):
             The center of the wavelengths bins
         """
 
-        d = 1./nsub
-        ind = np.arange(0, len(self)-1+d, d, dtype=float)
+        d = 1. / nsub
+        ind = np.arange(0, len(self) - 1 + d, d, dtype=float)
         wav = self(ind)
 
         return wav
@@ -242,7 +242,7 @@ class Linear(Disperser):
             The indices (will be integer dtype)
         """
 
-        ind = np.round((wav-self.wave0)/self.dwave).astype(int)
+        ind = np.round((wav - self.wave0) / self.dwave).astype(int)
         return ind
 
     def limits(self, nsub=1):
@@ -265,8 +265,8 @@ class Linear(Disperser):
         #
         # lim2 = np.arange(self.wave0-dw2, self.wave1+dw2+dwn, dwn)
 
-        d = 1./nsub
-        ind = np.arange(-0.5, len(self)+d-0.5, d, dtype=float)
+        d = 1. / nsub
+        ind = np.arange(-0.5, len(self) + d - 0.5, d, dtype=float)
         lim = self(ind)
 
         return lim
@@ -346,13 +346,13 @@ class Laurent(Disperser):
         """
 
         n = self.n
-        num = (n-2)+self.alpha*n
-        den = (n-2)+self.alpha
-        return int(np.ceil(num/den))
+        num = (n - 2) + self.alpha * n
+        den = (n - 2) + self.alpha
+        return int(np.ceil(num / den))
 
     def __call__(self, lam, nsub=1):
 
-        wav = self.wave0 + self.dwave*lam*(self.alpha-1)/(self.alpha-lam)
+        wav = self.wave0 + self.dwave * lam * (self.alpha - 1) / (self.alpha - lam)
         return wav
 
     def wavelengths(self, nsub=1):
@@ -390,7 +390,7 @@ class Laurent(Disperser):
 
         DELTAi = wav - self.wave0
 
-        ind = DELTAi/(self.dwave + (DELTAi-self.dwave)/self.alpha)
+        ind = DELTAi / (self.dwave + (DELTAi - self.dwave) / self.alpha)
         ind = np.round(ind).astype(int)
         return ind
 
@@ -409,7 +409,7 @@ class Laurent(Disperser):
             A float array that gives the edges of the bins
         """
 
-        ind = np.arange(-0.5, len(self)+0.5, 1, dtype=float)
+        ind = np.arange(-0.5, len(self) + 0.5, 1, dtype=float)
         wav = self(ind)
         return wav
 

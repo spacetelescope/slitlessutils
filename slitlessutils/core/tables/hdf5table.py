@@ -64,7 +64,7 @@ class HDF5Table(HDF5Columns):
         super().__setitem__(k, list(v))
 
     def __mul__(self, a):
-        self['val'] = self.get('val')*a
+        self['val'] = self.get('val') * a
         return self
 
     def __rmul__(self, a):
@@ -74,7 +74,7 @@ class HDF5Table(HDF5Columns):
         return self.__mul__(a)
 
     def __itruediv__(self, a):
-        self['val'] = self.get('val')/a
+        self['val'] = self.get('val') / a
         return self
 
     def __iter__(self):
@@ -168,7 +168,7 @@ class HDF5Table(HDF5Columns):
             if lam is None:
                 lam = self.get('lam')
 
-            wav = wav0+lam*dwav
+            wav = wav0 + lam * dwav
             return wav
 
     # def compute_xyg(self):
@@ -245,16 +245,16 @@ class HDF5Table(HDF5Columns):
 
         if 'x' in self and 'y' in self:
             x = self.get('x')
-            x0 = np.amin(x)-dx[0]
-            x1 = np.amax(x)+dx[1]
+            x0 = np.amin(x) - dx[0]
+            x1 = np.amax(x) + dx[1]
             if 'nx' in self.attrs:
                 x0 = np.ceil(max(x0, 0))
                 x1 = np.floor(min(x1, self.attrs['nx']))
             x0, x1 = int(x0), int(x1)
 
             y = self.get('y')
-            y0 = np.amin(y)-dy[0]
-            y1 = np.amax(y)+dy[1]
+            y0 = np.amin(y) - dy[0]
+            y1 = np.amax(y) + dy[1]
             if 'ny' in self.attrs:
                 y0 = np.ceil(max(y0, 0))
                 y1 = np.floor(min(y1, self.attrs['ny']))
@@ -331,15 +331,15 @@ class HDF5Table(HDF5Columns):
             y0, y1 = np.amin(y), np.amax(y)
             x0, x1 = np.amin(x), np.amax(x)
 
-            msk = np.zeros((y1-y0+2*pad+1, x1-x0+2*pad+1), dtype=bool)  # np.uint8)
-            msk[y-y0+pad, x-x0+pad] = 1
+            msk = np.zeros((y1 - y0 + 2 * pad + 1, x1 - x0 + 2 * pad + 1), dtype=bool)  # np.uint8)
+            msk[y - y0 + pad, x - x0 + pad] = 1
 
             # contour the image
             contours = measure.find_contours(msk, level=level)
 
             # reset the contours
-            py = contours[0][:, 0]+y0-pad
-            px = contours[0][:, 1]+x0-pad
+            py = contours[0][:, 0] + y0 - pad
+            px = contours[0][:, 1] + x0 - pad
 
         else:
             px, py = np.array([]), np.array([])

@@ -91,7 +91,7 @@ class AffineTweak(dict):
                     # create and fill a dict of the data
                     self[ext] = {}
                     self[ext]['A'] = np.dot(cd1, np.linalg.inv(cd0))
-                    self[ext]['d'] = crval1-crval0
+                    self[ext]['d'] = crval1 - crval0
                     self[ext]['wcsname0'] = hdu.header[f'WCSNAME{self.key0}']
                     self[ext]['wcsname1'] = hdu.header[f'WCSNAME{self.key1}']
 
@@ -133,7 +133,7 @@ class AffineTweak(dict):
                 crval = utils.get_crval(hdul[ext].header, self.key0)
 
                 cd = np.dot(data['A'], cd)
-                crval = crval+data['d']
+                crval = crval + data['d']
 
                 hdul[ext].header.set('WCSNAME', data['wcsname1'])
                 utils.set_cd(hdul[ext].header, cd, self.key1)
