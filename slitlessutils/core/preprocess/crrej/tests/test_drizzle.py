@@ -1,16 +1,12 @@
-import numpy as np
 from pathlib import Path
-import pytest
 from tempfile import TemporaryDirectory
 
+import numpy as np
+import pytest
 from astroquery.mast import Observations
 
 from slitlessutils.core.preprocess.crrej.drizzle import (
-    drizzle,
-    group_by_visit,
-    group_by_position_angle,
-    drizzle_grouped_files,
-)
+    drizzle, drizzle_grouped_files, group_by_position_angle, group_by_visit)
 from slitlessutils.core.wfss import WFSSCollection
 
 

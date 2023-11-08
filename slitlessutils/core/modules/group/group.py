@@ -1,8 +1,8 @@
 from shapely import geometry
 
-from .groupcollection import GroupCollection
-from ..module import Module
 from ...tables import PDTFile
+from ..module import Module
+from .groupcollection import GroupCollection
 
 
 class Group(Module):

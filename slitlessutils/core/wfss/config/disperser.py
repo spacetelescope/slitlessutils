@@ -1,7 +1,7 @@
+from copy import copy
 from dataclasses import dataclass
 
 import numpy as np
-from copy import copy
 
 from ....logger import LOGGER
 from ...utilities import headers

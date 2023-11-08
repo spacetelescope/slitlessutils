@@ -1,8 +1,9 @@
 import numpy as np
 from astropy.io import fits
 
-from ...utilities import headers
 from slitlessutils.logger import LOGGER
+
+from ...utilities import headers
 
 
 def check_in_field(func):

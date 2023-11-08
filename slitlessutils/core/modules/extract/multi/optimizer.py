@@ -1,9 +1,8 @@
 import numpy as np
 
-
 from .....logger import LOGGER
-from .menger import menger
 from ....utilities import headers
+from .menger import menger
 
 
 def optimizer(algorithm, logdamp):

@@ -1,16 +1,15 @@
-from astropy.io import fits
-import numpy as np
-from scipy.constants import c
-from astropy.utils.data import download_file
-
-import shutil
 import os
+import shutil
 
+import numpy as np
+from astropy.io import fits
+from astropy.utils.data import download_file
+from scipy.constants import c
 
-from .throughput import Throughput
-from .avefnu import avefnu
-from ...logger import LOGGER
 from ...config import Config
+from ...logger import LOGGER
+from .avefnu import avefnu
+from .throughput import Throughput
 
 
 class SED:

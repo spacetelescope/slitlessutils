@@ -2,11 +2,11 @@ import os
 from dataclasses import dataclass
 from datetime import datetime
 
-from astropy.io import fits
 import numpy as np
-from pypolyclip import clip_multi
 import pysiaf
 import yaml
+from astropy.io import fits
+from pypolyclip import clip_multi
 
 from ....config import Config
 from ....logger import LOGGER

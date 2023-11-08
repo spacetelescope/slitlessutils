@@ -1,6 +1,6 @@
 # import subprocess
-import os
 import gzip
+import os
 import shutil
 
 from ...logger import LOGGER

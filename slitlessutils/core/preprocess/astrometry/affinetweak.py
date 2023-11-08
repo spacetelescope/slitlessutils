@@ -1,5 +1,5 @@
-from astropy.io import fits
 import numpy as np
+from astropy.io import fits
 
 from ....logger import LOGGER
 from . import utils

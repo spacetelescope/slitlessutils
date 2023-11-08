@@ -1,9 +1,8 @@
-import numpy as np
 import matplotlib.pyplot as plt
-
-from .hdf5table import HDF5Table
+import numpy as np
 
 from ..utilities import indices
+from .hdf5table import HDF5Table
 
 
 class OPT(HDF5Table):

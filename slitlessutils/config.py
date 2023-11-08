@@ -2,16 +2,15 @@ import glob
 import json
 import os
 import shutil
-from pathlib import Path
-from astropy.utils.data import download_file
 import tarfile
-from packaging import version
 import textwrap
+from pathlib import Path
 
+from astropy.utils.data import download_file
+from packaging import version
 
 from .core.utilities import headers
 from .logger import LOGGER
-
 
 # file suffixes.  Probably shouldn't ever change these, but here they are:
 SUFFIXES = {'1d spectra': 'x1d',

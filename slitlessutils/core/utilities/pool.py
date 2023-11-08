@@ -1,7 +1,8 @@
-import tqdm
 import multiprocessing as mp
-import psutil as ps
 from functools import partial
+
+import psutil as ps
+import tqdm
 
 from ...logger import LOGGER
 

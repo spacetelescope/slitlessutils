@@ -1,8 +1,8 @@
 import numpy as np
 
-from .parametricpolynomial import StandardPolynomial, ReciprocalPolynomial
-from .spatialpolynomial import SpatialPolynomial
+from .parametricpolynomial import ReciprocalPolynomial, StandardPolynomial
 from .sensitivity import Sensitivity
+from .spatialpolynomial import SpatialPolynomial
 
 
 class Order:

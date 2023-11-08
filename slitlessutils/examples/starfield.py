@@ -1,15 +1,15 @@
-import slitlessutils as su
-
-from astropy.io import fits
-from astropy.wcs import WCS
-from astropy.modeling import models
-import matplotlib.pyplot as plt
-import numpy as np
 import os
 import warnings
 
-from .parameters import RA, DEC, NPIX, PIXSCL
+import matplotlib.pyplot as plt
+import numpy as np
+from astropy.io import fits
+from astropy.modeling import models
+from astropy.wcs import WCS
 
+import slitlessutils as su
+
+from .parameters import DEC, NPIX, PIXSCL, RA
 
 ROOT = 'starfield'            # base name for files in this example
 DATASETS = ('a', 'b', 'c')    # dataset names (will do 3 datasets)

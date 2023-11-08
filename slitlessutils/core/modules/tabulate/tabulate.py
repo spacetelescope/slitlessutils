@@ -1,10 +1,10 @@
 import numpy as np
 
 from ....logger import LOGGER
-from ..module import Module
-from ...tables import PDTFile, PDT
-from ...utilities import indices, as_iterable
+from ...tables import PDT, PDTFile
+from ...utilities import as_iterable, indices
 from ...wfss import WFSS
+from ..module import Module
 
 
 class Tabulate(Module):

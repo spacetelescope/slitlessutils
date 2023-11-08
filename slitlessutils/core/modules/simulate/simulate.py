@@ -1,14 +1,14 @@
 from datetime import datetime
 
-from astropy.io import fits
 import numpy as np
+from astropy.io import fits
 
 from ....info import __code__, __version__
 from ....logger import LOGGER
-from ..module import Module
 from ...tables import PDTFile
-from ...utilities import indices, headers
+from ...utilities import headers, indices
 from ...utilities.compression import compress
+from ..module import Module
 
 
 class Simulate(Module):
