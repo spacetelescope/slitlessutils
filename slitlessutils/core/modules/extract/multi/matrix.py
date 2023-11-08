@@ -1,14 +1,13 @@
 import numpy as np
-from scipy.sparse import linalg, coo_matrix
+from scipy.sparse import coo_matrix, linalg
 from tqdm import tqdm
 
 from .....config import Config
-from .lcurve import LCurve
 from .....logger import LOGGER
-from .result import Result
 from ....tables import PDTFile
-from ....utilities import indices, headers, as_iterable
-
+from ....utilities import as_iterable, headers, indices
+from .lcurve import LCurve
+from .result import Result
 
 # Just for notation sake
 # variables with a 'g' are in the grism image

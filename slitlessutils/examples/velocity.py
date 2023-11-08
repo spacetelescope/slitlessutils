@@ -1,9 +1,8 @@
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 import numpy as np
 # from scipy.special import expit
 from astropy.modeling.models import Sersic2D
-
-import matplotlib as mpl
-import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
 
 Vmax = 250.

@@ -1,7 +1,7 @@
 import os
 
-from ..utilities import Pool, headers
 from ...logger import LOGGER
+from ..utilities import Pool, headers
 
 
 class Module:

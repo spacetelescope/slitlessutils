@@ -1,8 +1,9 @@
-from astropy.io import fits
 import numpy as np
+from astropy.io import fits
 from numpy.testing import assert_allclose
 
-from slitlessutils.core.preprocess.astrometry.utils import get_cd, set_cd, get_crval, set_crval
+from slitlessutils.core.preprocess.astrometry.utils import (get_cd, get_crval,
+                                                            set_cd, set_crval)
 
 
 def test_cd_utils():

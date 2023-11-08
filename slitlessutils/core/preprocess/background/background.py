@@ -1,8 +1,8 @@
+import numpy as np
 from astropy import convolution
 from astropy.io import fits
 from astropy.modeling import fitting, models
 from astropy.stats import sigma_clip, sigma_clipped_stats
-import numpy as np
 from scipy.signal import savgol_filter
 from skimage import morphology
 

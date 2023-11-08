@@ -1,10 +1,11 @@
-import numpy as np
-from skimage import morphology as morph
-from scipy import ndimage as ndi
 import matplotlib.pyplot as plt
+import numpy as np
+from scipy import ndimage as ndi
+from skimage import morphology as morph
+
+from slitlessutils.logger import LOGGER
 
 from ..utilities import headers
-from slitlessutils.logger import LOGGER
 
 
 class Operator:

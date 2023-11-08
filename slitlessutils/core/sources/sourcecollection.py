@@ -1,14 +1,15 @@
 import warnings
 
 import numpy as np
-from astropy.wcs import WCS, FITSFixedWarning, utils as wcsutils
 from astropy.io import fits
+from astropy.wcs import WCS, FITSFixedWarning
+from astropy.wcs import utils as wcsutils
 
+from ...logger import LOGGER
+from ..photometry import Throughput
+from ..utilities import headers, indices
 from .sedfile import SEDFile
 from .source import Source
-from ..photometry import Throughput
-from ..utilities import indices, headers
-from ...logger import LOGGER
 
 
 class SourceCollection(dict):

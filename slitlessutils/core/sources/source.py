@@ -1,16 +1,17 @@
 import os
 
-from astropy.io import fits
-from astropy.stats import sigma_clipped_stats
-from astropy.wcs import WCS, utils as wcsutils
-from astropy.modeling import fitting, models
 import matplotlib.pyplot as plt
 import numpy as np
+from astropy.io import fits
+from astropy.modeling import fitting, models
+from astropy.stats import sigma_clipped_stats
+from astropy.wcs import WCS
+from astropy.wcs import utils as wcsutils
 from skimage.segmentation import expand_labels
 
-from .dispersedregion import DispersedRegion
-from ..utilities import headers, indices
 from ...logger import LOGGER
+from ..utilities import headers, indices
+from .dispersedregion import DispersedRegion
 
 
 class Source(list):

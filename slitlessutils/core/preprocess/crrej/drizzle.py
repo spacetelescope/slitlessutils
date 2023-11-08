@@ -1,11 +1,11 @@
 import math
-import numpy as np
 from pathlib import Path
 
+import numpy as np
 from astropy.io import fits
 from drizzlepac import astrodrizzle
-from scipy.spatial import distance
 from scipy.cluster.hierarchy import fcluster, linkage
+from scipy.spatial import distance
 
 from slitlessutils.core.wfss import WFSSCollection
 from slitlessutils.logger import LOGGER

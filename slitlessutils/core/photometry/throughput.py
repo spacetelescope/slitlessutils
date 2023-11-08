@@ -1,12 +1,12 @@
 import os
 
-from astropy.io import fits
 import numpy as np
+from astropy.io import fits
 from scipy.constants import c
 
-from .band import Band
-from ...logger import LOGGER
 from ...config import Config
+from ...logger import LOGGER
+from .band import Band
 
 
 class Throughput(Band):

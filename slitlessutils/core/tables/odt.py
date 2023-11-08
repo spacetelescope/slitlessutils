@@ -1,8 +1,7 @@
 import numpy as np
 
-from .hdf5table import HDF5Table
-
 from ..utilities import indices
+from .hdf5table import HDF5Table
 
 
 class ODT(HDF5Table):

@@ -1,16 +1,17 @@
-import h5py
 import os
+
+import h5py
 
 from ...logger import LOGGER
 from . import attributes
 from .hdf5columns import HDF5Columns
 
+# r Readonly, file must exist (default)
+# r+    Read/write, file must exist
+# w Create file, truncate if exists
+# w- or x   Create file, fail if exists
+# a Read/write if exists, create otherwise
 
-# r	Readonly, file must exist (default)
-# r+	Read/write, file must exist
-# w	Create file, truncate if exists
-# w- or x	Create file, fail if exists
-# a	Read/write if exists, create otherwise
 
 class HDF5File(HDF5Columns):
     """

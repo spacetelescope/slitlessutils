@@ -1,16 +1,16 @@
 import os
 
+import numpy as np
 from astropy.io import fits
 from astropy.stats import SigmaClip
-import numpy as np
 
-from .....config import Config, SUFFIXES
-from .contamination import Contamination
+from .....config import SUFFIXES, Config
 from .....info import __code__
 from .....logger import LOGGER
-from ...module import Module
 from ....tables import PDTFile
-from ....utilities import indices, headers  # , as_iterable
+from ....utilities import headers, indices  # , as_iterable
+from ...module import Module
+from .contamination import Contamination
 
 
 class Single(Module):

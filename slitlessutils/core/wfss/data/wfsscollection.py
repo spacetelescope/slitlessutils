@@ -1,18 +1,18 @@
+import warnings
 from dataclasses import dataclass
 from glob import glob
 from io import StringIO
-import warnings
 
-from astropy.io import fits
-from astropy.wcs import FITSFixedWarning
-from astropy.table import Table
 import numpy as np
 import pandas as pd
+from astropy.io import fits
+from astropy.table import Table
+from astropy.wcs import FITSFixedWarning
 
-from .wfss import WFSS
-from ..config import InstrumentConfig
-from ...utilities import headers
 from ....logger import LOGGER
+from ...utilities import headers
+from ..config import InstrumentConfig
+from .wfss import WFSS
 
 
 @dataclass

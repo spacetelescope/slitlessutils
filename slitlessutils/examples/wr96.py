@@ -1,13 +1,13 @@
+import os
+import shutil
+
+import matplotlib.pyplot as plt
+import numpy as np
 from astropy.io import fits
 from astropy.wcs import WCS
 from astroquery.mast import Observations
 from drizzlepac import astrodrizzle
 from scipy.ndimage import gaussian_filter1d
-
-import matplotlib.pyplot as plt
-import numpy as np
-import os
-import shutil
 
 import slitlessutils as su
 

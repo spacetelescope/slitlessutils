@@ -1,5 +1,5 @@
-from .affinetweak import AffineTweak
 from ....logger import LOGGER
+from .affinetweak import AffineTweak
 
 
 def upgrade_wcs(reffile, inputs, key0='A', key1='', newfile=None, inplace=False):

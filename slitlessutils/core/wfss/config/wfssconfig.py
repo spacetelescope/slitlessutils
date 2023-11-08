@@ -1,10 +1,11 @@
-import numpy as np
 import os
 
+import numpy as np
+
+from ....logger import LOGGER
 from .flatfield import load_flatfield
 from .order import Order
 from .pom import load_pom
-from ....logger import LOGGER
 
 
 class WFSSConfig(dict):

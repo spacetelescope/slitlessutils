@@ -1,7 +1,7 @@
-from .region import Region
-from .attributes import Attributes
-
 import sys
+
+from .attributes import Attributes
+from .region import Region
 
 
 class DS9Regions(list):

@@ -1,11 +1,13 @@
-from astropy.wcs import WCS, Sip, utils as wcsutils
-from astropy.io import fits
-import numpy as np
 import os
 import warnings
 
-from ..config import InstrumentConfig
+import numpy as np
+from astropy.io import fits
+from astropy.wcs import WCS, Sip
+from astropy.wcs import utils as wcsutils
+
 from ....logger import LOGGER
+from ..config import InstrumentConfig
 
 
 class WFSSDetector:

@@ -1,15 +1,16 @@
 import datetime
 import os
 
+import matplotlib.colors as mc
+import matplotlib.pyplot as plt
+import numpy as np
 from astropy.io import fits
 from astropy.table import Table
-import matplotlib.pyplot as plt
-import matplotlib.colors as mc
 from matplotlib.backends.backend_pdf import PdfPages
-import numpy as np
+
+from slitlessutils.logger import LOGGER
 
 from .menger import menger
-from slitlessutils.logger import LOGGER
 
 
 class LCurve:

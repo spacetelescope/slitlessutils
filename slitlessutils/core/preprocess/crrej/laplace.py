@@ -1,12 +1,12 @@
-from astropy.io import fits
-import numpy as np
 import os
-from scipy import ndimage, interpolate
-from skimage import morphology, measure
+
+import numpy as np
+from astropy.io import fits
+from scipy import interpolate, ndimage
+from skimage import measure, morphology
 
 from ....logger import LOGGER
 from ...utilities import headers, indices
-
 
 # some pre-built Laplace kernels
 KERNELS = {'3a': [[0, -1, 0],

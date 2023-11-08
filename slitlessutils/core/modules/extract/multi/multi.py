@@ -1,19 +1,18 @@
 
-from astropy.io import fits
-from matplotlib.backends.backend_pdf import PdfPages
-import numpy as np
-
 import getpass
 
+import numpy as np
+from astropy.io import fits
+from matplotlib.backends.backend_pdf import PdfPages
 
-from .....config import Config, SUFFIXES
-from ...group import GroupCollection
+from .....config import SUFFIXES, Config
 from .....info import __code__
-from .matrix import Matrix
-from ...module import Module
 from .....logger import LOGGER
-from .optimizer import optimizer
 from ....utilities import as_iterable, headers
+from ...group import GroupCollection
+from ...module import Module
+from .matrix import Matrix
+from .optimizer import optimizer
 
 
 class Multi(Module):

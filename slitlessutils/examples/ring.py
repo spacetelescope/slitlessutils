@@ -1,10 +1,11 @@
-import slitlessutils as su
 import numpy as np
-from scipy.special import gammaincinv
 from astropy.io import fits
 from astropy.wcs import WCS
+from scipy.special import gammaincinv
 
-from .parameters import RA, DEC, NPIX, PIXSCL
+import slitlessutils as su
+
+from .parameters import DEC, NPIX, PIXSCL, RA
 
 # import matplotlib as mpl
 # import matplotlib.pyplot as plt

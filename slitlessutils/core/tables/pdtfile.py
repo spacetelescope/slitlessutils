@@ -1,12 +1,13 @@
 from shapely.geometry import Polygon
 
+from slitlessutils.logger import LOGGER
+
 from . import attributes
 from .hdf5file import HDF5File
-from .opt import OPT
 from .odt import ODT
+from .opt import OPT
 from .pdt import PDT
 from .rdt import RDT
-from slitlessutils.logger import LOGGER
 
 
 class PDTFile(HDF5File):
