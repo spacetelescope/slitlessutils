@@ -25,6 +25,12 @@ Installing ``slitlessutils``
 
 There are several ways to install ``slitlessutils``:
 
+* **Install from PyPI:** to install the latest stable version:
+
+  .. code-block:: bash
+
+    pip install slitlessutils
+
 
 * **Install from GitHub:** to install the latest development version:
 

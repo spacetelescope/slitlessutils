@@ -9,11 +9,19 @@ Slitlessutils is under active development software and subject to change.
 
 ## Quickstart
 
-To install the latest version of this repository, please use:
-``
+The latest released version of this package can be installed using pip
+from the command line:
+```
+pip install slitlessutils
+```
+
+To install the latest develoment version of this repository, please use:
+```
 pip install git+https://github.com/spacetelescope/slitlessutils.git
-``
+```
 
-You also need to obtain the calibration (reference) files, which are stored in a public box folder, which can be done with the slitlessutils config objects.  Please see [configuring slitlessutils](https://github.com/spacetelescope/slitlessutils/blob/main/docs/configure.rst) for instructions and examples.  Please see [our documentation](https://github.com/spacetelescope/slitlessutils/blob/main/docs/install.rst) for additional installation instructions and/or methods.
+You also need to obtain the calibration (reference) files, which are stored in a public box folder, which can be done with the slitlessutils config objects.  Please see [configuring slitlessutils](https://slitlessutils.readthedocs.io/en/latest/configure.html)
+for instructions and examples.  Please see our [documentation](https://slitlessutils.readthedocs.io/en/latest/install.html)
+for additional installation instructions and/or methods.
 
-We have encountered several frequently-asked questions and give some examples [our FAQ page](https://github.com/spacetelescope/slitlessutils/blob/main/docs/faq.rst).
+We have encountered several frequently-asked questions and give some examples our [FAQ page](https://slitlessutils.readthedocs.io/en/latest/faq.html).
