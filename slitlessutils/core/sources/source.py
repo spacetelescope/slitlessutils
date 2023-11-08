@@ -286,7 +286,7 @@ class Source(list):
                 mod = models.Sersic2D(amplitude=amplitude,
                                       x_0=xc, y_0=yc,
                                       n=2.5, r_eff=a,
-                                      ellip =np.sqrt(1 - (b / a)**2),
+                                      ellip=np.sqrt(1 - (b / a)**2),
                                       theta=theta)
             else:
                 msg = f'profile {profile} is not supported'

@@ -55,8 +55,8 @@ class STDOUTFormatter(BaseFormatter):
             "\033[93;1mWARNING %(processName)s> "
             "\033[00m\033[93m%(message)s\033[00m"),
         logging.ERROR: (
-                "\033[91;5;1mERROR %(processName)s>\033[00m"
-                "\033[91m %(message)s\033[00m"),
+            "\033[91;5;1mERROR %(processName)s>\033[00m"
+            "\033[91m %(message)s\033[00m"),
         logging.CRITICAL: "\033[91;1;5;7mCRITICAL %(processName)s> %(message)s\033[00m"}
 
 

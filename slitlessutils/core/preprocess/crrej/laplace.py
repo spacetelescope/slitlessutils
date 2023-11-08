@@ -255,8 +255,8 @@ def laplace(filename, inplace=True, newfile=None, bitvalue=None,
                                                                            s=1e6, kx=1, ky=1)
 
                                 hdul[('SCI', extver)].data[by + y0, bx + x0] = spline(subx[subbpx],
-                                                                                  suby[subbpx],
-                                                                                  grid=False)
+                                                                                      suby[subbpx],
+                                                                                      grid=False)
 
                         # gxy=(xx[gpx],yy[gpx])
                         # gsci=sci[gpx]

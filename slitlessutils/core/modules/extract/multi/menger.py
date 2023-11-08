@@ -43,9 +43,9 @@ def menger(xyj, xyk, xyl):
         # could maybe consider subtracting off xyk from xyj and xyl to
         # improve the precision?
 
-        num = 2. * np.abs(xyj[0] * (xyk[1] - xyl[1]) +
-                        xyk[0] * (xyl[1] - xyj[1]) +
-                        xyl[0] * (xyj[1] - xyk[1]))
+        num = 2. * np.abs(xyj[0] * (xyk[1] - xyl[1])
+                          + xyk[0] * (xyl[1] - xyj[1])
+                          + xyl[0] * (xyj[1] - xyk[1]))
 
         djk = np.hypot(xyk[0] - xyj[0], xyk[1] - xyj[1])
         dkl = np.hypot(xyl[0] - xyk[0], xyl[1] - xyk[1])

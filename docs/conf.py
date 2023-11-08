@@ -11,7 +11,6 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -227,8 +226,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', f'{project}.tex', f'{project} Documentation',
-   f'{project}', 'manual'),
+    ('index', f'{project}.tex', f'{project} Documentation',
+     f'{project}', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -268,9 +267,9 @@ man_show_urls = True
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', f'{project}', f'{project} Documentation',
-   f'{author}', f'{project}', f'{project}',
-   'Miscellaneous'),
+    ('index', f'{project}', f'{project} Documentation',
+     f'{author}', f'{project}', f'{project}',
+     'Miscellaneous'),
 ]
 
 # Documents to append as an appendix to all manuals.

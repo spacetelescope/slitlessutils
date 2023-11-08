@@ -97,7 +97,8 @@ for c in cnt.collections:
     c.set_clip_path(ell1)
 
 
-sers = Sersic2D(amplitude=1, r_eff=5, n=1, x_0=0, y_0=0, ellip=1 - aspect, theta=np.radians(90 - pa))
+sers = Sersic2D(amplitude=1, r_eff=5, n=1, x_0=0, y_0=0, ellip=1 - aspect,
+                theta=np.radians(90 - pa))
 
 
 img2 = a2.imshow(sers(x, y), extent=extent,
