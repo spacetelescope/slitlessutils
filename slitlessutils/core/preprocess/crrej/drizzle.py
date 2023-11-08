@@ -80,7 +80,7 @@ def drizzle(files, outdir=Path().absolute(), **kwargs):
     if isinstance(files, list):
         file_to_check = files[0]
     elif isinstance(files, str):
-        with open(files, "r") as f:
+        with open(files) as f:
             file_to_check = f.readline()
     drizzle_kwargs.update(_get_instrument_defaults(file_to_check))
     # Finally override any args with the ones the user supplied

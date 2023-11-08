@@ -206,7 +206,7 @@ class LCurve:
         # put the frobenius norm in the plot
         # if self.norm is not None:
         if rescale:
-            ax1.text(0.67, 0.88, r'$\log\ ||W||_F=${0:+.3f}'.format(self.norm),
+            ax1.text(0.67, 0.88, fr'$\log\ ||W||_F=${self.norm:+.3f}',
                      horizontalalignment='left', transform=ax1.transAxes,
                      bbox=dict(facecolor='white', edgecolor='white'))
             ylabel = r'$\log\ ||W||_F^2\,||f||^2$'

@@ -433,7 +433,7 @@ class WFSSCollection(dict):
         LOGGER.info(f'Loading WFSS data from file list: {obsfile}')
 
         filenames = []
-        with open(obsfile, 'r') as fp:
+        with open(obsfile) as fp:
             for line in fp:
                 line = line.strip()
                 if line and line[0] not in cls.COMMENTS:
@@ -553,7 +553,7 @@ class WFSSCollection(dict):
                     'exptime': kwargs.get('exptime', 1000.),           # in sec
                     'background': kwargs.get('background', 0.0)}       # in e-/s
 
-        with open(wcsfile, 'r') as fp:
+        with open(wcsfile) as fp:
             dat = ''
 
             # read the CSV, but scan for a header with defaults and update

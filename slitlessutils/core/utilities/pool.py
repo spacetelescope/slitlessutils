@@ -87,8 +87,8 @@ class Pool:
 
     def __str__(self):
         lines = ['Pool object with:',
-                 'NCPU = {}'.format(self.ncpu),
-                 'FUNC = {}'.format(self.func)]
+                 f'NCPU = {self.ncpu}',
+                 f'FUNC = {self.func}']
         return '\n'.join(lines)
 
     def __call__(self, itrs, *args, total=None, **kwargs):

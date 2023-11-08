@@ -610,7 +610,7 @@ class InstrumentConfig(dict):
                                      f'{telescope}_{instrument}.yaml'.lower())
 
         # load the yaml config file
-        with open(self.filename, 'r') as f:
+        with open(self.filename) as f:
             data = yaml.safe_load(f)
 
         # extract relevant data from the yaml dict

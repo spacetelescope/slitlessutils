@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # STSCI documentation build configuration file, created by
 # sphinx-quickstart on Thu Oct 22 17:25:41 2015.

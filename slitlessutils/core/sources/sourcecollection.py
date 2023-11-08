@@ -541,7 +541,7 @@ class SourceCollection(dict):
         LOGGER.info(f'loading SEDs from sedcat: {sedcat}')
         self.sedstype = 'sedcat'
         self.sedcat = sedcat
-        with open(self.sedcat, 'r') as f:
+        with open(self.sedcat) as f:
             for line in f:
                 line = line.strip()
                 if line.startswith('#'):

@@ -304,7 +304,7 @@ class WFSSConfig(dict):
         data = {}
 
         # open the file
-        with open(conffile, 'r') as fp:
+        with open(conffile) as fp:
 
             # parse the file, line-by-line and look for commented lines
             for line in fp:

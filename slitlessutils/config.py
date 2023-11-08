@@ -133,7 +133,7 @@ class Config(dict):
         if not cls._instance:
 
             # make a new config object
-            cls._instance = super(Config, cls).__new__(cls)
+            cls._instance = super().__new__(cls)
             cls._instance._refpath = os.getcwd()
 
             # first check if the refroot exists
@@ -148,14 +148,14 @@ class Config(dict):
 
             # read the defaults as json
             if os.path.exists(deffile):
-                with open(deffile, 'r') as f:
+                with open(deffile) as f:
                     cfg = json.load(f)
             else:
                 cfg = {}
 
             # if a conffile is given, read and update with that
             if conffile:
-                with open(conffile, 'r') as f:
+                with open(conffile) as f:
                     custom = json.load(f)
                 cfg.update(custom)
 
@@ -244,7 +244,7 @@ class Config(dict):
         # check if the file exists
         if os.path.exists(filename):
             # open file as a json
-            with open(filename, 'r') as fp:
+            with open(filename) as fp:
                 data = json.load(fp)
 
         else:
@@ -405,7 +405,7 @@ class Config(dict):
             return
 
         # open the manifest as a json file
-        with open(f, 'r') as fp:
+        with open(f) as fp:
             data = json.load(fp)
 
         # output variables:
@@ -564,7 +564,7 @@ class Config(dict):
         else:
             try:
                 # return the actual value
-                return super(Config, self).__getattribute__(k)
+                return super().__getattribute__(k)
             except AttributeError:
                 LOGGER.warning(f"Attribute {k} not found.")
                 return
@@ -589,7 +589,7 @@ class Config(dict):
             self[k].value = v
         else:
             # deal with normal attribute setting
-            super(Config, self).__setattr__(k, v)
+            super().__setattr__(k, v)
 
     def update_header(self, hdr):
         """

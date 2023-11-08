@@ -447,7 +447,7 @@ class Rebin(Operator):
                 newhdr['CDELT2'] *= binfact
 
             LOGGER.debug('REBINNING SEGMAP IS PROBABLY NOT RIGHT')
-            g = np.where((seg != newhdr['SEGID']))    # pixels not the source
+            g = np.where(seg != newhdr['SEGID'])    # pixels not the source
             newseg = seg.copy()
             newseg[g] = 0
             newseg = ndi.maximum(newseg, labels=bins, index=b).reshape(new)

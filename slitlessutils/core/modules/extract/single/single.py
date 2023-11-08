@@ -454,7 +454,7 @@ class Single(Module):
 
                             # aggregate factors
                             den = vv*sens*flat*area*fluxscale
-                            g = np.where((den > 0))[0]
+                            g = np.where(den > 0)[0]
 
                             # only keep terms that are strictly positive
                             if g.size > 0:

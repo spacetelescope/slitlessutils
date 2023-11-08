@@ -228,7 +228,7 @@ class Multiple(Optimizer):
         """
 
         super().update_header(hdr)
-        hdr.set('LOGDAMPS', value=','.join((str(ld) for ld in self.logdamp)),
+        hdr.set('LOGDAMPS', value=','.join(str(ld) for ld in self.logdamp),
                 comment='log(damping) value used')
 
     def __call__(self, matrix):
