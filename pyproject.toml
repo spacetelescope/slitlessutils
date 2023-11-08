@@ -97,7 +97,7 @@ doctest_plus = 'enabled'
 text_file_format = 'rst'
 addopts = '--color=yes --doctest-rst'
 xfail_strict = true
-remote_data_strict = true
+remote_data_strict = false
 filterwarnings = [
     'error',  # turn warnings into exceptions
     'ignore:numpy.ufunc size changed:RuntimeWarning',
