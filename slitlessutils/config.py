@@ -39,7 +39,7 @@ class Parameter:
         The fits header comment card
 
     editable : bool, optional
-        Flag that this parameter can be editted
+        Flag that this parameter can be edited
 
     """
 
@@ -98,7 +98,7 @@ class Config(dict):
     Parameters
     ----------
     kwargs : dict, optional
-       A dictinary of keyword/value pairs to override default values.
+       A dictionary of keyword/value pairs to override default values.
 
     """
 
@@ -273,7 +273,7 @@ class Config(dict):
         if refversion is None:
             # if refvserion is `None`, then compute the latest-greatest.
 
-            # initalize with a nonsense value
+            # initialize with a nonsense value
             bestvers = version.parse('0.0.0')
             bestpath = None
 
@@ -679,7 +679,7 @@ class Config(dict):
         Returns
         -------
         dic : dict
-           A dictionary of hte HDF5 config
+           A dictionary of the HDF5 config
 
         """
 

@@ -16,7 +16,7 @@ from .result import Result
 #                'comp' are compressed over the indices
 #                'uniq' are uniq such that this is true: i=iuniq[icomp].
 #                       which means that max(icomp)=len(iuniq)
-# pixel coordinates will be represnted as either 1-d pixels (xyg) or
+# pixel coordinates will be represented as either 1-d pixels (xyg) or
 # a 2-d pixel pair (xg,yg).  This is because 1d coordinates are easier to
 # work with in terms of summations, but harder when retrieving pixel
 # values out of an image
@@ -193,7 +193,7 @@ class Matrix:
                     if not hasattr(self, 'imgdim'):
                         self.imgdim = tuple(reversed(sci.shape))
 
-                    # updae msk for the mskorders
+                    # update msk for the mskorders
                     for ordname in self.mskorders:
                         h5.load_order(ordname)
                         for source in sources.values():
@@ -286,7 +286,7 @@ class Matrix:
 
         except BaseException:
             LOGGER.debug(self.npix, self.npar, self.nsources)
-            raise RuntimeError("Matrix calulation has failed")
+            raise RuntimeError("Matrix calculation has failed")
 
         # get the indices to do all reverse calculations
         self.ri = indices.reverse(extind)
@@ -365,7 +365,7 @@ class Matrix:
         explicitly called by a user.
         """
 
-        # compute teh wavelengths
+        # compute the wavelengths
         wav = tab.wavelengths()
         x = tab.get('x', dtype=int)
         y = tab.get('y', dtype=int)
@@ -684,7 +684,7 @@ class Matrix:
         """
 
         if not self:
-            LOGGER.warning("Cannot update header, matrix unitialized")
+            LOGGER.warning("Cannot update header, matrix uninitialized")
             return
 
         hdr['NNZ'] = (len(self), 'number of non-zero matrix elements')

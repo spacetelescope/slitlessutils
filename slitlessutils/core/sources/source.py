@@ -63,7 +63,7 @@ class Source(list):
 
         nsig : 2-tuple, int, or float, optional
             The number of sigma to clip the sky background.  If the value
-            is a tuple, then the numbers are interepreted as (low,high)
+            is a tuple, then the numbers are interpreted as (low,high)
             values. If it is a single value, then will be both low and high
             clipping values.  Default is (5.,5.).
 

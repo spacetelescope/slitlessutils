@@ -12,7 +12,7 @@ class SpatialPolynomial(dict):
        p(x,y) = a + b*x + c*y + d*x^2 + e*x*y + f*y^2 + ...
 
 
-    inherts from dict.  The key/value pairs are the spatial exponents
+    inherits from dict.  The key/value pairs are the spatial exponents
     (stored via 'Cantor pairing') and coefficients, respectively.
 
     """

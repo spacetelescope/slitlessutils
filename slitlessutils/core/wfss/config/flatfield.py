@@ -9,7 +9,7 @@ from ...utilities import headers
 def check_in_field(func):
     """
     A decorator function to check if an (x,y)-coordinate pair is within
-    the bounds of a two-dimensional `np.ndarray`.  If the coordiante pair
+    the bounds of a two-dimensional `np.ndarray`.  If the coordinate pair
     is out-of-bounds, the a value of 0.0 is returned.
 
     Parameters

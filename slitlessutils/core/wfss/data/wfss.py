@@ -192,7 +192,7 @@ class WFSSDetector:
 
         Notes
         -----
-        The input coordiantes (x,y) must have the same shape, but their
+        The input coordinates (x,y) must have the same shape, but their
         dtype does not matter.
 
         """
@@ -317,7 +317,7 @@ class WFSSDetector:
             Science image --- a two-dimensional array
 
         addnoise : bool, optional
-            Flag to add noise to the image. Default is Tre
+            Flag to add noise to the image. Default is True.
 
         Returns
         -------
@@ -461,7 +461,7 @@ class WFSSDetector:
            A flag controlling the direction of the transform.
 
            -> If True, then transform *FROM* this image *TO* this WCS.
-           -> If False, then transfrom *TO* this image *FROM* this WCS
+           -> If False, then transform *TO* this image *FROM* this WCS
 
         Returns
         -------
@@ -723,7 +723,7 @@ class WFSS(dict):
             The name of the dispersive element
 
         kwargs : dict, optional
-             Optional keywords that are pssed to
+             Optional keywords that are passed to
              `slitlessutils.core.wfss.config.InstrumentConfig`.  A key
              variable one might add is `blocking=<str>` to enable
              blocking filters (a la JWST)

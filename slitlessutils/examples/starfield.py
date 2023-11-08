@@ -160,7 +160,7 @@ def simulate_grisms():
     3) All products are written to disk.
 
     """
-    # write a "WCS" file to disk that contains properites of
+    # write a "WCS" file to disk that contains properties of
     # the images to emulate an observers setup
     with open(f'{ROOT}_wcs.csv', 'w') as fp:
         print('dataset,ra,dec,orientat,telescope,instrument,disperser,blocking', file=fp)

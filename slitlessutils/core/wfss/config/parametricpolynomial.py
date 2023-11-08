@@ -67,7 +67,7 @@ class ParametricPolynomial(list):
         Returns
         -------
         coefs : list
-            The coefficients for each parameteric order
+            The coefficients for each parametric order
 
         """
 

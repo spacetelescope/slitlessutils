@@ -136,7 +136,7 @@ class SED:
 
         flux : int, float
            The value to force the spectrum to have.  This can be either
-           fnu-based flux or an AB magnitude, as controled by the `abmag`
+           fnu-based flux or an AB magnitude, as controlled by the `abmag`
            optional parameter.
 
         abmag : bool, optional

@@ -161,7 +161,7 @@ def laplace(filename, inplace=True, newfile=None, bitvalue=None,
         # and it is of valid type
         get_header_bitvalue = True
 
-        # if bitvalue is an int, check if its a multple of 2
+        # if bitvalue is an int, check if its a multiple of 2
         if isinstance(bitvalue, int):
             get_header_bitvalue = not np.log2(bitvalue).is_integer()
 
