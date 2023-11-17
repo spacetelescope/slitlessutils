@@ -1,4 +1,6 @@
 import numpy as np
+import os
+
 from astropy import convolution
 from astropy.io import fits
 from astropy.modeling import fitting, models
@@ -75,26 +77,31 @@ def background_processing(mastersky=False):
 
                         # if doing master sky, then need to prep the sky
                         if mastersky:
+                            if isinstance(backfile, str) and os.path.exists(backfile):
+                                # get the model and check normalization
+                                mod = fits.getdata(backfile, ('SKY', vers))
 
-                            # get the model and check normalization
-                            mod = fits.getdata(backfile, ('SKY', vers))
+                                a, m, s = sigma_clipped_stats(mod)
+                                if np.abs(a-1) > 1e-2:
+                                    msg = (f'The master sky image ({backfile}) is '
+                                           f'unnormalized {a}. Results will be fine, '
+                                           f'but the units may not make sense.')
+                                    LOGGER.warning(msg)
 
-                            a, m, s = sigma_clipped_stats(mod)
-                            if np.abs(a - 1) > 1e-3:
-                                msg = (f'The master sky image ({backfile}) is '
-                                       'unnormalized. Results will be fine, '
-                                       'but the units will not make sense.')
+                                # excise if need-be
+                                if phdr['INSTRUME'] == 'WFC3':
+                                    x0 = -int(hdr.get('LTV1', 0))
+                                    y0 = -int(hdr.get('LTV2', 0))
+                                    nx = hdr['NAXIS1']
+                                    ny = hdr['NAXIS2']
+                                    mod = mod[y0:ny+y0, x0:nx+x0]
+
+                                ret, src = func(self, sci, hdr, unc, med, gpx, mod, **kwargs)
+                            else:
+                                msg = f'The master-sky image is invalid: {backfile}.  ' + \
+                                    'No subtraction performed.'
                                 LOGGER.warning(msg)
-
-                            # excise if need-be
-                            if phdr['INSTRUME'] == 'WFC3':
-                                x0 = -int(hdr.get('LTV1', 0))
-                                y0 = -int(hdr.get('LTV2', 0))
-                                nx = hdr['NAXIS1']
-                                ny = hdr['NAXIS2']
-                                mod = mod[y0:ny + y0, x0:nx + x0]
-
-                            ret, src = func(self, sci, hdr, unc, med, gpx, mod, **kwargs)
+                                ret = 0.
                         else:
                             ret, src = func(self, sci, hdr, unc, med, gpx, **kwargs)
 
@@ -365,6 +372,60 @@ class Background:
         return out, np.logical_not(sky)
 
     @background_processing(mastersky=False)
+    def constant(self, sci, hdr, unc, mod, gpx):
+        r"""
+        Function to fit a constant background to a WFSS image, which
+        is taken as a sigma clipped median.
+
+        Parameters
+        ----------
+        data : str or `wfss.WFSS`
+           Either a string that is the full path to a WFSS file or a
+           `wfss.WFSS`.
+
+        Returns
+        -------
+        outfile : str
+           The name of the master-sky subtracted file.
+        """
+        # find the intiial sky pixels
+        sky = self.skypixels(sci, unc, mod)
+        npix = np.count_nonzero(sky)
+
+        # initialize the iterations
+        proceed = True
+        it = 1
+        while proceed:
+
+            # find the good pixels
+            g = np.logical_and(sky, gpx)
+
+            # compute the 'average'
+            ave, med, sig = sigma_clipped_stats(sci[g], sigma=self.skysigma)
+
+            # re-find sky pixels
+            sky = self.skypixels(sci, unc, med)
+
+            # update the iteration values
+            it += 1
+            npix2 = np.count_nonzero(sky)
+            proceed = (npix != npix2) and (it < self.maxiter)
+            npix = npix2
+            if not proceed:
+                break
+
+        # the output image
+        out = np.full_like(sci, med)
+
+        # update the header
+        self.update_header(hdr)
+        hdr.set('METHOD', value='Constant', comment='method')
+        hdr.set('SKYVAL', value=mod, comment='constant level')
+        hdr.set('SKYITER', value=it, comment='number of iterations')
+
+        return out, np.logical_not(sky)
+
+    @background_processing(mastersky=False)
     def poly1d(self, sci, hdr, unc, mod, gpx, degree=2, filtwindow=51, filtorder=1):
         r"""
         Method to fit polynomials in the cross-dispersion axis and
@@ -415,11 +476,11 @@ class Background:
         # set some slice objects
         # TODO: change these from lambdas to defs
         if self.dispaxis == 1:
-            loopdisp = lambda lam: (slice(None, None, None), lam)  # noqa: E731
-            loopcross = lambda eta: (eta, slice(None, None, None))  # noqa: E731
+            def loopdisp(lam): return (slice(None, None, None), lam)  # noqa
+            def loopcross(eta): return (eta, slice(None, None, None))  # noqa
         elif self.dispaxis == 0:
-            loopcross = lambda lam: (slice(None, None, None), lam)  # noqa: E731
-            loopdisp = lambda eta: (eta, slice(None, None, None))  # noqa: E731
+            def loopcross(lam): return (slice(None, None, None), lam)  # noqa
+            def loopdisp(eta): return (eta, slice(None, None, None))  # noqa
 
         # set up the iteration
         npix = np.count_nonzero(sky)

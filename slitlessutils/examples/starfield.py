@@ -22,7 +22,21 @@ WRANGE = (5500., 9500.)       # wavelength range to inspect
 FILTER = 'F775W'              # name of the filter for the direct image
 SUFFIX = 'flc'                # type of suffix
 NCPU = 1                      # number of CPUs to use
-LOCAL_BACK = False             # flag for local background in direct image
+LOCAL_BACK = False            # flag for local background in direct image
+
+
+ROOT = 'starfield'            # base name for files in this example
+DATASETS = ('a', 'b', 'c')    # dataset names (will do 3 datasets)
+TELESCOPE = 'HST'             # name of the telescope
+INSTRUMENT = 'WFC3'           # name of the instrument
+DETECTOR = 'IR'               # name of the detector in the instrument
+DISPERSER = 'G102'            # name of the spectral element
+BLOCKING = ''                 # name of the blocking filter
+WRANGE = (7500., 11000.)      # wavelength range to inspect
+FILTER = 'F105W'              # name of the filter for the direct image
+SUFFIX = 'flt'                # type of suffix
+NCPU = 1                      # number of CPUs to use
+LOCAL_BACK = False            # flag for local background in direct image
 
 
 # Settings to look at Prism for SBC
@@ -35,9 +49,9 @@ LOCAL_BACK = False             # flag for local background in direct image
 SPECCAT = 'pickles'
 
 # properties of the sources.  The entries are: SEGID:(x,y,ABmag,sedfile)
-SOURCES = {1: (500, 500, 19.0, 'pickles_uk_15.fits'),
-           2: (485, 480, 19.5, 'pickles_uk_20.fits'),
-           3: (420, 550, 20.0, 'pickles_uk_25.fits')}
+SOURCES = {1: (500, 500, 19.0, 'pickles_uk_35.fits'),
+           2: (485, 480, 19.5, 'pickles_uk_40.fits'),
+           3: (420, 550, 20.0, 'pickles_uk_44.fits')}
 PSFSIG = 1.5          # stdev of the PSF in pixels
 APERRAD = 0.3         # radius in arcsec
 SEDPATH = 'starfield_input'
@@ -344,7 +358,8 @@ def compare(nsig=1.):
 
         g = np.where((WRANGE[0] <= l) & (l <= WRANGE[1]))
 
-        ylim = (np.amin(f[g]) * 0.9, np.amax(f[g]) * 1.1)
+        # ylim = (np.amin(f[g]) * 0.9, np.amax(f[g]) * 1.1)
+        ylim = (-0.05, np.amax(f[g]) * 1.1)
         ax.set_ylim(*ylim)
         ax.set_xlim(*WRANGE)
         model = ax.plot(l, f, label='input spectrum', color='black')
@@ -352,6 +367,8 @@ def compare(nsig=1.):
     files = {'single-exposure': (f'{ROOT}_x1d.fits', 'green'),
              'multi-exposure': (f'{ROOT}_multi_x1d.fits', 'blue'),
              'group-exposure': (f'{ROOT}_group_x1d.fits', 'red')}
+
+    # files = {'single-exposure': (f'{ROOT}_x1d.fits', 'green')}
 
     artists = [model[0]]
     labels = ['model spectrum']
@@ -364,18 +381,29 @@ def compare(nsig=1.):
                     s = str(segid)
                     if s in hdul:
                         hdu = hdul[s]
-                        lo = hdu.data['flam'] - nsig * hdu.data['func']
-                        hi = hdu.data['flam'] + nsig * hdu.data['func']
+                        flam = hdu.data['flam']
+                        if label == 'single-exposure':
+                            flam -= hdu.data['cont']
+
+                        lo = flam - nsig * hdu.data['func']
+                        hi = flam + nsig * hdu.data['func']
 
                         patch = ax.fill_between(hdu.data['lamb'], lo, hi,
                                                 color=c, alpha=0.2)
-                        meas = ax.plot(hdu.data['lamb'], hdu.data['flam'],
-                                       color=c)
+                        meas = ax.plot(hdu.data['lamb'], flam, color=c)
+                        contplot = ax.plot(hdu.data['lamb'], hdu.data['cont'], color='magenta')
 
                         if first:
                             artists.append((patch, meas[0]))
                             labels.append(label)
                             first = False
+
+    artists.append(contplot[0])
+    labels.append('contamination')
+
+    for ax, segid in zip(axes, SOURCES.keys()):
+        ax.text(0.02, 0.92, segid, horizontalalignment='center',
+                verticalalignment='center', transform=ax.transAxes)
 
     axes[0].legend(artists, labels)
     axes[n //

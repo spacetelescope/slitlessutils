@@ -21,20 +21,6 @@ class PDT(HDF5Table):
         self.attrs['x'] = self.DTYPES['x'](x)
         self.attrs['y'] = self.DTYPES['y'](y)
 
-    # def wavelengths(self,lam=None):
-    #
-    #    if 'wav0' in self.attrs and 'dwav' in self.attrs:
-    #        wav0=self.attrs['wav0']
-    #        dwav=self.attrs['dwav']
-    #
-    #        if lam is None:
-    #            lam=self.get('lam')
-    #
-    #        wav=wav0+lam*dwav
-    #        return wav
-    #    else:
-    #        return lam
-
     @property
     def name(self):
         # '({},{})'.format(*self.pixel)

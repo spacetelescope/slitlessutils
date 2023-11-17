@@ -33,7 +33,7 @@ def optimizer(algorithm, logdamp):
     elif algorithm == 'multiple':
         optimizer = Multiple(logdamp)
     else:
-        LOGGER.warn('defaulting to golden search')
+        LOGGER.warning('defaulting to golden search')
         optimizer = Golden(logdamp)
     return optimizer
 

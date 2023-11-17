@@ -124,3 +124,7 @@ class Band:
         see __mul__
         """
         return self.__mul__(a)
+
+    @property
+    def average_wavelength(self):
+        return np.average(self.wave, weights=self.tran)

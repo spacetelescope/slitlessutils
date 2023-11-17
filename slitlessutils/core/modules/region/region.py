@@ -83,12 +83,15 @@ class Region(Module):
         outfiles = []
 
         # get wavelengths
-        # wav=data.grating.wavelengths(nsub=1./2.)
         wav = data.disperser.wavelengths(nsub=2)
-
         kwargs = {'width': 4, 'move': False, 'rotate': False, 'fixed': True, 'edit': False}
         for detname, detdata in data.items():
             orders = self.orders if self.orders else detdata.orders
+
+            # need this data for subarrays
+            hdr = detdata.headfits('science')
+            ltv1 = hdr.get('LTV1', 0.)
+            ltv2 = hdr.get('LTV2', 0.)
 
             regfile = f'{data.dataset}_{detdata.name}.reg'
             outfiles.append(regfile)
@@ -96,9 +99,9 @@ class Region(Module):
 
                 for segid, source in sources.items():
                     x, y = [], []
-                    for args in source.pixels():
-                        x.append(args[0])
-                        y.append(args[1])
+                    for pixels in source.pixels():
+                        x.append(pixels[0])
+                        y.append(pixels[1])
                     x = np.asarray(x)
                     y = np.asarray(y)
 
@@ -117,29 +120,23 @@ class Region(Module):
 
                         # image size
                         dim = (y1 - y0 + 1, x1 - x0 + 1)
-
-                        yxg = np.ravel_multi_index((yg - y0, xg - x0), dim, order='F')
+                        yxg = np.ravel_multi_index((yg-y0, xg-x0), dim, order='F')
                         yxg = indices.uniq(yxg)
                         yg, xg = np.unravel_index(yxg, dim, order='F')
                         xg += x0
                         yg += y0
 
-                        # idx=np.ravel_multi_index((xg,yg),dim,order='F')
-                        # idx=indices.uniq(idx)
-                        # xg,yg=np.unravel_index(idx,dim,order='F')
-
                         # fill it one
                         msk = np.zeros(dim, dtype=int)
-                        # msk[yg,xg]=1
-                        msk[yg - y0 + 1, xg - x0 + 1] = 1
+                        msk[yg-y0+1, xg-x0+1] = 1
                         msk = ndimage.binary_closing(msk, structure=struct)
 
                         # get the contour
                         contours = measure.find_contours(msk.astype(int), 0.1,
                                                          fully_connected='high')
                         # make the contours and thin
-                        xc = contours[0][::self.nthin, 1] + x0
-                        yc = contours[0][::self.nthin, 0] + y0
+                        xc = contours[0][::self.nthin, 1]+x0-ltv1
+                        yc = contours[0][::self.nthin, 0]+y0-ltv2
 
                         # create the region
                         color = self.COLORS.get(order, 'green')

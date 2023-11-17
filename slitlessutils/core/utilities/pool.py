@@ -144,12 +144,6 @@ class Pool:
                 imap = p.imap(self.__worker__, self.__zip__(itrs, *args))
                 results = list(tqdm.tqdm(imap, total=total, desc=self.desc))
 
-            # func=partial(self.func,**kwargs)
-            # print(func)
-            # p=mp.Pool(processes=self.ncpu)
-            # imap=p.map(func,self.__zip__(itrs,*args))
-            # results=list(tqdm.tqdm(imap,total=total,desc=self.desc))
-
             if kwargs:
                 self.func = func   # reset it
 

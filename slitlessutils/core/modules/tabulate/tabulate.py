@@ -1,10 +1,9 @@
 import numpy as np
 
 from ....logger import LOGGER
-from ...tables import PDT, PDTFile
-from ...utilities import as_iterable, indices
-from ...wfss import WFSS
 from ..module import Module
+from ...tables import PDTFile, PDT
+from ...utilities import indices, as_iterable
 
 
 class Tabulate(Module):
@@ -39,8 +38,8 @@ class Tabulate(Module):
     """
 
     # define the pixel footprint
-    DX = np.array([0, 0, 1, 1], dtype=float)
-    DY = np.array([0, 1, 1, 0], dtype=float)
+    DX = np.array([0, 0, 1, 1], dtype=float)-0.5
+    DY = np.array([0, 1, 1, 0], dtype=float)-0.5
 
     DESCRIPTION = 'Tabulating'
 
@@ -156,10 +155,6 @@ class Tabulate(Module):
         # create a wavelength grid with subsampling factor
         disperser = data.config.tabulator
 
-        # grating=data.grating
-        # grating=insconf.parameters
-        # wav=insconf.parameters.wavelengths(nsub=self.nsub)
-
         with PDTFile(data, remake=self.remake, path=self.path) as h5:
             if not isinstance(h5, PDTFile):
                 return h5
@@ -167,34 +162,28 @@ class Tabulate(Module):
 
             # parse the data type of the `insdata` to place content
             # in the attributes of the output file
-            # if isinstance(insdata,WFSS):#SimulatedFile):
-            #    pass
-            # elif isinstance(insdata,WFSS): #ObservedFile):
-            #    pass
-            if isinstance(data, WFSS):  # SimulatedFile):
+            h5.attrs['visit'] = data.visit
+            h5.attrs['orbit'] = data.orbit
+            h5.attrs['subarray'] = data.subarray
+            h5.attrs['filetype'] = data.filetype
+            h5.attrs['filename'] = data.filename
+            if data.filetype == 'observed':
                 pass
-            elif isinstance(data, WFSS):  # ObservedFile):
-                pass
-
+            elif data.filetype == 'simulated':
+                h5.attrs['pa_v3'] = data.pa_v3
             else:
-                LOGGER.critical(f'Unknown image type: {type(data)}')
-                outfile = None
+                LOGGER.warning(f'Unknown image type: {data.filetype}')
 
             # okay... process the file
             if outfile:
 
-                # for detname,detdata in insdata.items():
                 for detname, detdata in data.items():
-                    # detconf=insconf[detname]
-
                     # add a detector to the file
-                    # h5.add_detector(detdata.detconf)
                     h5.add_detector(detdata.config)
 
                     # process each order
                     orders = self.orders if self.orders else detdata.orders
                     for ordname in orders:
-                        # for ordname,ordconf in detdata.config.items():
                         ordconf = detdata.config[ordname]
                         h5.add_order(ordconf)
 
@@ -219,9 +208,6 @@ class Tabulate(Module):
         nwav = len(wav)
         dwav = (wav1 - wav0) / (nwav - 1)
 
-        # get the order property
-        # ordconf=detconf[ordname]
-
         # the outputs
         pdts = {}
 
@@ -230,8 +216,6 @@ class Tabulate(Module):
 
         # get some dimensionalities
         dims = (*detdata.naxis, nwav)
-        # x0 = y0=np.inf
-        # x1 = y1=0
 
         # process each pixel
         for x, y, w in source.pixels(applyltv=False, weights=True):
@@ -246,18 +230,15 @@ class Tabulate(Module):
                       wav0=np.float32(wav0),
                       wav1=np.float32(wav1),
                       dwav=np.float32(dwav),
-                      units=disperser.units, **kwargs)
+                      units=disperser.units,
+                      profile=w, pixrat=pixrat, **kwargs)
 
             # transform the pixel position and apply footprint
             xg, yg = detdata.xy2xy(x + self.DX, y + self.DY, source.wcs, forward=False)
 
             # drizzle this pixel
             xx, yy, ll, aa = detdata.config.drizzle(xg, yg, ordname, wav)
-            if len(xx) > 0:
-                # x0=min(x0,np.amin(xx))
-                # x1=max(x1,np.amax(xx))
-                # y0=min(y0,np.amin(yy))
-                # y1=max(y1,np.amax(yy))
+            if xx.size > 0:
 
                 # decimate this pixel.
                 # in theory, this isn't needed, but if we have really small
@@ -271,7 +252,7 @@ class Tabulate(Module):
                 # 1. direct image weight (w)
                 # 2. ratio of pixel areas between direct and grism (pixrat)
                 # 3. wavelength sampling for integrals (dwav)
-                pdt.extend(xx, yy, ll, aa * w * pixrat * dwav)
+                pdt.extend(xx, yy, ll, aa * w * dwav * pixrat)
 
                 # save this PDT
                 pdts[(x, y)] = pdt

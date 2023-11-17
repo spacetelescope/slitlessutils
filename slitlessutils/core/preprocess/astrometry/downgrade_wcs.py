@@ -4,7 +4,7 @@ from ....logger import LOGGER
 from . import utils
 
 
-def _downgrade_wcs(imgfile, key, mode, newfile, inplace):
+def _downgrade_wcs(imgfile, key, mode, newfile, inplace, force):
     """
     Helper function to actually execute the downgrading
 
@@ -40,8 +40,14 @@ def _downgrade_wcs(imgfile, key, mode, newfile, inplace):
         LOGGER.warning('imgfile must be a string')
         return None
 
-    LOGGER.info(f'downgrading WCS in {imgfile} to WCSNAME{key}')
     with fits.open(imgfile, mode=mode) as hdul:
+        # check if already tweaked
+        wcscorr = hdul[0].header.get('WCSCORR', False)
+        if wcscorr and not force:
+            msg = f'Astrometry was already corrected: {imgfile}'
+            LOGGER.warning(msg)
+            return imgfile
+        LOGGER.info(f'downgrading WCS in {imgfile} to WCSNAME{key}')
 
         for ext, hdu in enumerate(hdul):
 
@@ -69,11 +75,8 @@ def _downgrade_wcs(imgfile, key, mode, newfile, inplace):
 
                 # update with some comments
                 utils.update_wcshistory(hdul[ext].header, 'downgrade')
-                # hdul[ext].header.set('WCSTWEAK', value=True,
-                #                      comment='WCS tweaked by slitlessutils')
-                # hdul[ext].header.set('WCSTYPE', value='downgrade')
 
-        hdul[0].header.add_history('Downgraded astrometry')
+        utils.update_wcshistory(hdul[0].header, 'downgrade')
 
         # get a new file
         outfile = utils.new_filename(imgfile, newfile=newfile, inplace=inplace,
@@ -84,7 +87,7 @@ def _downgrade_wcs(imgfile, key, mode, newfile, inplace):
     return outfile
 
 
-def downgrade_wcs(inputs, key='A', newfile=None, inplace=False):
+def downgrade_wcs(inputs, key='A', newfile=None, inplace=False, force=False):
     """
     Method to take WCS in a direct image that has been tied to Gaia, and
     downgrade it to a previous WCS.
@@ -105,6 +108,10 @@ def downgrade_wcs(inputs, key='A', newfile=None, inplace=False):
     newfile : str, optional
         See the file `utils.py` for more details.  Default is None
 
+    force : bool, optional
+        Force the updating of the astrometry, even if done already.
+        Default is False.
+
     Returns
     -------
     outfile : str
@@ -115,9 +122,9 @@ def downgrade_wcs(inputs, key='A', newfile=None, inplace=False):
     mode = 'update' if inplace else 'readonly'
 
     if isinstance(inputs, str):
-        return _downgrade_wcs(inputs, key, mode, newfile, inplace)
+        return _downgrade_wcs(inputs, key, mode, newfile, inplace, force)
     elif isinstance(inputs, (list, tuple)):
-        return [_downgrade_wcs(i, key, mode, newfile, inplace) for i in inputs]
+        return [_downgrade_wcs(i, key, mode, newfile, inplace, force) for i in inputs]
     else:
         LOGGER.warning(f"Invalid datatype ({type(inputs)}) for input.")
         return

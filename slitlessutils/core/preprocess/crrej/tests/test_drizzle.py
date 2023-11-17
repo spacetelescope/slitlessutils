@@ -6,7 +6,11 @@ import pytest
 from astroquery.mast import Observations
 
 from slitlessutils.core.preprocess.crrej.drizzle import (
-    drizzle, drizzle_grouped_files, group_by_position_angle, group_by_visit)
+    drizzle,
+    group_by_visit,
+    group_by_position_angle,
+    run_astrodrizzle
+)
 from slitlessutils.core.wfss import WFSSCollection
 
 
@@ -56,7 +60,7 @@ def test_wr96_drizzle():
         # Check that our temp folder is indeed empty
         assert len(list(mosaic_dir.iterdir())) == 0
         # Actually perform drizzle
-        drizzle(rawdata_filepaths, outdir=mosaic_dir, num_cores=1)
+        run_astrodrizzle(rawdata_filepaths, outdir=mosaic_dir, num_cores=1))
         # Confirm we have our output mosaics
         assert len(list(mosaic_dir.iterdir())) > 0
 
@@ -144,10 +148,12 @@ def test_drizzle_groups():
                 files_to_dowload[filename], local_path=str(rawdata_dir / filename)
             )
         rawdata_filepaths = [str(filepath) for filepath in rawdata_dir.iterdir()]
-        drizzled_files_by_visit = drizzle_grouped_files(
+        # drizzled_files_by_visit = drizzle_grouped_files(
+        drizzled_files_by_visit = drizzle(
             rawdata_filepaths, grouping="visit", num_cores=1
         )
-        drizzled_files_by_pa = drizzle_grouped_files(
+        # drizzled_files_by_pa = drizzle_grouped_files(
+        drizzled_files_by_pa = drizzle(
             rawdata_filepaths, grouping="position_angle", num_cores=1
         )
         assert len(drizzled_files_by_pa) == len(files_to_dowload)

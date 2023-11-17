@@ -331,25 +331,3 @@ if __name__ == '__main__':
               [2, 2, 0, 0, 4]]
     ri = reverse(segids)
     print(ri)
-
-# if __name__=='__main__':
-#    print('hi')
-#
-###
-#
-#    x=np.array([[0,0,1,1,0],
-#                [1,0,2,2,2],
-#                [0,5,5,10,0]],dtype=int)
-#
-#
-#
-#    #x=np.ravel(x)
-#    r=reverse(x)
-#    print(x.shape)
-#    #print(r)
-#    for ind,pix in r.items():
-#        #pix=np.unravel_index(p,x.shape)
-#        print(pix)
-#
-#        print(x[pix])
-#        #print(ind,x[pix],pix)

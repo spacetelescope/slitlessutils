@@ -180,11 +180,9 @@ class Simulate(Module):
                                     # 4) source spectra       (flam)
                                     sens = ordconf.sensitivity(wav)
                                     flat = flatfield(xg, yg, wav)
-                                    # area=detdata.relative_pixelarea(xg,yg)
                                     flam = region.sed(wav, fnu=False)
 
                                     # apply the corrections to the weights
-                                    # val *= (sens*flat*area*flam)
                                     val *= (sens * flat * flam)
 
                                     # sum over wavelengths

@@ -3,6 +3,8 @@ import os
 
 import numpy as np
 
+from ...utilities import headers
+
 
 def new_filename(imgfile, newfile=None, inplace=False, suffix='wcs'):
     """
@@ -45,7 +47,7 @@ def new_filename(imgfile, newfile=None, inplace=False, suffix='wcs'):
     return outfile
 
 
-def update_wcshistory(hdr, wcstype):
+def update_wcshistory(hdr, wcsmeth):
     """
     Function to update the WCS history in the header
 
@@ -60,9 +62,10 @@ def update_wcshistory(hdr, wcstype):
     """
 
     now = datetime.datetime.now()
-    hdr.set('WCSTWEAK', value=True, comment='WCS tweaked by slitlessutils')
-    hdr.set('WCSTYPE', value=wcstype)
-    hdr.add_history(f'WCS updated by slitlessutils on {now.isoformat()}."')
+    hdr.set('WCSCORR', value=True, comment='WCS corrected by slitlessutils')
+    hdr.set('WCSMETH', value=wcsmeth, comment='method for updating WCS by slitlessutils')
+    headers.add_stanza(hdr, 'Astrometry Corrections', before='WCSCORR')
+    hdr.add_history(f'WCS updated by slitlessutils on {now.isoformat()}.')
 
 
 def get_cd(hdr, key):

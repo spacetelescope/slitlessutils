@@ -84,10 +84,3 @@ def uncompress(filename, keeporig=False):
         os.remove(filename)
 
     return newfile
-
-
-if __name__ == '__main__':
-    with open('t.txt', 'w') as f:
-        print('this is a file', file=f)
-    compress('icoi3qcdq_flt.fits')
-    uncompress('icoi3qcdq_flt.fits.gz')
