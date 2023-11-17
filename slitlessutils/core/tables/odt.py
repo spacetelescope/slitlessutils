@@ -123,7 +123,7 @@ class ODT(HDF5Table):
 
                 # do the summations
                 vv, xx, yy, ll = indices.decimate(val, x, y, lam, dims=self.dims)
-                factor = 1 - xx.size/x.size
+                factor = 1 - xx.size / x.size
 
                 # put these values in the self
                 self.clear()

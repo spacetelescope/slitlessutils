@@ -1,6 +1,6 @@
-import numpy as np
 import os
 
+import numpy as np
 from astropy import convolution
 from astropy.io import fits
 from astropy.modeling import fitting, models
@@ -82,7 +82,7 @@ def background_processing(mastersky=False):
                                 mod = fits.getdata(backfile, ('SKY', vers))
 
                                 a, m, s = sigma_clipped_stats(mod)
-                                if np.abs(a-1) > 1e-2:
+                                if np.abs(a - 1) > 1e-2:
                                     msg = (f'The master sky image ({backfile}) is '
                                            f'unnormalized {a}. Results will be fine, '
                                            f'but the units may not make sense.')
@@ -94,7 +94,7 @@ def background_processing(mastersky=False):
                                     y0 = -int(hdr.get('LTV2', 0))
                                     nx = hdr['NAXIS1']
                                     ny = hdr['NAXIS2']
-                                    mod = mod[y0:ny+y0, x0:nx+x0]
+                                    mod = mod[y0:ny + y0, x0:nx + x0]
 
                                 ret, src = func(self, sci, hdr, unc, med, gpx, mod, **kwargs)
                             else:
@@ -388,7 +388,7 @@ class Background:
         outfile : str
            The name of the master-sky subtracted file.
         """
-        # find the intiial sky pixels
+        # find the initial sky pixels
         sky = self.skypixels(sci, unc, mod)
         npix = np.count_nonzero(sky)
 
@@ -476,11 +476,17 @@ class Background:
         # set some slice objects
         # TODO: change these from lambdas to defs
         if self.dispaxis == 1:
-            def loopdisp(lam): return (slice(None, None, None), lam)  # noqa
-            def loopcross(eta): return (eta, slice(None, None, None))  # noqa
+            def loopdisp(lam):
+                return (slice(None, None, None), lam)
+
+            def loopcross(eta):
+                return (eta, slice(None, None, None))
         elif self.dispaxis == 0:
-            def loopcross(lam): return (slice(None, None, None), lam)  # noqa
-            def loopdisp(eta): return (eta, slice(None, None, None))  # noqa
+            def loopcross(lam):
+                return (slice(None, None, None), lam)
+
+            def loopdisp(eta):
+                return (eta, slice(None, None, None))
 
         # set up the iteration
         npix = np.count_nonzero(sky)

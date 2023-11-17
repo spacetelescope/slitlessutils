@@ -157,12 +157,12 @@ class Contamination(dict):
         poly = self[key]
 
         if bbx is None:
-            bbx = (0, detdata.naxis[0]-1)
-        nx = bbx[1]-bbx[0]+1
+            bbx = (0, detdata.naxis[0] - 1)
+        nx = bbx[1] - bbx[0] + 1
 
         if bby is None:
-            bby = (0, detdata.naxis[1]-1)
-        ny = bby[1]-bby[0]+1
+            bby = (0, detdata.naxis[1] - 1)
+        ny = bby[1] - bby[0] + 1
 
         # an image of the contamination
         img = np.zeros((ny, nx), dtype=float)
@@ -207,11 +207,11 @@ class Contamination(dict):
                                 sens = detdata.config[ordname].sensitivity(wav)
                                 area = detdata.relative_pixelarea(xg, yg)
                                 flam = region.sed(wav, fnu=False)
-                                val *= (sens*area*flat*flam)
+                                val *= (sens * area * flat * flam)
 
                                 # sum over pixels
                                 val, xx, yy = indices.decimate(val, xg, yg)
-                                img[yy-bby[0], xx-bbx[0]] += val
+                                img[yy - bby[0], xx - bbx[0]] += val
 
         # return the data as fits.ImageHDU so we can do stuff later
         hdr = detdata.wcs.to_header(relax=True)

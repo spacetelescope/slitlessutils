@@ -1,9 +1,9 @@
 import numpy as np
 
 from ....logger import LOGGER
+from ...tables import PDT, PDTFile
+from ...utilities import as_iterable, indices
 from ..module import Module
-from ...tables import PDTFile, PDT
-from ...utilities import indices, as_iterable
 
 
 class Tabulate(Module):
@@ -38,8 +38,8 @@ class Tabulate(Module):
     """
 
     # define the pixel footprint
-    DX = np.array([0, 0, 1, 1], dtype=float)-0.5
-    DY = np.array([0, 1, 1, 0], dtype=float)-0.5
+    DX = np.array([0, 0, 1, 1], dtype=float) - 0.5
+    DY = np.array([0, 1, 1, 0], dtype=float) - 0.5
 
     DESCRIPTION = 'Tabulating'
 

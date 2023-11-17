@@ -1,10 +1,13 @@
 import os
-from scipy import ndimage
-from skimage import morphology, measure
 
-from .crbitvalues import BITVALUES
+import numpy as np
+from astropy.io import fits
+from scipy import ndimage
+from skimage import measure, morphology
+
 from ....logger import LOGGER
 from ...utilities import headers, indices
+from .crbitvalues import BITVALUES
 
 # some pre-built Laplace kernels
 KERNELS = {'3a': [[0, -1, 0],

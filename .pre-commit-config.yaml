@@ -84,3 +84,9 @@ repos:
                "--skip", "*.pdf"]
         additional_dependencies:
           - tomli
+
+  - repo: https://github.com/hhatto/autopep8
+    rev: v2.0.4
+    hooks:
+      - id: autopep8
+        args: ["--in-place", "--aggressive"]

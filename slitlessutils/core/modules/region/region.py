@@ -120,7 +120,7 @@ class Region(Module):
 
                         # image size
                         dim = (y1 - y0 + 1, x1 - x0 + 1)
-                        yxg = np.ravel_multi_index((yg-y0, xg-x0), dim, order='F')
+                        yxg = np.ravel_multi_index((yg - y0, xg - x0), dim, order='F')
                         yxg = indices.uniq(yxg)
                         yg, xg = np.unravel_index(yxg, dim, order='F')
                         xg += x0
@@ -128,15 +128,15 @@ class Region(Module):
 
                         # fill it one
                         msk = np.zeros(dim, dtype=int)
-                        msk[yg-y0+1, xg-x0+1] = 1
+                        msk[yg - y0 + 1, xg - x0 + 1] = 1
                         msk = ndimage.binary_closing(msk, structure=struct)
 
                         # get the contour
                         contours = measure.find_contours(msk.astype(int), 0.1,
                                                          fully_connected='high')
                         # make the contours and thin
-                        xc = contours[0][::self.nthin, 1]+x0-ltv1
-                        yc = contours[0][::self.nthin, 0]+y0-ltv2
+                        xc = contours[0][::self.nthin, 1] + x0 - ltv1
+                        yc = contours[0][::self.nthin, 0] + y0 - ltv2
 
                         # create the region
                         color = self.COLORS.get(order, 'green')

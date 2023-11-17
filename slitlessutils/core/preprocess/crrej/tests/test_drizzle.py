@@ -6,11 +6,7 @@ import pytest
 from astroquery.mast import Observations
 
 from slitlessutils.core.preprocess.crrej.drizzle import (
-    drizzle,
-    group_by_visit,
-    group_by_position_angle,
-    run_astrodrizzle
-)
+    drizzle, group_by_position_angle, group_by_visit, run_astrodrizzle)
 from slitlessutils.core.wfss import WFSSCollection
 
 
@@ -60,7 +56,7 @@ def test_wr96_drizzle():
         # Check that our temp folder is indeed empty
         assert len(list(mosaic_dir.iterdir())) == 0
         # Actually perform drizzle
-        run_astrodrizzle(rawdata_filepaths, outdir=mosaic_dir, num_cores=1))
+        run_astrodrizzle(rawdata_filepaths, outdir=mosaic_dir, num_cores=1)
         # Confirm we have our output mosaics
         assert len(list(mosaic_dir.iterdir())) > 0
 

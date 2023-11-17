@@ -1,8 +1,7 @@
 import os
 
-import matplotlib.pyplot as plt
 import matplotlib.colors as colors
-
+import matplotlib.pyplot as plt
 import numpy as np
 from astropy.io import fits
 from astropy.modeling import fitting, models

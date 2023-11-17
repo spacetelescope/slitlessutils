@@ -216,7 +216,7 @@ class Single(Module):
         result = results.pop(0)
         segids = list(result.keys())
         for segid in segids:
-            result[segid]['file'] = [0]*len(result[segid]['flam'])
+            result[segid]['file'] = [0] * len(result[segid]['flam'])
 
         i = 1
         while results:
@@ -226,7 +226,7 @@ class Single(Module):
                 result[segid]['func'].extend(res['func'])
                 result[segid]['wave'].extend(res['wave'])
                 result[segid]['cont'].extend(res['cont'])
-                result[segid]['file'].extend([i]*len(res['flam']))
+                result[segid]['file'].extend([i] * len(res['flam']))
                 i += 1
 
         # get all the objects in this output catalog
@@ -307,7 +307,7 @@ class Single(Module):
             for ind, g in ri.items():
                 val = flam[g]
                 unc = func[g]
-                wht = 1./unc**2      # initialize weights as inverse variance
+                wht = 1. / unc**2      # initialize weights as inverse variance
                 cnt = cont[g]
 
                 # update the weights with sigma clipping if requested
@@ -341,9 +341,9 @@ class Single(Module):
                     #    wht[bad] = 0.0
 
                     # save the results
-                    out['flam'][ind] = np.sum(wht*val)/wsum
-                    out['func'][ind] = 1./np.sqrt(wsum)
-                    out['cont'][ind] = np.sum(wht*cnt)/wsum
+                    out['flam'][ind] = np.sum(wht * val) / wsum
+                    out['func'][ind] = 1. / np.sqrt(wsum)
+                    out['cont'][ind] = np.sum(wht * cnt) / wsum
                     out['npix'][ind] = nwht
 
             # update the source
@@ -519,10 +519,10 @@ class Single(Module):
                             # if requested, compute the contamination model:
                             if self.contamination:
                                 # grow bounding boxes for contamination models
-                                bbx = (np.maximum(x0-padx[0], 0),
-                                       np.minimum(x1+padx[1], detdata.naxis[0]-1))
-                                bby = (np.maximum(y0-pady[0], 0),
-                                       np.minimum(y1+pady[1], detdata.naxis[1]-1))
+                                bbx = (np.maximum(x0 - padx[0], 0),
+                                       np.minimum(x1 + padx[1], detdata.naxis[0] - 1))
+                                bby = (np.maximum(y0 - pady[0], 0),
+                                       np.minimum(y1 + pady[1], detdata.naxis[1] - 1))
 
                                 # get the contam data
                                 chdu = self.contamination(segid, ordname, h5, sources,
@@ -538,7 +538,7 @@ class Single(Module):
                             if cartesian:
                                 # for making the residuals
                                 # mod = np.zeros_like(sci)
-                                for x in range(x0, x1+1, 1):
+                                for x in range(x0, x1 + 1, 1):
                                     g = np.where(x == xg)[0]
                                     xx = xg[g]
                                     yy = yg[g]
@@ -550,7 +550,7 @@ class Single(Module):
                                     xx, yy, vv, ww, dw = self.apply_bitmask(
                                         dqa[yy, xx], xx, yy, vv, ww, dw, bitmask=bitmask)
 
-                                    ww, _y = indices.decimate(ww*vv, yy)
+                                    ww, _y = indices.decimate(ww * vv, yy)
                                     vv, yy = indices.decimate(vv, yy)
                                     ww /= vv
                                     xx = np.full_like(yy, x, dtype=int)
@@ -564,11 +564,11 @@ class Single(Module):
                                     sens = detdata.config[ordname].sensitivity(ww)
                                     flat = flatfield(xx, yy, ww)
                                     area = detdata.relative_pixelarea(xx, yy)
-                                    den = flat*area*sens*fluxscale*disp
+                                    den = flat * area * sens * fluxscale * disp
 
                                     # apply calibrations
-                                    ss = sci[yy, xx]/den
-                                    uu = unc[yy, xx]/den
+                                    ss = sci[yy, xx] / den
+                                    uu = unc[yy, xx] / den
 
                                     # set the cross dispersion profile
                                     if profile == 'uniform':
@@ -589,10 +589,10 @@ class Single(Module):
                                         # normalize the profile
                                         prof /= np.sum(prof)
 
-                                        wht = prof/uu**2
-                                        norm = np.sum(prof*wht)
-                                        flam = np.sum(ss*wht)/norm
-                                        func = np.sqrt(np.sum(prof)/norm)
+                                        wht = prof / uu**2
+                                        norm = np.sum(prof * wht)
+                                        flam = np.sum(ss * wht) / norm
+                                        func = np.sqrt(np.sum(prof) / norm)
 
                                     # this can happen if sens==0
                                     if np.isnan(flam):
@@ -603,11 +603,11 @@ class Single(Module):
 
                                     # compute contamination
                                     if self.contamination:
-                                        cc = chdu.data[yy-yoff, xx-xoff]/den
+                                        cc = chdu.data[yy - yoff, xx - xoff] / den
                                         if profile == 'uniform':
                                             cont = np.sum(cc)
                                         else:
-                                            cont = np.sum(cc*wht)/norm
+                                            cont = np.sum(cc * wht) / norm
                                     else:
                                         cont = 0.0
 
@@ -622,7 +622,7 @@ class Single(Module):
 
                                 di = 0.5
                                 for ind, wave in enumerate(wavelengths):
-                                    w0, w1 = pars(ind-di), pars(ind+di)
+                                    w0, w1 = pars(ind - di), pars(ind + di)
                                     g = np.where((w0 <= wav) & (wav < w1))[0]
                                     # for ind, g in ri.items():
                                     xx = xg[g]
@@ -680,7 +680,7 @@ class Single(Module):
                                     # FWHM = SIG*2.35
 
                                     # decimate over unique pixels
-                                    ww, _x, _y = indices.decimate(ww*vv, xx, yy)
+                                    ww, _x, _y = indices.decimate(ww * vv, xx, yy)
                                     vv, xx, yy = indices.decimate(vv, xx, yy)
                                     ww /= vv
 
@@ -689,22 +689,22 @@ class Single(Module):
                                     sens = detdata.config[ordname].sensitivity(ww)
                                     flat = flatfield(xx, yy, ww)
                                     area = detdata.relative_pixelarea(xx, yy)
-                                    den = flat*area*sens*fluxscale*disp
-                                    ss = sci[yy, xx]/den
-                                    uu = unc[yy, xx]/den
+                                    den = flat * area * sens * fluxscale * disp
+                                    ss = sci[yy, xx] / den
+                                    uu = unc[yy, xx] / den
 
                                     # using forward model weights
                                     prof = np.maximum(vv, 0.)
-                                    prof = prof/np.sum(prof)
-                                    wht = prof/uu**2
-                                    norm = np.sum(prof*wht)
-                                    flam = np.sum(ss*wht)/norm
-                                    func = np.sqrt(np.sum(prof)/norm)
+                                    prof = prof / np.sum(prof)
+                                    wht = prof / uu**2
+                                    norm = np.sum(prof * wht)
+                                    flam = np.sum(ss * wht) / norm
+                                    func = np.sqrt(np.sum(prof) / norm)
 
                                     # if doing contamination
                                     if self.contamination:
-                                        cc = chdu.data[yy-yoff, xx-xoff]
-                                        cont = np.sum(cc*wht)/norm
+                                        cc = chdu.data[yy - yoff, xx - xoff]
+                                        cont = np.sum(cc * wht) / norm
                                     else:
                                         cont = 0.0
 

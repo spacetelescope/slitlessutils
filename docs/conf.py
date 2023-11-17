@@ -225,10 +225,8 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
-latex_documents = [
-    ('index', f'{project}.tex', f'{project} Documentation',
-     f'{project}', 'manual'),
-]
+latex_documents = [('index', f'{project}.tex', f'{project} Documentation',
+                    f'{project}', 'manual'),]
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
@@ -266,11 +264,9 @@ man_show_urls = True
 # Grouping the document tree into Texinfo files. List of tuples
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
-texinfo_documents = [
-    ('index', f'{project}', f'{project} Documentation',
-     f'{author}', f'{project}', f'{project}',
-     'Miscellaneous'),
-]
+texinfo_documents = [('index', f'{project}', f'{project} Documentation',
+                      f'{author}', f'{project}', f'{project}',
+                      'Miscellaneous')]
 
 # Documents to append as an appendix to all manuals.
 # texinfo_appendices = []

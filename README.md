@@ -15,7 +15,7 @@ from the command line:
 pip install slitlessutils
 ```
 
-To install the latest develoment version of this repository, please use:
+To install the latest development version of this repository, please use:
 ```
 pip install git+https://github.com/spacetelescope/slitlessutils.git
 ```
