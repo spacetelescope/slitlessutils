@@ -411,8 +411,6 @@ class Background:
             npix2 = np.count_nonzero(sky)
             proceed = (npix != npix2) and (it < self.maxiter)
             npix = npix2
-            if not proceed:
-                break
 
         # the output image
         out = np.full_like(sci, med)
