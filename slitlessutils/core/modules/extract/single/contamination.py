@@ -5,31 +5,31 @@ from .....logger import LOGGER
 from ....utilities import headers, indices
 
 
-class ContOrders:
+class ContaminantOrders:
     """
     Class to contain info for the spectral orders considered contaminants
 
     Parameters
     ----------
-    cntorders : list/tuple
+    contam_orders : list/tuple
         the orders to consider contaminants
     """
 
-    def __init__(self, cntorders):
-        self.cntorders = cntorders
+    def __init__(self, contam_orders):
+        self.contam_orders = contam_orders
 
     def __str__(self):
-        if isinstance(self.cntorders, str) and self.cntorders.lower() == 'all':
-            conorders = '<all>'
-        elif isinstance(self.cntorders, (tuple, list)):
-            if len(self.cntorders) == 0:
-                conorders = '<all>'
+        if isinstance(self.contam_orders, str) and self.contam_orders.lower() == 'all':
+            contam_orders_str = '<all>'
+        elif isinstance(self.contam_orders, (tuple, list)):
+            if len(self.contam_orders) == 0:
+                contam_orders_str = '<all>'
             else:
-                conorders = ','.join(self.cntorders)
+                contam_orders_str = ','.join(self.contam_orders)
         else:
-            conorders = '<None>'
+            contam_orders_str = '<None>'
 
-        return conorders
+        return contam_orders_str
 
     def __call__(self, h5):
         """
@@ -45,16 +45,16 @@ class ContOrders:
         The HDF5 dataset
         """
 
-        if isinstance(self.cntorders, str) and self.cntorders.lower() == 'all':
+        if isinstance(self.contam_orders, str) and self.contam_orders.lower() == 'all':
             yield from h5.h5detector.keys()
 
-        elif isinstance(self.cntorders, (tuple, list)):
-            yield from self.cntorders
+        elif isinstance(self.contam_orders, (tuple, list)):
+            yield from self.contam_orders
         else:
             pass
 
     def update_header(self, hdr):
-        hdr.set('CONORDS', value=str(self.cntorders), comment='orders masked')
+        hdr.set('CONORDS', value=str(self.contam_orders), comment='orders masked')
 
 
 class Contamination(dict):
@@ -63,14 +63,14 @@ class Contamination(dict):
 
     Parameters
     ----------
-    cntorders : list/tuple or str
+    contam_orders : list/tuple or str
         The orders to consider as contamination.  If "all" then all
         orders are masked.
 
     """
 
-    def __init__(self, cntorders):
-        self.cntorders = ContOrders(cntorders)
+    def __init__(self, contam_orders):
+        self.contam_orders = ContaminantOrders(contam_orders)
         self.threshold = 0.0
 
     def update_header(self, hdr):
@@ -84,7 +84,7 @@ class Contamination(dict):
         """
 
         hdr.set('CONTAM', value=True, comment='was contamination applied')
-        self.cntorders.update_header(hdr)
+        self.contam_orders.update_header(hdr)
         hdr.set('CONTHRSH', value=self.threshold, comment='threshold contamination (e-/s)')
         headers.add_stanza(hdr, 'Contamination Settings', before='CONTAM')
 
@@ -108,7 +108,7 @@ class Contamination(dict):
         LOGGER.info(f'Building contamination model for {h5.dataset}{h5.h5detector.name}')
 
         # load all the polygons
-        for ordname in self.cntorders(h5):
+        for ordname in self.contam_orders(h5):
             h5.load_order(ordname)
             for segid, source in sources.items():
                 poly = h5.load_polygon(source)
