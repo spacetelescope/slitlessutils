@@ -29,7 +29,6 @@ class DS9Regions(list):
     @property
     def header(self):
         pars = str(self.attrs)
-        # pars=' '.join([format_value(k,v) for k,v in self.attrs.items()])
         head = f'{self.HEADER}\nglobal {pars}'
         if self.fk5:
             head += "\nfk5"
@@ -45,11 +44,6 @@ class DS9Regions(list):
             self.filename = filename
         else:
             filename = self.filename
-
-        # with self as fp:
-        #    print(fp)
-        #    for reg in self:
-        #        self.write_region(reg)
 
         with open(filename, 'w') as fp:
             self.fp = fp

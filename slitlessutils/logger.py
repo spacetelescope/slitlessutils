@@ -96,7 +96,7 @@ def setLevel(level, logger=None):
         handler.setLevel(level)
 
 
-def initialize(level=10, asciilog=True, stdout=True, stderr=False):
+def initialize(level=10, asciilog=True, stdout=True, stderr=False, enable=True):
     """
     Initialize the custom Logger
 
@@ -113,6 +113,9 @@ def initialize(level=10, asciilog=True, stdout=True, stderr=False):
 
     stderr : bool, optional
         Flag to log to STDErr.  Default is False
+
+    enable : bool, optional
+        Flag to enable the logger
 
     Returns
     -------
@@ -131,6 +134,10 @@ def initialize(level=10, asciilog=True, stdout=True, stderr=False):
         args, **kwargs: log._log(KNOWNISSUE, msg, args, **kwargs) if \
         log.isEnabledFor(KNOWNISSUE) else None
 
+    # the enable level
+    disable = not enable
+    log.disabled = disable
+
     # create a file handler
     if asciilog:
 
@@ -148,18 +155,21 @@ def initialize(level=10, asciilog=True, stdout=True, stderr=False):
         # establish the handler
         filehandler = logging.FileHandler(logfile)
         filehandler.setFormatter(FileFormatter())
+        filehandler.disabled = disable
         log.addHandler(filehandler)
 
     # create a stdout handler
     if stdout:
         stdouthandler = logging.StreamHandler(sys.stdout)
         stdouthandler.setFormatter(STDOUTFormatter())
+        stdouthandler.disabled = disable
         log.addHandler(stdouthandler)
 
     # create a stderr handler
     if stderr:
         stderrhandler = logging.StreamHandler(sys.stderr)
         stderrhandler.setFormatter(STDOUTFormatter())
+        stderrhandler.disabled = disable
         log.addHandler(stderrhandler)
 
     # set the levels
@@ -172,6 +182,27 @@ def initialize(level=10, asciilog=True, stdout=True, stderr=False):
 
 
 LOGGER = initialize()
+
+
+def enable():
+    LOGGER.disabled = False
+    for handler in LOGGER.handlers:
+        handler.disabled = False
+
+
+def disable():
+    LOGGER.disabled = True
+    for handler in LOGGER.handlers:
+        handler.disabled = True
+
+
+def toggle():
+    state = LOGGER.disabled
+    newstate = not state
+    LOGGER.disabled = newstate
+    for handler in LOGGER.handlers:
+        handler.disabled = newstate
+
 
 # if __name__=='__main__':
 #

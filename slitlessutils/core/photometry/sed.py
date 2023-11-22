@@ -773,12 +773,3 @@ class SED:
         for k, v in kwargs.items():
             hdu.header[k] = v
         return hdu
-
-
-if __name__ == '__main__':
-    x = SED()
-    l = np.arange(50)
-    f = np.arange(1, 51)
-    x.append(l, f)
-    y = x * 2.
-    print(y.data)

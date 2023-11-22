@@ -650,6 +650,19 @@ class WFSS(dict):
 
         return np.average(pxs), np.average(pys)
 
+    def get_parameters(self):
+        """
+        Method to read the dispering information
+
+        Returns
+        -------
+        disperser : `su.core.wfss.config.Disperser`
+            the information on the dispersive element
+        """
+
+        conf = InstrumentConfig.from_fitsfile(self.filename)
+        return conf.disperser
+
     @property
     def dataset(self):
         filename = os.path.basename(self.filename)
@@ -798,10 +811,3 @@ class WFSS(dict):
             LOGGER.error(f'Telescope ({tel}) is not found to get visit')
 
         return obj
-
-
-if __name__ == '__main__':
-    data = WFSS.observed('/Users/rryan/icoi3qcdq_flt.fits')
-    # data=WFSS.observed('/Users/rryan/ACS/WFC/HST/15401/JDQL01JPQ/jdql01jpq_flc.fits')
-
-    print(data)

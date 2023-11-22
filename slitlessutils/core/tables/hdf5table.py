@@ -171,14 +171,6 @@ class HDF5Table(HDF5Columns):
             wav = wav0 + lam * dwav
             return wav
 
-    # def compute_xyg(self):
-    #    LOGGER.debug('make this use utilities')
-    #
-    #    xyg=np.ravel_multi_index((self.get('x'),self.get('y')),
-    #                             dims=(self.attrs['nx'],self.attrs['ny']),
-    #                             order='F')
-    #    return xyg
-
     def as_pandas(self):
         """
         Method to dump this table as a pandas Dataframe
@@ -222,11 +214,13 @@ class HDF5Table(HDF5Columns):
         ----------
         dx : 2-tuple of integers, optional
             Extra padding to include in the bounding box of the form
-            (left,right) padding.  Default is (0,0)
+            (left,right) padding.  Positive values imply growing, negative
+            values imply shrinking.  Default is (0,0)
 
         dy : 2-tuple of integers, optional
             Extra padding to include in the bounding box of the form
-            (below,above) padding.  Default is (0,0)
+            (below,above) padding.  Positive values imply growing, negative
+            values imply shrinking.  Default is (0,0)
 
         Returns
         -------
@@ -249,7 +243,7 @@ class HDF5Table(HDF5Columns):
             x1 = np.amax(x) + dx[1]
             if 'nx' in self.attrs:
                 x0 = np.ceil(max(x0, 0))
-                x1 = np.floor(min(x1, self.attrs['nx']))
+                x1 = np.floor(min(x1, self.attrs['nx'] - 1))
             x0, x1 = int(x0), int(x1)
 
             y = self.get('y')
@@ -257,7 +251,7 @@ class HDF5Table(HDF5Columns):
             y1 = np.amax(y) + dy[1]
             if 'ny' in self.attrs:
                 y0 = np.ceil(max(y0, 0))
-                y1 = np.floor(min(y1, self.attrs['ny']))
+                y1 = np.floor(min(y1, self.attrs['ny'] - 1))
             y0, y1 = int(y0), int(y1)
 
         else:

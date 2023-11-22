@@ -10,7 +10,7 @@ from .lcurve import LCurve
 from .result import Result
 
 # Just for notation sake
-# variables with a 'g' are in the grism image
+# variables with a 'g' are in the WFSS image
 #                a 'u' are unique versions (so duplicates have been removed
 #                      or summed over as applicable)
 #                'comp' are compressed over the indices
@@ -74,13 +74,13 @@ class Matrix:
     def __str__(self):
         return f'Sparse matrix with {len(self)} elements'
 
-    def build_matrix(self, grisms, sources, group=0):
+    def build_matrix(self, data, sources, group=0):
         """
         Method to build a matrix
 
         Parameters
         ----------
-        grisms : `WFSSCollection`
+        data : `WFSSCollection`
             The WFSS data to make into a matrix
 
         sources : `SourceCollection`
@@ -107,13 +107,12 @@ class Matrix:
         self.group = group
 
         # get some dimensionalities
-        self.nfiles = len(grisms)  # grisms.nfiles
-        # self.ndets=grisms.ndetectors
+        self.nfiles = len(data)
         self.nsources = len(sources)
         self.segids = list(sources.keys())
 
         # get the extraction parameters
-        self.defpars = grisms.get_parameters()
+        self.defpars = data.get_parameters()
         nwave = len(self.defpars)
 
         # compute the cumulative number of wavelength elements
@@ -134,7 +133,7 @@ class Matrix:
 
         # compute number of knowns (ie. total number of pixels) and
         # unknowns (ie. total number of wavelengths
-        self.nknowns = grisms.npixels()     # total number of knowns
+        self.nknowns = data.npixels()     # total number of knowns
         self.nunknowns = self.cumlam[-1]    # total number of unknowns
 
         # record this value so we can make residuals
@@ -142,10 +141,9 @@ class Matrix:
 
         # print a message
         LOGGER.info('Building a matrix\n' +
-                    f'      Grism files: {self.nfiles}\n' +\
-                    # f'      Grism dets:  {self.ndets}\n'+\
-                    f'      Sources:     {self.nsources}\n' +\
-                    f'      Unknowns:    {self.nunknowns}\n' +\
+                    f'      WFSS files: {self.nfiles}\n' +
+                    f'      Sources:     {self.nsources}\n' +
+                    f'      Unknowns:    {self.nunknowns}\n' +
                     f'      Knowns:      {self.nknowns}')
 
         # lists to save the matrix content
@@ -154,15 +152,15 @@ class Matrix:
         self.aij = []   # matrix elements
         self.bi = []    # vector of known values
 
-        # process each grism image
+        # process each WFSS image
         self.detindex = 0
-        for grism in tqdm(grisms, desc='Loading Grism Images', total=self.nfiles,
+        for datum in tqdm(data, desc='Loading WFSS Images', total=self.nfiles,
                           dynamic_ncols=True):
 
-            # load the data for this grism image
-            with PDTFile(grism, path=self.path, mode='r') as h5:
+            # load the data for this WFSS image
+            with PDTFile(datum, path=self.path, mode='r') as h5:
 
-                for detname, detdata in grism.items():
+                for detname, detdata in datum.items():
                     h5.load_detector(detname)
                     flatfield = detdata.config.load_flatfield()
 
@@ -218,7 +216,7 @@ class Matrix:
                                                       ordname, detdata, flatfield)
 
                     # ok.  At this point, we've loaded all the data for
-                    # a grism detector.  But let's verify that there are
+                    # a WFSS detector.  But let's verify that there are
                     # actually good pixels
                     if self.xyg:
                         # now must get the unique pixels from the observations
@@ -235,7 +233,7 @@ class Matrix:
                         self.bi.extend(bi)
 
                         # record the image info to make residual images later
-                        self.imgdata.append((grism.dataset, detname))
+                        self.imgdata.append((datum.dataset, detname))
 
                         # increment -- could just use len(self.imgdata)
                         self.detindex += 1
@@ -269,8 +267,9 @@ class Matrix:
 
         # do some more checks
         if not self.overdetermined:
-            LOGGER.warn(f"Underdetermined matrix: ({self.npix}\u00d7{self.npar}).\n" +
-                        "Results will be dubious")
+            dimlab = f"{self.npix}\u00d7{self.npar}"
+            msg = f"Underdetermined matrix: ({dimlab}).\nResults will be dubious"
+            LOGGER.warning(msg)
 
         # compute some extra things for the ragged arrays (ie. where
         # sources can have different number of spectral elements)
@@ -415,7 +414,7 @@ class Matrix:
         # unique pairs of (i,j), hence the 'u' designation
         vu, iu, ju = indices.decimate(val, ii, jj, dims=(self.nknowns, self.nunknowns))
 
-        # get the grism-pixel coordinates (subtracting the offset as promised)
+        # get the WFSS-pixel coordinates (subtracting the offset as promised)
         xygu = indices.uniq(iu - ii0)
 
         # save all these values and increment a global counter

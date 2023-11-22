@@ -133,7 +133,7 @@ class Module:
 
             self._path = path
         except BaseException:
-            LOGGER.warn(f'Cannot make directory: {path}')
+            LOGGER.warning(f'Cannot make directory: {path}')
 
     def update_header(self, hdr):
         """

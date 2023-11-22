@@ -2,11 +2,12 @@ import os
 
 import numpy as np
 from astropy.io import fits
-from scipy import interpolate, ndimage
+from scipy import ndimage
 from skimage import measure, morphology
 
 from ....logger import LOGGER
 from ...utilities import headers, indices
+from .crbitvalues import BITVALUES
 
 # some pre-built Laplace kernels
 KERNELS = {'3a': [[0, -1, 0],
@@ -24,17 +25,12 @@ KERNELS = {'3a': [[0, -1, 0],
                   [0, -1, -2, -1, 0],
                   [0, 0, -1, 0, 0]]}
 
-# what bit value to put in the DQAs
-BITVALUES = {'ACS': 16384}
-DEFAULT = 8192
 
-
-def laplace(filename, inplace=True, newfile=None, bitvalue=None,
-            interp=False, interpmethod='cubic',
-            kernel='3a', snlim=9., minpix=3, maxpix=100,
-            growsize=2, growform='diamond'):
+def _laplace(filename, inplace=True, newfile=None, bitvalue=None,
+             kernel='3a', snlim=9., minpix=3, maxpix=100,
+             growsize=2, growform='diamond'):
     """
-    Function to identify cosmic rays (CRs) by Laplace filtering.
+    Helper function to identify cosmic rays (CRs) by Laplace filtering.
 
     The default nature is to update the data-quality array (DQA) of the
     file in place, without altering the science or error arrays.
@@ -62,16 +58,6 @@ def laplace(filename, inplace=True, newfile=None, bitvalue=None,
            hardcoded for different instruments.
         If set to a valid integer (ie. one that is a multiple of 2), then
            that is used.
-
-    interp : bool, optional
-        Flag to interpolate over CRs in the science image.  This is note
-        advised for anything other than visualization purposes as the
-        bad pixels will be rejected and this is a slow operation.  Therefore
-        there is little value, other than display. Default is False
-
-    interpmethod : str, optional
-        Keyword governing the form of interpolation sent to `np.griddata()`
-        Default is 'linear'
 
     kernel : str, optional
         The form of the Laplacian kernel.  The higher order kernels provide
@@ -159,11 +145,11 @@ def laplace(filename, inplace=True, newfile=None, bitvalue=None,
         # assume we have to look in the header to get the INSTRUME to
         # lookup the bitvalue.  This could change if a bitvalue is passed
         # and it is of valid type
-        get_header_bitvalue = True
-
         # if bitvalue is an int, check if its a multiple of 2
         if isinstance(bitvalue, int):
             get_header_bitvalue = not np.log2(bitvalue).is_integer()
+        else:
+            get_header_bitvalue = True
 
         # if bitvalue is invalid, get something from the header
         if get_header_bitvalue:
@@ -171,23 +157,15 @@ def laplace(filename, inplace=True, newfile=None, bitvalue=None,
             # grab the instrument name
             ins = hdul[0].header.get('INSTRUME')
 
-            # could do this in a single line: ins = BITVALUES.get(ins,DEFAULT)
-            # but I want to log a warning message if using the default, so
-            # break it up into an if/else block.
-            if ins in BITVALUES:
-                # if ins is in the default dict, then use it
-                bitvalue = BITVALUES[ins]
-            else:
-                # else use the actual default
-                LOGGER.warning(f"Instrument {ins} not found, using default bit value: {DEFAULT}")
-                bitvalue = DEFAULT
+            # grab the bitvalue to mask
+            bitvalue = BITVALUES[ins]
 
         # process each extension
         for hdu in hdul:
             if hdu.header.get('EXTNAME', 'primary') == 'SCI':
 
                 # get the extension version for use below
-                extver = hdu.header['EXTVER']
+                extver = hdu.header.get('EXTVER', 1)
 
                 # convolve with a Laplacian and weight by uncertainty
                 sci = hdul[('SCI', extver)].data
@@ -225,48 +203,6 @@ def laplace(filename, inplace=True, newfile=None, bitvalue=None,
                 # update the data
                 g = np.where(bpx)
                 if g[0].size > 0:
-                    # interpolate over in the science image?
-                    # this should be consider cosmetic *ONLY*
-                    if interp:
-                        LOGGER.info(f"Interpolating over CRs: {filename}[('SCI',{extver})]")
-                        gpx = ~bpx
-
-                        xx, yy = np.meshgrid(np.arange(sci.shape[1], dtype=int),
-                                             np.arange(sci.shape[0], dtype=int))
-
-                        crs = indices.reverse(measure.label(bpx))
-                        for idx, (y, x) in crs.items():
-                            if idx > 0:
-                                y0 = max(np.amin(y) - 3, 0)
-                                x0 = max(np.amin(x) - 3, 0)
-                                y1 = min(np.amax(y) + 3, sci.shape[0] - 1)
-                                x1 = min(np.amax(x) + 3, sci.shape[1] - 1)
-
-                                subsci = sci[y0:y1, x0:x1]
-                                subgpx = gpx[y0:y1, x0:x1]
-                                subbpx = bpx[y0:y1, x0:x1]
-                                subx = xx[y0:y1, x0:x1]
-                                suby = yy[y0:y1, x0:x1]
-                                by, bx = np.where(subbpx)
-
-                                spline = interpolate.SmoothBivariateSpline(subx[subgpx],
-                                                                           suby[subgpx],
-                                                                           subsci[subgpx],
-                                                                           s=1e6, kx=1, ky=1)
-
-                                hdul[('SCI', extver)].data[by + y0, bx + x0] = spline(subx[subbpx],
-                                                                                      suby[subbpx],
-                                                                                      grid=False)
-
-                        # gxy=(xx[gpx],yy[gpx])
-                        # gsci=sci[gpx]
-                        # bxy=(xx[bpx],yy[bpx])
-                        #
-                        # newval=interpolate.griddata(gxy,gsci,bxy,
-                        #                            fill_value=np.nan,
-                        #                            method=interpmethod)
-                        # hdul[('SCI',extver)].data[g]=newval
-
                     # update the DQ array
                     hdul[('DQ', extver)].data[g] += bitvalue
                     didsomething = True      # update flag that things happened
@@ -279,10 +215,10 @@ def laplace(filename, inplace=True, newfile=None, bitvalue=None,
             hdul[0].header.set('CRSN', value=snlim, comment='S/N per pix')
             hdul[0].header.set('CRMINPIX', value=minpix,
                                comment='Minimum CR size')
-            hdul[0].header.set('CRINTERP', value=interp,
-                               comment='Interpolate over CRs in science exten')
-            hdul[0].header.set('CRINTMTH', value=interpmethod,
-                               comment='method for CR interpolation')
+            # hdul[0].header.set('CRINTERP', value=interp,
+            #                   comment='Interpolate over CRs in science exten')
+            # hdul[0].header.set('CRINTMTH', value=interpmethod,
+            #                   comment='method for CR interpolation')
             hdul[0].header.set('CRGRWSZ', value=str(growsize),
                                comment='Npix to grow CRs')
             hdul[0].header.set('CRGRWFRM', value=growform,
@@ -303,6 +239,34 @@ def laplace(filename, inplace=True, newfile=None, bitvalue=None,
             outfile = newfile
 
     return outfile
+
+
+def laplace(filenames, **kwargs):
+    """
+    Function to perform the Laplace filtering of cosmic rays
+
+    Parameters
+    ----------
+    filenames : str or list/tuple
+        The name of files to search for cosmic rays
+
+    **kwargs : dict
+        See `_laplace()`
+
+    Return
+    ------
+    outfiles : str or list/tuple
+        The name of the files with the cosmic rays masked
+    """
+
+    if isinstance(filenames, (list, tuple)):
+        outfiles = [_laplace(f, **kwargs) for f in filenames]
+    elif isinstance(filenames, str):
+        outfiles = _laplace(filenames, **kwargs)
+    else:
+        LOGGER.warning(f'Invalid data type for filenames: {type(filenames)}')
+
+    return outfiles
 
 
 # if __name__=='__main__':

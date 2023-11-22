@@ -95,7 +95,7 @@ class AffineTweak(dict):
                     self[ext]['wcsname0'] = hdu.header[f'WCSNAME{self.key0}']
                     self[ext]['wcsname1'] = hdu.header[f'WCSNAME{self.key1}']
 
-    def __call__(self, datfile, inplace=False, newfile=None):
+    def __call__(self, datfile, inplace=False, newfile=None, force=False):
         """
         Main method to apply the tweaks to a given file.
 
@@ -114,6 +114,10 @@ class AffineTweak(dict):
         newfile : str or None, optional
             See the file `utils.py` for more details.  Default is None.
 
+        force : bool, optional
+            Force the updating of the astrometry, even if done already.
+            Default is False.
+
         Returns
         -------
         filename : str
@@ -123,6 +127,14 @@ class AffineTweak(dict):
 
         mode = 'update' if inplace else 'readonly'
         with fits.open(datfile, mode=mode) as hdul:
+            # check if already tweaked
+            wcscorr = hdul[0].header.get('WCSCORR', False)
+            if wcscorr and not force:
+                msg = f'Astrometry was already corrected: {datfile}'
+                LOGGER.warning(msg)
+                return
+
+            LOGGER.info(f'upgrading WCS in {datfile} from {self.reffile}')
             for ext, data in self.items():
 
                 wcsname0 = hdul[ext].header[f'WCSNAME{self.key0}']
@@ -140,22 +152,24 @@ class AffineTweak(dict):
                 utils.set_crval(hdul[ext].header, crval, self.key1)
 
                 # add the tweak to the header
-                hdul[ext].header.set('DCRVAL1', value=data['d'][0])
-                hdul[ext].header.set('DCRVAL2', value=data['d'][1])
-                hdul[ext].header.set('A1_1', value=data['A'][0, 0])
-                hdul[ext].header.set('A1_2', value=data['A'][0, 1])
-                hdul[ext].header.set('A2_1', value=data['A'][1, 0])
-                hdul[ext].header.set('A2_2', value=data['A'][1, 1])
-
-                # add some more to header
                 utils.update_wcshistory(hdul[ext].header, 'affine upgrade')
-                # hdul[ext].header.set('WCSTWEAK', value=True,
-                #                      comment='Affine tweaked by slitlessutils')
-                # hdul[ext].header.set('WCSTYPE', value='affine upgrade')
+                hdul[ext].header.set('DCRVAL1', value=data['d'][0],
+                                     comment='Change in CRVAL1 (deg)')
+                hdul[ext].header.set('DCRVAL2', value=data['d'][1],
+                                     comment='Change in CRVAL2 (deg)')
+                hdul[ext].header.set('A1_1', value=data['A'][0, 0],
+                                     comment='Affine transform')
+                hdul[ext].header.set('A1_2', value=data['A'][0, 1],
+                                     comment='Affine transform')
+                hdul[ext].header.set('A2_1', value=data['A'][1, 0],
+                                     comment='Affine transform')
+                hdul[ext].header.set('A2_2', value=data['A'][1, 1],
+                                     comment='Affine transform')
 
-            hdul[0].header.add_history('Affine tweaked astrometry')
+            utils.update_wcshistory(hdul[0].header, 'affine upgrade')
 
-            outfile = utils.new_filename(datfile, inplace=inplace, suffix='twcs')
+            outfile = utils.new_filename(datfile, inplace=inplace,
+                                         suffix='twcs')
             if not inplace:
                 hdul.writeto(outfile, overwrite=True)
 

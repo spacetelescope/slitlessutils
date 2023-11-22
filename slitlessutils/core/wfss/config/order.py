@@ -21,7 +21,7 @@ class Order:
         self.dispx = StandardPolynomial()
         self.dispy = StandardPolynomial()
 
-        # print("WORRY ABOUT ORDER OF COEFS")
+        # this may be fragile based on the order of the coefficients
         for k, v in data[self.order].items():
             if k.startswith('DISPX'):
                 self.dispx.append(v)
@@ -86,7 +86,7 @@ class Order:
 
         # default wavelength to the average value over the sensitivity
         if wavelength is None:
-            wavelength = self.sens.wave_ave
+            wavelength = self.sensitivity.average_wavelength
 
         # compute the dispersion using:
         # t = h^-1(lambda)
@@ -181,8 +181,3 @@ class Order:
     #    data = WFSSConfig.read_asciifile(filename)
     #    obj = cls(data, order)
     #    return obj
-
-
-if __name__ == '__main__':
-    x = Order(1, 2)
-    print(x)

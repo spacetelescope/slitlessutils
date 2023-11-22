@@ -54,7 +54,7 @@ def _angular_distance(angle1, angle2, degrees=True):
     return distance[0]
 
 
-def drizzle(files, outdir=Path().absolute(), **kwargs):
+def run_astrodrizzle(files, outdir=Path().absolute(), **kwargs):
     """
     Runs AstroDrizzle as part of Cosmic Ray handling. Passes any additional arguments
     not listed here directly to AstroDrizzle. Any user-specified arguments will override
@@ -182,7 +182,7 @@ def group_by_position_angle(files, degrees=True, max_pa_diff=0.05, **kwargs):
     return grouped_files
 
 
-def drizzle_grouped_files(input_data, grouping="visit", **kwargs):
+def drizzle(input_data, grouping="visit", **kwargs):
     """
     Apply cosmic ray masking using drizzle to a list of files or a WFSSCollection object,
     and return the files that have undergone cosmic ray masking by their selected groups.
@@ -210,13 +210,12 @@ def drizzle_grouped_files(input_data, grouping="visit", **kwargs):
     # Perform grouping based on the desired criteria
     if grouping == "visit":
         grouped_files = group_by_visit(files)
-
     elif grouping == "position_angle":
         grouped_files = group_by_position_angle(files)
     else:
-        grouped_files = files  # No grouping; consider all files as one group
+        grouped_files = [files]  # No grouping; consider all files as one group
 
     # Apply cosmic ray masking to each group of files
     for list_of_files in grouped_files:
-        drizzle(list_of_files, **kwargs)
+        run_astrodrizzle(list_of_files, **kwargs)
     return files

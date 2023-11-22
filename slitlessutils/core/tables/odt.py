@@ -46,6 +46,11 @@ class ODT(HDF5Table):
         # collect the input pixels
         self.pixels = []
 
+        # stuff to compute object centroid
+        # self.profile = 0.0
+        # self.xc = 0.0
+        # self.yc = 0.0
+
     @property
     def name(self):
         return str(self.segid)
@@ -61,15 +66,36 @@ class ODT(HDF5Table):
 
         """
 
-        pixel = pdt.pixel
-        self.pdts[pixel] = pdt
-        self.pixels.append(pixel)
+        if pdt:
+            pixel = pdt.pixel
+            self.pdts[pixel] = pdt
+            self.pixels.append(pixel)
+
+            # update the one-pass averages to get center
+            # profile = self.profile
+            # p = pdt.attrs['profile']
+            # self.profile += p
+            # self.xc = (self.xc*profile + pixel[0]*p)/self.profile
+            # self.yc = (self.yc*profile + pixel[1]*p)/self.profile
 
     def decimate(self):
         """
         Method to decimate over the PDTs
+
+        Parameters
+        ----------
+        None.
+
+        Returns
+        -------
+        factor : float
+            The decimation factor --- the fractional decrease in the size of the table
+            from summing over repeated indices.  Will be `np.nan` if the table cannot
+            be decimated.
+
         """
 
+        factor = np.nan
         if self.pdts:
 
             # extract all the values, but start with the existing data
@@ -77,30 +103,27 @@ class ODT(HDF5Table):
             y = self['y']
             lam = self['lam']
             val = self['val']
-            for pdt in self.pdts.values():
+
+            for pix, pdt in self.pdts.items():
+                # update
                 x.extend(pdt['x'])
                 y.extend(pdt['y'])
                 lam.extend(pdt['lam'])
                 val.extend(pdt['val'])
 
-            # current size of aggregated table
-            n = len(x)
-            if n > 0:
-
+            if x:
                 # ok... let's just save some space
                 self.pdts.clear()
 
                 # change datatypes
-                x = np.array(x, dtype=int)
-                y = np.array(y, dtype=int)
-                lam = np.array(lam, dtype=int)
-                val = np.array(val, dtype=float)
+                x = np.asarray(x, dtype=int)
+                y = np.asarray(y, dtype=int)
+                lam = np.asarray(lam, dtype=int)
+                val = np.asarray(val, dtype=float)
 
                 # do the summations
                 vv, xx, yy, ll = indices.decimate(val, x, y, lam, dims=self.dims)
-                # m = len(xx)
-                # r = float(n-m)/float(n)
-                # print(f'Decimation factor: {r}')
+                factor = 1 - xx.size / x.size
 
                 # put these values in the self
                 self.clear()
@@ -109,5 +132,4 @@ class ODT(HDF5Table):
                 self['lam'] = ll
                 self['val'] = vv
 
-        else:
-            pass
+        return factor

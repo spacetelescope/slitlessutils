@@ -42,7 +42,7 @@ ROOT = 'WRAY-15-1736'
 # position of source
 RA = 264.1019010      # in deg
 DEC = -32.9087315     # in deg
-RAD = 0.5             # in arcsec
+RAD = 0.25            # in arcsec
 SUFFIX, DRZSUF = 'flc', 'drc'
 SCALE = 0.05          # driz image pix scale
 
@@ -67,6 +67,9 @@ def download():
 
 def preprocess_grism():
 
+    grismfiles = [f'{grismdset}_{SUFFIX}.fits' for grismdset in DATASETS[GRATING]]
+    grismfiles = su.core.preprocess.crrej.drizzle(grismfiles, grouping=None)
+
     # create a background subtraction object
     back = su.core.preprocess.background.Background()
 
@@ -74,11 +77,8 @@ def preprocess_grism():
         grismfile = f'{grismdset}_{SUFFIX}.fits'
         imgfile = f'{imgdset}_{SUFFIX}.fits'
 
-        # flag CRs by Laplace filtering
-        su.core.preprocess.crrej.laplace(grismfile, inplace=True)
-
         # subtract background via master-sky
-        back.master(grismfile)
+        back.master(grismfile, inplace=True)
 
         # update WCS to match Gaia
         su.core.preprocess.astrometry.upgrade_wcs(imgfile, grismfile,
@@ -156,7 +156,7 @@ def plot_spectra():
     # load and smooth the Larsen spectrum
     l, f = np.loadtxt(reffile, unpack=True, usecols=(0, 1))
     f /= 1e-13
-    ff = gaussian_filter1d(f, 50)
+    ff = gaussian_filter1d(f, 40)
 
     # load the data and change the units
     dat, hdr = fits.getdata(f'{ROOT}_x1d.fits', header=True)
@@ -166,13 +166,15 @@ def plot_spectra():
     # get a good range of points to compute a (variance-weighted) scale factor
     g = np.where((dat['lamb'] > 5800) & (dat['lamb'] < 9900))[0]
     ff2 = np.interp(dat['lamb'], l, ff)
-    num = np.sum((dat['flam'][g] / dat['func'][g])**2)
-    den = np.sum((ff2[g] / dat['func'][g]) * (dat['flam'][g] / dat['func'][g]))
+    den = np.sum((dat['flam'][g] / dat['func'][g])**2)
+    num = np.sum((ff2[g] / dat['func'][g]) * (dat['flam'][g] / dat['func'][g]))
     scl = num / den
 
     # plot the SU spectrum
-    plt.plot(dat['lamb'], dat['flam'], label=GRATING)
-    plt.plot(l, ff * scl, label='Larsen et al. (smoothed)')
+    plt.plot(dat['lamb'], dat['flam'] * scl, label=GRATING)
+    plt.plot(l, ff, label='Larsen et al. (smoothed)')
+
+    print('scaling factor', scl, 1. / scl)
 
     # uncomment this to see the hi-res file.
     # plt.plot(l, f, label='Larsen et al. (high-res)')
@@ -183,7 +185,7 @@ def plot_spectra():
 
     # put on legend and change limits
     plt.legend(loc='upper left')
-    plt.ylim(0., 0.55)
+    plt.ylim(0.05, 0.55)
     plt.xlim(5500, 10000)
 
     # write the file to disk

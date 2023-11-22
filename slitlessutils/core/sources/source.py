@@ -1,5 +1,6 @@
 import os
 
+import matplotlib.colors as colors
 import matplotlib.pyplot as plt
 import numpy as np
 from astropy.io import fits
@@ -100,6 +101,11 @@ class Source(list):
             that will have spectral overlap in this series of WFSS images.
             see `su.core.modules.Group` for more information. Default is 0.
 
+        epsilon : float, optional
+            The critical value for forcing positivity.  Any value below this
+            will be re-mapped onto the positive domain.  Default is 1e-9.
+            See the IDL implementation for more info.
+            https://idlastro.gsfc.nasa.gov/ftp/pro/image/positivity.pro
 
         Notes
         ----
@@ -756,64 +762,46 @@ class Source(list):
 
         return X, Y, a, b, theta
 
-    def plot(self):
+    def plot(self, minfactor=1e-3, padding=1):
         """
         Method to make a plot.
 
-        This is not finished and should not be used
+        Parameters
+        ----------
+        minfactor : float, optional
+            The minimum display value (in units of peak weight).   Default is 1e-3
+
+        padding : int, optional
+            Amount to pad the images.  Default is 1.
         """
 
-        raise NotImplementedError
+        fig, axes = plt.subplots(1, 2, sharex=True, sharey=True)
 
         x = []
         y = []
-        w = []
-        r = []
-        # for regid,region in enumerate(self.spectralregions):
-        for regid, region in enumerate(self):
+        regid = []
+        weight = []
+        for i, region in enumerate(self, start=1):
             x.extend(region.x)
             y.extend(region.y)
-            w.extend(region.w)
-            r.extend([regid] * len(region))
+            regid.extend([i] * len(x))
+            weight.extend(region.w)
+        x = np.asarray(x, dtype=int)
+        y = np.asarray(y, dtype=int)
+        x0, x1 = np.amin(x) - padding, np.amax(x) + padding
+        y0, y1 = np.amin(y) - padding, np.amax(y) + padding
+        nx, ny = x1 - x0 + 1, y1 - y0 + 1
+        reg = np.full((ny, nx), np.nan)
+        img = np.full((ny, nx), np.nan)
 
-        x = np.array(x)
-        y = np.array(y)
-        w = np.array(w)
-        r = np.array(r)
+        # reg[y - y0 + padding, x - x0 + padding] = regid
+        # img[y - y0 + padding, x - x0 + padding] = weight
+        reg[y - y0, x - x0] = regid
+        img[y - y0, x - x0] = weight
 
-        x0, x1 = np.amin(x), np.amax(x)
-        y0, y1 = np.amin(y), np.amax(y)
-        shape = (y1 - y0 + 1, x1 - x0 + 1)
+        mx = np.nanmax(img)
+        axes[0].imshow(reg, origin='lower')
+        axes[1].imshow(img, origin='lower', norm=colors.LogNorm(mx * minfactor, mx))
 
-        wht = np.full(shape, np.nan)
-        reg = np.full(shape, np.nan)
-        wht[y, x] = w
-        reg[y, x] = r
-
-        #
-        #
-        # x0,x1=np.inf,0
-        # y0,y1=np.inf,0
-        #
-        # for region in self.spectralregions:
-        #     x0=min(x0,np.amin(region.x))
-        #     x1=max(x1,np.amax(region.x))
-        #     y0=min(y0,np.amin(region.y))
-        #     y1=max(y1,np.amax(region.y))
-        #
-        # shape=(y1-y0+1,x1-x0+1)
-        # wht=np.full(shape,np.nan,dtype=float)
-        # reg=np.full(shape,np.nan,dtype=float)
-        #
-        # for regid,region in enumerate(self.spectralregions):
-        #     wht[region.y,region.x]=region.w
-        #     reg[region.y,region.x]=regid
-
-        fig, axes = plt.subplots(1, 2, sharex=True, sharey=True)
-        axes[0].imshow(wht, origin='lower', interpolation='nearest')
-        axes[0].set_title('weights')
-        axes[1].imshow(reg, origin='lower', interpolation='nearest')
-        axes[1].set_title('region')
         plt.tight_layout()
-        fig.canvas.draw()
         plt.show()
