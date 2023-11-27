@@ -44,6 +44,7 @@ The single-orient extraction is essentially the optimal spectroscopy algorithm p
 				\end{eqnarray}
 				
 			where :math:`f_{\lambda,i}`, :math:`u_{\lambda,i}`, and :math:`c_{\lambda,i}` are the optimal flux, uncertainty, and contamination, respectively for the :math:`i^\mathrm{th}` WFSS image.  Additionally, :math:`S_{x,y}`, :math:`U_{x,y}`, :math:`P_{x,y}`, and :math:`C_{x,y}` are the science, uncertainty, cross-dispersion profile, and contamination images (more on this below in :ref:`Contamination Model <contmodel>`), respectively.  ``Slitlessutils`` offers three choices for the cross-dispersion profile :math:`P_{x,y}`:
+
 				* **uniform** This does no profile weighting and instead just sums the pixels within the aperture.  This is effectively the box-extraction in `hstaxe <https://hstaxe.readthedocs.io/en/latest/>`_
 				* **forward** This uses the forward model to establish the cross dispersion weights.  
 				* **data** This uses the science image, masked for the :term:`DQA <data-quality array>` as the weights.  This is effectively the `Horne 1986 <https://ui.adsabs.harvard.edu/abs/1986PASP...98..609H/abstract>`_ algorithm.

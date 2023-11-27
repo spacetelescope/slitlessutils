@@ -25,6 +25,7 @@ To tabulate all the pixel transformations for a WFSS image and create a PDT, the
 				#. For each spectral order:
 	
 					* For each tabulation wavelength (see Note below):
+
 						a. convert wavelength into parameter :math:`t` using the inverse of the dispersion relation
 						b. evaluate the trace at the parameter :math:`t`
 						c. compute fractional pixel area (see :numref:`animatedpixel` below)
