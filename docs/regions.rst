@@ -34,7 +34,7 @@ The resulting regions will have their title as the segmentation ID and the spect
 	:align: center
 	:alt: Spectral order colors
 
-	The colors used for spectral orders.  The bold/pastel colors refer to positive/negative orders, respectively.  The zeroth order will be illustrated as white.
+	The colors used for spectral orders (indicated as text labels).  The bold/pastel colors refer to positive/negative orders, respectively.  The zeroth order will be illustrated as white.
 
 
 

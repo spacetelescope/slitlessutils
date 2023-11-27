@@ -125,7 +125,7 @@ and the parameters :math:`\lambda_0, \lambda_1` are the lower and upper bounds (
 Sensitivity Curves
 ------------------
 
-The :term:`sensitivity curve` provides the conversion between detector units (usually :math:`e^-/s`) to physical units (usually :math:`erg/s/cm^2/Å`), which depends on spectral order by **NOT** on spatial extent as that is addressed by the :ref:`flat-field <flatfield>`. This can be thought of as a wavelength-dependent :term:`zeropoint` in flux units.  :numref:`senscurves` shows the sensitivity curves for several :term:`grism` and :term:`prism` modes for several HST instruments.
+The :term:`sensitivity curve` provides the conversion between detector units (usually :math:`\mathrm{e}^-/\mathrm{s}`) to physical units (usually :math:`erg/s/cm^2/Å`), which depends on spectral order by **NOT** on spatial extent as that is addressed by the :ref:`flat-field <flatfield>`. This can be thought of as a wavelength-dependent :term:`zeropoint` in flux units.  :numref:`senscurves` shows the sensitivity curves for several :term:`grism` and :term:`prism` modes for several HST instruments.
 
 .. note::
 	Although the sensitivity curves have explicit units, they are adjusted by the :doc:`configurable parameters <configure>`: ``fluxscale`` and ``fluxunits``.

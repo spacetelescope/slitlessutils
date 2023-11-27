@@ -19,7 +19,7 @@ Instrument-Wide Settings
      - Unit
      - Description
    * - Image units
-     - :math:`e^-/s` or :math:`e^-`
+     - :math:`\mathrm{e}^-/\mathrm{s}` or :math:`\mathrm{e}^-`
      - The units of the images to be written.
    * - File suffix
      - ``flt`` or ``flc``

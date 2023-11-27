@@ -51,7 +51,7 @@ To add noise to this noiseless image, ``slitlessutils`` requires two additional 
      - Unit
      - Description
    * - Background
-     - :math:`e^-/s`
+     - :math:`\mathrm{e}^-/\mathrm{s}`
      - | The notional background level, which is assumed to be constant across the
        | detector
    * - Exposure time
@@ -77,10 +77,10 @@ where :math:`B` and :math:`t` are the background and exposure time described in 
     U_{x,y} &=& \sqrt{\left(\frac{\tilde{S}_{x,y} + B + D}{t}\right)+ \left(\frac{R}{t}\right)^2}
   \end{eqnarray}
 
-both in units of :math:`e^-/s`.  The background rate and dark current are subtracted here to produce an image equivalent to a :doc:`sky-subtracted WFSS image <background>`.
+both in units of :math:`\mathrm{e}^-/\mathrm{s}`.  The background rate and dark current are subtracted here to produce an image equivalent to a :doc:`sky-subtracted WFSS image <background>`.
 
 .. important::
-  Some detectors (e.g. WFC3/IR) record the images in :math:`e^-/s`, while others (e.g WFC3/UVIS, ACS/WFC, ACS/SBC) use :math:`e^-`.  This information is encoded in the instrument-specific ``yaml`` files in :file:`$HOME/.slitlessutils/<VERSION>/instruments` (but see also :doc:`instrument tables <instrumentfiles>`), which will modify the definitions for the final, noised images :math:`S_{x,y}` and :math:`U_{x,y}`.
+  Some detectors (e.g. WFC3/IR) record the images in :math:`\mathrm{e}^-/\mathrm{s}`, while others (e.g WFC3/UVIS, ACS/WFC, ACS/SBC) use :math:`e^-`.  This information is encoded in the instrument-specific ``yaml`` files in :file:`$HOME/.slitlessutils/<VERSION>/instruments` (but see also :doc:`instrument tables <instrumentfiles>`), which will modify the definitions for the final, noised images :math:`S_{x,y}` and :math:`U_{x,y}`.
 
 
 

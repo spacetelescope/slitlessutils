@@ -47,7 +47,7 @@ To tabulate all the pixel transformations for a WFSS image and create a PDT, the
    :align: center
    :alt: fractional pixel animation
 
-   Dispersed pixel and fractional area calculations.  ``Slitlessutils`` uses `pypolyclip <https://github.com/spacetelescope/pypolyclip>`_ to compute fractional pixel area on a dispersed image pixel grid (shown by colored polygons).  The known area of the input polygon (shown in blue outline) is :math:`0.64 \mathrm{pix}^2`.
+   Dispersed pixel and fractional area calculations.  ``Slitlessutils`` uses `pypolyclip <https://github.com/spacetelescope/pypolyclip>`_ to compute fractional pixel area on a dispersed image pixel grid (shown by colored polygons).  The known area of the input polygon (shown in blue outline) is :math:`0.64~\mathrm{pix}^2`.
 
 
 Given the hierarchical nature outlined in the above algorithm, the PDTs are stored as `hierarchical data-format 5 (HDF5) <https://www.hdfgroup.org/solutions/hdf5/>`_ and the can be viewed or manually edited with standard tools (e.g. `HDFView <https://www.hdfgroup.org/downloads/hdfview/>`_).
@@ -91,4 +91,4 @@ The overall philosophy of ``slitlessutils`` is to compute these tables *once* at
 where :math:`(n_x,n_y)` represents the dimensionality of the WFSS image.  This computation and summation is carried out by :func:`~slitlessutils.utilities.indices.decimate()`.
 
 .. note::
-	The PDT files only contain information on the scene geometry, and the detector effects and astrophysical signals are included in later stages.  Therefore these files **only depend on the :term:`world-coordinate system`** and its calibration.
+	The PDT files only contain information on the scene geometry, and the detector effects and astrophysical signals are included in later stages.  Therefore these files **only depend** on the :term:`world-coordinate system` and its calibration.

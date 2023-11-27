@@ -49,12 +49,12 @@ Here we find the affine transformation between any two WCSs from the direct imag
 If the initial and final ``CD``-matrices for the direct image are :math:`\mathrm{CD}_{0,d}` and :math:`\mathrm{CD}_{1,d}` (respectively), then the affine transformation matrix is given as:
 
 .. math::
-	A = \mathrm{CD}_{1,d} \mathrm{CD}^{-1}_{0,d}
+	A_d = \mathrm{CD}_{1,d} \mathrm{CD}^{-1}_{0,d}
 
 This transformation matrix is then applied to the ``CD`` matrix from the WFSS image (:math:`\mathrm{CD}_0`):
 
 .. math::
-	\mathrm{CD}_1 = A \mathrm{CD}_0
+	\mathrm{CD}_1 = A_d\, \mathrm{CD}_0
 
 Similarly, we must adjust the ``CRVAL`` keywords, which are loaded from the WCS object as:
 
@@ -65,12 +65,12 @@ Similarly, we must adjust the ``CRVAL`` keywords, which are loaded from the WCS 
 Again, if :math:`\mathrm{CRVAL}_{0,d}` and :math:`\mathrm{CRVAL}_{1,d}` refer to the ``CRVAL``-vectors for the initial and final WCS solution from the direct image, then the perturbation vector is:
 
 .. math::
-	\Delta \mathrm{CRVAL} = \mathrm{CRVAL}_{1,d} - \mathrm{CRVAL}_{0,d}
+	\Delta \mathrm{CRVAL}_d = \mathrm{CRVAL}_{1,d} - \mathrm{CRVAL}_{0,d}
 
 which can be applied to the ``CRVAL`` vector from the WFSS image with the same WCS key used to instantiate :math:`\mathrm{CRVAL}_0`:
 
 .. math::
-	\mathrm{CRVAL}_1 = \mathrm{CRVAL}_0 + \Delta \mathrm{CRVAL}
+	\mathrm{CRVAL}_1 = \mathrm{CRVAL}_0 + \Delta \mathrm{CRVAL}_d
 
 This affine tweaking is implemented in the convenience function :func:`upgrade_wcs()`:
 
