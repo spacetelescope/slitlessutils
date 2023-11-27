@@ -44,6 +44,7 @@ The single-orient extraction is essentially the optimal spectroscopy algorithm p
 				* **uniform** This does no profile weighting and instead just sums the pixels within the aperture.  This is effectively the box-extraction in `hstaxe <https://hstaxe.readthedocs.io/en/latest/>`_
 				* **forward** This uses the forward model to establish the cross dispersion weights.  
 				* **data** This uses the science image, masked for the :term:`DQA <data-quality array>` as the weights.  This is effectively the `Horne 1986 <https://ui.adsabs.harvard.edu/abs/1986PASP...98..609H/abstract>`_ algorithm.
+			
 			these can be selected by the keyword argument: ``profile``.  The default behavior is ``profile='data'``.
 			#. record these values in a temporary data structure used to combine the spectra from different WFSS images
 

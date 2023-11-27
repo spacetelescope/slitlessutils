@@ -78,8 +78,8 @@ Again, the inputs are a :term:`direct image<direct imaging>` and :term:`segmenta
      	 | Default is 0.
    * - ``zeropoint``
      - ``float`` or ``int``
-     - | The magnitude AB zeropoint for the :term:`direct 
-       | image<direct imaging>`.
+     - | The magnitude AB zeropoint for the 
+       | :term:`direct image<direct imaging>`.
    * - ``throughput``
      - | ``None``, ``str``, or
        | ``slitlessutils.core.photometry.Throughput``
