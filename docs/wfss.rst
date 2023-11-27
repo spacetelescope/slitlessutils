@@ -5,7 +5,7 @@
 Wide-Field Slitless Spectroscopy
 ================================
 
-:term:`wide-field slitless spectroscopy` (WFSS) refers to either the act of obtaining a complete, unbiased spectroscopic view of the sky by means of transmissive and dispersive optical element (usually a :term:`grism` or :term:`prism`) **and** the data produced by such an observation.  This is to distinguish other ways of using these optical elements, such as spatial/drift scanning, spectro-polarimetry, or detailed transient spectroscopy, which are not implemented in ``slitlessutils``.  It is unclear if/when such modes will be implemented.
+:term:`Wide-field slitless spectroscopy<wide-field slitless spectroscopy>` (WFSS) refers to either the act of obtaining a complete, unbiased spectroscopic view of the sky by means of transmissive and dispersive optical element (usually a :term:`grism` or :term:`prism`) **and** the data produced by such an observation.  This is to distinguish other ways of using these optical elements, such as spatial/drift scanning, spectro-polarimetry, or detailed transient spectroscopy, which are not implemented in ``slitlessutils``.  It is unclear if/when such modes will be implemented.
 
 Below the two main *container* datatypes that one generally interacts with are the :class:`~slitlessutils.wfss.WFSS()` and :class:`~slitlessutils.wfss.WFSSCollection()` to hold a single WFSS file/image and a set of such objects, respectively.  Since some of the extraction techniques implemented in ``slitlessutils`` can be computationally expensive and/or use a significant amount of memory, care has been taken to limit the memory footprint of objects (for example, the image-objects do not instantiate the data until requested).
 
@@ -14,9 +14,9 @@ WFSS data (`~slitlessutils.core.wfss.data.WFSS()`)
 --------------------------------------------------
 A light weight object that describes a single WFSS image.  This object will emulate a ``dict``-like object, where the keyword/value pairs are the detector name and a :class:`~slitlessutils.wfss.WFSSDetector()` object, which is unlikely to be directly instantiated by a user.  The :class:`~slitlessutils.wfss.WFSS()` objects are generally instantiated by one of two classmethods:
 
-* :func:`~slitlessutils.wfss.WFSS.simulated()`: load the WFSS for simulation.
+* :func:`~slitlessutils.wfss.WFSS.simulated()`: load a WFSS data structure for simulation (see :doc:`simulation`).
 
-* :func:`~slitlessutils.wfss.WFSS.observed()`: load the WFSS as an observed file.
+* :func:`~slitlessutils.wfss.WFSS.observed()`: load a WFSS image as an observed file.
 
 
 

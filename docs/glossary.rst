@@ -3,7 +3,7 @@
 Glossary
 ========
 
-Since many terms may be used colloquially and/or have different definitions in other contexts, this Glossary provides a concrete definition for ambiguous terms.
+Since many terms may be used colloquially and/or have different definitions in other contexts, this Glossary provides a concrete definition for potentially ambiguous terms.
 
 
 .. glossary::
@@ -14,17 +14,23 @@ Since many terms may be used colloquially and/or have different definitions in o
 	compound source
 		A source that is decomposed into more than one :term:`dispersed region`.
 
+	contamination
+		Light from a separate (unrelated) source that affects the source in question.  Colloquially, pixels that contain light from multiple (unrelated) sources are said to be "contaminated".  This is sometimes referred to as "confusion".
+
 	contamination model
-		A model that describes the amount of light from an unrelated source that adversely affects the flux of the source in question.  These models are built on existing observations, usually broadband photometry, but can be spectroscopic data as well.  The concept of a *contamination model* only pertains to the :doc:`Single-Exposure Extraction <single>`, as the :doc:`Multi-Exposure Extraction <multi>` uses data at multiple position angles to mitigate contamination (see `Ryan, Casertano, & Pirzkal (2018) <https://ui.adsabs.harvard.edu/abs/2018PASP..130c4501R/abstract>`_ for more information).
+		A model that describes the :term:`contamination`.  These models are built on existing observations, usually broadband photometry, but can be spectroscopic data as well.  The concept of a *contamination model* only pertains to the :doc:`Single-Exposure Extraction <single>`, as the :doc:`Multi-Exposure Extraction <multi>` uses data at multiple position angles to mitigate contamination (see `Ryan, Casertano, & Pirzkal (2018) <https://ui.adsabs.harvard.edu/abs/2018PASP..130c4501R/abstract>`_ for more information).
 
 	cosmic ray
-		A high energy particle that imparts a significant amount of charge resulting in a very sharp, bright, and  discontinuous profile.  Since cosmic rays are stochastic in nature, they do not reappear in successive images.  Further, they are unrelated to the sources of interest and render their pixels unusable for science, therefore they must be flagged before any type of analysis.
+		A high energy particle that imparts a significant amount of charge resulting in a very sharp, bright, and discontinuous profile.  Since cosmic rays are stochastic in nature, they do not reappear in successive images.  Further, they are unrelated to the sources of interest and render their pixels unusable for science, therefore they must be flagged before any type of analysis.
 
 	damping target
 		The vector of spectra that the sparse-least squares solutions will tend to minimize high-frequency noise.  See scipy implementation of the `LSQR <https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.lsqr.html>`_ algorithm.
 
 	data-quality array
 		A bitmask containing the flags that indicate different failure modes of a pixel.  In general, the *good* pixels have a data-quality value of 0.  Also called DQA.
+
+	decimation
+		The act of summing a data vector over unique combinations of an index vector (these vectors should have the same length).  For example, if the data vector is :math:`v=\{0.1,0.2,0.3,0.2,0.1,0.0\}` and the index vector is :math:`i=\{0,0,0,1,3,1\}` then the decimated data and indices will be :math:`v_d=\{0.6, 0.2, 0.3\}` and :math:`i_d=\{0,1,3\}`, respectively.  The index vector must have integer datatype, but see :func:`slitlessutils.core.utilities.indices.decimate()` for more information and examples.  **This is a critical concept in slitlessutils**.
 
 	direct imaging
 		Data collected in a standard broadband imaging filter contemporaneously with the WFSS data.  These data are often used to improve the astrometric information in the WFSS data, but may have utility in other ways (such as determining the cross-dispersion profile weights, specifying the extraction apertures, or estimating contamination via broadband colors).  See also :term:`post-imaging` or :term:`pre-imaging`.
@@ -33,7 +39,7 @@ Since many terms may be used colloquially and/or have different definitions in o
 		A subset of a source that has a single spectrum.  If a source has a single dispersed region, then it is said to be a :term:`simple source`.  Alternatively, a source that is decomposed into a many dispersed then it is a :term:`compound source`.
 
 	drizzle
-		A method for combining multiple images while correcting for image distortion.  See the `drizzlepac <https://drizzlepac.readthedocs.io/en/latest/>`_ documentation.
+		A method for combining multiple images while correcting for image distortion and offsets/dithers.  See the `drizzlepac <https://drizzlepac.readthedocs.io/en/latest/>`_ documentation.
 
 	grism
 	    A transmissive and dispersive spectral element that often has a (nearly) constant rate of dispersion.  A grism differs from a :term:`prism` by having an additional diffractive surface on one side, which results in the constant dispersion, little spatial offset between the :term:`spectral trace` and :term:`undispersed position`, and multiple spectral orders.  See also :term:`prism`.
@@ -72,7 +78,7 @@ Since many terms may be used colloquially and/or have different definitions in o
 		An image that describes which :term:`direct imaging` pixels belong each object, which effectively sets the extraction/simulation apertures and is used to initialize the :term:`dispersed region` for the sources.
 
 	sensitivity curve
-		The conversion between instrumental units (usually :math:`e^-/s`) to physical units (usually :math:`erg/s/cm^2/Å`), which is necessarily a function of wavelength.
+		The conversion between instrumental units (usually :math:`\mathrm{e}^-/\mathrm{s}`) to physical units (usually :math:`\mathrm{erg}/\mathrm{s}/\mathrm{cm}^2/\mathrm{Å}`), which is necessarily a function of wavelength.
 
 	signal-to-noise
 		An empirical estimate of the quality of the data by comparing the measurement (the signal) to its corresponding uncertainty (the noise).  This may also be referred to as S/N or quoted as a *number of sigma* (:math:`n_{sig}`).
@@ -105,4 +111,4 @@ Since many terms may be used colloquially and/or have different definitions in o
 		The complete description of the instrument layout on the sky, including the :term:`attitude` of the telescope, the relative position of the detectors, and their individual distortion models.  Also called WCS, and see also: `world-coordinate system <https://docs.astropy.org/en/stable/wcs/>`_.
 
 	zeropoint
-		The magnitude corresponding to 1 unit of flux (typically given as :math:`e^-/s`).
+		The magnitude corresponding to 1 unit of flux (typically given as :math:`\mathrm{e}^-/\mathrm{s}`).

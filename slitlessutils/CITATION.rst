@@ -8,6 +8,7 @@ Russell Ryan
 Gagandeep Anand
 Roberto Avila
 Larry Bradley
+Stefano Casertano
 Norman Grogin
 Nimish Hathi
 Hatice Karatay
@@ -16,6 +17,7 @@ Duy Nguyen
 Richard O'Steen
 Camila Pacifici
 Aidan Pidgeon
+Nor Pirzkal
 Lee Quick
 Debopam Som
 Megan Sosey

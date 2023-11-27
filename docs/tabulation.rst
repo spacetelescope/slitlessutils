@@ -5,12 +5,12 @@ Tabulation in ``slitlessutils`` (`~slitlessutils.modules.Tabulate()`)
 =====================================================================
 
 
-The most computationally expensive aspect of extracting or simulating WFSS observations comes from the forward-modeling every (relevant) pixel in the :term:`direct imaging`.  Therefore, ``slitlessutils`` only performs these calculations when requested and stores these intermediate results as a :term:`pixel-dispersion table` (PDT).  These PDTs will be written to a subdirectory :file:`tables/`, which can be
+The most computationally expensive aspect of extracting or simulating WFSS observations comes from the forward-modeling every (relevant) pixel in the :term:`direct imaging`.  Therefore, ``slitlessutils`` only performs these calculations when requested and stores these intermediate results as a :term:`pixel-dispersion table` (PDT).  These PDTs will be written to a subdirectory :file:`tables/` by default, but can be changed by setting the ``path`` keyword argument.  
 
 
 Tabulation Algorithm
 --------------------
-To tabulate all the pixel transformations for a WFSS image and create a PDT, the algorithm iterates over all combinations of detector, source, direct-image pixel, spectral order, and wavelength:
+To tabulate all the pixel transformations for a WFSS image and create a PDT, the algorithm iterates over all combinations of detector, source, direct-image pixel, spectral order, and wavelength according to:
 
 * INPUT: a WFSS file:
 	- For each detector in the WFSS file:
@@ -44,6 +44,12 @@ To tabulate all the pixel transformations for a WFSS image and create a PDT, the
 
 Given the hierarchical nature outlined in the above algorithm, the PDTs are stored as `hierarchical data-format 5 (HDF5) <https://www.hdfgroup.org/solutions/hdf5/>`_ and the can be viewed or manually edited with standard tools (e.g. `HDFView <https://www.hdfgroup.org/downloads/hdfview/>`_).
 
+Quick Primer on HDF5
+^^^^^^^^^^^^^^^^^^^^
+
+The HDF5 format is a "high-performance data management and storage suite" (`The HDF Group <https://www.hdfgroup.org/solutions/hdf5/>`_) that emulates the a file directory structure, where directories are referred to as "groups" and files are "datasets".  Each of these structures (groups or datasets) may contain some "attributes" that are effectively dictionary like keyword/value pairs that generally contain metadata.  Users who wish to inspect the precise nature/layout of any HDF5 file may find the `HDFView <https://www.hdfgroup.org/downloads/hdfview/>`_ graphical-user interface useful, which can be used to view or manually edit the HDF5 file.  The HDFGroup offers this editor for free (after registration), but it is **not required** for using ``slitlessutils``.  
+
+
 Example
 ^^^^^^^
 
@@ -69,13 +75,12 @@ This example loads :doc:`sources <sources>` and :doc:`WFSS data <wfss>`, instant
 Use Cases
 ---------
 
-The working philosophy of ``slitlessutils`` is to compute these tables *once* at the outset, and use them for all downstream analyses, as they only contain the geometry of the astrophysical scene and the instrument/detector layout.  The primary use within ``slitlessutils`` begins with aggregating the PDTs from the appropriate :term:`direct imaging` pixels and spectral order, and summing over unique triplets :math:`(x,y,l)`.  These indices are combined into a single, unique index by `np.ravel_multi_index <https://numpy.org/doc/stable/reference/generated/numpy.ravel_multi_index.html>`_ following:
+The overall philosophy of ``slitlessutils`` is to compute these tables *once* at the outset, and use them for all downstream analyses, as they only contain the geometry of the astrophysical scene and the instrument/detector layout.  The primary use within ``slitlessutils`` begins with aggregating the PDTs from the appropriate :term:`direct imaging` pixels and spectral order, and summing over unique triplets :math:`(x,y,l)`.  These indices are combined into a single, unique index by `np.ravel_multi_index <https://numpy.org/doc/stable/reference/generated/numpy.ravel_multi_index.html>`_ following:
 
 .. math::
 	i = x + n_x\,y + n_x\,n_y\,l
 
 where :math:`(n_x,n_y)` represents the dimensionality of the WFSS image.  This computation and summation is carried out by :func:`~slitlessutils.utilities.indices.decimate()`.
 
-
 .. note::
-	For users who wish to work directly with these files, then the files can be viewed or manually edited with standard/free tools, such as `HDFView <https://www.hdfgroup.org/downloads/hdfview/>`_.
+	The PDT files only contain information on the scene geometry, and the detector effects and astrophysical signals are included in later stages.  Therefore these files **only depend on the :term:`world-coordinate system`** and its calibration.
