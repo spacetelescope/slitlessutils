@@ -78,7 +78,7 @@ The :term:`damping target` predominately controls how the spectra behave near th
 
 
 .. _dampingtarget:
-.. figure:: images/target.pdf
+.. figure:: images/target.png
    :align: center
    :alt: Effect of damping target.
 
@@ -140,7 +140,7 @@ As discussed above, the regularized least-squares introduces a tunable parameter
 
 
 .. _lcurveexample:
-.. figure:: images/starfield_multi_lcv.pdf
+.. figure:: images/starfield_multi_lcv.png
    :align: center
    :alt: Example regularization plot.
 

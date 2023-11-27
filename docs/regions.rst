@@ -30,7 +30,7 @@ The resulting regions will have their title as the segmentation ID and the spect
 
 
 .. _tab20:
-.. figure:: images/ordercolors.pdf
+.. figure:: images/ordercolors.png
 	:align: center
 	:alt: Spectral order colors
 
