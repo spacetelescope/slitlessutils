@@ -92,6 +92,7 @@ Rules for Ascribing the ``Throughput``
 The ``throughput`` variable described in the above table is needed to normalize the SEDs to match the aperture photometry derived from the direct image, therefore it is **essential that this curve overlap with the spectral element**.  Additionally, the ``throughput`` variable can take many different types, which affect how the object will be loaded:
 
 If the ``throughput`` is a:
+
 	* ``slitlessutils.core.photometry.Throughput``: return that;
 	* ``str``: assume this is the full path to the throughput file, so load that;
 	* any other type:
