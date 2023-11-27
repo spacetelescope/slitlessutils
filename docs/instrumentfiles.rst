@@ -23,8 +23,8 @@ Instrument-Wide Settings
      - The units of the images to be written.
    * - File suffix
      - ``flt`` or ``flc``
-     - | The file suffix in the HST parlance for without and with the CTE 
-       | corrections.
+     - | The file suffix in the HST parlance denoting files without and 
+       | with the CTE corrections, respectively.
    * - Path
      - ``str``
      - | The relative path from the ``yaml`` file where the files for this
