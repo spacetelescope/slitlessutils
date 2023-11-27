@@ -1,6 +1,4 @@
 .. _wfss:
-.. sectionauthor:: Russell Ryan <rryan@stsci.edu>
-.. codeauthor:: Russell Ryan <rryan@stsci.edu>
 
 Wide-Field Slitless Spectroscopy
 ================================
