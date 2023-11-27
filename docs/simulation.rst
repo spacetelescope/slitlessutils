@@ -34,7 +34,7 @@ The current implementation will *only* simulate the signal from the sources, but
       where :math:`I_{x_d,y_d}` is the direct-image brightness, :math:`\mathbb{S}_i` is the collection of direct-imaging pixels associated with this source (see :doc:`source description <sources>`), and :math:`\delta\lambda` is the tabulation bandwidth.
 
       * :term:`decimate<decimation>` the list of PDTs over the wavelength index (:math:`l`)
-      * sum this decimated list into to noiseless science image:
+      * sum this decimated list into the noiseless science image:
 
       .. math::
 
