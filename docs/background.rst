@@ -72,7 +72,7 @@ The `slitlessutils` algorithm for masking objects is:
 
    for iteration :math:`k`.
 
-As a consequence of this iterative approach is the optimized scaling parameter :math:`\alpha^{(k)}`, which is used to produce the final sky-subtracted WFSS image:
+A consequence of this iterative approach is the optimized scaling parameter :math:`\alpha^{(k)}`, which is used to produce the final sky-subtracted WFSS image:
 
 .. math::
    S'_{x,y} = S_{x,y} - \alpha^{(k)} B_{x,y}
