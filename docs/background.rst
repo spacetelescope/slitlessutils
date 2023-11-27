@@ -37,7 +37,7 @@ For a Gaussian likelihood function, the pixel weight are given as the inverse of
       \begin{array}{ll}
          0 & \quad \mathrm{if sky}\\
          1 & \quad \mathrm{if source}
-      \end{array}
+      \end{array}\right.
 
 but is initialized to all sky pixels (ie. :math:`\Theta_{x,y}=0`).  Now the final weights are:
 

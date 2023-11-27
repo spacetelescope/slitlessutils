@@ -32,13 +32,14 @@ The single-orient extraction is essentially the optimal spectroscopy algorithm p
 			#. divide each :math:`y`-pixel in the WFSS image by their :doc:`flat-field <calib>`, :doc:`sensitivity curve <calib>`, :doc:`pixel-area map <simulation>`, ``fluxscale`` (see the :doc:`configuration object <configure>`), and the instantaneous dispersion for this average wavelength
 			#. compute the `Horne 1986 <https://ui.adsabs.harvard.edu/abs/1986PASP...98..609H/abstract>`_ optimal parameters:
 
-.. math::
+			.. math::
 
-	\begin{eqnarray}
-		f_{\lambda,i} &=& \frac{\sum\limits_{\lambda\pm\Delta\lambda}P_{x,y}S_{x,y}/U_{x,y}^2}{\sum\limits_{\lambda\pm\Delta\lambda}P_{x,y}P_{x,y}/U_{x,y}^2}\\
-		u_{\lambda,i} &=& \sqrt{\frac{\sum\limits_{\lambda\pm\Delta\lambda}P_{x,y}}{\sum\limits_{\lambda\pm\Delta\lambda}P_{x,y}P_{x,y}/U_{x,y}^2}}\\
-		c_{\lambda,i} \frac{\sum\limits_{\lambda\pm\Delta\lambda}P_{x,y}C_{x,y}/U_{x,y}^2}{\sum\limits_{\lambda\pm\Delta\lambda}P_{x,y}P_{x,y}/U_{x,y}^2}
-	\end{eqnarray}
+				\begin{eqnarray}
+					f_{\lambda,i} &=& \frac{\sum\limits_{\lambda\pm\Delta\lambda}P_{x,y}S_{x,y}/U_{x,y}^2}{\sum\limits_{\lambda\pm\Delta\lambda}P_{x,y}P_{x,y}/U_{x,y}^2}\\
+					u_{\lambda,i} &=& \sqrt{\frac{\sum\limits_{\lambda\pm\Delta\lambda}P_{x,y}}{\sum\lim_iits_{\lambda\pm\Delta\lambda}P_{x,y}P_{x,y}/U_{x,y}^2}}\\
+					c_{\lambda,i} \frac{\sum\limits_{\lambda\pm\Delta\lambda}P_{x,y}C_{x,y}/U_{x,y}^2}{\sum\limits_{\lambda\pm\Delta\lambda}P_{x,y}P_{x,y}/U_{x,y}^2}
+				\end{eqnarray}
+				
 			where :math:`f_{\lambda,i}`, :math:`u_{\lambda,i}`, and :math:`c_{\lambda,i}` are the optimal flux, uncertainty, and contamination, respectively for the :math:`i^\mathrm{th}` WFSS image.  Additionally, :math:`S_{x,y}`, :math:`U_{x,y}`, :math:`P_{x,y}`, and :math:`C_{x,y}` are the science, uncertainty, cross-dispersion profile, and contamination images (more on this below in :ref:`Contamination Model <contmodel>`), respectively.  ``Slitlessutils`` offers three choices for the cross-dispersion profile :math:`P_{x,y}`:
 				* **uniform** This does no profile weighting and instead just sums the pixels within the aperture.  This is effectively the box-extraction in `hstaxe <https://hstaxe.readthedocs.io/en/latest/>`_
 				* **forward** This uses the forward model to establish the cross dispersion weights.  
@@ -84,9 +85,9 @@ The results from the :ref:`Extraction <extsec>` module are combined into a singl
 
 	.. math::
 
-		f_{\lambda} &=& \frac{\sum f_{\lambda,i}\,w_i}{\sum w_{\lambda,i}}\\
-		u_{\lambda} &=& \frac{1}{\sqrt{\sum w_{\lambda,i}}}\\
-		c_{\lambda} &=& \frac{\sum c_{\lambda,i}\,w_{\lambda,i}}{\sum w_{\lambda,i}}
+		f_{\lambda} &=& \frac{\sum_i f_{\lambda,i}\,w_{\lambda,i}}{\sum_i w_{\lambda,i}}\\
+		u_{\lambda} &=& \frac{1}{\sqrt{\sum_i w_{\lambda,i}}}\\
+		c_{\lambda} &=& \frac{\sum_i c_{\lambda,i}\,w_{\lambda,i}}{\sum_i w_{\lambda,i}}
 
 	where :math:`f_{\lambda}`, :math:`u_{\lambda}`, and :math:`c_{\lambda}` are the averaged spectrum, uncertainty, and contamination model that ``slitlessutils`` reports for this source
 

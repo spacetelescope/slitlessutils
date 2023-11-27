@@ -26,9 +26,9 @@ The current implementation will *only* simulate the signal from the sources, but
 
       * multiply the fractional pixel :math:`a_{(x_d,y_d)\rightarrow(x,y)}` area between the direct and WFSS image (and tabulated in the PDTs), :doc:`wavelength-dependent flat-field <calib>` :math:`F_{x,y}(\lambda)`, :doc:`sensitivity curve <calib>` :math:`T(\lambda)`, :term:`pixel-area map` :math:`P_{x,y}` (:ref:`see more below <pam>`), and the source spectrum :math:`f_{x_d,y_d}(\lambda)` associated with this direct-image pixel:
 
-    .. math::
+      .. math::
 
-      s_{x,y,l} = a_{(x_d,y_d)\rightarrow(x,y)}\,\frac{I_{x_d,y_d}}{\sum\limits_{\mathbb{S}} I_{x_d,y_d}}\,F_{x,y}(\lambda)\,T(\lambda)\,f_{x_d,y_d}(\lambda)\, P_{x,y}\,\delta\lambda
+        s_{x,y,l} = a_{(x_d,y_d)\rightarrow(x,y)}\,\frac{I_{x_d,y_d}}{\sum\limits_{\mathbb{S}} I_{x_d,y_d}}\,F_{x,y}(\lambda)\,T(\lambda)\,f_{x_d,y_d}(\lambda)\, P_{x,y}\,\delta\lambda
 
       where :math:`I_{x_d,y_d}` is the direct-image brightness, :math:`\mathbb{S}` is the collection of direct-imaging pixels associated with this source (see :doc:`source description <sources>`), and :math:`\delta\lambda` is the tabulation bandwidth.
 
@@ -63,7 +63,7 @@ Now the expected total number of electrons will be :math:`E = \left(\tilde{S}_{x
 .. math::
 
   \begin{eqnarray}
-    p_{x,y} &\sim& \mathcal{P}\left(E)\\
+    p_{x,y} &\sim& \mathcal{P}\left(E\right)\\
     g_{x,y} &\sim& \mathcal{N}\left(0,R^2\right)
   \end{eqnarray}
 

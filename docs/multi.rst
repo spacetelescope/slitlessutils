@@ -82,7 +82,7 @@ The :term:`damping target` predominately controls how the spectra behave near th
    :align: center
    :alt: Effect of damping target.
 
-   Example of the role of the :term:`damping target`.  The true spectrum is shown as a solid black line (taken to be a constant of :math:`\sim0.034` erg/s/cm:math:`^2`/Å), and the extractions with no damping target (blue) and a constant equal to the broadband flux (red).  The light gray region shows the throughput curve of the G102 grism on WFC3/IR.  The solver algorithms will attempt to extrapolate the spectrum equal to the damping target, therefore the "no-damping target" case (blue) will tend to zero.  On the other hand, the damping target set to the broadband photometry (red) will tend to that value, which will produce spectra that better match the photometry.  **Note: the y-axis values are in units of :math:`10^{-17}`.**
+   Example of the role of the :term:`damping target`.  The true spectrum is shown as a solid black line (taken to be a constant of :math:`\sim0.034 \mathrm{erg}/\mathrm{s}/\mathrm{cm}^2/\mathrm{Å}`), and the extractions with no damping target (blue) and a constant equal to the broadband flux (red).  The light gray region shows the throughput curve of the G102 grism on WFC3/IR.  The solver algorithms will attempt to extrapolate the spectrum equal to the damping target, therefore the "no-damping target" case (blue) will tend to zero.  On the other hand, the damping target set to the broadband photometry (red) will tend to that value, which will produce spectra that better match the photometry.  **Note: the y-axis values are in units of :math:`10^{-17}`.**
 
 Notes on the Uncertainties
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -90,7 +90,7 @@ Notes on the Uncertainties
 Based on the above mathematical formulation, the linear-reconstruction methods will produce uncertainties as the diagonals of the matrix: 
 
 .. math::
-   u_{\varphi} = \sqrt{\left(W^\mathrm{T}W+\ell^2||W_F||^2\right)^-1}
+   u_{\varphi} = \sqrt{\left(W^\mathrm{T}W+\ell^2||W_F||^2\right)^{-1}}
 
 However, the propagation of uncertainties that accounts for only the detector/astrophysical effects should come from the diagonal elements of :math:`\sqrt{\left(W^\mathrm{T}W\right)^{-1}}` (ie. :math:`\ell=0`).  Therefore for :math:`\ell\neq0`, the uncertainties will be underestimated.  
 
@@ -132,7 +132,7 @@ Regularization Optimization
 As discussed above, the regularized least-squares introduces a tunable parameter that trades between modeling the data (ie. the :math:`\chi^2`-term) and damping the high frequency noise present in inverse problems (ie. the :math:`\xi^2`-term).  However, there have been heuristic approaches at "optimizing" the :term:`regularization parameter` :math:`\ell`, and the most common method is to consider a plot of :math:`\log\xi^2` versus :math:`\log\chi^2`, which often called the "L-curve" as it shows a characteristic sharp resembling a capital-L (see :numref:`lcurveexample`).  It is accepted that the vertex of the L is represents a good compromise, and so there are several techniques to honing in on this critical point. In broad terms, these methods all rely on some aspect of the finding the point of maximum curvature [#curvefoot]_ (lower panel of :numref:`lcurveexample`) along the parametric curve (upper panel of :numref:`lcurveexample`).  ``Slitlessutils`` offers three options for identifying this critical point:
 
 #. **Single-value:** Accept a single value of the :term:`regularization parameter`, and return the vector :math:`f_{\varphi}`.
-#. **Brute-force search:** Define a linear grid of :math:`\ell`, compute the curvature[#curvefoot]_ at all points, and return the value of :math:`f_{\varphi}` that is associated with the maximizing value of :math:`\ell`.
+#. **Brute-force search:** Define a linear grid of :math:`\ell`, compute the curvature [#curvefoot]_ at all points, and return the value of :math:`f_{\varphi}` that is associated with the maximizing value of :math:`\ell`.
 #. **Golden-ratio search:** `Cultrerra & Callegaro <https://ui.adsabs.harvard.edu/abs/2020IOPSN...1b5004C/abstract>`_ present a method based on subdividing the search space by various factors of the `golden ratio <https://en.wikipedia.org/wiki/Golden_ratio>`_ to minimize unnecessary calls to the sparse least-squares solver and use fewer steps than a brute-force approach.
 
 .. note::
@@ -144,7 +144,7 @@ As discussed above, the regularized least-squares introduces a tunable parameter
    :align: center
    :alt: Example regularization plot.
 
-   The top panel shows the standard L-curve with the scaling factor of the Frobenius norm to ensure that the :term:`regularization parameter` :math:`\ell` is dimensionless, which is encoded in the color of the plot symbols (see colorbar at the very bottom).  The lower panel shows the curvature[#curvefoot]_ as a function of the log of the (dimensionless) :term:`regularization parameter`.  The clear peak at :math:`\log\ell\sim-1.9` represents the sharp vertex in the L-curve at :math:`(\log\chi^2,\log\xi^2)\sim(2.1,3.6)`.  This point is adopted as it represents a roughly "equal" compromise between modeling the data (ie. the :\math:`\chi^2`-term) and damping high-frequency structure (ie. the :math:`\xi^2`-term).  This plot was made using the grid-based search with :math:`\Delta\log\ell=0.1`.
+   The top panel shows the standard L-curve with the scaling factor of the Frobenius norm to ensure that the :term:`regularization parameter` :math:`\ell` is dimensionless, which is encoded in the color of the plot symbols (see colorbar at the very bottom).  The lower panel shows the curvature [#curvefoot]_ as a function of the log of the (dimensionless) :term:`regularization parameter`.  The clear peak at :math:`\log\ell\sim-1.9` represents the sharp vertex in the L-curve at :math:`(\log\chi^2,\log\xi^2)\sim(2.1,3.6)`.  This point is adopted as it represents a roughly "equal" compromise between modeling the data (ie. the :\math:`\chi^2`-term) and damping high-frequency structure (ie. the :math:`\xi^2`-term).  This plot was made using the grid-based search with :math:`\Delta\log\ell=0.1`.
 
 
 

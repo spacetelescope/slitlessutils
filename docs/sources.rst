@@ -68,20 +68,26 @@ Again, the inputs are a :term:`direct image<direct imaging>` and :term:`segmenta
      - Description
    * - ``maglim``
      - ``float`` or ``int``
-     - The magnitude limit for valid sources, which must be *brighter* than this.  Default is ``np.inf``.
+     - | The magnitude limit for valid sources, 
+    	 | which must be *brighter* than this.  
+    	 | Default is ``np.inf``.
    * - ``minpix``
      - ``int``
-     - The minimum number of direct-image pixels for a source to be consider valid.  Default is 0.
+     - | The minimum number of direct-image pixels 
+     	 | for a source to be consider valid. 
+     	 | Default is 0.
    * - ``zeropoint``
      - ``float`` or ``int``
-     - The magnitude AB zeropoint for the :term:`direct image<direct imaging>`.
+     - | The magnitude AB zeropoint for the :term:`direct 
+       | image<direct imaging>`.
    * - ``throughput``
      - | ``None``, ``str``, or
        | ``slitlessutils.core.photometry.Throughput``
      - A description of the filter curve (more below).
    * - ``sedfile``
      - ``str``
-     - The filename to an multi-extension fits file that contains the SEDs (more below).
+     - | The filename to an multi-extension fits file 
+       | that contains the SEDs (more below).
 
 The keywords ``maglim`` and ``minpix`` are used to eliminate spurious sources before they are added to the collection.  The final two keyword arguments (``throughput`` and ``sedfile``) **are only used when simulating a scene** and establish the throughput curve associated with the direct image and a file that contains the SEDs to be associated with each ``DispersedRegion``, respectively.
 

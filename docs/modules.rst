@@ -21,13 +21,13 @@ It is unlikely that a user should ever need instantiate the parent `Module()` cl
     - Notes
   * - ncpu
     - ``int`` or ``None``
-    - | the number of cpu threads to use.  If set to ``None``, then the total number on 
-      | the system **minus one** will be used. Otherwise, use the integer as specified.  
-      | Default is ``None``.
+    - | the number of cpu threads to use.  If set to ``None``, then the total number 
+      | on the system **minus one** will be used. Otherwise, use the integer as 
+      | specified.  Default is ``None``.
   * - tables
     - ``str``
-    - | local path with respect to the current-working directory where the temporary 
-      | tables are stored.
+    - | local path with respect to the current-working directory where the 
+      | temporary tables are stored.
 
 
 
