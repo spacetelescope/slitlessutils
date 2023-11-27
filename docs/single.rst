@@ -24,10 +24,13 @@ The single-orient extraction is essentially the optimal spectroscopy algorithm p
 
 
 * For each WFSS image in the :doc:`WFSS Collection <wfss>`:
+	
 	* For each source in the :doc:`Source Collection <sources>`:
+	
 		#. load the PDTs for each :term:`direct imaging` pixel in the source
 		#. :term:`decimate<decimation>` the PDTs over the unique combinations of WFSS pixel and wavelength
 		#. For each unique :math:`x`-coordinate:
+			
 			- compute average wavelength (weighted by the forward-model profile) for the :math:`y`-pixels in this vertical slice
 			- divide each :math:`y`-pixel in the WFSS image by their :doc:`flat-field <calib>`, :doc:`sensitivity curve <calib>`, :doc:`pixel-area map <simulation>`, ``fluxscale`` (see the :doc:`configuration object <configure>`), and the instantaneous dispersion for this average wavelength
 			- compute the `Horne 1986 <https://ui.adsabs.harvard.edu/abs/1986PASP...98..609H/abstract>`_ optimal parameters:

@@ -58,7 +58,6 @@ Again, the inputs are a :term:`direct image<direct imaging>` and :term:`segmenta
 
 .. _sourcekwargs:
 .. list-table:: Keyword Arguments
-   :widths: 25 25 50
    :header-rows: 1
    :stub-columns: 0
    :width: 600
