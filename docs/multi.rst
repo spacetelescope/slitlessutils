@@ -74,7 +74,7 @@ with :math:`||W||_F` is the `Frobenius norm <https://en.wikipedia.org/wiki/Matri
 The Role of the Damping Target
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The :term:`damping target` predominately controls how the spectra behave near the edges of the WFSS :term:`sensitivity curve`.  The default behavior is to have no damping target, which is effectively assuming a damping of zero: :math:`f_{\varphi}^{(0)}=0`, and will tend to produce spectra that "go to zero".  This is likely unphysical and not one generally expects.  However if the damping target is set to something reasonable, such as the broadband photometry, then the linear-reconstruction algorithm will tend to that spectrum.  In :numref:`dampingtarget`, we show an example of this using a source with a flat spectrum: :math:`f_{\lambda}=0.03\times10^{-17}~\mathrm{erg}/\mathrm{s}/\mathrm{cm}^2/\mathrm{Å}`.  
+The :term:`damping target` predominately controls how the spectra behave near the edges of the WFSS :term:`sensitivity curve`.  The default behavior is to have no damping target, which is effectively assuming a damping of zero: :math:`f_{\varphi}^{(0)}=0`, and will tend to produce spectra that "go to zero".  This is likely unphysical and not what one generally expects.  However if the damping target is set to something reasonable, such as the broadband photometry, then the linear-reconstruction algorithm will tend to that spectrum.  In :numref:`dampingtarget`, we show an example of this using a source with a flat spectrum: :math:`f_{\lambda}=0.03\times10^{-17}~\mathrm{erg}/\mathrm{s}/\mathrm{cm}^2/\mathrm{Å}`.  
 
 
 .. _dampingtarget:
