@@ -80,7 +80,7 @@ Again, the inputs are a :term:`direct image<direct imaging>` and :term:`segmenta
      - A description of the filter curve (more below).
    * - ``sedfile``
      - ``str``
-     - | The filename to an multi-extension fits file 
+     - | The filename to a multi-extension fits file 
        | that contains the SEDs (more below).
 
 The keywords ``maglim`` and ``minpix`` are used to eliminate spurious sources before they are added to the collection.  The final two keyword arguments (``throughput`` and ``sedfile``) **are only used when simulating a scene** and establish the throughput curve associated with the direct image and a file that contains the SEDs to be associated with each ``DispersedRegion``, respectively.
