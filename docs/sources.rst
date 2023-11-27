@@ -68,8 +68,8 @@ Again, the inputs are a :term:`direct image<direct imaging>` and :term:`segmenta
      - Description
    * - ``maglim``
      - ``float`` or ``int``
-     - | The magnitude limit for valid sources, 
-    	 | which must be *brighter* than this.  
+     - | The magnitude limit for valid sources,
+     	 | which must be *brighter* than this.  
     	 | Default is ``np.inf``.
    * - ``minpix``
      - ``int``

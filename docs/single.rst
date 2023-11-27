@@ -28,16 +28,16 @@ The single-orient extraction is essentially the optimal spectroscopy algorithm p
 		#. load the PDTs for each :term:`direct imaging` pixel in the source
 		#. :term:`decimate<decimation>` the PDTs over the unique combinations of WFSS pixel and wavelength
 		#. For each unique :math:`x`-coordinate:
-			#. compute average wavelength (weighted by the forward-model profile) for the :math:`y`-pixels in this vertical slice
-			#. divide each :math:`y`-pixel in the WFSS image by their :doc:`flat-field <calib>`, :doc:`sensitivity curve <calib>`, :doc:`pixel-area map <simulation>`, ``fluxscale`` (see the :doc:`configuration object <configure>`), and the instantaneous dispersion for this average wavelength
-			#. compute the `Horne 1986 <https://ui.adsabs.harvard.edu/abs/1986PASP...98..609H/abstract>`_ optimal parameters:
+			- compute average wavelength (weighted by the forward-model profile) for the :math:`y`-pixels in this vertical slice
+			- divide each :math:`y`-pixel in the WFSS image by their :doc:`flat-field <calib>`, :doc:`sensitivity curve <calib>`, :doc:`pixel-area map <simulation>`, ``fluxscale`` (see the :doc:`configuration object <configure>`), and the instantaneous dispersion for this average wavelength
+			- compute the `Horne 1986 <https://ui.adsabs.harvard.edu/abs/1986PASP...98..609H/abstract>`_ optimal parameters:
 
 			.. math::
 
 				\begin{eqnarray}
-					f_{\lambda,i} &=& \frac{\sum\limits_{\lambda\pm\Delta\lambda}P_{x,y}S_{x,y}/U_{x,y}^2}{\sum\limits_{\lambda\pm\Delta\lambda}P_{x,y}P_{x,y}/U_{x,y}^2}\\
-					u_{\lambda,i} &=& \sqrt{\frac{\sum\limits_{\lambda\pm\Delta\lambda}P_{x,y}}{\sum\lim_iits_{\lambda\pm\Delta\lambda}P_{x,y}P_{x,y}/U_{x,y}^2}}\\
-					c_{\lambda,i} \frac{\sum\limits_{\lambda\pm\Delta\lambda}P_{x,y}C_{x,y}/U_{x,y}^2}{\sum\limits_{\lambda\pm\Delta\lambda}P_{x,y}P_{x,y}/U_{x,y}^2}
+					f_{\lambda,i} &=& \frac{\sum_y P_{x,y}S_{x,y}/U_{x,y}^2}{\sum_y P_{x,y}P_{x,y}/U_{x,y}^2}\\
+					u_{\lambda,i} &=& \sqrt{\frac{\sum_y P_{x,y}}{\sum_y P_{x,y}P_{x,y}/U_{x,y}^2}}\\
+					c_{\lambda,i} &=& \frac{\sum_y P_{x,y}C_{x,y}/U_{x,y}^2}{\sum_y P_{x,y}P_{x,y}/U_{x,y}^2}
 				\end{eqnarray}
 				
 			where :math:`f_{\lambda,i}`, :math:`u_{\lambda,i}`, and :math:`c_{\lambda,i}` are the optimal flux, uncertainty, and contamination, respectively for the :math:`i^\mathrm{th}` WFSS image.  Additionally, :math:`S_{x,y}`, :math:`U_{x,y}`, :math:`P_{x,y}`, and :math:`C_{x,y}` are the science, uncertainty, cross-dispersion profile, and contamination images (more on this below in :ref:`Contamination Model <contmodel>`), respectively.  ``Slitlessutils`` offers three choices for the cross-dispersion profile :math:`P_{x,y}`:
@@ -46,7 +46,8 @@ The single-orient extraction is essentially the optimal spectroscopy algorithm p
 				* **data** This uses the science image, masked for the :term:`DQA <data-quality array>` as the weights.  This is effectively the `Horne 1986 <https://ui.adsabs.harvard.edu/abs/1986PASP...98..609H/abstract>`_ algorithm.
 			
 			these can be selected by the keyword argument: ``profile``.  The default behavior is ``profile='data'``.
-			#. record these values in a temporary data structure used to combine the spectra from different WFSS images
+			
+			- record these values in a temporary data structure used to combine the spectra from different WFSS images
 
 
 This produces a single spectrum for each source for each WFSS image, and these spectra are combined in the next section.  The two key differences between this and the `Horne 1986 <https://ui.adsabs.harvard.edu/abs/1986PASP...98..609H/abstract>`_ algorithm are (1) there is no iterative reassessment of either the profile (:math:`P_{x,y}`), the cosmic ray mask, or the pixel variances; and (2) the science image is not smoothed in the dispersion direction.
