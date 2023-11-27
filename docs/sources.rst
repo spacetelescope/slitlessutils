@@ -97,9 +97,11 @@ Rules for Ascribing the ``Throughput``
 The ``throughput`` variable described in the above table is needed to normalize the SEDs to match the aperture photometry derived from the direct image, therefore it is **essential that this curve overlap with the spectral element**.  Additionally, the ``throughput`` variable can take many different types, which affect how the object will be loaded:
 
 If the ``throughput`` is a:
+
 	* ``slitlessutils.core.photometry.Throughput``: return that;
 	* ``str``: assume this is the full path to the throughput file, so load that;
 	* any other type:
+	
 		* if ``FILTFILE`` is in the header, load that;
 		* if keywords ``TELESCOP``, ``INSTRUME``, and ``FILTER`` exist and indicate a valid throughput file in the :file:`$HOME/.slitlessutils/<VERSION>/bandpasses/` directory, which contains several common bandpasses used with the WFC3 and ACS instruments.  These files are also fits files and have the name: ``<TELESCOP>_<INSTURME>_<FILTER>.fits``.  These files can also contain the zeropoint, based on the header keyword ``ZERO``.  Users can obtain any throughput for HST instruments using `synphot <https://synphot.readthedocs.io/en/latest/>`_, but should inspect the packaged files to understand the necessary formatting of the file.
 
