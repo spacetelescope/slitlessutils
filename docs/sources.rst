@@ -67,18 +67,13 @@ Again, the inputs are a :term:`direct image<direct imaging>` and :term:`segmenta
      - Description
    * - ``maglim``
      - ``float`` or ``int``
-     - | The magnitude limit for valid sources,
-     	 | which must be *brighter* than this.  
-    	 | Default is ``np.inf``.
+     - | The magnitude limit for valid sources, which must be *brighter* than this. Default is ``np.inf``.
    * - ``minpix``
      - ``int``
-     - | The minimum number of direct-image pixels 
-     	 | for a source to be consider valid. 
-     	 | Default is 0.
+     - | The minimum number of direct-image pixels for a source to be consider valid. Default is 0.
    * - ``zeropoint``
      - ``float`` or ``int``
-     - | The magnitude AB zeropoint for the 
-       | :term:`direct image<direct imaging>`.
+     - | The magnitude AB zeropoint for the :term:`direct image<direct imaging>`.
    * - ``throughput``
      - | ``None``, ``str``, or
        | ``slitlessutils.core.photometry.Throughput``

@@ -82,7 +82,7 @@ The :term:`damping target` predominately controls how the spectra behave near th
    :align: center
    :alt: Effect of damping target.
 
-   Example of the role of the :term:`damping target`.  The true spectrum is shown as a solid black line (taken to be a constant of :math:`\sim0.034 \mathrm{erg}/\mathrm{s}/\mathrm{cm}^2/\mathrm{Å}`), and the extractions with no damping target (blue) and a constant equal to the broadband flux (red).  The light gray region shows the throughput curve of the G102 grism on WFC3/IR.  The solver algorithms will attempt to extrapolate the spectrum equal to the damping target, therefore the "no-damping target" case (blue) will tend to zero.  On the other hand, the damping target set to the broadband photometry (red) will tend to that value, which will produce spectra that better match the photometry.  **Note: the y-axis values are in units of :math:`10^{-17}`.**
+   Example of the role of the :term:`damping target`.  The true spectrum is shown as a solid black line (taken to be a constant of :math:`\sim0.034 \mathrm{erg}/\mathrm{s}/\mathrm{cm}^2/\mathrm{Å}`), and the extractions with no damping target (blue) and a constant equal to the broadband flux (red).  The light gray region shows the throughput curve of the G102 grism on WFC3/IR.  The solver algorithms will attempt to extrapolate the spectrum equal to the damping target, therefore the "no-damping target" case (blue) will tend to zero.  On the other hand, the damping target set to the broadband photometry (red) will tend to that value, which will produce spectra that better match the photometry.  **Note:** the y-axis values are in units of :math:`10^{-17}`.
 
 Notes on the Uncertainties
 ^^^^^^^^^^^^^^^^^^^^^^^^^^

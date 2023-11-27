@@ -11,7 +11,7 @@ Methodology
 The current implementation will *only* simulate the signal from the sources, but includes the Poisson noise from the source(s), sky background, and dark current and Gaussian noise from the read noise.  To create a noiseless WFSS image:
 
 
-#. Load :doc:`WFSS data<wfss>` and :doc`spectral sources<sources>` as ``WFSSCollection()`` and ``SourceCollection()``, respectively.
+#. Load :doc:`WFSS data<wfss>` and :doc:`spectral sources<sources>` as ``WFSSCollection()`` and ``SourceCollection()``, respectively.
 #. Tabulate each WFSS image with the :doc:`tabulation module <tabulation>`
 #. For each WFSS image:
 
@@ -19,6 +19,7 @@ The current implementation will *only* simulate the signal from the sources, but
   b. For each detector in the WFSS file:  
     
     * For each source in the source collection:
+      
       * For each :term:`direct imaging` pixel :math:`(x_d,y_d)` in the source:
     
         * load the PDT from the :class:`~slitlessutils.tables.PDTFile()`
@@ -28,9 +29,9 @@ The current implementation will *only* simulate the signal from the sources, but
 
       .. math::
 
-        s_{x,y,l} = a_{(x_d,y_d)\rightarrow(x,y)}\,\frac{I_{x_d,y_d}}{\sum\limits_{\mathbb{S}} I_{x_d,y_d}}\,F_{x,y}(\lambda)\,T(\lambda)\,f_{x_d,y_d}(\lambda)\, P_{x,y}\,\delta\lambda
+        s_{x,y,l} = a_{(x_d,y_d)\rightarrow(x,y)}\,\frac{I_{x_d,y_d}}{\sum\limits_{\mathbb{S}_i} I_{x_d,y_d}}\,F_{x,y}(\lambda)\,T(\lambda)\,f_{x_d,y_d}(\lambda)\, P_{x,y}\,\delta\lambda
 
-      where :math:`I_{x_d,y_d}` is the direct-image brightness, :math:`\mathbb{S}` is the collection of direct-imaging pixels associated with this source (see :doc:`source description <sources>`), and :math:`\delta\lambda` is the tabulation bandwidth.
+      where :math:`I_{x_d,y_d}` is the direct-image brightness, :math:`\mathbb{S}_i` is the collection of direct-imaging pixels associated with this source (see :doc:`source description <sources>`), and :math:`\delta\lambda` is the tabulation bandwidth.
 
       * :term:`decimate<decimation>` the list of PDTs over the wavelength index (:math:`l`)
       * sum this decimated list into to noiseless science image:
@@ -58,7 +59,7 @@ To add noise to this noiseless image, ``slitlessutils`` requires two additional 
      - The exposure time
 
 
-Now the expected total number of electrons will be :math:`E = \left(\tilde{S}_{x,y}+B+D\right)\,t`, which is used to draw random Poisson and normal deviates for each pixel:
+Now the expected total number of electrons will be :math:`E = \left(\tilde{S}_{x,y}+B+D\right)\times t`, which is used to draw random Poisson and normal deviates for each pixel:
 
 .. math::
 
