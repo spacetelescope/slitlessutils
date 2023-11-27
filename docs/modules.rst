@@ -26,7 +26,7 @@ It is unlikely that a user should ever need instantiate the parent `Module()` cl
       | specified.  Default is ``None``.
   * - tables
     - ``str``
-    - | local path with respect to the current-working directory where the 
+    - | local path with respect to the current working directory where the 
       | temporary tables are stored.
 
 
