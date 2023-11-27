@@ -5,7 +5,7 @@ Tabulation in ``slitlessutils`` (`~slitlessutils.modules.Tabulate()`)
 =====================================================================
 
 
-The most computationally expensive aspect of extracting or simulating WFSS observations comes from the forward-modeling every (relevant) pixel in the :term:`direct imaging`.  Therefore, ``slitlessutils`` only performs these calculations when requested and stores these intermediate results as a :term:`pixel-dispersion table` (PDT).  These PDTs will be written to a subdirectory :file:`tables/` by default, but can be changed by setting the ``path`` keyword argument.  
+The most computationally expensive aspect of extracting or simulating WFSS observations comes from the forward-modeling every (relevant) pixel in the :term:`direct imaging`.  Therefore, ``slitlessutils`` only performs these calculations when requested and stores these intermediate results as a :term:`pixel-dispersion table` (PDT).  These PDTs will be written to a subdirectory :file:`tables/` by default, but this can be changed by setting the ``path`` keyword argument.  
 
 
 Tabulation Algorithm
