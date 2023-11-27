@@ -13,16 +13,22 @@ Tabulation Algorithm
 To tabulate all the pixel transformations for a WFSS image and create a PDT, the algorithm iterates over all combinations of detector, source, direct-image pixel, spectral order, and wavelength according to:
 
 * INPUT: a WFSS file:
+	
 	- For each detector in the WFSS file:
+	
 		> For each source in the source collection:
+	
 			+ For each :term:`direct imaging` pixel :math:`(x_d,y_d)` in the source:
+	
 				#. convert the direct imaging pixel to the :term:`undispersed position` :math:`(x_0,y_0)` using the WCS information for both images
 				#. For each spectral order:
+	
 					* For each tabulation wavelength (see Note below):
 						a. convert wavelength into parameter :math:`t` using the inverse of the dispersion relation
 						b. evaluate the trace at the parameter :math:`t`
 						c. compute fractional pixel area (see :numref:`animatedpixel` below)
 						d. record an entry in the PDT as :math:`(x, y, l, a)`, where :math:`a` is the fractional pixel area that the :term:`direct imaging` pixel :math:`(x_d,y_d)` projects onto the WFSS image pixel :math:`(x,y)` at the wavelength index (see Note below)
+
 * OUTPUT: a PDT written to disk.
 
 .. note:: **The tabulation wavelengths:**

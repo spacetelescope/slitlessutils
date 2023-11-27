@@ -84,6 +84,7 @@ Exposure Combination
 The results from the :ref:`Extraction <extsec>` module are combined into a single one-dimensional spectrum for each source.
 
 * For each source in the :doc:`Source Collection <sources>`:
+
 	* bin the wavelengths according to the extraction wavelengths
 	* initialize the weights as the inverse of the square of the uncertainties: :math:`w=1/u^2`.
 	* Compute the number of non-zero weights for each wavelength :math:`n_{\lambda}`, and the weighted moments of the photometric data:
@@ -106,4 +107,4 @@ The results from the :ref:`Extraction <extsec>` module are combined into a singl
 Example
 -------
 
-See :file:`slitlessutils.examples.starfield` for a working example
+See :file:`slitlessutils.examples.starfield` for a working example.
