@@ -107,7 +107,10 @@ Notes on the Photometric Zeropoint
 
 The AB magnitude zeropoint is needed for two reasons:
 
-*. ``slitlessutils`` measures the aperture magnitude with a simple, local background subtraction, which allows the user to reject sources that are too faint; and/or 
+*. ``slitlessutils`` measures the aperture magnitude with a simple, 
+
+local background subtraction, which allows the user to reject sources that are too faint; and/or
+
 *. when simulating, the source spectra are normalized to match these aperture magnitudes.
 
 

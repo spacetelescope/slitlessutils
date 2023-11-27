@@ -26,7 +26,7 @@ The single-orient extraction is essentially the optimal spectroscopy algorithm p
 * For each WFSS image in the :doc:`WFSS Collection <wfss>`:
 	* For each source in the :doc:`Source Collection <sources>`:
 		#. load the PDTs for each :term:`direct imaging` pixel in the source
-		#. :term:`decimate` the PDTs over the unique combinations of WFSS pixel and wavelength
+		#. :term:`decimate<decimation>` the PDTs over the unique combinations of WFSS pixel and wavelength
 		#. For each unique :math:`x`-coordinate:
 			#. compute average wavelength (weighted by the forward-model profile) for the :math:`y`-pixels in this vertical slice
 			#. divide each :math:`y`-pixel in the WFSS image by their :doc:`flat-field <calib>`, :doc:`sensitivity curve <calib>`, :doc:`pixel-area map <simulation>`, ``fluxscale`` (see the :doc:`configuration object <configure>`), and the instantaneous dispersion for this average wavelength
@@ -67,7 +67,7 @@ The :term:`contamination model` is initialized by converting the spectral traces
 	The contamination will be computed if-and-only-if the ``mskorders`` keyword is set.  This can be either a single string for the orders to mask, the string ``'all'`` to mask all orders, or ``None`` to mask no orders.  The default behavior is ``mskorders='all'``.  
 
 .. note::
-	The class setting :code:`savecont=True` to the ``Single()`` module will save the two-dimensional contamination models as a multi-extension fits file to disk, where each extension will refer to a different :term:`segmentation ID <seg ID>`.
+	The class setting :code:`savecont=True` to the ``Single()`` module will save the two-dimensional contamination models as a multi-extension fits file to disk, where each extension will refer to a different :term:`segmentation ID <source ID>`.
 
 
 .. _expcombo:

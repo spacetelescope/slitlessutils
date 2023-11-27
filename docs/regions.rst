@@ -12,7 +12,7 @@ To determine the outline of a spectral source in a WFSS image, one should load t
 		* For every source:
 			* For every spectral order in question:
 				#. load the PDTs for all of the :term:`direct imaging` pixels associated with the source
-				#. :term:`decimate` over wavelength
+				#. :term:`decimate<decimation>` over wavelength
 				#. make temporary mask with 1 for any pixel present in the decimated PDT
 				#. apply a *binary closing* morphological operator from `skimage.ndimage <https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.binary_closing.html>`_ with a square kernel, whose size is set in the :class:`slitlessutils.modules.Region()` object
 				#. find the contours for a highly-connected binary image using `scikit-image <https://scikit-image.org/docs/stable/api/skimage.measure.html#skimage.measure.find_contours>`_ as a closed polygon
