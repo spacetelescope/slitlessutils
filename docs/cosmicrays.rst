@@ -51,7 +51,7 @@ and for :math:`h=1`, this expression is concisely given as a simple image convol
     0 & -1 & -2 & -1 &  0 \\
     0 &  0 & -1 &  0 &  0 \end{array}\right)
 
-where :math:`K_{3a}` is the kernel for the above approximation[#f1]_.  After convolving the image with the Laplacian kernel, pixels that deviate more than :math:`n` times above their respective uncertainties (:math:`U`) are considered as candidate CR pixels:
+where :math:`K_{3a}` is the kernel for the above approximation [#f1]_.  After convolving the image with the Laplacian kernel, pixels that deviate more than :math:`n` times above their respective uncertainties (:math:`U`) are considered as candidate CR pixels:
 
 .. math::
    \left|\nabla^2 S\right| \geq n\, U
