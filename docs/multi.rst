@@ -74,7 +74,7 @@ with :math:`||W||_F` is the `Frobenius norm <https://en.wikipedia.org/wiki/Matri
 The Role of the Damping Target
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The :term:`damping target` predominately controls how the spectra behave near the edges of the WFSS :term:`sensitivity curve`.  The default behavior is to have no damping target, which is effectively assuming a damping of zero: :math:`f_{\varphi}^{(0)}=0`, and will tend to produce spectra that "go to zero".  This is likely unphysical and not what one generally expects.  However if the damping target is set to something reasonable, such as the broadband photometry, then the linear-reconstruction algorithm will tend to that spectrum.  In :numref:`dampingtarget`, we show an example of this using a source with a flat spectrum: :math:`f_{\lambda}=0.03\times10^{-17}~\mathrm{erg}/\mathrm{s}/\mathrm{cm}^2/\mathrm{Å}`.  
+The :term:`damping target` predominately controls how the spectra behave near the edges of the WFSS :term:`sensitivity curve`.  The default behavior is to damp to the broadband photometry, which will lead to spectra that tend to the photometry.  In :numref:`dampingtarget`, we show an example of this using a source with a flat spectrum: :math:`f_{\lambda}\sim6.1\times10^{-17}~\mathrm{erg}/\mathrm{s}/\mathrm{cm}^2/\mathrm{Å}` as a dotted black line.  
 
 
 .. _dampingtarget:
@@ -82,7 +82,11 @@ The :term:`damping target` predominately controls how the spectra behave near th
    :align: center
    :alt: Effect of damping target.
 
-   Example of the role of the :term:`damping target`.  The true spectrum is shown as a solid black line (taken to be a constant of :math:`\sim0.034 \mathrm{erg}/\mathrm{s}/\mathrm{cm}^2/\mathrm{Å}`), and the extractions with no damping target (blue) and a constant equal to the broadband flux (red).  The light gray region shows the throughput curve of the G102 grism on WFC3/IR.  The solver algorithms will attempt to extrapolate the spectrum equal to the damping target, therefore the "no-damping target" case (blue) will tend to zero.  On the other hand, the damping target set to the broadband photometry (red) will tend to that value, which will produce spectra that better match the photometry.  **Note:** the y-axis values are in units of :math:`10^{-17}`.
+   Example of the role of the :term:`damping target`.  The true spectrum is shown as a dotted black line (taken to be a constant of :math:`\sim6.1\times10^{-17} \mathrm{erg}/\mathrm{s}/\mathrm{cm}^2/\mathrm{Å}` or :math:`m_{\mathrm{AB}}=18` mag), and the extractions with no damping target (blue) and a constant equal to the broadband flux (orange).  The light gray region shows the throughput curve of the G102 grism on WFC3/IR.  The solver algorithm will attempt to extrapolate the spectrum equal to the damping target, therefore the "no-damping target" case (blue) will tend to zero.  On the other hand, the damping target set to the broadband photometry (orange) will tend to that value, which will produce spectra that better match the photometry.
+
+.. note::
+   The damping target can be changed by :func:`slitlessutils.core.modules.extract.multi.Matrix.set_damping_target()`, and future versions will improve this functionality.
+
 
 Notes on the Uncertainties
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
