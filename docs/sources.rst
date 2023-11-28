@@ -8,7 +8,7 @@ Spectroscopic Sources
 Source (`~slitlessutils.sources.Source()`)
 ------------------------------------------
 
-A :term:`source` is defined as a single region on the sky that will be considered for processing by the :doc:`modules <modules>`.  A source can only be instantiated from two-dimensional images that describe the :term:`direct image<direct imaging>` and :term:`segmentation map`.  The segmentation map describes the direct-image pixels that belong to the source, and so in the most basic terms, a source is the set of direct-image pixels:
+A :term:`source` is defined as a single region on the sky that will be considered for processing by the :doc:`modules <modules>`.  A source is only instantiated from two-dimensional images that represent  the :term:`direct image<direct imaging>` and :term:`segmentation map` (see :numref:`segmapexample` below).  The segmentation map describes the direct-image pixels that belong to the source, and so in the most basic terms, a source is the set of direct-image pixels:
 
 .. math::
 	\mathbb{S} = \left\{(x_1, y_1), (x_2,y_2), (x_3, y_3), ..., (x_n, y_n)\right\}
@@ -22,14 +22,6 @@ In addition to the metadata mentioned above, a source also describes the spectru
 
 Since a source may contain multiple dispersed regions, the :func:`slitlessutils.core.sources.Source()` inherits from ``list``, which iterates over the dispersed regions.
 
-
-Dispersed Region (`~slitlessutils.sources.DispersedRegion()`)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-As stated above, a :term:`dispersed region` is defined as the unique subset of direct-image pixels that have the same spectrum, which is stored as an ``slitlessutils.core.photometry.SED`` object.  Importantly, the ``SED`` object contains the usual data one expects for a spectrum (e.g. wavelength, flux, uncertainty, etc.), the ``DispersedRegion`` object must contain additional metadata, including the direct-image pixels, the :term:`source ID`, and the :term:`region ID`.  By construction, every source has a unique :term:`source ID`: ``segid``, but each of its constituent ``DispersedRegion``\s will be assigned a :term:`region ID`: ``regid``.  However, the ``regid`` always counts from 0 for each source, therefore the tuple ``(segid, regid)`` uniquely specifies an :term:`sed ID`.
-
-
-
 .. _segmapexample:
 .. figure:: images/animate_segmap.gif
 	:align: center
@@ -39,11 +31,18 @@ As stated above, a :term:`dispersed region` is defined as the unique subset of d
 
 
 
+Dispersed Region (`~slitlessutils.sources.DispersedRegion()`)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+As stated above, a :term:`dispersed region` is defined as the unique subset of direct-image pixels that have the same spectrum, which is stored as an ``slitlessutils.core.photometry.SED`` object.  Importantly, the ``SED`` object contains the usual data one expects for a spectrum (e.g. wavelength, flux, uncertainty, etc.) and the ``DispersedRegion`` object must contain additional metadata, including the direct-image pixels, the :term:`source ID`, and the :term:`region ID`.  By construction, every source has a unique :term:`source ID`: ``segid``, but each of its constituent ``DispersedRegion``\s will be assigned a :term:`region ID`: ``regid``.  However, the ``regid`` always counts from 0 for each source, therefore the tuple ``(segid, regid)`` uniquely specifies an :term:`sed ID`.
+
+
+
 
 Source Collection (`~slitlessutils.sources.SourceCollection()`)
 ---------------------------------------------------------------
 
-This is the primary data structure that users will interact with, which is meant to mimic the structure of the ``WFSSCollection`` (see the :doc:`spectroscopy page <wfss>`), that inherits from ``dict`` where the keys will be the :term:`source ID` and the values will be instances of the ``Source``.  In typical usage, one will instantiate a single ``SourceCollection``, which will be passed to any of the :doc:`computational modules <modules>`.
+This is the primary data structure that users will interact with, which is meant to mimic the structure of the ``WFSSCollection`` (see the :doc:`spectroscopy documentation<wfss>`), that inherits from ``dict`` where the keys will be the :term:`source ID` and the values will be instances of the ``Source``.  In typical usage, one will instantiate a single ``SourceCollection``, which will be passed to any of the :doc:`computational modules <modules>`.
 
 These definitions establish a *hierarchy*, where a ``SourceCollection`` (likely) contains many ``Source``\s that (potentially) contain many ``DispersedRegion``\s that (typically) contain many spectral elements (ie. wavelengths, fluxes, and uncertainties).  This hierarchy is shown schematically in :numref:`hierarchy`, with the any :term:`compound source` highlighted in gray.
 
@@ -55,11 +54,10 @@ These definitions establish a *hierarchy*, where a ``SourceCollection`` (likely)
 	Schematic representation of the source/spectra hierarchy with the primary inputs (segmentation map and direct image) shown.  A ``SourceCollection`` (purple box) is the primary way to instantiate a ``Source`` (blue circles), which contain any number of ``DispersedRegion``\s (orange hexagons) that each contain one ``SED`` (red cylinder).  A :term:`compound source` is highlighted in gray.
 
 
-The primary inputs are a :term:`direct image<direct imaging>` and :term:`segmentation map`, and :numref:`segmapexample` shows an example of these data, however there are several keyword-arguments that control aspects of the source instantiation.
+Again, the inputs are a :term:`direct image<direct imaging>` and :term:`segmentation map`, and :numref:`segmapexample` shows an example of these data, however there are several keyword-arguments that control aspects of the source instantiation.
 
 .. _sourcekwargs:
 .. list-table:: Keyword Arguments
-   :widths: 25 25 50
    :header-rows: 1
    :stub-columns: 0
    :width: 600
@@ -69,22 +67,23 @@ The primary inputs are a :term:`direct image<direct imaging>` and :term:`segment
      - Description
    * - ``maglim``
      - ``float`` or ``int``
-     - The magnitude limit for valid sources, which must be *brighter* than this.  Default is ``np.inf``.
+     - | The magnitude limit for valid sources, which must be *brighter* than this. Default is ``np.inf``.
    * - ``minpix``
      - ``int``
-     - The minimum number of direct-image pixels for a source to be consider valid.  Default is 0.
+     - | The minimum number of direct-image pixels for a source to be consider valid. Default is 0.
    * - ``zeropoint``
      - ``float`` or ``int``
-     - The magnitude AB zeropoint for the :term:`direct image<direct imaging>`.
+     - | The magnitude AB zeropoint for the :term:`direct image<direct imaging>`.
    * - ``throughput``
      - | ``None``, ``str``, or
        | ``slitlessutils.core.photometry.Throughput``
      - A description of the filter curve (more below).
    * - ``sedfile``
      - ``str``
-     - The filename to an multi-extension fits file that contains the SEDs (more below).
+     - | The filename to a multi-extension fits file 
+       | that contains the SEDs (more below).
 
-The keywords ``maglim`` and ``minpix`` are used to eliminate spurious sources before they are added to the collection.  The final two keyword arguments (``throughput`` and ``sedfile``) are used when simulating a scene to establish the throughput curve associated with the direct image and a file that contains the SEDs to be associated with each ``DispersedRegion``, respectively.
+The keywords ``maglim`` and ``minpix`` are used to eliminate spurious sources before they are added to the collection.  The final two keyword arguments (``throughput`` and ``sedfile``) **are only used when simulating a scene** and establish the throughput curve associated with the direct image and a file that contains the SEDs to be associated with each ``DispersedRegion``, respectively.
 
 
 Rules for Ascribing the ``Throughput``
@@ -93,20 +92,25 @@ Rules for Ascribing the ``Throughput``
 The ``throughput`` variable described in the above table is needed to normalize the SEDs to match the aperture photometry derived from the direct image, therefore it is **essential that this curve overlap with the spectral element**.  Additionally, the ``throughput`` variable can take many different types, which affect how the object will be loaded:
 
 If the ``throughput`` is a:
+
 	* ``slitlessutils.core.photometry.Throughput``: return that;
 	* ``str``: assume this is the full path to the throughput file, so load that;
 	* any other type:
+	
 		* if ``FILTFILE`` is in the header, load that;
-		* if keywords ``TELESCOP``, ``INSTRUME``, and ``FILTER`` exist and indicate a valid throughput file in the :file:`$HOME/.slitlessutils/<VERSION>/bandpasses/` directory, which contains several common bandpasses used with the WFC3 and ACS instruments.  These files are also fits files and have the name: ``<TELESCOP>_<INSTURME>_<FILTER>.fits``.  These files can also contain the zeropoint, based on the header keyword ``ZERO``.
+		* if keywords ``TELESCOP``, ``INSTRUME``, and ``FILTER`` exist and indicate a valid throughput file in the :file:`$HOME/.slitlessutils/<VERSION>/bandpasses/` directory, which contains several common bandpasses used with the WFC3 and ACS instruments.  These files are also fits files and have the name: ``<TELESCOP>_<INSTURME>_<FILTER>.fits``.  These files can also contain the zeropoint, based on the header keyword ``ZERO``.  Users can obtain any throughput for HST instruments using `synphot <https://synphot.readthedocs.io/en/latest/>`_, but should inspect the packaged files to understand the necessary formatting of the file.
 
 
 .. note::
-	**Ascii-Formatted Throughput Curves**	If loading a user-specified, ascii-formatted throughput curve, then it is assumed to be space-delimited columns of wavelength and transmission, which are units of angstroms and dimensionless, respectively.
+	**Ascii-Formatted Throughput Curves:**	If loading a user-specified, ascii-formatted throughput curve, then it is assumed to be space-delimited columns of wavelength and transmission, which are units of angstroms and dimensionless, respectively.
 
 Notes on the Photometric Zeropoint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The AB magnitude zeropoint is needed for two reasons.  Firstly, ``slitlessutils`` measures the aperture magnitude with a simple, local background subtraction, which allows the user to reject sources that are too faint.  Secondly, when simulating, the source spectra are normalized to match these aperture magnitudes.
+The AB magnitude zeropoint is needed for two reasons:
+
+	#. ``slitlessutils`` measures the aperture magnitude with a simple, local background subtraction, which allows the user to reject sources that are too faint; and/or
+	#. when simulating, the source spectra are normalized to match these aperture magnitudes.
 
 
 Description of the ``sedfile``

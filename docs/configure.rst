@@ -8,7 +8,7 @@ Many of the functions and classes within ``slitlessutils`` expose their individu
 
 ``Slitlessutils`` Calibration Files
 -----------------------------------
-The reference files used to perform the spectral extraction and modeling with ``slitlessutils`` must be installed in a dot-directory in the user's home: :file:`{$HOME}/.slitlessutils`.  When the :class:`~slitlessutils.config.Config()` object is instantiated, it will check if this directory exists and valid reference files are populated.  If no such directory is found, then it is created; if no such reference files are found, then the most recent files will be automatically retrieved from a public box directory.  However, users can programmatically retrieve and use older versions of files:
+The reference files used to perform the spectral extraction and modeling with ``slitlessutils`` must be installed in a dot-directory in the user's home: :file:`{{$HOME}}/.slitlessutils`.  When the :class:`~slitlessutils.config.Config()` object is instantiated, it will check if this directory exists and valid reference files are populated.  If no such directory is found, then it is created; if no such reference files are found, then the most recent files will be automatically retrieved from a public box directory.  However, users can programmatically retrieve and use older versions of files:
 
 .. code-block:: python
 

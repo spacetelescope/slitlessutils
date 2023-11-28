@@ -11,7 +11,7 @@ The calibration files for ``slitlessutils`` are staged on a centralized box repo
 Spectral Specification
 ----------------------
 
-To extract or simulate WFSS data, we must specify the `Spectral Trace`_  and the `Spectral Dispersion`_, which are each given as parametric curves (as described in `Pirzkal and Ryan 2017 <https://www.stsci.edu/files/live/sites/www/files/home/hst/instrumentation/wfc3/documentation/instrument-science-reports-isrs/_documents/2017/WFC3-2017-01.pdf>`_). In brief, here a parameter: :math:`0 \leq t \leq 1` describes the :math:`(x(t), y(t),\lambda(t))`.  However, these functions can vary within the field-of-view, which is parametrized by the :term:`undispersed position` :math:`(x_0,y_0)`.
+For most operations with WFSS data, we must specify the `Spectral Trace`_  and the `Spectral Dispersion`_, which are each given as parametric curves (as described in `Pirzkal and Ryan 2017 <https://www.stsci.edu/files/live/sites/www/files/home/hst/instrumentation/wfc3/documentation/instrument-science-reports-isrs/_documents/2017/WFC3-2017-01.pdf>`_). In brief, here a parameter: :math:`0 \leq t \leq 1` describes the :math:`(x(t), y(t),\lambda(t))`.  However, these functions can vary within the field-of-view, which is parametrized by the :term:`undispersed position` :math:`(x_0,y_0)`.
 
 
 Spectral Trace
@@ -125,7 +125,7 @@ and the parameters :math:`\lambda_0, \lambda_1` are the lower and upper bounds (
 Sensitivity Curves
 ------------------
 
-The :term:`sensitivity curve` provides the conversion between detector units (usually :math:`e^-/s`) to physical units (usually :math:`erg/s/cm^2/Å`), which depends on spectral order by **NOT** on spatial extent as that is addressed by the :ref:`flat-field <flatfield>`. This can be thought of as a wavelength-dependent :term:`zeropoint` in flux units.  :numref:`senscurves` shows the sensitivity curves for several :term:`grism` and :term:`prism` modes for several HST instruments.
+The :term:`sensitivity curve` provides the conversion between detector units (usually :math:`\mathrm{e}^-/\mathrm{s}`) to physical units (usually :math:`erg/s/cm^2/Å`), which depends on spectral order by **NOT** on spatial extent as that is addressed by the :ref:`flat-field <flatfield>`. This can be thought of as a wavelength-dependent :term:`zeropoint` in flux units.  :numref:`senscurves` shows the sensitivity curves for several :term:`grism` and :term:`prism` modes for several HST instruments.
 
 .. note::
 	Although the sensitivity curves have explicit units, they are adjusted by the :doc:`configurable parameters <configure>`: ``fluxscale`` and ``fluxunits``.

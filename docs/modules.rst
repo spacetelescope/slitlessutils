@@ -8,6 +8,7 @@ Computational Modules (`~slitlessutils.modules.Module()`)
 
 It is unlikely that a user should ever need instantiate the parent `Module()` class directly, but there are a few key keyword-arguments that control the multiprocessing and temporary tables (see :doc:`Tabulating Module <tabulation>`) that one might need to pass to the parent via any of the child Modules (see :numref:`modulekeys`).
 
+
 .. _modulekeys:
 .. list-table:: Module Keyword Arguments
   :widths: 15 10 75
@@ -20,10 +21,13 @@ It is unlikely that a user should ever need instantiate the parent `Module()` cl
     - Notes
   * - ncpu
     - ``int`` or ``None``
-    - the number of cpu threads to use.  If set to ``None``, then the total number on the system **minus one** will be used. Otherwise, use the integer as specified.  Default is ``None``.
+    - | the number of cpu threads to use.  If set to ``None``, then the total number 
+      | on the system **minus one** will be used. Otherwise, use the integer as 
+      | specified.  Default is ``None``.
   * - tables
     - ``str``
-    - local path with respect to the current-working directory where the temporary tables are stored.
+    - | local path with respect to the current working directory where the 
+      | temporary tables are stored.
 
 
 
