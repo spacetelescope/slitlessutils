@@ -1,6 +1,6 @@
 # Slitlessutils
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10215187.svg)](https://doi.org/10.5281/zenodo.10215187)
+[![PyPI Version](https://img.shields.io/pypi/v/slitlessutils.svg)](https://pypi.org/project/slitlessutils/) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10215187.svg)](https://doi.org/10.5281/zenodo.10215187) [![CI Tests](https://github.com/spacetelescope/slitlessutils/actions/workflows/ci_tests.yml/badge.svg?branch=main)](https://github.com/spacetelescope/slitlessutils/actions/workflows/ci_tests.yml) [![Documentation Status](https://readthedocs.org/projects/slitlessutils/badge/?version=latest)](https://slitlessutils.readthedocs.io/en/latest/)
 
 Slitlessutils is a package for simulating and extracting wide-field slitless spectroscopy (WFSS) data, highly focused on data from the Advanced Camera for Surveys (ACS) and Wide-Field Camera 3 (WFC3) on the *Hubble Space Telescope*.
 
