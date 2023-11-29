@@ -1,5 +1,7 @@
 # Slitlessutils
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10215187.svg)](https://doi.org/10.5281/zenodo.10215187)
+
 Slitlessutils is a package for simulating and extracting wide-field slitless spectroscopy (WFSS) data, highly focused on data from the Advanced Camera for Surveys (ACS) and Wide-Field Camera 3 (WFC3) on the *Hubble Space Telescope*.
 
 
