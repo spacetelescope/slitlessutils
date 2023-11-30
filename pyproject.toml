@@ -68,7 +68,6 @@ docs = [
 requires = [
     'setuptools>=61.2',
     'setuptools-scm>=6.2',
-    'numpy>=1.22.3'
 ]
 build-backend = 'setuptools.build_meta'
 
