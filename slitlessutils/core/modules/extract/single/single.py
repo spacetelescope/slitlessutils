@@ -446,7 +446,7 @@ class Single(Module):
 
         # sort out optional inputs
         cartesian = kwargs.get('cartesian', True)
-        profile = kwargs.get('profile', 'data').lower()
+        profile = kwargs.get('profile', 'uniform').lower()
 
         # padding for the contamination models
         padx = (5, 5)

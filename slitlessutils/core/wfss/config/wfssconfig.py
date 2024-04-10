@@ -42,7 +42,7 @@ class WFSSConfig(dict):
         self.ffname = None
         self.set_rotation(0.)
         self.set_shift(0., 0.)
-
+        
         # read the data
         self.data = self.read_asciifile(self.conffile)
 
@@ -88,8 +88,8 @@ class WFSSConfig(dict):
         -------
         None
         """
-        self.set_rotation(fwcpos - self.data['FWCPOS_REF'])
-
+        self.set_rotation(fwcpos - self.data['FWCPOS_REF'][0])
+                
     def set_rotation(self, theta):
         """
         Method to set a rotation in the spectral trace.
@@ -103,10 +103,10 @@ class WFSSConfig(dict):
         -------
         None
         """
-        self.theta = np.radians(theta)
-        self.cos = np.cos(theta)
-        self.sin = np.sin(theta)
-
+        self.theta = theta
+        self.cos = np.cos(np.radians(self.theta))
+        self.sin = np.sin(np.radians(self.theta))
+        
     def add_rotation(self, dtheta):
         """
         Method to update the current spectral dispersion  rotation angle
@@ -120,7 +120,7 @@ class WFSSConfig(dict):
         -------
         None
         """
-        self.set_rotation(self.theta + np.radians(dtheta))
+        self.set_rotation(self.theta + dtheta)
 
     def set_shift(self, dx, dy):
         """
@@ -249,9 +249,8 @@ class WFSSConfig(dict):
         """
 
         dx, dy = self[order].deltas(x0, y0, wav)
-
-        x = x0 + self.xshift + self.cos * dx + self.sin * dy
-        y = y0 + self.yshift - self.sin * dx + self.cos * dy
+        x = x0 + self.xshift + self.cos * dx - self.sin * dy
+        y = y0 + self.yshift + self.sin * dx + self.cos * dy
 
         return x, y
 
@@ -339,7 +338,6 @@ class WFSSConfig(dict):
                             # save the recast value
                             values.append(value)
                         if len(values) == 1:
-
                             # if there is only one value, the pop it. else
                             # convert to a np array
                             if isinstance(values[0], str):
