@@ -92,56 +92,73 @@ class Region(Module):
             hdr = detdata.headfits('science')
             ltv1 = hdr.get('LTV1', 0.)
             ltv2 = hdr.get('LTV2', 0.)
-
+            nx = hdr['NAXIS1']
+            ny = hdr['NAXIS2']
+            
             regfile = f'{data.dataset}_{detdata.name}.reg'
             outfiles.append(regfile)
             with ds9reg.DS9Regions(regfile, **kwargs) as rf:
 
                 for segid, source in sources.items():
+                    
+
                     x, y = [], []
                     for pixels in source.pixels():
                         x.append(pixels[0])
                         y.append(pixels[1])
                     x = np.asarray(x)
                     y = np.asarray(y)
-
+                    
                     xx, yy = detdata.xy2xy(x, y, source.wcs, forward=False)
-
+                    
                     for order in orders:
                         xg, yg = detdata.config.config.disperse(xx, yy, order, wav)
+                        xg = xg.flatten()
+                        yg = yg.flatten()
+                        #if any(xg>0) or any(xg<nx-1) or any(yg>0) or any(yg<ny-1):
+                        if any((0<xg) & (xg<nx-1) & (0<yg) & (yg<ny-1)):
+                            
+                            xg = xg.astype(int).flatten()
+                            yg = yg.astype(int).flatten()
 
-                        xg = xg.astype(int).flatten()
-                        yg = yg.astype(int).flatten()
+                            x0 = np.amin(xg) - pad
+                            x1 = np.amax(xg) + pad
+                            y0 = np.amin(yg) - pad
+                            y1 = np.amax(yg) + pad
 
-                        x0 = np.amin(xg) - pad
-                        x1 = np.amax(xg) + pad
-                        y0 = np.amin(yg) - pad
-                        y1 = np.amax(yg) + pad
+                            # image size
+                            dim = (y1 - y0 + 1, x1 - x0 + 1)
+                            yxg = np.ravel_multi_index((yg - y0, xg - x0), dim, order='F')
+                            yxg = indices.uniq(yxg)
+                            yg, xg = np.unravel_index(yxg, dim, order='F')
+                            xg += x0
+                            yg += y0
 
-                        # image size
-                        dim = (y1 - y0 + 1, x1 - x0 + 1)
-                        yxg = np.ravel_multi_index((yg - y0, xg - x0), dim, order='F')
-                        yxg = indices.uniq(yxg)
-                        yg, xg = np.unravel_index(yxg, dim, order='F')
-                        xg += x0
-                        yg += y0
+                            # fill it one
+                            msk = np.zeros(dim, dtype=int)
+                            msk[yg - y0 + 1, xg - x0 + 1] = 1
+                            msk = ndimage.binary_closing(msk, structure=struct)
 
-                        # fill it one
-                        msk = np.zeros(dim, dtype=int)
-                        msk[yg - y0 + 1, xg - x0 + 1] = 1
-                        msk = ndimage.binary_closing(msk, structure=struct)
 
-                        # get the contour
-                        contours = measure.find_contours(msk.astype(int), 0.1,
-                                                         fully_connected='high')
-                        # make the contours and thin
-                        xc = contours[0][::self.nthin, 1] + x0 - ltv1
-                        yc = contours[0][::self.nthin, 0] + y0 - ltv2
+                          
+                            
+                            # get the contour
+                            contours = measure.find_contours(msk.astype(int), 0.1,
+                                                             fully_connected='high')
 
-                        # create the region
-                        color = self.COLORS.get(order, 'green')
-                        reg = ds9reg.Polygon(xc, yc, color=color)
 
-                        # write to the file
-                        rf.write_region(reg)
+                            # get the color for the order
+                            color = self.COLORS.get(order, 'green')
+
+                            # make the contours and thin
+                            for contour in contours:
+                                xc = contour[::self.nthin, 1] + x0 - ltv1
+                                yc = contour[::self.nthin, 0] + y0 - ltv2
+                                
+                                # create the region
+                                reg = ds9reg.Polygon(xc, yc, color=color)
+                                
+                                # write to the file
+                                rf.write_region(reg)
+
         return tuple(outfiles)
