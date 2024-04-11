@@ -478,10 +478,10 @@ class WFSSDetector:
         """
 
         if forward:
-            #X, Y = wcs.all_world2pix(*self.wcs.all_pix2world(x, y, 0), 0)
+            # X, Y = wcs.all_world2pix(*self.wcs.all_pix2world(x, y, 0), 0)
             X, Y = wcs.wcs_world2pix(*self.wcs.wcs_pix2world(x, y, 0), 0)
         else:
-            #X, Y = self.wcs.all_world2pix(*wcs.all_pix2world(x, y, 0), 0)
+            # X, Y = self.wcs.all_world2pix(*wcs.all_pix2world(x, y, 0), 0)
             X, Y = self.wcs.wcs_world2pix(*wcs.wcs_pix2world(x, y, 0), 0)
         return X, Y
 

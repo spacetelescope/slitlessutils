@@ -94,30 +94,28 @@ class Region(Module):
             ltv2 = hdr.get('LTV2', 0.)
             nx = hdr['NAXIS1']
             ny = hdr['NAXIS2']
-            
+
             regfile = f'{data.dataset}_{detdata.name}.reg'
             outfiles.append(regfile)
             with ds9reg.DS9Regions(regfile, **kwargs) as rf:
 
                 for segid, source in sources.items():
-                    
-
                     x, y = [], []
                     for pixels in source.pixels():
                         x.append(pixels[0])
                         y.append(pixels[1])
                     x = np.asarray(x)
                     y = np.asarray(y)
-                    
+
                     xx, yy = detdata.xy2xy(x, y, source.wcs, forward=False)
-                    
+
                     for order in orders:
                         xg, yg = detdata.config.config.disperse(xx, yy, order, wav)
                         xg = xg.flatten()
                         yg = yg.flatten()
-                        #if any(xg>0) or any(xg<nx-1) or any(yg>0) or any(yg<ny-1):
-                        if any((0<xg) & (xg<nx-1) & (0<yg) & (yg<ny-1)):
-                            
+                        # if any(xg>0) or any(xg<nx-1) or any(yg>0) or any(yg<ny-1):
+                        if any((0 < xg) & (xg < nx - 1) & (0 < yg) & (yg < ny - 1)):
+
                             xg = xg.astype(int).flatten()
                             yg = yg.astype(int).flatten()
 
@@ -139,13 +137,9 @@ class Region(Module):
                             msk[yg - y0 + 1, xg - x0 + 1] = 1
                             msk = ndimage.binary_closing(msk, structure=struct)
 
-
-                          
-                            
                             # get the contour
                             contours = measure.find_contours(msk.astype(int), 0.1,
                                                              fully_connected='high')
-
 
                             # get the color for the order
                             color = self.COLORS.get(order, 'green')
@@ -154,10 +148,10 @@ class Region(Module):
                             for contour in contours:
                                 xc = contour[::self.nthin, 1] + x0 - ltv1
                                 yc = contour[::self.nthin, 0] + y0 - ltv2
-                                
+
                                 # create the region
                                 reg = ds9reg.Polygon(xc, yc, color=color)
-                                
+
                                 # write to the file
                                 rf.write_region(reg)
 

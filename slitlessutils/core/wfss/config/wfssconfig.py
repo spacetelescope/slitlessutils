@@ -42,7 +42,7 @@ class WFSSConfig(dict):
         self.ffname = None
         self.set_rotation(0.)
         self.set_shift(0., 0.)
-        
+
         # read the data
         self.data = self.read_asciifile(self.conffile)
 
@@ -89,7 +89,7 @@ class WFSSConfig(dict):
         None
         """
         self.set_rotation(fwcpos - self.data['FWCPOS_REF'][0])
-                
+
     def set_rotation(self, theta):
         """
         Method to set a rotation in the spectral trace.
@@ -106,7 +106,7 @@ class WFSSConfig(dict):
         self.theta = theta
         self.cos = np.cos(np.radians(self.theta))
         self.sin = np.sin(np.radians(self.theta))
-        
+
     def add_rotation(self, dtheta):
         """
         Method to update the current spectral dispersion  rotation angle
