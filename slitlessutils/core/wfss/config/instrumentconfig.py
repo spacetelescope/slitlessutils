@@ -561,10 +561,10 @@ class DetectorConfig:
             # truncate pixels to be in the grid (move this into pypolyclip?)
             xg = np.clip(xg - 0.5, 0, self.naxis[0] - 1)
             yg = np.clip(yg - 0.5, 0, self.naxis[1] - 1)
-            
+
             # clip against the pixel grid
             x, y, area, slices = clip_multi(xg, yg, self.naxis)
-            
+
             # make wavelength indices
             lam = np.empty_like(x, dtype=np.uint16)
             for i, s in enumerate(slices):
