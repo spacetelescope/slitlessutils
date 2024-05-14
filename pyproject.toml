@@ -38,7 +38,7 @@ dependencies = [
     'h5py==3.10',
     'drizzlepac>=3.7',
     'networkx>=2.6.3',
-    'numpy>=1.22.3',
+    'numpy>=1.22.3,<2',
     'matplotlib>=3.5.2',
     'pandas>=1.4.2',
     'psutil>=5.9.0',
