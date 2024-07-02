@@ -2,13 +2,9 @@ from astropy.io import fits
 from astropy.wcs import WCS
 from astroquery.mast import Observations
 from drizzlepac import astrodrizzle
+import numpy as np
 import pytest
 
-import matplotlib.pyplot as plt
-import numpy as np
-import os
-import glob
-import shutil
 
 import slitlessutils as su
 
@@ -41,18 +37,11 @@ def test_ACS_grism(tmp_path):
 
     # some settings for downloading
     kwargs = {'productSubGroupDescription': [SUFFIX.upper()],
-            'extension': 'fits'}
+              'extension': 'fits'}
 
     for row in obstab:
         obsid = str(row['obsid'])
-        downloads = Observations.download_products(obsid, download_dir=tmp_path, **kwargs)
-        '''
-        for local in downloads['Local Path']:
-            local = str(local)
-            f = os.path.basename(local)
-            if f.startswith(obs_ids):
-                shutil.copy2(local, '.')
-        '''
+        Observations.download_products(obsid, download_dir=tmp_path, **kwargs)
 
     # create a background subtraction object
     back = su.core.preprocess.background.Background()
@@ -69,7 +58,7 @@ def test_ACS_grism(tmp_path):
 
         # update WCS to match Gaia
         su.core.preprocess.astrometry.upgrade_wcs(imgfile, grismfile,
-                                                inplace=True)
+                                                  inplace=True)
 
     files = []
     for imgdset in DATASETS[FILTER]:
@@ -80,12 +69,12 @@ def test_ACS_grism(tmp_path):
     # mosaic data via astrodrizzle
 
     astrodrizzle.AstroDrizzle(files, output=f'{tmp_path}/{ROOT}', build=False,
-                                static=False, skysub=True, driz_separate=False,
-                                median=False, blot=False, driz_cr=False,
-                                driz_combine=True, final_wcs=True,
-                                final_rot=0., final_scale=SCALE,
-                                final_pixfrac=1.0, preserve=False,
-                                overwrite=True, final_fillval=0.0)
+                              static=False, skysub=True, driz_separate=False,
+                              median=False, blot=False, driz_cr=False,
+                              driz_combine=True, final_wcs=True,
+                              final_rot=0., final_scale=SCALE,
+                              final_pixfrac=1.0, preserve=False,
+                              overwrite=True, final_fillval=0.0)
 
     # Have to remove second extensions
     # Must use memmap=False to force close all handles and allow file overwrite
@@ -97,9 +86,9 @@ def test_ACS_grism(tmp_path):
     x, y = wcs.all_world2pix(RA, DEC, 0)
 
     xx, yy = np.meshgrid(np.arange(hdr['NAXIS1']),
-                        np.arange(hdr['NAXIS2']))
-    rr = np.hypot(xx-x, yy-y)
-    seg = rr < (RAD/SCALE)
+                         np.arange(hdr['NAXIS2']))
+    rr = np.hypot(xx - x, yy - y)
+    seg = rr < (RAD / SCALE)
 
     # add some things for SU
     hdr['TELESCOP'] = TELESCOPE
@@ -107,17 +96,17 @@ def test_ACS_grism(tmp_path):
     hdr['FILTER'] = FILTER
 
     # write the files to disk
-    fits.writeto(f'{tmp_path}/{ROOT}_{DRZSUF}_sci.fits', img, hdr, overwrite=True)
-    fits.writeto(f'{tmp_path}/{ROOT}_{DRZSUF}_seg.fits', seg.astype(int), hdr, overwrite=True)
+    fits.writeto(f'{tmp_path} / {ROOT}_{DRZSUF}_sci.fits', img, hdr, overwrite=True)
+    fits.writeto(f'{tmp_path} / {ROOT}_{DRZSUF}_seg.fits', seg.astype(int), hdr, overwrite=True)
 
     # load data into SU
     files = [f'{tmp_path}/mastDownload/HST/{f}/{f}_{SUFFIX}.fits' for f in DATASETS[GRATING]]
     data = su.wfss.WFSSCollection.from_list(files)
 
     # load the sources into SU
-    sources = su.sources.SourceCollection(f'{tmp_path}/{ROOT}_{DRZSUF}_seg.fits',
-                                        f'{tmp_path}/{ROOT}_{DRZSUF}_sci.fits',
-                                        zeropoint=ZEROPOINT)
+    sources = su.sources.SourceCollection(f'{tmp_path} / {ROOT}_{DRZSUF}_seg.fits',
+                                          f'{tmp_path} / {ROOT}_{DRZSUF}_sci.fits',
+                                          zeropoint=ZEROPOINT)
 
     # project the sources onto the grism images
     tab = su.modules.Tabulate(ncpu=1)
@@ -130,8 +119,8 @@ def test_ACS_grism(tmp_path):
     # load the data and change the units
     cfg = su.config.Config()
     dat, hdr = fits.getdata(f'{ROOT}_x1d.fits', header=True)
-    dat['flam'] *= cfg.fluxscale/1e-13
-    dat['func'] *= cfg.fluxscale/1e-13
+    dat['flam'] *= cfg.fluxscale / 1e-13
+    dat['func'] *= cfg.fluxscale / 1e-13
 
     assert dat.shape == (119,)
     assert np.allclose(dat[1], (5620.0, 0.029815594, 0.00016166682, 0.0, 13))
