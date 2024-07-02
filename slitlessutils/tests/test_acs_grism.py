@@ -13,6 +13,7 @@ import shutil
 import slitlessutils as su
 
 
+@pytest.mark.remote_data
 def test_ACS_grism(tmp_path):
     # the observations
     TELESCOPE = 'HST'
@@ -53,8 +54,6 @@ def test_ACS_grism(tmp_path):
                 shutil.copy2(local, '.')
         '''
 
-    print(tmp_path)
-
     # create a background subtraction object
     back = su.core.preprocess.background.Background()
 
@@ -79,17 +78,18 @@ def test_ACS_grism(tmp_path):
         files.append(f"{tmp_path}/mastDownload/HST/{imgdset}/{imgfile}")
 
     # mosaic data via astrodrizzle
-    astrodrizzle.AstroDrizzle(files, output=ROOT, build=False,
+
+    astrodrizzle.AstroDrizzle(files, output=f'{tmp_path}/{ROOT}', build=False,
                                 static=False, skysub=True, driz_separate=False,
                                 median=False, blot=False, driz_cr=False,
                                 driz_combine=True, final_wcs=True,
                                 final_rot=0., final_scale=SCALE,
-                                final_pixfrac=1.0,
+                                final_pixfrac=1.0, preserve=False,
                                 overwrite=True, final_fillval=0.0)
 
     # Have to remove second extensions
     # Must use memmap=False to force close all handles and allow file overwrite
-    with fits.open(f'{tmp_path}/{ROOT}_{DRZSUF}_sci.fits', memmap=False) as hdulist:
+    with fits.open(f'test_data/{ROOT}_{DRZSUF}_sci.fits', memmap=False) as hdulist:
         img = hdulist['PRIMARY'].data
         hdr = hdulist['PRIMARY'].header
 
@@ -107,16 +107,16 @@ def test_ACS_grism(tmp_path):
     hdr['FILTER'] = FILTER
 
     # write the files to disk
-    fits.writeto(f'{ROOT}_{DRZSUF}_sci.fits', img, hdr, overwrite=True)
-    fits.writeto(f'{ROOT}_{DRZSUF}_seg.fits', seg.astype(int), hdr, overwrite=True)
+    fits.writeto(f'{tmp_path}/{ROOT}_{DRZSUF}_sci.fits', img, hdr, overwrite=True)
+    fits.writeto(f'{tmp_path}/{ROOT}_{DRZSUF}_seg.fits', seg.astype(int), hdr, overwrite=True)
 
     # load data into SU
-    files = [f'{f}_{SUFFIX}.fits' for f in DATASETS[GRATING]]
+    files = [f'{tmp_path}/mastDownload/HST/{f}/{f}_{SUFFIX}.fits' for f in DATASETS[GRATING]]
     data = su.wfss.WFSSCollection.from_list(files)
 
     # load the sources into SU
-    sources = su.sources.SourceCollection(f'{ROOT}_{DRZSUF}_seg.fits',
-                                        f'{ROOT}_{DRZSUF}_sci.fits',
+    sources = su.sources.SourceCollection(f'{tmp_path}/{ROOT}_{DRZSUF}_seg.fits',
+                                        f'{tmp_path}/{ROOT}_{DRZSUF}_sci.fits',
                                         zeropoint=ZEROPOINT)
 
     # project the sources onto the grism images
@@ -133,4 +133,6 @@ def test_ACS_grism(tmp_path):
     dat['flam'] *= cfg.fluxscale/1e-13
     dat['func'] *= cfg.fluxscale/1e-13
 
-    assert dat[1] == (5620.0, 0.029815594, 0.00016166682, 0.0, 13)
+    assert dat.shape == (119,)
+    assert np.allclose(dat[1], (5620.0, 0.029815594, 0.00016166682, 0.0, 13))
+    assert np.allclose(dat[-1], (10300.0, 0.081851676, 0.0007620386, 0.0, 4))
