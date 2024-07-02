@@ -41,6 +41,7 @@ dependencies = [
     'numpy>=1.22.3',
     'matplotlib>=3.5.2',
     'pandas>=1.4.2',
+    'photutils<1.13',
     'psutil>=5.9.0',
     'pypolyclip>=1.0.0',
     'pysiaf>=0.16.4',
