@@ -1,3 +1,4 @@
+import os
 import pytest
 from slitlessutils import config
 
@@ -5,6 +6,7 @@ cfg = config.Config()
 
 # download the latest reference files
 reffile = cfg.retrieve_reffiles(update=True)
+
 
 # Copied over from https://github.com/spacetelescope/ci_watson
 @pytest.fixture(scope='function')
