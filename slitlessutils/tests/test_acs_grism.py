@@ -10,6 +10,7 @@ import slitlessutils as su
 
 
 @pytest.mark.remote_data
+@pytest.mark.usefixtures('_jail')
 def test_ACS_grism(tmp_path):
     # the observations
     TELESCOPE = 'HST'
@@ -41,14 +42,14 @@ def test_ACS_grism(tmp_path):
 
     for row in obstab:
         obsid = str(row['obsid'])
-        Observations.download_products(obsid, download_dir=tmp_path, **kwargs)
+        Observations.download_products(obsid, **kwargs)
 
     # create a background subtraction object
     back = su.core.preprocess.background.Background()
 
     for imgdset, grismdset in zip(DATASETS[FILTER], DATASETS[GRATING]):
-        grismfile = f'{tmp_path}/mastDownload/HST/{grismdset}/{grismdset}_{SUFFIX}.fits'
-        imgfile = f'{tmp_path}/mastDownload/HST/{imgdset}/{imgdset}_{SUFFIX}.fits'
+        grismfile = f'mastDownload/HST/{grismdset}/{grismdset}_{SUFFIX}.fits'
+        imgfile = f'mastDownload/HST/{imgdset}/{imgdset}_{SUFFIX}.fits'
 
         # flag CRs by Laplace filtering
         su.core.preprocess.crrej.laplace(grismfile, inplace=True)
@@ -64,11 +65,11 @@ def test_ACS_grism(tmp_path):
     for imgdset in DATASETS[FILTER]:
         imgfile = f'{imgdset}_{SUFFIX}.fits'
         # su.core.preprocess.crrej.laplace(imgfile,inplace=True)
-        files.append(f"{tmp_path}/mastDownload/HST/{imgdset}/{imgfile}")
+        files.append(f"mastDownload/HST/{imgdset}/{imgfile}")
 
     # mosaic data via astrodrizzle
 
-    astrodrizzle.AstroDrizzle(files, output=f'{tmp_path}/{ROOT}', build=False,
+    astrodrizzle.AstroDrizzle(files, output=f'{ROOT}', build=False,
                               static=False, skysub=True, driz_separate=False,
                               median=False, blot=False, driz_cr=False,
                               driz_combine=True, final_wcs=True,
@@ -96,16 +97,16 @@ def test_ACS_grism(tmp_path):
     hdr['FILTER'] = FILTER
 
     # write the files to disk
-    fits.writeto(f'{tmp_path} / {ROOT}_{DRZSUF}_sci.fits', img, hdr, overwrite=True)
-    fits.writeto(f'{tmp_path} / {ROOT}_{DRZSUF}_seg.fits', seg.astype(int), hdr, overwrite=True)
+    fits.writeto(f'{ROOT}_{DRZSUF}_sci.fits', img, hdr, overwrite=True)
+    fits.writeto(f'{ROOT}_{DRZSUF}_seg.fits', seg.astype(int), hdr, overwrite=True)
 
     # load data into SU
-    files = [f'{tmp_path}/mastDownload/HST/{f}/{f}_{SUFFIX}.fits' for f in DATASETS[GRATING]]
+    files = [f'mastDownload/HST/{f}/{f}_{SUFFIX}.fits' for f in DATASETS[GRATING]]
     data = su.wfss.WFSSCollection.from_list(files)
 
     # load the sources into SU
-    sources = su.sources.SourceCollection(f'{tmp_path} / {ROOT}_{DRZSUF}_seg.fits',
-                                          f'{tmp_path} / {ROOT}_{DRZSUF}_sci.fits',
+    sources = su.sources.SourceCollection(f'{ROOT}_{DRZSUF}_seg.fits',
+                                          f'{ROOT}_{DRZSUF}_sci.fits',
                                           zeropoint=ZEROPOINT)
 
     # project the sources onto the grism images
