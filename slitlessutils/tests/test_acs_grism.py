@@ -79,7 +79,7 @@ def test_ACS_grism(tmp_path):
 
     # Have to remove second extensions
     # Must use memmap=False to force close all handles and allow file overwrite
-    with fits.open(f'test_data/{ROOT}_{DRZSUF}_sci.fits', memmap=False) as hdulist:
+    with fits.open(f'{ROOT}_{DRZSUF}_sci.fits', memmap=False) as hdulist:
         img = hdulist['PRIMARY'].data
         hdr = hdulist['PRIMARY'].header
 

@@ -494,7 +494,7 @@ class Config(dict):
                 relname = os.path.join(self.REFROOT, name)
                 absname = os.path.abspath(relname)
                 if absname.startswith(self.REFROOT):
-                    tarf.extract(name, path=self.REFROOT)
+                    tarf.extract(name, path=self.REFROOT, filter="tar")
 
         # delete the local file now that we're done with it
         os.remove(localfile)
