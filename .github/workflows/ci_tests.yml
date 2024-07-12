@@ -54,6 +54,10 @@ jobs:
             tox_env: 'py311-test-cov'
             allow_failure: false
             prefix: ''
+            with:
+              libraries: |
+                brew:
+                  - hdf5
 
           - os: windows-latest
             python: '3.11'
