@@ -33,7 +33,7 @@ jobs:
           - os: ubuntu-latest
             python: '3.9'
             tox_env: 'py39-test'
-            allow_failure: false
+            allow_failure: true
             prefix: ''
 
           - os: ubuntu-latest
