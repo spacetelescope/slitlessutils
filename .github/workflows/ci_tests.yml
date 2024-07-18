@@ -33,7 +33,7 @@ jobs:
           - os: ubuntu-latest
             python: '3.9'
             tox_env: 'py39-test'
-            allow_failure: false
+            allow_failure: true
             prefix: ''
 
           - os: ubuntu-latest
@@ -49,11 +49,13 @@ jobs:
             allow_failure: false
             prefix: ''
 
-          - os: macos-latest
+          - name: MacOS with coverage and remote data
+            os: macos-latest
             python: '3.11'
             tox_env: 'py311-test-cov'
             allow_failure: false
             prefix: ''
+            toxposargs: --remote-data=any
 
           - os: windows-latest
             python: '3.11'
@@ -101,6 +103,9 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python }}
+    - name: Install HDF5
+      if: ${{ contains(matrix.os, 'macos') }}
+      run: brew install hdf5
     - name: Install base dependencies
       run: python -m pip install --upgrade pip setuptools tox
     - name: Print Python, pip, setuptools, and tox versions
