@@ -126,6 +126,10 @@ class Pool:
         # get the number of CPUs to use
         ncpu = min(total, self.ncpu)
 
+        # Force to min 1
+        if ncpu == 0:
+            ncpu = 1
+
         # start multiprocessing as necessary
         if ncpu == 1:
             LOGGER.info('Serial processing')
