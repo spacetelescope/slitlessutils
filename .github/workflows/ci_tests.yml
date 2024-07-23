@@ -31,12 +31,6 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            python: '3.9'
-            tox_env: 'py39-test'
-            allow_failure: true
-            prefix: ''
-
-          - os: ubuntu-latest
             python: '3.10'
             tox_env: 'py310-test'
             allow_failure: false
