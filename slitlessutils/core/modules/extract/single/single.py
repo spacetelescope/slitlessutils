@@ -48,10 +48,10 @@ class Single(Module):
         to set this.  Default is None.
 
     outpath : str, optional
-        A path where output products will be written.  If set to None or invalid,
-        then CWD will be used.  If set to valid str, then path will be created
-        (if possible), then used.  If still not valid, then will use CWD.
-        Default is None.
+        A path where output products will be written.  If set to None or
+        invalid, then CWD will be used.  If set to valid str, then path
+        will be created (if possible), then used.  If still not valid, then
+        will use CWD.  Default is None.
 
     writecsv : bool, optional
         Flag to write light-weight boolean files.  Default is True.
@@ -275,7 +275,7 @@ class Single(Module):
             func = np.array(res['func'])
             wave = np.array(res['wave'])
             cont = np.array(res['cont'])
-            file = np.array(res['file'])
+            nimg = np.array(res['file'])
 
             # find the spectral bins that these elements belong to
             lamb = pars.indices(wave)
@@ -290,7 +290,7 @@ class Single(Module):
             cont = cont[g]        # contamination model
             wave = wave[g]        # wavelengths in A
             lamb = lamb[g]        # wavelength indices
-            file = file[g]
+            nimg = nimg[g]
 
             # get reverse elements
             ri = indices.reverse(lamb)
@@ -390,7 +390,7 @@ class Single(Module):
                 out = tuple(a[g] for a in args)
             else:
                 LOGGER.warning(f'Bitmask ({bitmask}) removes all pixels')
-                out = tuple([] for a in args)
+                out = tuple(np.empty(0, dtype=a.dtype) for a in args)
             if len(args) == 1:
                 out = out[0]
             return out
@@ -446,7 +446,11 @@ class Single(Module):
 
         # sort out optional inputs
         cartesian = kwargs.get('cartesian', True)
-        profile = kwargs.get('profile', 'uniform').lower()
+        profile = kwargs.get('profile', 'uniform')
+        if isinstance(profile, str):
+            profile = profile.lower()
+        else:
+            profile = 'none'
 
         # padding for the contamination models
         padx = (5, 5)
@@ -469,7 +473,7 @@ class Single(Module):
             for detname, detdata in data.items():
                 h5.load_detector(detname)
                 bitmask = detdata.config.bitmask
-
+                
                 # load the data
                 phdr = detdata.primaryheader()
                 sci, hdr = detdata.readfits('science', header=True)
@@ -484,7 +488,6 @@ class Single(Module):
                     time = phdr['EXPTIME']
                     sci /= time
                     unc /= time
-
                 # initialize the contamination modeling
                 self.contamination.make_model(sources, h5)
 
@@ -537,7 +540,7 @@ class Single(Module):
 
                             if cartesian:
                                 # for making the residuals
-                                # mod = np.zeros_like(sci)
+                                mod = np.zeros_like(sci)
                                 for x in range(x0, x1 + 1, 1):
                                     g = np.where(x == xg)[0]
                                     xx = xg[g]
@@ -549,75 +552,94 @@ class Single(Module):
                                     # apply the bitmask
                                     xx, yy, vv, ww, dw = self.apply_bitmask(
                                         dqa[yy, xx], xx, yy, vv, ww, dw, bitmask=bitmask)
+                                    if len(xx) > 0:
+                                        ww, _y = indices.decimate(ww * vv, yy)
+                                        vv, yy = indices.decimate(vv, yy)
+                                        ww /= vv
+                                        xx = np.full_like(yy, x, dtype=int)
+                                    
+                                        # the average wavelength in this column
+                                        wave = np.average(ww, weights=vv)
 
-                                    ww, _y = indices.decimate(ww * vv, yy)
-                                    vv, yy = indices.decimate(vv, yy)
-                                    ww /= vv
-                                    xx = np.full_like(yy, x, dtype=int)
+                                        # compute the calibrations
+                                        disp = detdata.config[ordname].dispersion(
+                                            *source.xyc, wavelength=ww)
+                                        sens = detdata.config[ordname].sensitivity(ww)
+                                        flat = flatfield(xx, yy, ww)
+                                        area = detdata.relative_pixelarea(xx, yy)
+                                        den = flat * area * sens * fluxscale * disp
+                                        
+                                        # apply calibrations, but guard against
+                                        # divide by zero errors
+                                        bad = np.where(den == 0)[0]
+                                        den[bad] = 1.
+                                        ss = sci[yy, xx] / den
+                                        uu = unc[yy, xx] / den
+                                        ss[bad] = np.nan
+                                        uu[bad] = np.nan
+                                        
+                                        # set the cross dispersion profile
+                                        if profile is None or profile == 'none':
+                                            # simple summing over pixels
+                                            flam = np.nansum(ss)
+                                            func = np.sqrt(np.nansum(uu**2))
 
-                                    # the average wavelength in this column
-                                    wave = np.average(ww, weights=vv)
-
-                                    # compute the calibrations
-                                    disp = detdata.config[ordname].dispersion(
-                                        *source.xyc, wavelength=ww)
-                                    sens = detdata.config[ordname].sensitivity(ww)
-                                    flat = flatfield(xx, yy, ww)
-                                    area = detdata.relative_pixelarea(xx, yy)
-                                    den = flat * area * sens * fluxscale * disp
-
-                                    # apply calibrations
-                                    ss = sci[yy, xx] / den
-                                    uu = unc[yy, xx] / den
-
-                                    # set the cross dispersion profile
-                                    if profile == 'uniform':
-                                        # simple summing over pixels
-                                        flam = np.sum(ss)
-                                        func = np.sqrt(np.sum(uu**2))
-                                    else:
-                                        # weighting by profile (a la Horne)
-                                        if profile == 'forward':
-                                            prof = vv.copy()
-                                        elif profile == 'data':
-                                            prof = np.maximum(sci[yy, x], 0.)
+                                            # set the profile to a dummy value
+                                            prof = 1.0
                                         else:
-                                            msg = f'Profile setting ({profile}) is invalid'
-                                            LOGGER.error(msg)
-                                            raise RuntimeError(msg)
+                                            # if using a profile
+                                            if profile == 'forward':
+                                                prof = vv.copy()
+                                            elif profile == 'data':
+                                                prof = np.maximum(sci[yy, x], 0.)
+                                            elif profile == 'uniform':
+                                                prof = np.ones_like(ss, dtype=float)
+                                            else:
+                                                msg = f'Profile setting ({profile}) is invalid'
+                                                LOGGER.error(msg)
+                                                raise RuntimeError(msg)
 
-                                        # normalize the profile
-                                        prof /= np.sum(prof)
+                                            # normalize the profile
+                                            profnorm = np.nansum(prof)
+                                            prof /= profnorm
+                                        
+                                            wht = prof / uu**2
+                                            norm = np.nansum(prof * wht)
 
-                                        wht = prof / uu**2
-                                        norm = np.sum(prof * wht)
-                                        flam = np.sum(ss * wht) / norm
-                                        func = np.sqrt(np.sum(prof) / norm)
+                                            # take out some protection from
+                                            # divide by zero
+                                            if norm == 0:
+                                                flam = np.nan
+                                                func = np.nan
+                                            else:
+                                                flam = np.nansum(ss * wht) / norm
+                                                func = np.sqrt(profnorm / norm)
+                                            
+                                        # update the model
+                                        mod[yy, x] = flam*den*prof
 
-                                    # this can happen if sens==0
-                                    if np.isnan(flam):
-                                        flam = 0.0
-
-                                    # update the model
-                                    # mod[yy, x] = flam*den*prof
-
-                                    # compute contamination
-                                    if self.contamination:
-                                        cc = chdu.data[yy - yoff, xx - xoff] / den
-                                        if profile == 'uniform':
-                                            cont = np.sum(cc)
+                                        # compute contamination
+                                        if self.contamination:
+                                            cc = chdu.data[yy - yoff, xx - xoff] / den
+                                            if profile == 'uniform':
+                                                cont = np.sum(cc)
+                                            else:
+                                                cont = np.sum(cc * wht) / norm
                                         else:
-                                            cont = np.sum(cc * wht) / norm
-                                    else:
-                                        cont = 0.0
+                                            cont = 0.0
 
-                                    # save the results
-                                    results[segid]['flam'].append(flam)
-                                    results[segid]['func'].append(func)
-                                    results[segid]['wave'].append(wave)
-                                    results[segid]['dwav'].append(0.0)
-                                    results[segid]['cont'].append(cont)
-
+                                        # save the results
+                                        results[segid]['flam'].append(flam)
+                                        results[segid]['func'].append(func)
+                                        results[segid]['wave'].append(wave)
+                                        results[segid]['dwav'].append(0.0)
+                                        results[segid]['cont'].append(cont)
+                                with open(f'{data.dataset}_{segid}.sed', 'w') as fp:
+                                    for args in zip(results[segid]['wave'], results[segid]['flam']):
+                                        print(*args, file=fp)
+                                
+                                fits.writeto(f'{data.dataset}_res.fits', (sci-mod)/unc, overwrite=True)
+                                    
                             else:
 
                                 di = 0.5
