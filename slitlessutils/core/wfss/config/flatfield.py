@@ -291,7 +291,7 @@ class PolynomialFlatField(FlatField):
     #    super().update_header(hdr)
 
 
-def load_flatfield(*args, unity=False):
+def load_flatfield(*args, **kwargs):
     """
     A factory function to load different flat field types
 
@@ -315,6 +315,9 @@ def load_flatfield(*args, unity=False):
     NotImplementedError for 2 or more inputs or non-string inputs.
 
     """
+
+    # sort out the inputs
+    unity = kwargs.get('unity', False)
 
     n = len(args)
     if n == 0 or unity:

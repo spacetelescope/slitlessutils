@@ -1,4 +1,5 @@
 import os
+import re
 import warnings
 
 import numpy as np
@@ -667,9 +668,18 @@ class WFSS(dict):
 
     @property
     def dataset(self):
+        if isinstance(self.config.suffix, (list, tuple, np.ndarray)):
+            regex = '|'.join([f'_{s}' for s in self.config.suffix])
+        else:
+            regex = '_' + self.config.suffix
+
         filename = os.path.basename(self.filename)
-        tokens = filename.split(f'_{self.config.suffix}')
-        return tokens[0]
+        tokens = re.split(regex, filename)
+        dataset = tokens[0]
+        if len(tokens) == 1:
+            LOGGER.warning('Filename does not contain suffix.')
+
+        return dataset
 
     @property
     def telescope(self):

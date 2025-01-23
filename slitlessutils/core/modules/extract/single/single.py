@@ -473,7 +473,7 @@ class Single(Module):
             for detname, detdata in data.items():
                 h5.load_detector(detname)
                 bitmask = detdata.config.bitmask
-                
+
                 # load the data
                 phdr = detdata.primaryheader()
                 sci, hdr = detdata.readfits('science', header=True)
@@ -557,7 +557,7 @@ class Single(Module):
                                         vv, yy = indices.decimate(vv, yy)
                                         ww /= vv
                                         xx = np.full_like(yy, x, dtype=int)
-                                    
+
                                         # the average wavelength in this column
                                         wave = np.average(ww, weights=vv)
 
@@ -568,7 +568,7 @@ class Single(Module):
                                         flat = flatfield(xx, yy, ww)
                                         area = detdata.relative_pixelarea(xx, yy)
                                         den = flat * area * sens * fluxscale * disp
-                                        
+
                                         # apply calibrations, but guard against
                                         # divide by zero errors
                                         bad = np.where(den == 0)[0]
@@ -577,7 +577,7 @@ class Single(Module):
                                         uu = unc[yy, xx] / den
                                         ss[bad] = np.nan
                                         uu[bad] = np.nan
-                                        
+
                                         # set the cross dispersion profile
                                         if profile is None or profile == 'none':
                                             # simple summing over pixels
@@ -602,7 +602,7 @@ class Single(Module):
                                             # normalize the profile
                                             profnorm = np.nansum(prof)
                                             prof /= profnorm
-                                        
+
                                             wht = prof / uu**2
                                             norm = np.nansum(prof * wht)
 
@@ -614,9 +614,9 @@ class Single(Module):
                                             else:
                                                 flam = np.nansum(ss * wht) / norm
                                                 func = np.sqrt(profnorm / norm)
-                                            
+
                                         # update the model
-                                        mod[yy, x] = flam*den*prof
+                                        mod[yy, x] = flam * den * prof
 
                                         # compute contamination
                                         if self.contamination:
@@ -637,9 +637,8 @@ class Single(Module):
                                 with open(f'{data.dataset}_{segid}.sed', 'w') as fp:
                                     for args in zip(results[segid]['wave'], results[segid]['flam']):
                                         print(*args, file=fp)
-                                
-                                fits.writeto(f'{data.dataset}_res.fits', (sci-mod)/unc, overwrite=True)
-                                    
+
+                                # fits.writeto(f'{data.dataset}_res.fits', (sci-mod)/unc, overwrite=True)
                             else:
 
                                 di = 0.5

@@ -4,6 +4,7 @@ import shutil
 import matplotlib.pyplot as plt
 import numpy as np
 from astropy.io import fits
+from astropy.modeling import models, fitting
 from astropy.wcs import WCS
 from astroquery.mast import Observations
 from drizzlepac import astrodrizzle
@@ -42,7 +43,7 @@ ROOT = 'WRAY-15-1736'
 # position of source
 RA = 264.1019010      # in deg
 DEC = -32.9087315     # in deg
-RAD = 0.25            # in arcsec
+RAD = 0.5             # in arcsec
 SUFFIX, DRZSUF = 'flc', 'drc'
 SCALE = 0.05          # driz image pix scale
 
@@ -91,7 +92,6 @@ def preprocess_direct():
         imgfile = f'{imgdset}_{SUFFIX}.fits'
         # su.core.preprocess.crrej.laplace(imgfile,inplace=True)
         files.append(imgfile)
-
     # mosaic data via astrodrizzle
     astrodrizzle.AstroDrizzle(files, output=ROOT, build=False,
                               static=False, skysub=True, driz_separate=False,
@@ -109,11 +109,27 @@ def preprocess_direct():
 
     wcs = WCS(hdr)
     x, y = wcs.all_world2pix(RA, DEC, 0)
+    xim, yim = np.meshgrid(np.arange(hdr['NAXIS1']),
+                           np.arange(hdr['NAXIS2']))
 
-    xx, yy = np.meshgrid(np.arange(hdr['NAXIS1']),
-                         np.arange(hdr['NAXIS2']))
-    rr = np.hypot(xx - x, yy - y)
+    sz = 10
+    xmin = int(x) - sz
+    xmax = int(x) + sz
+    ymin = int(y) - sz
+    ymax = int(y) + sz
+    pix = (slice(ymin, ymax), slice(xmin, xmax))
+
+    mod = models.Gaussian2D(x_mean=sz, y_mean=sz, amplitude=np.amax(img[pix]))
+
+    fitter = fitting.LevMarLSQFitter()
+    yy, xx = np.indices(img[pix].shape, dtype=float)
+    res = fitter(mod, xx, yy, img[pix])
+    x = res.x_mean.value + xmin
+    y = res.y_mean.value + ymin
+
+    rr = np.hypot(xim - x, yim - y)
     seg = rr < (RAD / SCALE)
+    seg = seg.astype(int)
 
     # add some things for SU
     hdr['TELESCOP'] = TELESCOPE
@@ -122,7 +138,7 @@ def preprocess_direct():
 
     # write the files to disk
     fits.writeto(f'{ROOT}_{DRZSUF}_sci.fits', img, hdr, overwrite=True)
-    fits.writeto(f'{ROOT}_{DRZSUF}_seg.fits', seg.astype(int), hdr, overwrite=True)
+    fits.writeto(f'{ROOT}_{DRZSUF}_seg.fits', seg, hdr, overwrite=True)
 
 
 def extract_single():
@@ -137,12 +153,12 @@ def extract_single():
                                           zeropoint=ZEROPOINT)
 
     # project the sources onto the grism images
-    tab = su.modules.Tabulate(ncpu=1)
+    tab = su.modules.Tabulate(ncpu=1, orders=('+1',), remake=True)
     pdtfiles = tab(data, sources)  # noqa: F841
 
     # run the single-orient extraction
-    ext = su.modules.Single('+1', mskorders=None, root=ROOT)
-    res = ext(data, sources)  # noqa: F841
+    ext = su.modules.Single('+1', mskorders=None, root=ROOT, ncpu=1)
+    res = ext(data, sources, profile='forward')  # noqa: F841
 
 
 def plot_spectra():
@@ -156,7 +172,12 @@ def plot_spectra():
     # load and smooth the Larsen spectrum
     l, f = np.loadtxt(reffile, unpack=True, usecols=(0, 1))
     f /= 1e-13
-    ff = gaussian_filter1d(f, 40)
+
+    # smooth the Larsen spectrum.  the Scale factor is from comparing the
+    # notional ACS dispersion (40A/pix) to the spectrum quoted from
+    # Pasquali+ 2002 which has 1.26 A/pix. Therefore smoothing factor is
+    # 40./1.26 = 31.7
+    ff = gaussian_filter1d(f, 31.7)
 
     # load the data and change the units
     dat, hdr = fits.getdata(f'{ROOT}_x1d.fits', header=True)
@@ -164,17 +185,21 @@ def plot_spectra():
     dat['func'] *= cfg.fluxscale / 1e-13
 
     # get a good range of points to compute a (variance-weighted) scale factor
-    g = np.where((dat['lamb'] > 5800) & (dat['lamb'] < 9900))[0]
+    lmin = 7350.
+    lmax = 8120.
+    g = np.where((lmin <= dat['lamb']) & (dat['lamb'] <= lmax))[0]
     ff2 = np.interp(dat['lamb'], l, ff)
     den = np.sum((dat['flam'][g] / dat['func'][g])**2)
     num = np.sum((ff2[g] / dat['func'][g]) * (dat['flam'][g] / dat['func'][g]))
     scl = num / den
+    # scl = np.median(ff2[g] / dat['flam'][g])
+
+    print(f'Scaling factor: {scl}')
 
     # plot the SU spectrum
+    plt.axvspan(lmin, lmax, color='lightgrey')
     plt.plot(dat['lamb'], dat['flam'] * scl, label=GRATING)
     plt.plot(l, ff, label='Larsen et al. (smoothed)')
-
-    print('scaling factor', scl, 1. / scl)
 
     # uncomment this to see the hi-res file.
     # plt.plot(l, f, label='Larsen et al. (high-res)')
@@ -185,7 +210,7 @@ def plot_spectra():
 
     # put on legend and change limits
     plt.legend(loc='upper left')
-    plt.ylim(0.05, 0.55)
+    plt.ylim(0.0, 0.85)
     plt.xlim(5500, 10000)
 
     # write the file to disk

@@ -37,9 +37,10 @@ class Tabulate(Module):
 
     """
 
+    # should be +0.5 for uvis
     # define the pixel footprint
-    DX = np.array([0, 0, 1, 1], dtype=float) - 0.5
-    DY = np.array([0, 1, 1, 0], dtype=float) - 0.5
+    DX = np.array([0, 0, 1, 1], dtype=float) + 0.5
+    DY = np.array([0, 1, 1, 0], dtype=float) + 0.5
 
     DESCRIPTION = 'Tabulating'
 

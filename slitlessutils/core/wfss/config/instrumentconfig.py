@@ -363,8 +363,8 @@ class DetectorConfig:
     Class to configure a WFSS detector
     """
 
-    def __init__(self, name, data, disperser, path, exptime=1000., background=0.,
-                 **kwargs):
+    def __init__(self, name, data, disperser, path, exptime=1000.,
+                 background=0., **kwargs):
         """
         Initializer method
 
@@ -700,7 +700,7 @@ class InstrumentConfig(dict):
                     disperser = (h0['FILTER'], h0['PUPIL'])
                     kwargs['fwcpos'] = h0['FWCPOS']
                 else:
-                    raise NotImplementedError(f"Unsupported: {tel = } {ins = }")
+                    raise NotImplementedError(f"Unsupported: {tel=} {ins=}")
 
                 # instantiate the object
                 insconf = cls(tel, ins, disperser, subarray=subarray, **kwargs)
