@@ -1,12 +1,10 @@
 import os
 
 import numpy as np
-import skimage
 from astropy import convolution
 from astropy.io import fits
 from astropy.modeling import fitting, models
 from astropy.stats import sigma_clip, sigma_clipped_stats
-from astropy.utils import minversion
 from scipy.signal import savgol_filter
 from skimage import morphology
 
@@ -50,6 +48,17 @@ def background_processing(mastersky=False):
                     LOGGER.warning(msg)
                     return
 
+                # check that this is *NOT* a subarray.  Eventually, we can
+                # excise the master sky image(s) and this check can be
+                # removed, but that is going to take a little more care.
+                # Specifically, the concerns will be which CCD/detector is
+                # the subarray on?  This affects the primary for-loop
+                # over the HDUL.  This shouldn't be too hard.
+                if mastersky and phdr.get('SUBARRAY', False):
+                    msg = f"Master-sky subtraction is not supported for subarrays: {filename}"
+                    LOGGER.knownissue(msg)
+                    return
+
                 # dummy variable for writing a new file
                 wrote = False
 
@@ -76,22 +85,7 @@ def background_processing(mastersky=False):
                             if mastersky:
                                 if isinstance(backfile, str) and os.path.exists(backfile):
                                     # get the model and check normalization
-                                    if phdr.get('SUBARRAY', False):
-                                        # In the subarray case, we could have both CCDCHIP and
-                                        # EXTVER both be 1, so we need to make sure we get the correct
-                                        # extension from the master background file.
-                                        if hdr['CCDCHIP'] == 1:
-                                            back_vers = 2
-                                        elif hdr['CCDCHIP'] == 2:
-                                            back_vers = 1
-                                        # Warn that results might still be suspect
-                                        msg = ("Master-sky subtraction may give poor results for subarray"
-                                               f"data, especially for small subarrays: {filename}")
-                                        LOGGER.knownissue(msg)
-                                    else:
-                                        back_vers = vers
-
-                                    mod = fits.getdata(backfile, ('SKY', back_vers))
+                                    mod = fits.getdata(backfile, ('SKY', vers))
 
                                     a, m, s = sigma_clipped_stats(mod)
                                     if np.abs(a - 1) > 1e-2:
@@ -202,10 +196,7 @@ class Background:
         if self._dispaxis == 'x':
             self.dispaxis = 1
             self.kernel = kernel.T
-            if minversion(skimage, '0.25.0'):
-                self.footprint = morphology.footprint_rectangle((100, 5))
-            else:
-                self.footprint = morphology.rectangle(100, 5)
+            self.footprint = morphology.rectangle(100, 5)
         elif self._dispaxis == 'y':
             self.dispaxis = 0
             self.kernel = kernel
