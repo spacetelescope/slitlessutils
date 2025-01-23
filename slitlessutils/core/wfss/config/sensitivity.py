@@ -1,4 +1,6 @@
+import os
 import numpy as np
+
 from astropy.io import fits
 
 from ...photometry import Band
@@ -30,11 +32,14 @@ class Sensitivity(Band):
         self.senslimit = senslimit
 
         # read the file
-        data, header = fits.getdata(self.sensfile, 1, header=True)
+        if os.path.exists(self.sensfile):
+            data, header = fits.getdata(self.sensfile, 1, header=True)
 
-        g = np.where(data['SENSITIVITY'] > self.senslimit)
-        Band.__init__(self, data['WAVELENGTH'], data['SENSITIVITY'],
-                      where=g, unit=header.get('TUNIT1', ''))
+            g = np.where(data['SENSITIVITY'] > self.senslimit)
+            Band.__init__(self, data['WAVELENGTH'], data['SENSITIVITY'],
+                          where=g, unit=header.get('TUNIT1', ''))
+        else:
+            Band.__init__(self, np.array([0, np.inf]), np.array([1., 1.]))
 
     def __str__(self):
         return f'Sensitivity curve: {self.sensfile}'
