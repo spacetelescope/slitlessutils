@@ -161,7 +161,7 @@ class WFSSConfig(dict):
         self.xshift += dx
         self.yshift += dy
 
-    def load_flatfield(self, unity=False):
+    def load_flatfield(self, **kwargs):
         """
         Method to read a flat field from the configuration file.
 
@@ -175,6 +175,9 @@ class WFSSConfig(dict):
         flatfield : `np.ndarray`
             The two-dimensional flat field
         """
+
+        # sort out the defaults
+        unity = kwargs.get('unity', False)
 
         if unity or (self.ffname is None):
             ff = load_flatfield()

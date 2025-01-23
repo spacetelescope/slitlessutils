@@ -50,7 +50,7 @@ class Module:
 
     """
 
-    def __init__(self, func, path='tables', ncpu=None, postfunc=None,
+    def __init__(self, func, path='su_tables', ncpu=None, postfunc=None,
                  multiprocess=True, **kwargs):
 
         self.multiprocess = multiprocess

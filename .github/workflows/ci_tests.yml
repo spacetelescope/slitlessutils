@@ -31,12 +31,6 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            python: '3.10'
-            tox_env: 'py310-test'
-            allow_failure: false
-            prefix: ''
-
-          - os: ubuntu-latest
             python: '3.11'
             tox_env: 'py311-test-cov'
             toxposargs: --remote-data=any
