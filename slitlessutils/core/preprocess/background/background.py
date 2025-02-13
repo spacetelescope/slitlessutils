@@ -84,6 +84,7 @@ def background_processing(mastersky=False):
                                             back_vers = 1
                                     else:
                                         back_vers = vers
+
                                     mod = fits.getdata(backfile, ('SKY', back_vers))
 
                                     a, m, s = sigma_clipped_stats(mod)
