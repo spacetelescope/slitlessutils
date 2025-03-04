@@ -36,12 +36,11 @@ dependencies = [
     'astropy>=5.0.4',
     'astroquery',
     'h5py',
-    'drizzlepac@git+https://github.com/spacetelescope/drizzlepac.git',
+    'drizzlepac>=3.9.1',
     'networkx>=2.6.3',
     'numpy>=1.22.3',
     'matplotlib>=3.5.2',
     'pandas>=1.4.2',
-    'photutils<1.13',
     'psutil>=5.9.0',
     'pypolyclip>=1.0.0',
     'pysiaf>=0.16.4',
@@ -106,8 +105,6 @@ filterwarnings = [
     'ignore:numpy.ndarray size changed:RuntimeWarning',
     # warning from drizzlepac
     'ignore:unclosed file:ResourceWarning',
-    # remove after drizzlepac is updated
-    'ignore: `photutils.DAOStarFinder` is a deprecated alias:DeprecationWarning',
     'ignore: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.:UserWarning',
     # Ignore warning from astropy.io
     'ignore: Card is too long, comment will be truncated.',
