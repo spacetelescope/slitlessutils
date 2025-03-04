@@ -113,19 +113,12 @@ filterwarnings = [
 
 [tool.coverage.run]
 omit = [
-    'slitlessutils/_astropy_init*',
     'slitlessutils/conftest.py',
-    'slitlessutils/*setup_package*',
     'slitlessutils/tests/*',
     'slitlessutils/*/tests/*',
-    'slitlessutils/extern/*',
     'slitlessutils/version*',
-    '*/slitlessutils/_astropy_init*',
-    '*/slitlessutils/conftest.py',
-    '*/slitlessutils/*setup_package*',
     '*/slitlessutils/tests/*',
     '*/slitlessutils/*/tests/*',
-    '*/slitlessutils/extern/*',
     '*/slitlessutils/version*',
 ]
 
