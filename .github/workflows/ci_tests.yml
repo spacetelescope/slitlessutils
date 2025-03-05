@@ -45,12 +45,6 @@ jobs:
             prefix: ''
             toxposargs: --remote-data=any
 
-          - os: windows-latest
-            python: '3.11'
-            tox_env: 'py311-test'
-            allow_failure: true
-            prefix: '(Allowed failure)'
-
           - os: ubuntu-latest
             python: '3.11'
             tox_env: 'py311-test'
