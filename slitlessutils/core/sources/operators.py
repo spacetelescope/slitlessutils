@@ -1,11 +1,50 @@
+
 import matplotlib.pyplot as plt
 import numpy as np
+import skimage
+from astropy.utils import minversion
 from scipy import ndimage as ndi
 from skimage import morphology as morph
-
 from slitlessutils.logger import LOGGER
 
 from ..utilities import headers
+
+
+def create_footprint(function, size):
+    """
+    Method to create a footprint for erosion or dilation.
+
+    Parameters
+    ----------
+    function : {'disk', 'square', 'diamond'}
+        The function to create the footprint.
+
+    size : int
+        The size of the footprint.
+
+    Returns
+    -------
+    footprint : 2D `numpy.ndarray`
+        The footprint.
+    """
+    if size <= 0:
+        LOGGER.warning('Unable to create footprint - size <= 0.')
+        return None
+
+    if function == 'square':
+        if minversion(skimage, '0.25.0'):
+            footprint = morph.footprint_rectangle((size, size))
+        else:
+            footprint = morph.square(size)
+    elif function == 'disk':
+        footprint = morph.disk(size)
+    elif function == 'diamond':
+        footprint = morph.diamond(size)
+    else:
+        LOGGER.warning('Unable to create footprint - Invalid function.')
+        return None
+
+    return footprint
 
 
 class Operator:
@@ -135,7 +174,6 @@ class Erode(Operator):
     __str = 'Erosion Operator'
     __pars = {'eroderad': (2, 'size of erosion kernel'),
               'erodefun': ('disk', 'shape of erosion kernel')}
-    __shapes = {'disk': morph.disk, 'square': morph.square, 'diamond': morph.diamond}
 
     def __call__(self, img, seg, hdr):
         """
@@ -163,36 +201,33 @@ class Erode(Operator):
         newhdr : `astropy.io.fits.Header()`
             The updated direct image header
         """
-
-        if self.eroderad > 0 and self.erodefun in self.__shapes:
-            fun = self.__shapes[self.erodefun.lower()]
-            footprint = fun(self.eroderad)
-
-            # find the pixels with this segid
-            gpx = seg == hdr['SEGID']
-
-            # erode the image
-            newseg = morph.binary_erosion(gpx, footprint=footprint).astype(np.int)
-
-            # find pixels
-            b = np.where((seg != 0) & (seg != hdr['SEGID']))
-            g = np.where(newseg)
-            newseg[g] = seg[g]
-            newseg[b] = seg[b]
-
-            # axes[0].imshow(seg,origin='lower')
-            # axes[1].imshow(newseg,origin='lower')
-            # axes[2].imshow(seg-newseg,origin='lower')
-            # plt.show()
-
-            # record what was done
-            newhdr = hdr.copy()
-            self.update_header(newhdr)
-
-            return img, newseg, newhdr
-        else:
+        footprint = create_footprint(self.erodefun, self.eroderad)
+        if footprint is None:
             LOGGER.warning('Unable to erode.')
             return img, seg, hdr
+
+        # find the pixels with this segid
+        gpx = seg == hdr['SEGID']
+
+        # erode the image
+        newseg = morph.binary_erosion(gpx, footprint=footprint).astype(np.int)
+
+        # find pixels
+        b = np.where((seg != 0) & (seg != hdr['SEGID']))
+        g = np.where(newseg)
+        newseg[g] = seg[g]
+        newseg[b] = seg[b]
+
+        # axes[0].imshow(seg,origin='lower')
+        # axes[1].imshow(newseg,origin='lower')
+        # axes[2].imshow(seg-newseg,origin='lower')
+        # plt.show()
+
+        # record what was done
+        newhdr = hdr.copy()
+        self.update_header(newhdr)
+
+        return img, newseg, newhdr
 
 
 class Dilate(Operator):
@@ -220,7 +255,6 @@ class Dilate(Operator):
     __str = 'Dilation Operator'
     __pars = {'dilatrad': (3, 'size of dilation kernel'),
               'dilatfun': ('square', 'shape of dilation kernel')}
-    __shapes = {'disk': morph.disk, 'square': morph.square, 'diamond': morph.diamond}
 
     def __call__(self, img, seg, hdr):
         """
@@ -248,31 +282,28 @@ class Dilate(Operator):
         newhdr : `astropy.io.fits.Header()`
             The updated direct image header
         """
-
-        if self.dilatrad > 0 and self.dilatfun in self.__shapes:
-            fun = self.__shapes[self.dilatfun.lower()]
-            footprint = fun(self.dilatrad)
-
-            # find the pixels with this segid
-            gpx = seg == hdr['SEGID']
-
-            # erode the image
-            newseg = morph.binary_dilation(gpx, footprint=footprint).astype(np.int)
-
-            # find pixels
-            b = np.where((seg != 0) & (seg != hdr['SEGID']))
-            g = np.where(newseg)
-            newseg[g] = hdr['SEGID']
-            newseg[b] = seg[b]
-
-            # record what was done
-            newhdr = hdr.copy()
-            self.update_header(newhdr)
-
-            return img, newseg, newhdr
-        else:
+        footprint = create_footprint(self.dilatfun, self.dilatrad)
+        if footprint is None:
             LOGGER.warning('Unable to dilate.')
             return img, seg, hdr
+
+        # find the pixels with this segid
+        gpx = seg == hdr['SEGID']
+
+        # erode the image
+        newseg = morph.binary_dilation(gpx, footprint=footprint).astype(np.int)
+
+        # find pixels
+        b = np.where((seg != 0) & (seg != hdr['SEGID']))
+        g = np.where(newseg)
+        newseg[g] = hdr['SEGID']
+        newseg[b] = seg[b]
+
+        # record what was done
+        newhdr = hdr.copy()
+        self.update_header(newhdr)
+
+        return img, newseg, newhdr
 
 
 class Smooth(Operator):
@@ -299,7 +330,7 @@ class Smooth(Operator):
 
     __str = 'Smoothing Operator'
     __pars = {'smthsize': (2, 'Scale of smoothing operation'),
-              'smthfunc': ('guassian', 'Smoothing function')}
+              'smthfunc': ('gaussian', 'Smoothing function')}
 
     __funcs = {'gaussian': ndi.gaussian_filter,
                'median': ndi.median_filter}
