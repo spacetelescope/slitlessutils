@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.constants import c
+from astropy.utils import minversion
 
 from ...logger import LOGGER
 
@@ -57,20 +58,28 @@ class Band:
         self.wmin = np.amin(self.wave[where])
         self.wmax = np.amax(self.wave[where])
 
+        if minversion(np, '2.0'):
+            trap_function = np.trapezoid
+        else:
+            trap_function = np.trapz
+
         # compute the pivot wavelength
-        # num=np.trapz(self.tran[where],x=self.wave[where])
-        # den=np.trapz(self.tran[where]/self.wave[where]**2,x=self.wave[where])
+        # num = trap_function(self.tran[where], x=self.wave[where])
+        # den = trap_function(self.tran[where]/self.wave[where]**2,
+        #                     x=self.wave[where])
         # self.photplam=np.sqrt(num/den)
 
-        num = np.trapz(self.tran[where] * self.wave[where], x=self.wave[where])
-        den = np.trapz(self.tran[where] / self.wave[where], x=self.wave[where])
+        num = trap_function(self.tran[where] * self.wave[where],
+                            x=self.wave[where])
+        den = trap_function(self.tran[where] / self.wave[where],
+                            x=self.wave[where])
         self.photplam = np.sqrt(num / den)
 
         # compute the max value
         self.tmax = np.amax(self.tran)
 
         # compute normalization
-        self.fnunorm = np.trapz(self.tran / self.freq, x=self.freq)
+        self.fnunorm = trap_function(self.tran / self.freq, x=self.freq)
 
     def __call__(self, l, left=0., right=0.):
         """
