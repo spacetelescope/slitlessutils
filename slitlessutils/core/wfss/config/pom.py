@@ -191,10 +191,10 @@ class PolygonPOM(RangePOM):
         Parameters
         ----------
         px : list, tuple, or `np.ndarray`
-            An interable of the polygon x-coordinates
+            An iterable of the polygon x-coordinates
 
         py : list, tuple, or `np.ndarray`
-            An interable of the polygon y-coordinates
+            An iterable of the polygon y-coordinates
         """
         if len(px) < 3:
             raise ValueError('Must have a x-polygon, which requires >=3 '
