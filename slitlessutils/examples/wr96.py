@@ -4,7 +4,7 @@ import shutil
 import matplotlib.pyplot as plt
 import numpy as np
 from astropy.io import fits
-from astropy.modeling import models, fitting
+from astropy.modeling import fitting, models
 from astropy.wcs import WCS
 from astroquery.mast import Observations
 from drizzlepac import astrodrizzle

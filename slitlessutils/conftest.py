@@ -1,5 +1,7 @@
 import os
+
 import pytest
+
 from slitlessutils import config
 
 cfg = config.Config()

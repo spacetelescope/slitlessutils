@@ -1,10 +1,9 @@
+import numpy as np
+import pytest
 from astropy.io import fits
 from astropy.wcs import WCS
 from astroquery.mast import Observations
 from drizzlepac import astrodrizzle
-import numpy as np
-import pytest
-
 
 import slitlessutils as su
 
