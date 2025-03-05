@@ -102,7 +102,8 @@ filterwarnings = [
     'error',  # turn warnings into exceptions
     'ignore:numpy.ufunc size changed:RuntimeWarning',
     'ignore:numpy.ndarray size changed:RuntimeWarning',
-    # warning from drizzlepac
+    # drizzlepac warnings
+    "ignore: .*pkg_resources.*:DeprecationWarning",
     'ignore:unclosed file:ResourceWarning',
     'ignore: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.:UserWarning',
     # Ignore warning from astropy.io
