@@ -61,7 +61,7 @@ so that now :math:`\chi^2(f_{\varphi}) = ||I - W\,f_{\varphi}||^2`.  Although th
 .. math::
 
    \psi^2(f_{\varphi};\ell) = \chi^2(f_{\varphi}) + \ell\,\xi^2(f_{\varphi})
-   
+
 where :math:`\ell` is the :term:`regularization parameter` and the *regularization term* is
 
 .. math::
@@ -74,7 +74,7 @@ with :math:`||W||_F` is the `Frobenius norm <https://en.wikipedia.org/wiki/Matri
 The Role of the Damping Target
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The :term:`damping target` predominately controls how the spectra behave near the edges of the WFSS :term:`sensitivity curve`.  The default behavior is to damp to the broadband photometry, which will lead to spectra that tend to the photometry.  In :numref:`dampingtarget`, we show an example of this using a source with a flat spectrum: :math:`f_{\lambda}\sim6.1\times10^{-17}~\mathrm{erg}/\mathrm{s}/\mathrm{cm}^2/\mathrm{Å}` as a dotted black line.  
+The :term:`damping target` predominately controls how the spectra behave near the edges of the WFSS :term:`sensitivity curve`.  The default behavior is to damp to the broadband photometry, which will lead to spectra that tend to the photometry.  In :numref:`dampingtarget`, we show an example of this using a source with a flat spectrum: :math:`f_{\lambda}\sim6.1\times10^{-17}~\mathrm{erg}/\mathrm{s}/\mathrm{cm}^2/\mathrm{Å}` as a dotted black line.
 
 
 .. _dampingtarget:
@@ -91,12 +91,12 @@ The :term:`damping target` predominately controls how the spectra behave near th
 Notes on the Uncertainties
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Based on the above mathematical formulation, the linear-reconstruction methods will produce uncertainties as the diagonals of the matrix: 
+Based on the above mathematical formulation, the linear-reconstruction methods will produce uncertainties as the diagonals of the matrix:
 
 .. math::
    u_{\varphi} = \sqrt{\left(W^\mathrm{T}W+\ell^2||W_F||^2\right)^{-1}}
 
-However, the propagation of uncertainties that accounts for only the detector/astrophysical effects should come from the diagonal elements of :math:`\sqrt{\left(W^\mathrm{T}W\right)^{-1}}` (ie. :math:`\ell=0`).  Therefore for :math:`\ell\neq0`, the uncertainties will be underestimated.  In any case, although the matrix :math:`W` is constructed to be sparse, the product with its transpose :math:`W^\mathrm{T}` is not guaranteed to be sparse.  Therefore these estimates for :math:`u_{\varphi}` are compute iteratively, without explicitly computing :math:`W^\mathrm{T}W`.  
+However, the propagation of uncertainties that accounts for only the detector/astrophysical effects should come from the diagonal elements of :math:`\sqrt{\left(W^\mathrm{T}W\right)^{-1}}` (ie. :math:`\ell=0`).  Therefore for :math:`\ell\neq0`, the uncertainties will be underestimated.  In any case, although the matrix :math:`W` is constructed to be sparse, the product with its transpose :math:`W^\mathrm{T}` is not guaranteed to be sparse.  Therefore these estimates for :math:`u_{\varphi}` are compute iteratively, without explicitly computing :math:`W^\mathrm{T}W`.
 
 
 .. warning::
