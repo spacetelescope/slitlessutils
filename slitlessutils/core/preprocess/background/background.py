@@ -1,10 +1,12 @@
 import os
 
 import numpy as np
+import skimage
 from astropy import convolution
 from astropy.io import fits
 from astropy.modeling import fitting, models
 from astropy.stats import sigma_clip, sigma_clipped_stats
+from astropy.utils import minversion
 from scipy.signal import savgol_filter
 from skimage import morphology
 
@@ -196,7 +198,10 @@ class Background:
         if self._dispaxis == 'x':
             self.dispaxis = 1
             self.kernel = kernel.T
-            self.footprint = morphology.rectangle(100, 5)
+            if minversion(skimage, '0.25.0'):
+                self.footprint = morphology.footprint_rectangle((100, 5))
+            else:
+                self.footprint = morphology.rectangle(100, 5)
         elif self._dispaxis == 'y':
             self.dispaxis = 0
             self.kernel = kernel

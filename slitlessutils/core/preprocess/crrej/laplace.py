@@ -1,7 +1,9 @@
 import os
 
 import numpy as np
+import skimage
 from astropy.io import fits
+from astropy.utils import minversion
 from scipy import ndimage
 from skimage import measure, morphology
 
@@ -109,9 +111,15 @@ def _laplace(filename, inplace=True, newfile=None, bitvalue=None,
     if growsize is not None and growsize > 0 and growform is not None:
         growform = growform.lower()
         if growform == 'square':
-            grower = morphology.square(growsize)
+            if minversion(skimage, '0.25.0'):
+                grower = morphology.footprint_rectangle((growsize, growsize))
+            else:
+                grower = morphology.square(growsize)
         elif growform == 'rectangle':
-            grower = morphology.rectangle(*growsize)
+            if minversion(skimage, '0.25.0'):
+                grower = morphology.footprint_rectangle(growsize)
+            else:
+                grower = morphology.rectangle(*growsize)
         elif growform == 'diamond':
             grower = morphology.diamond(growsize)
         elif growform == 'disk':

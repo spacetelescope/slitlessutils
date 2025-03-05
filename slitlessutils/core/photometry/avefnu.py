@@ -1,4 +1,5 @@
 import numpy as np
+from astropy.utils import minversion
 
 from ...logger import LOGGER
 
@@ -50,6 +51,11 @@ def avefnu(sed, band):
 
         fnu = sed(band.wave, fnu=True)
 
-        ave = np.trapz(fnu * band.tran / band.freq, x=band.freq) / band.fnunorm
+        if minversion(np, '2.0'):
+            trap_function = np.trapezoid
+        else:
+            trap_function = np.trapz
+        ave = trap_function(fnu * band.tran / band.wave,
+                            x=band.wave) / band.fnunorm
 
     return ave

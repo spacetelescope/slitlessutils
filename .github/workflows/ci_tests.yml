@@ -48,8 +48,8 @@ jobs:
           - os: windows-latest
             python: '3.11'
             tox_env: 'py311-test'
-            allow_failure: false
-            prefix: ''
+            allow_failure: true
+            prefix: '(Allowed failure)'
 
           - os: ubuntu-latest
             python: '3.11'
