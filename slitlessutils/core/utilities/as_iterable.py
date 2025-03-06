@@ -3,7 +3,7 @@ import numpy as np
 
 def as_iterable(d):
     """
-    Method to take a variable and recast it as an interable.
+    Method to take a variable and recast it as an iterable.
 
     Issue here is that sometimes a user may pass a variable like
     orders = '+1', which is technically an iterable.  But we need to be

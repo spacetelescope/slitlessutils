@@ -80,7 +80,7 @@ Again, the inputs are a :term:`direct image<direct imaging>` and :term:`segmenta
      - A description of the filter curve (more below).
    * - ``sedfile``
      - ``str``
-     - | The filename to a multi-extension fits file 
+     - | The filename to a multi-extension fits file
        | that contains the SEDs (more below).
 
 The keywords ``maglim`` and ``minpix`` are used to eliminate spurious sources before they are added to the collection.  The final two keyword arguments (``throughput`` and ``sedfile``) **are only used when simulating a scene** and establish the throughput curve associated with the direct image and a file that contains the SEDs to be associated with each ``DispersedRegion``, respectively.
@@ -96,7 +96,7 @@ If the ``throughput`` is a:
 	* ``slitlessutils.core.photometry.Throughput``: return that;
 	* ``str``: assume this is the full path to the throughput file, so load that;
 	* any other type:
-	
+
 		* if ``FILTFILE`` is in the header, load that;
 		* if keywords ``TELESCOP``, ``INSTRUME``, and ``FILTER`` exist and indicate a valid throughput file in the :file:`$HOME/.slitlessutils/<VERSION>/bandpasses/` directory, which contains several common bandpasses used with the WFC3 and ACS instruments.  These files are also fits files and have the name: ``<TELESCOP>_<INSTURME>_<FILTER>.fits``.  These files can also contain the zeropoint, based on the header keyword ``ZERO``.  Users can obtain any throughput for HST instruments using `synphot <https://synphot.readthedocs.io/en/latest/>`_, but should inspect the packaged files to understand the necessary formatting of the file.
 

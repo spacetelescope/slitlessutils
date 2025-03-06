@@ -302,7 +302,7 @@ class Noise:
     Notes
     -----
     This module is likely to change in the future as new instruments and
-    more complex modeling becomes necesssary or available.
+    more complex modeling becomes necessary or available.
     """
 
     dark: float

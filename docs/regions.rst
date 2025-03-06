@@ -26,7 +26,7 @@ To determine the outline of a spectral source in a WFSS image, one should load t
 
 * Output a separate ``ds9`` regions file for each WFSS file and detector combination.
 
-The resulting regions will have their title as the segmentation ID and the spectral order will encoded by the color of the region.  ``Slitlessutils`` assumes the ``tab20`` colormap from `matplotlib <https://matplotlib.org/stable/tutorials/colors/colormaps.html>`_, where the bold colors are for positive orders, pastel colors are for negative orders, and the zeroth order will be white (see :numref:`tab20` below).  The region filename will be the WFSS image filename with the detector name appended.  In :numref:`regionsexample` we show an example of the first-order traces highlighted.  
+The resulting regions will have their title as the segmentation ID and the spectral order will encoded by the color of the region.  ``Slitlessutils`` assumes the ``tab20`` colormap from `matplotlib <https://matplotlib.org/stable/tutorials/colors/colormaps.html>`_, where the bold colors are for positive orders, pastel colors are for negative orders, and the zeroth order will be white (see :numref:`tab20` below).  The region filename will be the WFSS image filename with the detector name appended.  In :numref:`regionsexample` we show an example of the first-order traces highlighted.
 
 
 .. _tab20:

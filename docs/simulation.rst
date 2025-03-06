@@ -16,12 +16,12 @@ The current implementation will *only* simulate the signal from the sources, but
 #. For each WFSS image:
 
   a. Initialize noiseless science as all zero: :math:`\tilde{S}_{x,y}=0` for all WFSS image pixels :math:`(x,y)`.
-  b. For each detector in the WFSS file:  
-    
+  b. For each detector in the WFSS file:
+
     * For each source in the source collection:
-      
+
       * For each :term:`direct imaging` pixel :math:`(x_d,y_d)` in the source:
-    
+
         * load the PDT from the :class:`~slitlessutils.tables.PDTFile()`
         * append to a list
 

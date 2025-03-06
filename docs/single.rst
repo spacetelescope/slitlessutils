@@ -20,17 +20,17 @@ The *single-orient extraction* refers to extraction of one-dimensional spectra f
 Extraction Details
 ------------------
 
-The single-orient extraction is essentially the optimal spectroscopy algorithm presented by `Horne 1986 <https://ui.adsabs.harvard.edu/abs/1986PASP...98..609H/abstract>`_, with a few modifications related to details of WFSS data and/or the preprocessing that is expected.  The method is 
+The single-orient extraction is essentially the optimal spectroscopy algorithm presented by `Horne 1986 <https://ui.adsabs.harvard.edu/abs/1986PASP...98..609H/abstract>`_, with a few modifications related to details of WFSS data and/or the preprocessing that is expected.  The method is
 
 
 * For each WFSS image in the :doc:`WFSS Collection <wfss>`:
-	
+
 	* For each source in the :doc:`Source Collection <sources>`:
-	
+
 		#. load the PDTs for each :term:`direct imaging` pixel in the source
 		#. :term:`decimate<decimation>` the PDTs over the unique combinations of WFSS pixel and wavelength.
 		#. For each unique :math:`x`-coordinate:
-			
+
 			- compute average wavelength (weighted by the forward-model profile) for this vertical slice; now :math:`x\rightarrow \lambda`
 			- divide each :math:`y`-pixel in the WFSS image by their :doc:`flat-field <calib>`, :doc:`sensitivity curve <calib>`, :doc:`pixel-area map <simulation>`, ``fluxscale`` (see the :doc:`configuration object <configure>`), and the instantaneous dispersion for this average wavelength
 			- compute the `Horne 1986 <https://ui.adsabs.harvard.edu/abs/1986PASP...98..609H/abstract>`_ optimal parameters:
@@ -42,15 +42,15 @@ The single-orient extraction is essentially the optimal spectroscopy algorithm p
 					u_{\lambda,i} &=& \sqrt{\frac{\sum_y P_{x,y}}{\sum_y P_{x,y}^2/U_{x,y}^2}}\\
 					c_{\lambda,i} &=& \frac{\sum_y P_{x,y}C_{x,y}/U_{x,y}^2}{\sum_y P_{x,y}^2/U_{x,y}^2}
 				\end{eqnarray}
-				
+
 			where :math:`f_{\lambda,i}`, :math:`u_{\lambda,i}`, and :math:`c_{\lambda,i}` are the optimal flux, uncertainty, and contamination, respectively for the :math:`i^\mathrm{th}` WFSS image.  Additionally, :math:`S_{x,y}`, :math:`U_{x,y}`, :math:`P_{x,y}`, and :math:`C_{x,y}` are the science, uncertainty, cross-dispersion profile, and contamination images (more on this below in :ref:`Contamination Model <contmodel>`), respectively.  ``Slitlessutils`` offers three choices for the cross-dispersion profile :math:`P_{x,y}`:
 
 				* **uniform** This does no profile weighting and instead just sums the pixels within the aperture.  This is effectively the box-extraction in `hstaxe <https://hstaxe.readthedocs.io/en/latest/>`_
-				* **forward** This uses the forward model to establish the cross dispersion weights.  
+				* **forward** This uses the forward model to establish the cross dispersion weights.
 				* **data** This uses the science image, masked for the :term:`DQA <data-quality array>` as the weights.  This is effectively the `Horne 1986 <https://ui.adsabs.harvard.edu/abs/1986PASP...98..609H/abstract>`_ algorithm.
-			
+
 			these can be selected by the keyword argument: ``profile``.  The default behavior is ``profile='data'``.
-			
+
 			- record these values in a temporary data structure used to combine the spectra from different WFSS images
 
 
@@ -71,7 +71,7 @@ The :term:`contamination model` is initialized by converting the spectral traces
 
 
 .. important::
-	The contamination will be computed if-and-only-if the ``mskorders`` keyword is set.  This can be either a single string for the orders to mask, the string ``'all'`` to mask all orders, or ``None`` to mask no orders.  The default behavior is ``mskorders='all'``.  
+	The contamination will be computed if-and-only-if the ``mskorders`` keyword is set.  This can be either a single string for the orders to mask, the string ``'all'`` to mask all orders, or ``None`` to mask no orders.  The default behavior is ``mskorders='all'``.
 
 .. note::
 	The class setting :code:`savecont=True` to the ``Single()`` module will save the two-dimensional contamination models as a multi-extension fits file to disk, where each extension will refer to a different :term:`segmentation ID <source ID>`.

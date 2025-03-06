@@ -1,9 +1,10 @@
 ci:
   autofix_prs: false
+  autoupdate_schedule: 'monthly'
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v5.0.0
     hooks:
       - id: check-added-large-files
         # Prevent giant files from being committed.
@@ -31,7 +32,6 @@ repos:
         # Checks for the existence of private keys.
       - id: end-of-file-fixer
         # Makes sure files end in a newline and only a newline.
-        # Makes sure files end in a newline and only a newline.
         exclude: ".*(svg.*|extern.*)$"
       - id: trailing-whitespace
         # Trims trailing whitespace.
@@ -53,20 +53,20 @@ repos:
         # Enforce that all noqa annotations always occur with specific codes.
 
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.15.0
+    rev: v3.19.1
     hooks:
       - id: pyupgrade
         args: ["--py39-plus"]
 
   - repo: https://github.com/pycqa/isort
-    rev: 5.12.0
+    rev: 6.0.1
     hooks:
       - id: isort
         name: isort (python)
         additional_dependencies: [toml]
 
   - repo: https://github.com/PyCQA/flake8
-    rev: 6.1.0
+    rev: 7.1.2
     hooks:
       - id: flake8
         args: ["--ignore", "E501,E741,W503,W504"]
@@ -77,16 +77,16 @@ repos:
       - id: yesqa
 
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.6
+    rev: v2.4.1
     hooks:
       - id: codespell
-        args: ["--write-changes", "--ignore-words-list", "exten, som, ot",
-               "--skip", "*.pdf"]
+        args: ["--write-changes", "--ignore-words-list",
+               "Pidgeon, exten, som, ot", "--skip", "*.pdf"]
         additional_dependencies:
           - tomli
 
   - repo: https://github.com/hhatto/autopep8
-    rev: v2.0.4
+    rev: v2.3.2
     hooks:
       - id: autopep8
         args: ["--in-place", "--aggressive"]

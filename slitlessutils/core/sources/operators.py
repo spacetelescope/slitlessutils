@@ -1,10 +1,10 @@
-
 import matplotlib.pyplot as plt
 import numpy as np
 import skimage
 from astropy.utils import minversion
 from scipy import ndimage as ndi
 from skimage import morphology as morph
+
 from slitlessutils.logger import LOGGER
 
 from ..utilities import headers

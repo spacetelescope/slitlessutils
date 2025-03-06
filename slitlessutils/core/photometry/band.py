@@ -1,6 +1,6 @@
 import numpy as np
-from scipy.constants import c
 from astropy.utils import minversion
+from scipy.constants import c
 
 from ...logger import LOGGER
 
