@@ -84,6 +84,10 @@ def background_processing(mastersky=False):
                                             back_vers = 2
                                         elif hdr['CCDCHIP'] == 2:
                                             back_vers = 1
+                                        # Warn that results might still be suspect
+                                        msg = ("Master-sky subtraction may give poor results for subarray"
+                                               f"data, especially for small subarrays: {filename}")
+                                        LOGGER.knownissue(msg)
                                     else:
                                         back_vers = vers
 
