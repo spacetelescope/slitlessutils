@@ -55,7 +55,7 @@ def avefnu(sed, band):
             trap_function = np.trapezoid
         else:
             trap_function = np.trapz
-        ave = trap_function(fnu * band.tran / band.wave,
-                            x=band.wave) / band.fnunorm
+        ave = trap_function(fnu * band.tran / band.freq,
+                            x=band.freq) / band.fnunorm
 
     return ave
