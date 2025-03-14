@@ -89,6 +89,6 @@ def write(h5, key, val):
 
     if val is not None:
         if isinstance(val, (bool, str)):
-            h5.attrs[key] = np.string_(val)
+            h5.attrs[key] = np.bytes_(val)
         else:
             h5.attrs[key] = val
