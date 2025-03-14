@@ -125,13 +125,11 @@ def reverse(ints, ignore=()):
 
     """
 
-    uniq, ind, cnt = np.unique(ints, return_inverse=True, return_counts=True)
+    uniq, ind, cnt = np.unique(ints.ravel(), return_inverse=True,
+                               return_counts=True)
     rev = np.split(np.argsort(ind), np.cumsum(cnt[:-1]))
 
-    # changed to this so ints can be a list
-    ri = {u: np.unravel_index(r, np.shape(ints)) for u, r in zip(uniq, rev) if u not in ignore}
-
-    return ri
+    return {u: np.unravel_index(r, np.shape(ints)) for u, r in zip(uniq, rev) if u not in ignore}
 
 
 def decimate(val, *indices, dims=None, unravel=True, return_factor=False):
