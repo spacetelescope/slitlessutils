@@ -16,7 +16,7 @@ Start by creating an empty conda environment:
 
 .. code-block:: bash
 
-    conda create --name slitlessutils-env "python>=3.10, <3.11"
+    conda create --name slitlessutils-env "python>=3.11"
     conda activate slitlessutils-env
 
 
