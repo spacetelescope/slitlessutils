@@ -2,7 +2,7 @@
 name = 'slitlessutils'
 description = 'A compendium of tools to analyze slitless spectroscopy'
 readme = 'README.md'
-license = {file = 'LICENSE.rst'}
+license-files = ['LICENSE.rst']
 authors = [
     {name = 'Slitlessutils Developers', email = 'help@stsci.edu'},
 ]
@@ -23,7 +23,6 @@ keywords = [
 ]
 classifiers = [
     'Intended Audience :: Science/Research',
-    'License :: OSI Approved :: BSD License',
     'Natural Language :: English',
     'Operating System :: OS Independent',
     'Programming Language :: Python',
