@@ -1,7 +1,8 @@
 import os
 import shutil
-from astropy.io import fits
+
 import numpy as np
+from astropy.io import fits
 
 
 __all__ = ['embedsub_full_chip', 'embedsub_full_detector']
