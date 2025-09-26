@@ -1,7 +1,8 @@
 import os
 import shutil
-from astropy.io import fits
+
 import numpy as np
+from astropy.io import fits
 
 
 def embedsub_full_chip(subarray_file, y_axis, x_axis, output_dir=''):
