@@ -1,5 +1,3 @@
-import os
-
 import numpy as np
 import pytest
 
@@ -7,6 +5,7 @@ from astropy.io import fits
 from astropy.utils.data import download_file
 
 from slitlessutils.core.utilities.embedding import embedsub_full_detector
+
 
 @pytest.mark.remote_data
 def test_subarray_embedding(tmp_path):
@@ -37,7 +36,7 @@ def test_subarray_embedding(tmp_path):
     assert ir[1].data.shape == (1014, 1014)
 
     with pytest.raises(ValueError, match='Instrument cannot be set if y_size and x_size are set'):
-        bad_embed = embedsub_full_detector(ir_file, 'IR', y_size=1014, x_size=1014)
+        bad_embed = embedsub_full_detector(ir_file, 'IR', y_size=1014, x_size=1014)  # noqa
 
     with pytest.raises(ValueError, match='One of instrument or x_size'):
-        bad_embed = embedsub_full_detector(ir_file)
+        bad_embed = embedsub_full_detector(ir_file)  # noqa

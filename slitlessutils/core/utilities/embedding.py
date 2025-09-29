@@ -7,9 +7,11 @@ from astropy.io import fits
 
 __all__ = ['embedsub_full_chip', 'embedsub_full_detector']
 
-CHIP_SIZES = {'UVIS': {'y': 2051,'x': 4096},
-              'WFC': {'y': 2048,'x': 4096},
-              'IR': {'y': 1014,'x': 1014},}
+
+CHIP_SIZES = {'UVIS': {'y': 2051, 'x': 4096},
+              'WFC': {'y': 2048, 'x': 4096},
+              'IR': {'y': 1014, 'x': 1014}}
+
 
 def embedsub_full_chip(subarray_file, instrument=None, y_size=None, x_size=None, output_dir=''):
     """
@@ -70,7 +72,7 @@ def embedsub_full_chip(subarray_file, instrument=None, y_size=None, x_size=None,
     with fits.open(embedded_file, mode='update') as hdu:
 
         # Check that this is actually a subarray file
-        if not 'SUBARRAY' in hdu[0].header or not hdu[0].header['SUBARRAY']:
+        if 'SUBARRAY' not in hdu[0].header or not hdu[0].header['SUBARRAY']:
             raise ValueError("Expected a file with SUBARRAY=TRUE in the primary header")
 
         # Prepare empty full-frame arrays
