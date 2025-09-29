@@ -7,11 +7,11 @@ from astropy.io import fits
 
 __all__ = ['embedsub_full_chip', 'embedsub_full_detector']
 
-chip_sizes = {'UVIS': {'y': 2051,'x': 4096},
+CHIP_SIZES = {'UVIS': {'y': 2051,'x': 4096},
               'WFC': {'y': 2048,'x': 4096},
-              'IR': {'y': 1014,'x': 4096},}
+              'IR': {'y': 1014,'x': 1014},}
 
-def embedsub_full_chip(subarray_file, y_size, x_size, output_dir=''):
+def embedsub_full_chip(subarray_file, instrument=None, y_size=None, x_size=None, output_dir=''):
     """
     Embed a subarray flt/flc into a full chip
     The original file is saved as <output_dir>/<root>_original.fits
@@ -24,10 +24,14 @@ def embedsub_full_chip(subarray_file, y_size, x_size, output_dir=''):
     ----------
     subarray_file : str
         Path to original subarray _flt.fits file. e.g. '/my/path/ipppssoot_flt.fits'
+    instrument : str
+        'UVIS', 'WFC', or 'IR'. If this is not specified, y_size and x_size must be set explicitly.
     y_size : int
-        Number of y detector rows for a full chip; e.g. 2051 for UVIS, 2048 for WFC, 1014 for IR
+        Number of y detector rows for a full chip; e.g. 2051 for UVIS, 2048 for WFC, 1014 for IR.
+        Only usable if instrument is not specified.
     x_size : int
-        Number of x detector rows for a full chip; e.g. 4096 for UVIS and WFC
+        Number of x detector rows for a full chip; e.g. 4096 for UVIS and WFC.
+        Only usable if instrument is not specified.
     output_dir : str
         Optional. Directory to save embedded full-chip file e.g. '/my/other/path/'
 
@@ -37,14 +41,19 @@ def embedsub_full_chip(subarray_file, y_size, x_size, output_dir=''):
         Path to embedded file <output_dir>/<root>.fits
     """
 
+    if instrument is not None and y_size is not None and x_size is not None:
+        raise ValueError("Instrument cannot be set if y_size and x_size are set")
+    elif instrument is None and y_size is None and x_size is None:
+        raise ValueError("One of instrument or x_size + y_size must be provided")
+
+    if instrument is not None:
+        x_size = CHIP_SIZES[instrument]['x']
+        y_size = CHIP_SIZES[instrument]['y']
+
     # Get rootname and build filenames
     filename = os.path.basename(subarray_file)
     root, _ = os.path.splitext(filename)
     dirname = os.path.dirname(subarray_file)
-
-    # Check that subarray is either a flt or flc FITS file
-    if not filename.endswith(('_flt.fits', '_flc.fits')):
-        raise ValueError("Expected filename ending with '_flt.fits' or '_flc.fits'")
 
     # Copy the original file to new name
     original_file = os.path.join(output_dir, f"{root}_original.fits")
@@ -59,6 +68,10 @@ def embedsub_full_chip(subarray_file, y_size, x_size, output_dir=''):
 
     # Open the embedded file and update it
     with fits.open(embedded_file, mode='update') as hdu:
+
+        # Check that this is actually a subarray file
+        if not 'SUBARRAY' in hdu[0].header or not hdu[0].header['SUBARRAY']:
+            raise ValueError("Expected a file with SUBARRAY=TRUE in the primary header")
 
         # Prepare empty full-frame arrays
         sci = np.zeros((y_size, x_size), dtype=np.float32)
@@ -115,7 +128,7 @@ def embedsub_full_chip(subarray_file, y_size, x_size, output_dir=''):
     return embedded_file
 
 
-def embedsub_full_detector(subarray_file, y_size, x_size, output_dir=''):
+def embedsub_full_detector(subarray_file, instrument=None, y_size=None, x_size=None, output_dir=''):  # noqa
     """
     Embeds a full chip subarray into a full detector file, creating blank arrays for unused chip
     Intended for WFC3/UVIS and ACS/WFC
@@ -138,7 +151,8 @@ def embedsub_full_detector(subarray_file, y_size, x_size, output_dir=''):
     """
 
     # Embed subarray into full chip
-    embedded_file = embedsub_full_chip(subarray_file, y_size, x_size, output_dir)
+    embedded_file = embedsub_full_chip(subarray_file, instrument=instrument,
+                                       y_size=y_size, x_size=x_size, output_dir=output_dir)
 
     # Create full detector FITS
     with fits.open(embedded_file, mode='update') as hdu:
