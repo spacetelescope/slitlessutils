@@ -139,10 +139,14 @@ def embedsub_full_detector(subarray_file, instrument=None, y_size=None, x_size=N
     ----------
     subarray_file : str
         Path to full chip file. e.g. '/my/path/ipppssoot_fit.fits'
+    instrument : str
+        'UVIS', 'WFC', or 'IR'. If this is not specified, y_size and x_size must be set explicitly.
     y_size : int
-        Number of y detector rows for a full chip; e.g. 2051 for UVIS, 2048 for WFC, 1014 for IR
+        Number of y detector rows for a full chip; e.g. 2051 for UVIS, 2048 for WFC, 1014 for IR.
+        Only usable if instrument is not specified.
     x_size : int
-        Number of x detector rows for a full chip; e.g. 4096 for UVIS & WFC
+        Number of x detector rows for a full chip; e.g. 4096 for UVIS and WFC.
+        Only usable if instrument is not specified.
     output_dir : str
         Optional. Directory to save embedded full-detector file e.g. '/my/path/dir'
 
