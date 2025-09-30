@@ -4,7 +4,6 @@ import shutil
 import numpy as np
 from astropy.io import fits
 
-
 __all__ = ['embedsub_full_chip', 'embedsub_full_detector']
 
 
@@ -130,7 +129,7 @@ def embedsub_full_chip(subarray_file, instrument=None, y_size=None, x_size=None,
     return embedded_file
 
 
-def embedsub_full_detector(subarray_file, instrument=None, y_size=None, x_size=None, output_dir=''):  # noqa
+def embedsub_full_detector(subarray_file, instrument=None, y_size=None, x_size=None, output_dir=''):
     """
     Embeds a full chip subarray into a full detector file, creating blank arrays for unused chip
     Intended for WFC3/UVIS and ACS/WFC
