@@ -38,4 +38,4 @@ def test_subarray_embedding(tmp_path):
         bad_embed = embedsub_full_detector(ir_file, 'IR', y_size=1014, x_size=1014)
 
     with pytest.raises(ValueError, match='One of instrument or x_size'):
-        bad_embed = embedsub_full_detector(ir_file)  # noqa
+        bad_embed = embedsub_full_detector(ir_file)
