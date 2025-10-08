@@ -1,11 +1,8 @@
-from datetime import datetime
-
-# from ...logger import LOGGER
-from ...info import __author__, __code__, __version__
-
 """
 Methods to work with fits headers
 """
+from datetime import datetime
+from importlib.metadata import metadata
 
 
 def add_software_log(hdr):
@@ -17,15 +14,12 @@ def add_software_log(hdr):
     hdr : `astropy.io.fits.Header`
         The fits header to update
     """
-
-    hdr.set('CODE', value=__code__, comment='name of software')
-    hdr.set('VERSION', value=__version__, comment=f'{__code__} version number')
-    hdr.set('AUTHOR', value=__author__, comment=f'author of {__code__}')
-    # hdr.set('EMAIL',value=__email__,comment=f'email of author')
-    # hdr.set('REF',value=__ref__,
-    #        comment=f'publication reference')
-    # hdr.set('REFURL',value=__refurl__)
-
+    meta = metadata(__package__)
+    version = meta.get('Version', 'unknown')
+    author = meta.get('Author-email', 'unknown')
+    hdr.set('CODE', value=__package__, comment='software package')
+    hdr.set('VERSION', value=version, comment=f'{__package__} version number')
+    hdr.set('AUTHOR', value=author, comment=f'{__package__} author')
     add_stanza(hdr, "Software Log", before='CODE')
 
 

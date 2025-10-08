@@ -5,7 +5,7 @@ readme = 'README.md'
 license = 'BSD-3-Clause'
 license-files = ['LICENSE.rst']
 authors = [
-    {name = 'Slitlessutils Developers', email = 'help@stsci.edu'},
+    {name = 'Slitlessutils Developers'},
 ]
 keywords = [
     'grism',

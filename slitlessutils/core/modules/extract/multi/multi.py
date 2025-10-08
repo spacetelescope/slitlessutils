@@ -5,7 +5,6 @@ from astropy.io import fits
 from matplotlib.backends.backend_pdf import PdfPages
 
 from .....config import SUFFIXES, Config
-from .....info import __code__
 from .....logger import LOGGER
 from ....utilities import as_iterable, headers
 from ...group import GroupCollection
@@ -119,7 +118,7 @@ class Multi(Module):
 
         # file root name
         if not isinstance(root, str):
-            root = __code__
+            root = __package__
 
         # put loops over groups here
         if groups:
@@ -136,9 +135,9 @@ class Multi(Module):
             d = pdf.infodict()
             d['Title'] = 'L-Curve Results'
             d['Author'] = getpass.getuser()
-            d['Subject'] = f'L-Curve results for grouped data from {__code__}'
-            d['Keywords'] = f'{__code__} WFSS L-curve groups'
-            d['Producer'] = __code__
+            d['Subject'] = f'L-Curve results for grouped data from {__package__}'
+            d['Keywords'] = f'{__package__} WFSS L-curve groups'
+            d['Producer'] = __package__
 
             for grpid, srcdict in enumerate(groups(sources)):
 
