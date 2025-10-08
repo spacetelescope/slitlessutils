@@ -4,9 +4,7 @@ import sys
 from datetime import datetime
 from multiprocessing import current_process
 
-from .info import __code__
-
-LOGGERNAME = __code__
+LOGGERNAME = __package__
 KNOWNISSUE = 15
 RTD = 'https://slitlessutils.readthedocs.io/en/latest/knownissues.html'
 

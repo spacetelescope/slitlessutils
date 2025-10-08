@@ -5,7 +5,6 @@ from astropy.io import fits
 from astropy.stats import SigmaClip
 
 from .....config import SUFFIXES, Config
-from .....info import __code__
 from .....logger import LOGGER
 from ....tables import PDTFile
 from ....utilities import headers, indices  # , as_iterable
@@ -127,7 +126,7 @@ class Single(Module):
 
         # output file names
         if root is None:
-            root = __code__
+            root = __package__
         self.filename = os.path.join(self.outpath, f"{root}_{SUFFIXES[self.FILETYPE]}.fits")
 
         if self.savecont:

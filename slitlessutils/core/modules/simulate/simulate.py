@@ -1,9 +1,9 @@
 from datetime import datetime
+from importlib.metadata import metadata
 
 import numpy as np
 from astropy.io import fits
 
-from ....info import __code__, __version__
 from ....logger import LOGGER
 from ...tables import PDTFile
 from ...utilities import headers, indices
@@ -222,7 +222,8 @@ class Simulate(Module):
         dt = t1 - t0
 
         # put some times into the header
-        phdu.header.set('ORIGIN', value=f'{__code__} v{__version__}',
+        version = metadata(__package__).get('Version', 'unknown')
+        phdu.header.set('ORIGIN', value=f'{__package__} v{version}',
                         after='NAXIS')
         phdu.header.set('DATE', value=t1.strftime('%Y-%m-%d'), after='ORIGIN',
                         comment='date this file was written (yyyy-mm-dd)')
