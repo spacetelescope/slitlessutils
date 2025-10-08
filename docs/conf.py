@@ -12,13 +12,9 @@
 # serve to show the default.
 
 import sys
+import tomllib
 from datetime import datetime, timezone
 from pathlib import Path
-
-if sys.version_info < (3, 11):
-    import tomli as tomllib
-else:
-    import tomllib
 
 # Get configuration information from pyproject.toml
 with (Path(__file__).parents[1] / 'pyproject.toml').open('rb') as fh:
