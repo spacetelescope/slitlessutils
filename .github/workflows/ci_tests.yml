@@ -30,64 +30,85 @@ jobs:
     strategy:
       matrix:
         include:
+          # remote-data test fails with 3.13 due to drizzlepac
+          # deprecation (requires drizzlepac >= 3.11.0)
+          # https://github.com/spacetelescope/drizzlepac/pull/2059
           - os: ubuntu-latest
             python: '3.11'
             tox_env: 'py311-test-cov'
             toxposargs: --remote-data=any
-            allow_failure: false
-            prefix: ''
-
-          - name: MacOS with coverage and remote data
-            os: macos-latest
-            python: '3.11'
-            tox_env: 'py311-test-cov'
-            allow_failure: false
-            prefix: ''
-            toxposargs: --remote-data=any
-
-          - os: ubuntu-latest
-            python: '3.11'
-            tox_env: 'py311-test'
-            allow_failure: false
-            prefix: ''
-
-          - os: ubuntu-latest
-            python: '3.11'
-            tox_env: 'codestyle'
-            allow_failure: false
-            prefix: ''
-
-          - os: ubuntu-latest
-            python: '3.11'
-            tox_env: 'pep517'
-            allow_failure: false
-            prefix: ''
-
-          - os: ubuntu-latest
-            python: '3.11'
-            tox_env: 'securityaudit'
             allow_failure: false
             prefix: ''
 
           - os: ubuntu-latest
             python: '3.12'
-            tox_env: 'py312-test-devdeps'
-            toxposargs: --remote-data=any
+            tox_env: 'py312-test'
+            allow_failure: false
+            prefix: ''
+
+          - os: ubuntu-latest
+            python: '3.13'
+            tox_env: 'py313-test-cov'
+            allow_failure: false
+            prefix: ''
+
+          - os: macos-latest
+            python: '3.13'
+            tox_env: 'py313-test'
+            allow_failure: false
+            prefix: ''
+
+          # stregion dependency of drizzlepac does not build on Windows
+          # - os: windows-latest
+          #   python: '3.13'
+          #   tox_env: 'py313-test'
+          #   allow_failure: false
+          #   prefix: ''
+
+          # no h5py wheels for Python 3.14 yet
+          # - os: ubuntu-latest
+          #   python: '3.14'
+          #   tox_env: 'py314-test'
+          #   allow_failure: false
+          #   prefix: ''
+
+          - os: ubuntu-latest
+            python: '3.x'
+            tox_env: 'codestyle'
+            allow_failure: false
+            prefix: ''
+
+          - os: ubuntu-latest
+            python: '3.x'
+            tox_env: 'pep517'
+            allow_failure: false
+            prefix: ''
+
+          - os: ubuntu-latest
+            python: '3.x'
+            tox_env: 'securityaudit'
+            allow_failure: false
+            prefix: ''
+
+          # no h5py wheels for Python 3.14 yet
+          # Python 3.13 dev tests fail due to stregion deprecation warnings
+          - os: ubuntu-latest
+            python: '3.13'
+            tox_env: 'py313-test-devdeps'
             allow_failure: true
             prefix: '(Allowed failure)'
 
     steps:
-    - name: Checkout code
+    - name: Check out repository
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5.0.0
       with:
+        persist-credentials: false
         fetch-depth: 0
     - name: Set up Python ${{ matrix.python }}
       uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c  # v6.0.0
       with:
+        persist-credentials: false
         python-version: ${{ matrix.python }}
-    - name: Install HDF5
-      if: ${{ contains(matrix.os, 'macos') }}
-      run: brew install hdf5
     - name: Install base dependencies
       run: python -m pip install --upgrade pip setuptools tox
     - name: Print Python, pip, setuptools, and tox versions

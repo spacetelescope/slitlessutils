@@ -23,3 +23,5 @@ env*/
 *.log
 *.csv
 .vscode/
+
+*/version.py

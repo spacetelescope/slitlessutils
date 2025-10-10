@@ -39,7 +39,6 @@ jobs:
       # We upload to PyPI for all tag pushes, except tags ending in .dev
       upload_to_pypi: ${{ startsWith(github.ref, 'refs/tags/') && !endsWith(github.ref, '.dev') && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
 
-      python-version: 3.11
       test_extras: test
       test_command: pytest -p no:warnings --pyargs slitlessutils
 
