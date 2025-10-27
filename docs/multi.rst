@@ -120,7 +120,7 @@ Sparse Least-Squares Solution
 
 There have been several algorithms devised to find the vector :math:`f_{\varphi}` that minimizes the cost function for :math:`\psi^2`, and many have been implemented into the `scipy sparse solvers <https://docs.scipy.org/doc/scipy/reference/sparse.linalg.html#module-scipy.sparse.linalg>`_.  However, ``slitlessutils`` is only organized to work with the two most common methods:
 
-* **LSQR:** first presented by `Paige & Saunders (1982) <https://dl.acm.org/doi/10.1145/355984.355989>`_, is the standard tool for these types of linear systems.  See also the scipy implementation of `LSQR <https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.lsqr.html>`_
+* **LSQR:** first presented by `Paige & Saunders (1982) <https://stanford.edu/group/SOL/software/lsqr/lsqr-toms82a.pdf>`_ is the standard tool for these types of linear systems.  See also the scipy implementation of `LSQR <https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.lsqr.html>`_
 * **LSMR:** later developed by `Fong & Saunders (2011) <https://arxiv.org/abs/1006.0758>`_, and improves upon LSQR by generally converging faster.  See also the scipy implementation of `LSMR <https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.lsmr.html>`_.
 
 
