@@ -35,8 +35,14 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            python: '3.13'
-            tox_env: 'py313-test-devdeps'
+            python: '3.x'
+            tox_env: 'linkcheck'
+            allow_failure: false
+            prefix: ''
+
+          - os: ubuntu-latest
+            python: '3.14'
+            tox_env: 'py314-test-devdeps'
             toxposargs: --remote-data=any
             allow_failure: true
             prefix: '(Allowed failure)'

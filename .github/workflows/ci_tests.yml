@@ -48,7 +48,7 @@ jobs:
 
           - os: ubuntu-latest
             python: '3.13'
-            tox_env: 'py313-test-cov'
+            tox_env: 'py313-test'
             allow_failure: false
             prefix: ''
 
@@ -65,12 +65,11 @@ jobs:
           #   allow_failure: false
           #   prefix: ''
 
-          # no h5py wheels for Python 3.14 yet
-          # - os: ubuntu-latest
-          #   python: '3.14'
-          #   tox_env: 'py314-test'
-          #   allow_failure: false
-          #   prefix: ''
+          - os: ubuntu-latest
+            python: '3.14'
+            tox_env: 'py314-test'
+            allow_failure: false
+            prefix: ''
 
           - os: ubuntu-latest
             python: '3.x'
@@ -90,11 +89,9 @@ jobs:
             allow_failure: false
             prefix: ''
 
-          # no h5py wheels for Python 3.14 yet
-          # Python 3.13 dev tests fail due to stregion deprecation warnings
           - os: ubuntu-latest
-            python: '3.13'
-            tox_env: 'py313-test-devdeps'
+            python: '3.14'
+            tox_env: 'py314-test-devdeps'
             allow_failure: true
             prefix: '(Allowed failure)'
 
