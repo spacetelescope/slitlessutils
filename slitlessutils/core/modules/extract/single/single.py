@@ -1,8 +1,7 @@
 import os
 
-from astropy.io import fits
-from astropy.io import SigmaClip
 import numpy as np
+from astropy.io import SigmaClip, fits
 
 from .....config import SUFFIXES, Config
 from .....info import __code__
@@ -10,10 +9,9 @@ from .....logger import LOGGER
 from ....tables import PDTFile
 from ....utilities import headers
 from ...module import Module
-from .contamination import Contamination
-
-from .spectraltable import SpectralTable
 from .boxcar import boxcar
+from .contamination import Contamination
+from .spectraltable import SpectralTable
 
 
 class Single(Module):
@@ -406,7 +404,7 @@ class Single(Module):
                             # get the extraction parameters
                             # pars = defpars.update_pars(source[0])
 
-                            # do a contmaination if requestied
+                            # do a contmaination if requested
                             if self.contamination:
                                 # get bounding box
                                 x0, x1, y0, y1 = odt.bounding_box(dx=padx,

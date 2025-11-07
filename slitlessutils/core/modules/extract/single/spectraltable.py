@@ -1,5 +1,5 @@
-from astropy.stats import sigma_clip
 import numpy as np
+from astropy.stats import sigma_clip
 
 from ....utilities import indices
 
