@@ -1,22 +1,25 @@
 import os
 
-import numpy as np
 from astropy.io import fits
-from astropy.stats import SigmaClip
+from astropy.io import SigmaClip
+import numpy as np
 
 from .....config import SUFFIXES, Config
 from .....info import __code__
 from .....logger import LOGGER
 from ....tables import PDTFile
-from ....utilities import headers, indices  # , as_iterable
+from ....utilities import headers
 from ...module import Module
 from .contamination import Contamination
+
+from .spectraltable import SpectralTable
+from .boxcar import boxcar
 
 
 class Single(Module):
     """
-    Module to implement single-ended extraction, which is conceptually
-    similar to the Horne (1986) approach.
+    Module to implement single-ended extraction, which is capable of
+    the Horne (1986) optimal approach.
 
     inherits from `su.core.modules.Module`
 
@@ -186,8 +189,8 @@ class Single(Module):
 
         Parameters
         ----------
-        results : dict
-            A dictionary of dictionaries, one for each segid.
+        spectra : dict
+            A dictionary of `SpectralTable` objects, one for each source
 
         data : `su.core.wfss.WFSSCollection`
             The collection of WFSS images
@@ -202,35 +205,13 @@ class Single(Module):
 
         LOGGER.info("Combining the 1d spectra")
 
-        # suffix of all output data
+        # stuff for the output data
         prekwargs = {'filetype': (self.FILETYPE, 'contents of this file'),
                      'exttype': ('single', 'method for extraction'),
                      'savecont': (self.savecont, 'Was contamination saved?')}
 
         # grab the default extraction parameters
         defpars = data.get_parameters()
-
-        # the below may not work if a source isn't in the first result catalog?
-
-        # aggregate the results
-        result = results.pop(0)
-        segids = list(result.keys())
-        for segid in segids:
-            result[segid]['file'] = [0] * len(result[segid]['flam'])
-
-        i = 1
-        while results:
-            r = results.pop(0)
-            for segid, res in r.items():
-                result[segid]['flam'].extend(res['flam'])
-                result[segid]['func'].extend(res['func'])
-                result[segid]['wave'].extend(res['wave'])
-                result[segid]['cont'].extend(res['cont'])
-                result[segid]['file'].extend([i] * len(res['flam']))
-                i += 1
-
-        # get all the objects in this output catalog
-        segids = list(result.keys())
 
         # get the flux funits
         config = Config()
@@ -241,11 +222,11 @@ class Single(Module):
         # make a primary header and fill it with useful info
         phdu = fits.PrimaryHDU()
         headers.add_preamble(phdu.header, **prekwargs)  # basic preamble
-        headers.add_software_log(phdu.header)           # about software
-        data.update_header(phdu.header)                 # about WFSS images
-        sources.update_header(phdu.header)              # about the sources
+        headers.add_software_log(phdu.header)           # software props
+        data.update_header(phdu.header)                 # WFSS image props
+        sources.update_header(phdu.header)              # source props
         config.update_header(phdu.header)               # global config info
-        self.contamination.update_header(phdu.header)   # about the contamination
+        self.contamination.update_header(phdu.header)   # contamination prop
 
         # if there is a sigma clipper
         phdu.header.set('SIGCLIP', value=hasattr(self, 'sigclip'),
@@ -262,93 +243,27 @@ class Single(Module):
         hdul.append(phdu)
 
         # now process each object
-        for segid in segids:
-            res = result.pop(segid)
-
-            source = sources[segid]
+        # for segid, source in sources.items():#segid in segids:
+        for segid, source in sources.items():
 
             # set the spectral extraction parameters
             pars = defpars.update_pars(source[0])
 
-            # convert to np.array to do calculation
-            flam = np.array(res['flam'])
-            func = np.array(res['func'])
-            wave = np.array(res['wave'])
-            cont = np.array(res['cont'])
-            nimg = np.array(res['file'])
+            # get all the spectra for this object
+            spectra = SpectralTable(segid)
+            for result in results:
+                if segid in result:
+                    spectra += result[segid]
 
-            # find the spectral bins that these elements belong to
-            lamb = pars.indices(wave)
-
-            # number of wavelength elements
-            nwave = len(pars)
-            g = np.where((0 < lamb) & (lamb < nwave))[0]
-
-            # get good values
-            flam = flam[g]        # spectrum
-            func = func[g]        # uncertainties
-            cont = cont[g]        # contamination model
-            wave = wave[g]        # wavelengths in A
-            lamb = lamb[g]        # wavelength indices
-            nimg = nimg[g]
-
-            # get reverse elements
-            ri = indices.reverse(lamb)
-
-            # make an output data structure
-            out = np.zeros(nwave, dtype=self.DTYPE)
-            out['lamb'] = pars.wavelengths()           # PRISM CHANGE
-            out['flam'] = np.nan
-            out['func'] = np.nan
-            out['cont'] = np.nan
-            out['npix'] = 0
-
-            # compute weighted-averages over the bins
-            for ind, g in ri.items():
-                val = flam[g]
-                unc = func[g]
-                wht = 1. / unc**2      # initialize weights as inverse variance
-                cnt = cont[g]
-
-                # update the weights with sigma clipping if requested
-                # if hasattr(self, 'sigclip'):
-                #    masked = self.sigclip(val, masked=True, copy=True)
-                #    wht *= (1-np.ma.getmask(masked).astype(float))
-
-                # if a pixel has an infinite cont, then ignore it
-                # wht=np.where(np.isinf(cnt),0.,wht)
-
-                # update weights for the contamination
-                # gc=np.where(cnt>0)[0]
-                # if len(gc)>0:
-                #    frac=cnt[gc]/val[gc]
-                #    wht[gc]/=frac**2
-
-                # weighted STDEV as the error?
-                # err = np.sqrt(np.average((val-ave)**2, weights=wht))
-
-                # compute sum of weights (used later)
-                nwht = np.count_nonzero(wht)
-                if nwht > 0:
-                    wsum = np.sum(wht)
-
-                    # iteratively clip points
-                    # for it in range(1):
-                    #    wsum = np.sum(wht)
-                    #    ave = np.sum(wht*val)/wsum
-                    #    delta = np.abs(val - ave)/unc
-                    #    bad = np.where(np.abs(delta)>3.)[0]
-                    #    wht[bad] = 0.0
-
-                    # save the results
-                    out['flam'][ind] = np.sum(wht * val) / wsum
-                    out['func'][ind] = 1. / np.sqrt(wsum)
-                    out['cont'][ind] = np.sum(wht * cnt) / wsum
-                    out['npix'][ind] = nwht
+            # combine it
+            spectrum = spectra.combine(pars)
 
             # update the source
-            source[0].sed.reset(out['lamb'], out['flam'], func=out['func'],
-                                cont=out['cont'], npix=out['npix'])
+            source[0].sed.reset(spectrum.get('wave'),
+                                spectrum.get('flam'),
+                                func=spectrum.get('func'),
+                                cont=spectrum.get('cont'),
+                                npix=spectrum.get('npix'))
 
             # write out 1d SEDs?
             if self.writecsv:
@@ -427,9 +342,8 @@ class Single(Module):
 
         Returns
         -------
-        results : dict
-            This is a dictionary of dictionaries that get passed to
-            `self._combine`
+        spectra : `SpectralTable`
+            The measurements for all the spectra for this source and is passed to `self._combine`
 
         Notes
         -----
@@ -437,24 +351,21 @@ class Single(Module):
 
         """
 
-        # scale of the output fluxes
-        fluxscale = Config().fluxscale
+        # get the defaults
 
-        # create a data structure to hold the results
-        results = {segid: {'wave': [], 'flam': [], 'func': [], 'cont': [], 'dwav': []} for segid in
-                   sources.keys()}
+        # sort out the extraction mode
+        extmode = kwargs.get('extmode', 'boxcar').lower()
 
-        # sort out optional inputs
-        cartesian = kwargs.get('cartesian', True)
-        profile = kwargs.get('profile', 'uniform')
-        if isinstance(profile, str):
-            profile = profile.lower()
-        else:
-            profile = 'none'
+        # get the profile for horne?
+        # profile = kwargs.get('profile', 'uniform')
 
         # padding for the contamination models
-        padx = (5, 5)
-        pady = (5, 5)
+        padx = kwargs.get('padx', (5, 5))
+        pady = kwargs.get('pady', (5, 5))
+        width = kwargs.get('width', 5)
+
+        # create a data structure to hold the results
+        spectra = {segid: SpectralTable(segid) for segid in sources.keys()}
 
         # contamination image
         if self.savecont:
@@ -464,30 +375,20 @@ class Single(Module):
             LOGGER.debug("add stuff to contam images' primary headers")
             chdul.append(phdr)
 
-        # grab the default extraction parameters
-        defpars = data.get_parameters()
-
         # open the PDT for reading
         with PDTFile(data, path=self.path, mode='r') as h5:
 
             for detname, detdata in data.items():
+                # load the tables and configuration
                 h5.load_detector(detname)
-                bitmask = detdata.config.bitmask
+                cfg = detdata.config
 
                 # load the data
-                phdr = detdata.primaryheader()
-                sci, hdr = detdata.readfits('science', header=True)
-                unc = detdata.readfits('uncertainty')
-                dqa = detdata.readfits('dataquality')
+                sci, unc, dqa = detdata.readimages()
 
                 # get the flat field
                 flatfield = detdata.config.load_flatfield(**kwargs)
 
-                # convert units to a rate
-                if hdr['BUNIT'].lower() in ('electron', 'electrons', 'e', 'e-'):
-                    time = phdr['EXPTIME']
-                    sci /= time
-                    unc /= time
                 # initialize the contamination modeling
                 self.contamination.make_model(sources, h5)
 
@@ -495,248 +396,45 @@ class Single(Module):
                 orders = self.extorders if self.extorders else detdata.orders
                 for ordname in orders:
                     h5.load_order(ordname)
+                    order = cfg[ordname]
 
                     # process each source
                     for segid, source in sources.items():
 
                         odt = h5.load_odt(source)
                         if odt:
-                            # get contents of the table
-                            xg = odt.get('x')
-                            yg = odt.get('y')
-                            val = odt.get('val')
-                            # lam = odt.get('lam')
-                            wav = odt.wavelengths()
-                            dwav = np.zeros_like(val, dtype=float)
+                            # get the extraction parameters
+                            # pars = defpars.update_pars(source[0])
 
-                            # set the spectral extraction parameters
-                            pars = defpars.update_pars(source[0])
-                            wavelengths = pars.wavelengths()
-
-                            # limits = pars.limits()
-                            # lam = pars.indices(wav)
-
-                            # get minimum bounding box for lops
-                            x0, x1, y0, y1 = odt.bounding_box()
-
-                            # if requested, compute the contamination model:
+                            # do a contmaination if requestied
                             if self.contamination:
-                                # grow bounding boxes for contamination models
-                                bbx = (np.maximum(x0 - padx[0], 0),
-                                       np.minimum(x1 + padx[1], detdata.naxis[0] - 1))
-                                bby = (np.maximum(y0 - pady[0], 0),
-                                       np.minimum(y1 + pady[1], detdata.naxis[1] - 1))
+                                # get bounding box
+                                x0, x1, y0, y1 = odt.bounding_box(dx=padx,
+                                                                  dy=pady)
 
                                 # get the contam data
-                                chdu = self.contamination(segid, ordname, h5, sources,
-                                                          detdata, flatfield, bbx=bbx, bby=bby)
+                                chdu = self.contamination(segid, ordname,
+                                                          h5, sources,
+                                                          detdata, flatfield,
+                                                          bbx=(x0, x1), bby=(y0, y1))
 
                                 if self.savecont:
                                     chdul.append(chdu)
 
                                 # get the offsets in the contamination image
-                                xoff = -chdu.header.get('LTV1', 0)
-                                yoff = -chdu.header.get('LTV2', 0)
+                                # xoff = -chdu.header.get('LTV1', 0)
+                                # yoff = -chdu.header.get('LTV2', 0)
 
-                            if cartesian:
-                                # for making the residuals
-                                mod = np.zeros_like(sci)
-                                for x in range(x0, x1 + 1, 1):
-                                    g = np.where(x == xg)[0]
-                                    xx = xg[g]
-                                    yy = yg[g]
-                                    ww = wav[g]
-                                    vv = val[g]
-                                    dw = dwav[g]
+                            if extmode == 'boxcar':
+                                spectrum = boxcar(source, detdata, sci, unc, dqa, flatfield, order,
+                                                  odt, width=width)
 
-                                    # apply the bitmask
-                                    xx, yy, vv, ww, dw = self.apply_bitmask(
-                                        dqa[yy, xx], xx, yy, vv, ww, dw, bitmask=bitmask)
-                                    if len(xx) > 0:
-                                        ww, _y = indices.decimate(ww * vv, yy)
-                                        vv, yy = indices.decimate(vv, yy)
-                                        ww /= vv
-                                        xx = np.full_like(yy, x, dtype=int)
+                                spectra[segid] += spectrum
 
-                                        # the average wavelength in this column
-                                        wave = np.average(ww, weights=vv)
-
-                                        # compute the calibrations
-                                        disp = detdata.config[ordname].dispersion(
-                                            *source.xyc, wavelength=ww)
-                                        sens = detdata.config[ordname].sensitivity(ww)
-                                        flat = flatfield(xx, yy, ww)
-                                        area = detdata.relative_pixelarea(xx, yy)
-                                        den = flat * area * sens * fluxscale * disp
-
-                                        # apply calibrations, but guard against
-                                        # divide by zero errors
-                                        bad = np.where(den == 0)[0]
-                                        den[bad] = 1.
-                                        ss = sci[yy, xx] / den
-                                        uu = unc[yy, xx] / den
-                                        ss[bad] = np.nan
-                                        uu[bad] = np.nan
-
-                                        # set the cross dispersion profile
-                                        if profile is None or profile == 'none':
-                                            # simple summing over pixels
-                                            flam = np.nansum(ss)
-                                            func = np.sqrt(np.nansum(uu**2))
-
-                                            # set the profile to a dummy value
-                                            prof = 1.0
-                                        else:
-                                            # if using a profile
-                                            if profile == 'forward':
-                                                prof = vv.copy()
-                                            elif profile == 'data':
-                                                prof = np.maximum(sci[yy, x], 0.)
-                                            elif profile == 'uniform':
-                                                prof = np.ones_like(ss, dtype=float)
-                                            else:
-                                                msg = f'Profile setting ({profile}) is invalid'
-                                                LOGGER.error(msg)
-                                                raise RuntimeError(msg)
-
-                                            # normalize the profile
-                                            profnorm = np.nansum(prof)
-                                            prof /= profnorm
-
-                                            wht = prof / uu**2
-                                            norm = np.nansum(prof * wht)
-
-                                            # take out some protection from
-                                            # divide by zero
-                                            if norm == 0:
-                                                flam = np.nan
-                                                func = np.nan
-                                            else:
-                                                flam = np.nansum(ss * wht) / norm
-                                                func = np.sqrt(profnorm / norm)
-
-                                        # update the model
-                                        mod[yy, x] = flam * den * prof
-
-                                        # compute contamination
-                                        if self.contamination:
-                                            cc = chdu.data[yy - yoff, xx - xoff] / den
-                                            if profile == 'uniform':
-                                                cont = np.sum(cc)
-                                            else:
-                                                cont = np.sum(cc * wht) / norm
-                                        else:
-                                            cont = 0.0
-
-                                        # save the results
-                                        results[segid]['flam'].append(flam)
-                                        results[segid]['func'].append(func)
-                                        results[segid]['wave'].append(wave)
-                                        results[segid]['dwav'].append(0.0)
-                                        results[segid]['cont'].append(cont)
-                                with open(f'{data.dataset}_{segid}.sed', 'w') as fp:
-                                    for args in zip(results[segid]['wave'], results[segid]['flam']):
-                                        print(*args, file=fp)
-
-                                # fits.writeto(f'{data.dataset}_res.fits', (sci-mod)/unc, overwrite=True)
-                            else:
-
-                                di = 0.5
-                                for ind, wave in enumerate(wavelengths):
-                                    w0, w1 = pars(ind - di), pars(ind + di)
-                                    g = np.where((w0 <= wav) & (wav < w1))[0]
-                                    # for ind, g in ri.items():
-                                    xx = xg[g]
-                                    yy = yg[g]
-                                    ww = wav[g]
-                                    vv = val[g]
-                                    dw = dwav[g]
-
-                                    # apply the bitmask
-                                    xx, yy, vv, ww, dw = self.apply_bitmask(
-                                        dqa[yy, xx], xx, yy, vv, ww, dw, bitmask=bitmask)
-
-                                    # compute cross dispersion direction
-                                    # t = detdata.config[ordname].displ.invert(source.xyc[0],
-                                    # source.xyc[1], thiswave)
-                                    # dxdt = detdata.config[ordname].dispx.deriv(source.xyc[0],
-                                    # source.xyc[1], t)
-                                    # dydt = detdata.config[ordname].dispy.deriv(source.xyc[0],
-                                    # source.xyc[1], t)
-                                    # drdt = np.sqrt(dxdt**2 + dydt**2)
-
-                                    # dispx = dxdt/drdt
-                                    # dispy = dydt/drdt
-
-                                    # cross dispersion vector (orthogonal, by construction)
-                                    # crossx = -dy
-                                    # crossy = +dx
-
-                                    # center of region
-                                    # x0 = np.average(xx, weights=vv)
-                                    # y0 = np.average(yy, weights=vv)
-
-                                    # distances to the cross dispersion vector
-                                    # D = np.abs(crossx*(yy-y0)-crossy*(xx-x0))
-                                    # g = np.where(D<2)[0]
-                                    # if g.size>0:
-                                    #     xx = xx[g]
-                                    #     yy = yy[g]
-                                    #     vv = vv[g]
-                                    #     ww = ww[g]
-                                    #     dw = dw[g]
-
-                                    # measure size
-                                    # X = np.average(xx, weights=vv)
-                                    # Y = np.average(yy, weights=vv)
-                                    # X2 = np.average((xx-X)**2, weights=vv)
-                                    # Y2 = np.average((yy-Y)**2, weights=vv)
-                                    # XY = np.average((xx-X)*(yy-Y), weights=vv)
-                                    # DIF = (X2-Y2)/2.
-                                    # AVE = (X2+Y2)/2.
-                                    # DET = DIF**2 + XY**2
-                                    # A = np.sqrt(AVE + np.sqrt(DET))
-                                    # B = np.sqrt(AVE - np.sqrt(DET))
-                                    # SIG = np.sqrt(A*B)
-                                    # FWHM = SIG*2.35
-
-                                    # decimate over unique pixels
-                                    ww, _x, _y = indices.decimate(ww * vv, xx, yy)
-                                    vv, xx, yy = indices.decimate(vv, xx, yy)
-                                    ww /= vv
-
-                                    disp = detdata.config[ordname].dispersion(
-                                        *source.xyc, wavelength=wave)
-                                    sens = detdata.config[ordname].sensitivity(ww)
-                                    flat = flatfield(xx, yy, ww)
-                                    area = detdata.relative_pixelarea(xx, yy)
-                                    den = flat * area * sens * fluxscale * disp
-                                    ss = sci[yy, xx] / den
-                                    uu = unc[yy, xx] / den
-
-                                    # using forward model weights
-                                    prof = np.maximum(vv, 0.)
-                                    prof = prof / np.sum(prof)
-                                    wht = prof / uu**2
-                                    norm = np.sum(prof * wht)
-                                    flam = np.sum(ss * wht) / norm
-                                    func = np.sqrt(np.sum(prof) / norm)
-
-                                    # if doing contamination
-                                    if self.contamination:
-                                        cc = chdu.data[yy - yoff, xx - xoff]
-                                        cont = np.sum(cc * wht) / norm
-                                    else:
-                                        cont = 0.0
-
-                                    # store the results
-                                    results[segid]['flam'].append(flam)
-                                    results[segid]['func'].append(func)
-                                    results[segid]['wave'].append(wave)
-                                    results[segid]['dwav'].append(0.0)
-                                    results[segid]['cont'].append(cont)
+                            elif extmode == 'horne':
+                                raise NotImplementedError
 
         if self.savecont:
             chdul.writeto(f'{data.dataset}_cont.fits', overwrite=True)
 
-        return results
+        return spectra

@@ -37,10 +37,10 @@ class Tabulate(Module):
 
     """
 
-    # should be +0.5 for uvis
     # define the pixel footprint
-    DX = np.array([0, 0, 1, 1], dtype=float) + 0.5
-    DY = np.array([0, 1, 1, 0], dtype=float) + 0.5
+    # NB:  internal to the code, all coordinates are with the (0, 0) origin
+    DX = np.array((-0.5, +0.5, +0.5, -0.5), dtype=float)
+    DY = np.array((+0.5, +0.5, -0.5, -0.5), dtype=float)
 
     DESCRIPTION = 'Tabulating'
 
@@ -221,7 +221,8 @@ class Tabulate(Module):
         # process each pixel
         for x, y, w in source.pixels(applyltv=False, weights=True):
 
-            # coordinate in the main image
+            # coordinate in the main image (only applies LTV)
+            # these coordinates are on the (0, 0) reference
             xd, yd = source.image_coordinates(x, y, dtype=int)
 
             # make an empty table
@@ -235,7 +236,9 @@ class Tabulate(Module):
                       profile=w, pixrat=pixrat, **kwargs)
 
             # transform the pixel position and apply footprint
-            xg, yg = detdata.xy2xy(x + self.DX, y + self.DY, source.wcs, forward=False)
+            # (xg, yg) are on the (0, 0) system for the WFSS image
+            xg, yg = detdata.xy2xy(x + self.DX, y + self.DY, source.wcs,
+                                   forward=False)
 
             # drizzle this pixel
             xx, yy, ll, aa = detdata.config.drizzle(xg, yg, ordname, wav)
@@ -247,6 +250,12 @@ class Tabulate(Module):
                 # NSub), then this can be important.
                 aa, xx, yy, ll = indices.decimate(aa, xx, yy, ll, dims=dims)
 
+                # convert all coordinates from (0,0) to (1,1) system
+                # x += 1
+                # y += 1
+                # xx += 1
+                # yy += 1
+
                 # At this point, the only effect accounted for is the
                 # relative area between the grism and direct image (aa).
                 # now we will include three effects:
@@ -255,7 +264,7 @@ class Tabulate(Module):
                 # 3. wavelength sampling for integrals (dwav)
                 pdt.extend(xx, yy, ll, aa * w * dwav * pixrat)
 
-                # save this PDT
+                # save this PDT as (0, 0) system coordinates
                 pdts[(x, y)] = pdt
 
                 # if asked to save.  save it here
