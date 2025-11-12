@@ -155,3 +155,39 @@ def set_crval(hdr, crval, key):
 
     hdr[f'CRVAL1{key}'] = crval[0]
     hdr[f'CRVAL2{key}'] = crval[1]
+
+
+def get_keyword(hdr, val):
+    """
+    Function to reverse look-up of header value
+
+    Parameters
+    ----------
+    hdr : `astropy.io.fits.Header()`
+       The header to search in.
+
+    val : float, int, or str
+       The header value to look for --- the data type should match what is
+       expected in the header
+
+    Returns
+    -------
+    key : `None`, str, or list
+       The header keyword that gives the input value.  The output type will
+       be based on the number of matches found:
+
+       Number | Output Type
+       -------+------------
+         0    | NoneType
+         1    | str
+         else | list
+
+    """
+    keys = [k for k, v in hdr.items() if v == val]
+    n = len(keys)
+    if n == 0:
+        return None
+    elif n == 1:
+        return keys[0]
+    else:
+        return keys

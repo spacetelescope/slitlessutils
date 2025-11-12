@@ -54,6 +54,9 @@ dependencies = [
 Homepage = 'https://github.com/spacetelescope/slitlessutils'
 Documentation = 'https://slitlessutils.readthedocs.io/en/stable/'
 
+[project.scripts]
+listwcs = "slitlessutils.core.preprocess.astrometry.list_wcs:main"
+
 [project.optional-dependencies]
 test = [
     'pytest-astropy>=0.11',

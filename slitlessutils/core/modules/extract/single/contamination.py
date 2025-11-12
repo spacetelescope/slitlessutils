@@ -67,11 +67,14 @@ class Contamination(dict):
         The orders to consider as contamination.  If "all" then all
         orders are masked.
 
+    threshold : float
+        The threshold to flag for contamination.  Default: 0.0
+
     """
 
-    def __init__(self, contam_orders):
+    def __init__(self, contam_orders, threshold=0.0):
         self.contam_orders = ContaminantOrders(contam_orders)
-        self.threshold = 0.0
+        self.threshold = threshold
 
     def update_header(self, hdr):
         """

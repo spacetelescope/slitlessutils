@@ -410,6 +410,42 @@ class WFSSDetector:
         else:
             pass
 
+    def readimages(self, rate=True):
+        '''
+        Method to read all the relevant image data and convert units if needed
+
+        Parameters
+        ----------
+        rate : bool
+           Flag to convert output images into rate values.  Default=True
+
+        Returns
+        -------
+        sci : `np.ndarray`
+           The science image
+
+        unc : `np.ndarray`
+           The uncertainty image
+
+        dqa : `np.ndarray`
+           The data quality image
+
+        '''
+
+        phdr = self.primaryheader()
+        sci, hdr = self.readfits('science', header=True)
+        unc = self.readfits('uncertainty')
+        dqa = self.readfits('dataquality')
+
+        if rate:
+            bunit = hdr.get('BUNIT', '').lower()
+            if bunit in ('electron', 'electrons', 'e', 'e-'):
+                time = phdr.get('EXPTIME')
+                sci /= time
+                unc /= time
+
+        return sci, unc, dqa
+
     def primaryheader(self):
         """
         Method to read the primary header
@@ -478,12 +514,17 @@ class WFSSDetector:
         the output `X` and `Y` will have that shape
         """
 
+        # simple flag to use later
+        origin = 0
+
         if forward:
-            # X, Y = wcs.all_world2pix(*self.wcs.all_pix2world(x, y, 0), 0)
-            X, Y = wcs.wcs_world2pix(*self.wcs.wcs_pix2world(x, y, 0), 0)
+            # if transforming to the supplied WCS
+            a, d = self.wcs.all_pix2world(x, y, origin)
+            X, Y = wcs.all_world2pix(a, d, origin)
         else:
-            # X, Y = self.wcs.all_world2pix(*wcs.all_pix2world(x, y, 0), 0)
-            X, Y = self.wcs.wcs_world2pix(*wcs.wcs_pix2world(x, y, 0), 0)
+            # if transforming from the supplied WCS
+            a, d = wcs.all_pix2world(x, y, origin)
+            X, Y = self.wcs.all_world2pix(a, d, origin)
         return X, Y
 
     def ad2xy(self, a, d):
