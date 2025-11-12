@@ -3,7 +3,6 @@ import os
 from astropy.io import fits
 from astropy.stats import SigmaClip
 import numpy as np
-from astropy.io import SigmaClip, fits
 
 from .....config import SUFFIXES, Config
 from .....info import __code__
