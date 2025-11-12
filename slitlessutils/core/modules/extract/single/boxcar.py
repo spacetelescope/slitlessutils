@@ -1,11 +1,10 @@
-from astropy.stats import sigma_clipped_stats
 import matplotlib.pyplot as plt
 import numpy as np
-
-from .spectraltable import SpectralTable
+from astropy.stats import sigma_clipped_stats
 
 from .....config import Config
 from ....utilities import indices
+from .spectraltable import SpectralTable
 
 
 def boxcar(source, det, sci, unc, dqa, flatfield, order, odt,
