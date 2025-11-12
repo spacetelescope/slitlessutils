@@ -1,4 +1,3 @@
-from astropy.stats import sigma_clip
 import numpy as np
 
 from ....utilities import indices
@@ -143,7 +142,7 @@ class SpectralTable(dict):
         else:
             raise AttributeError(f'Invalid keyword: {k}')
 
-    def combine(self, pars, sigma=3.):
+    def combine(self, pars, clipper=None):
         '''
         Method to stack spectra
 
@@ -153,16 +152,14 @@ class SpectralTable(dict):
         pars : `Disperser`
            A light-weight object that describes the extraction wavelengths
 
-        sigma : `float` or `int`
-           Number of sigma to sigma clip.  Default: 3.
+        clipper : `astropy.stats.SigmaClip`
+           A method to sigma clip before combining.  Default is `None`
 
         Returns
         -------
         spectrum : `SpectralTable`
            A new `SpectralTable` object of the combined spectrum
         '''
-
-        self.to_csv('save.csv')
 
         spectrum = SpectralTable(self.segid)
 
@@ -197,13 +194,14 @@ class SpectralTable(dict):
             thisnpix = thisnpix[g]
 
             # sigma clip and remove bad data
-            clipped = sigma_clip(thisflam, sigma=sigma)
-            g = np.logical_not(clipped.mask)
-            thisflam = thisflam[g]
-            thisfunc = thisfunc[g]
-            thisflux = thisflux[g]
-            thiscont = thiscont[g]
-            thisnpix = thisnpix[g]
+            if clipper:
+                clipped = clipper(thisflam)
+                g = np.logical_not(clipped.mask)
+                thisflam = thisflam[g]
+                thisfunc = thisfunc[g]
+                thisflux = thisflux[g]
+                thiscont = thiscont[g]
+                thisnpix = thisnpix[g]
 
             # compute weights
             w = 1. / thisfunc**2

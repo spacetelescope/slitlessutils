@@ -4,25 +4,22 @@ from glob import glob
 from astropy.io import fits
 
 
-def list_wcs(suf):
+def list_wcs(arg):
     '''
     Method to list the WCSs present in a host of flt/flc files by
     printing to the screen.  The live WCSNAME will be shown in boldface.
 
     Parameters
     ----------
-    suf : str
-       The file suffix of the dataset to pass to `glob.glob`.  Typically
-       this will be either "flt" or "flc".
-
-
+    arg : str
+       Token to pass to `glob.glob()` to find all files.
 
     Returns
     -------
     None.
     '''
 
-    files = glob(f'*{suf}.fits')
+    files = glob(arg)
 
     for f in files:
 

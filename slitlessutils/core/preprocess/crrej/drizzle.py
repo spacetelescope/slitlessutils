@@ -25,7 +25,6 @@ def _get_instrument_defaults(file):
                 if csmid == "IR":
                     return instrument_args["ir"]
                 elif csmid == "UVIS":
-                    print(instrument_args['uvis'])
                     return instrument_args["uvis"]
                 else:
                     raise ValueError(f"Invalid CSMID: {csmid}")

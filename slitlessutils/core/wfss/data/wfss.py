@@ -513,13 +513,18 @@ class WFSSDetector:
         The input `x` and `y` variables must have the same shape, and then
         the output `X` and `Y` will have that shape
         """
-        o = 0
+
+        # simple flag to use later
+        origin = 0
+
         if forward:
-            X, Y = wcs.all_world2pix(*self.wcs.all_pix2world(x, y, o), o)
-            # X, Y = wcs.wcs_world2pix(*self.wcs.wcs_pix2world(x, y, o), o)
+            # if transforming to the supplied WCS
+            a, d = self.wcs.all_pix2world(x, y, origin)
+            X, Y = wcs.all_world2pix(a, d, origin)
         else:
-            X, Y = self.wcs.all_world2pix(*wcs.all_pix2world(x, y, o), o)
-            # X, Y = self.wcs.wcs_world2pix(*wcs.wcs_pix2world(x, y, o), o)
+            # if transforming from the supplied WCS
+            a, d = wcs.all_pix2world(x, y, origin)
+            X, Y = self.wcs.all_world2pix(a, d, origin)
         return X, Y
 
     def ad2xy(self, a, d):

@@ -11,7 +11,7 @@ from ....utilities import indices
 def boxcar(source, det, sci, unc, dqa, flatfield, order, odt,
            width=17, summation='cartesian', plot=False):
     '''
-    Worker function to perform boxcar or "aperture" spectrscopy
+    Worker function to perform boxcar or "aperture" spectroscopy
 
     Parameters
     ----------
@@ -65,8 +65,6 @@ def boxcar(source, det, sci, unc, dqa, flatfield, order, odt,
     vg = odt.get('val')
     wav = odt.wavelengths()
 
-    msk = np.zeros_like(sci)
-
     # make an output data structure to fill
     spec = SpectralTable(odt.segid)
 
@@ -94,10 +92,12 @@ def boxcar(source, det, sci, unc, dqa, flatfield, order, odt,
 
             # compute some things for this slice
             wave = np.average(wu, weights=vu)
-            yave = np.average(yu, weights=vu)
-            ycent, yfrac = np.divmod(yave, 1)
-            ytrace[i] = yave
+            ytrace[i] = np.average(yu, weights=vu)
             xtrace[i] = x
+
+            # get the fractional part of the trace to use for
+            # fractional pixel coverage
+            ycent, yfrac = np.divmod(ytrace[i], 1)
 
             # get the range
             ymin = max(int(ycent - half), 0)
@@ -112,11 +112,6 @@ def boxcar(source, det, sci, unc, dqa, flatfield, order, odt,
             aper[0] = 1 - yfrac
             aper[-1] = yfrac
             npix = np.sum(aper)
-            if 7550 < wave < 7900:
-                msk[ys, xs] = aper
-
-                # plt.plot(ys, sci[ys, xs])
-                # plt.show()
 
             # compute calibrations
             disp = order.dispersion(x0, y0, wavelength=wave)

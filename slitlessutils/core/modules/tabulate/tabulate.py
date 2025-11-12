@@ -250,12 +250,6 @@ class Tabulate(Module):
                 # NSub), then this can be important.
                 aa, xx, yy, ll = indices.decimate(aa, xx, yy, ll, dims=dims)
 
-                # convert all coordinates from (0,0) to (1,1) system
-                # x += 1
-                # y += 1
-                # xx += 1
-                # yy += 1
-
                 # At this point, the only effect accounted for is the
                 # relative area between the grism and direct image (aa).
                 # now we will include three effects:

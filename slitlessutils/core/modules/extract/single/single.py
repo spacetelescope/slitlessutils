@@ -1,7 +1,7 @@
 import os
 
 from astropy.io import fits
-from astropy.io import SigmaClip
+from astropy.stats import SigmaClip
 import numpy as np
 
 from .....config import SUFFIXES, Config
@@ -112,7 +112,9 @@ class Single(Module):
 
         # for sigma-clipping of the data
         if isinstance(nsigmaclip, (int, float)):
-            self.sigclip = SigmaClip(sigma=nsigmaclip, maxiters=maxiters)
+            self.clipper = SigmaClip(sigma=nsigmaclip, maxiters=maxiters)
+        else:
+            self.clipper = None
 
         # set output file path
         self.outpath = self.set_outpath(outpath)
@@ -229,21 +231,21 @@ class Single(Module):
         self.contamination.update_header(phdu.header)   # contamination prop
 
         # if there is a sigma clipper
-        phdu.header.set('SIGCLIP', value=hasattr(self, 'sigclip'),
+        phdu.header.set('SIGCLIP', value=bool(self.clipper),
                         comment='Sigma-clip weighting?')
         if phdu.header['SIGCLIP']:
-            phdu.header.set('NSIGMA', value=self.sigclip.sigma,
+            phdu.header.set('NSIGMA', value=self.clipper.sigma,
                             comment='number of sigma for clipping')
-            phdu.header.set('MAXITER', value=self.sigclip.maxiters,
+            phdu.header.set('MAXITER', value=self.clipper.maxiters,
                             comment='maximum number of iterations')
-        headers.add_stanza(phdu.header, 'Spectral Combination', before='SIGCLIP')
+        headers.add_stanza(phdu.header, 'Spectral Combination',
+                           before='SIGCLIP')
         super().update_header(phdu.header)            # about the CPU settings
 
         # add to the HDUList
         hdul.append(phdu)
 
         # now process each object
-        # for segid, source in sources.items():#segid in segids:
         for segid, source in sources.items():
 
             # set the spectral extraction parameters
@@ -256,7 +258,7 @@ class Single(Module):
                     spectra += result[segid]
 
             # combine it
-            spectrum = spectra.combine(pars)
+            spectrum = spectra.combine(pars, clipper=self.clipper)
 
             # update the source
             source[0].sed.reset(spectrum.get('wave'),
