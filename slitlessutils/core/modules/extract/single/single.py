@@ -1,8 +1,8 @@
 import os
 
+import numpy as np
 from astropy.io import fits
 from astropy.stats import SigmaClip
-import numpy as np
 
 from .....config import SUFFIXES, Config
 from .....info import __code__

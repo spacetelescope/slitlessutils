@@ -12,7 +12,6 @@ from scipy.ndimage import gaussian_filter1d
 
 import slitlessutils as su
 
-
 """
 Description
 -----------
@@ -87,7 +86,7 @@ def preprocess_grism():
 
     # process each image
     grismfiles = []
-    with open(f'{GRATING}.lst', 'r') as fp:
+    with open(f'{GRATING}.lst') as fp:
         for line in fp:
             grismfile = line.strip()
 
@@ -107,7 +106,7 @@ def preprocess_grism():
 def preprocess_direct():
 
     imagefiles = []
-    with open(f'{FILTER}.lst', 'r') as fp:
+    with open(f'{FILTER}.lst') as fp:
         for line in fp:
             imagefile = line.strip()
 
@@ -259,7 +258,7 @@ def run_all(plot=True):
     # step 2.  Process the grism images
     preprocess_grism()
 
-    # step 3.  process the driect images
+    # step 3.  process the direct images
     preprocess_direct()
 
     # step 4 (optional).  List the astrometry to verify that everything

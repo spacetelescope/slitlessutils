@@ -1,12 +1,12 @@
+import os
+import shutil
+
+import matplotlib.pyplot as plt
+import numpy as np
 from astropy.io import fits
 from astropy.wcs import WCS
 from astroquery.mast import Observations
 from drizzlepac import astrodrizzle
-
-import matplotlib.pyplot as plt
-import numpy as np
-import os
-import shutil
 
 import slitlessutils as su
 
@@ -81,7 +81,7 @@ def preprocess_grism():
     back = su.core.preprocess.background.Background()
 
     # process each image
-    with open(f'{GRATING}.lst', 'r') as fp:
+    with open(f'{GRATING}.lst') as fp:
         for line in fp:
             grismfile = line.strip()
 
@@ -95,7 +95,7 @@ def preprocess_grism():
 
 def preprocess_direct():
     imagefiles = []
-    with open(f'{FILTER}.lst', 'r') as fp:
+    with open(f'{FILTER}.lst') as fp:
         for line in fp:
             imagefile = line.strip()
 
@@ -190,8 +190,8 @@ def plot_spectra():
 
     # get the sensitivity curve just for fun
     subpath = os.path.join('instruments', 'WFC3IR')
-    senfile = cfg.get_reffile('WFC3.IR.G102.1st.sens.2.fits', subpath)
-    sens = fits.getdata(senfile)
+    sendfile = cfg.get_reffile('WFC3.IR.G102.1st.sens.2.fits', subpath)
+    sens = fits.getdata(sendfile)
 
     # read the SU spectrum
     dat, hdr = fits.getdata(f'{ROOT}_x1d.fits', header=True)

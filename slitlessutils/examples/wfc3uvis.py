@@ -1,15 +1,14 @@
 import os
 import shutil
 
+import matplotlib.pyplot as plt
+import numpy as np
 from astropy.io import fits
 from astropy.wcs import WCS
 from astroquery.mast import Observations
 from drizzlepac import astrodrizzle
-import matplotlib.pyplot as plt
-import numpy as np
 
 import slitlessutils as su
-
 
 """
 Description
@@ -82,7 +81,7 @@ def preprocess_grism():
 
     # process each file
     grismfiles = []
-    with open(f'{GRATING}.lst', 'r') as fp:
+    with open(f'{GRATING}.lst') as fp:
         for line in fp:
             grismfile = line.strip()
 
@@ -100,7 +99,7 @@ def preprocess_direct():
 
     imagefiles = []
 
-    with open(f'{FILTER}.lst', 'r') as fp:
+    with open(f'{FILTER}.lst') as fp:
         for line in fp:
             imagefile = line.strip()
 
