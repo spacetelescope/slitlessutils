@@ -190,8 +190,8 @@ def plot_spectra():
 
     # get the sensitivity curve just for fun
     subpath = os.path.join('instruments', 'WFC3IR')
-    sendfile = cfg.get_reffile('WFC3.IR.G102.1st.sens.2.fits', subpath)
-    sens = fits.getdata(sendfile)
+    sens_file = cfg.get_reffile('WFC3.IR.G102.1st.sens.2.fits', subpath)
+    sens = fits.getdata(sens_file)
 
     # read the SU spectrum
     dat, hdr = fits.getdata(f'{ROOT}_x1d.fits', header=True)
