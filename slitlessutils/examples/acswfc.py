@@ -12,18 +12,25 @@ from scipy.ndimage import gaussian_filter1d
 
 import slitlessutils as su
 
-'''
-  1) download data
-     a) copy files to working directory
-  2) preprocess grism images
-     a) flag cosmic rays
-     b) subtract master sky
-     c) sync WCS
-  3) preprocess direct images
-     a) run astrodrizzle
-     b) make segmentation map
-  4) extract single
-'''
+"""
+Description
+-----------
+
+This file demonstrates the analysis of HST ACS/WFC grism spectroscopy using
+the G800L observations of the standard star WR96.  It will compare the
+spectrum extracted with slitlessutils to a reference spectrum from
+Pasquali et al. (2002) that is stored in the reference file database.
+
+The grey bar shows the region used to normalize the spectra.
+
+Author
+------
+R. Ryan (STScI)
+
+Date
+----
+Nov 6, 2025
+"""
 
 
 # the observations
@@ -41,59 +48,76 @@ DATASETS = {GRATING: ["jdql01jpq", "jdql01jxq"],
 ROOT = 'WRAY-15-1736'
 
 # position of source
-RA = 264.1019010      # in deg
-DEC = -32.9087315     # in deg
+RA = 264.1018744
+DEC = -32.9087434
 RAD = 0.5             # in arcsec
 SUFFIX, DRZSUF = 'flc', 'drc'
 SCALE = 0.05          # driz image pix scale
 
 
 def download():
-    obs_ids = tuple(d.lower() for k, v in DATASETS.items() for d in v)
-    obstab = Observations.query_criteria(obs_id=obs_ids, obs_collection=TELESCOPE)
-
     # some settings for downloading
     kwargs = {'productSubGroupDescription': [SUFFIX.upper()],
               'extension': 'fits'}
 
-    for row in obstab:
-        obsid = str(row['obsid'])
-        downloads = Observations.download_products(obsid, **kwargs)
-        for local in downloads['Local Path']:
-            local = str(local)
-            f = os.path.basename(local)
-            if f.startswith(obs_ids):
-                shutil.copy2(local, '.')
+    for band in DATASETS.keys():
+        with open(f'{band}.lst', 'w') as fp:
+
+            for dataset in DATASETS[band]:
+                ipppss = dataset[:6]
+                obstab = Observations.query_criteria(
+                    obs_id=dataset, obs_collection=TELESCOPE)
+
+                for row in obstab:
+                    obsid = str(row['obsid'])
+                    downloads = Observations.download_products(obsid, **kwargs)
+                    for local in downloads['Local Path']:
+                        filename = os.path.basename(local)
+                        if filename.startswith(ipppss):
+
+                            shutil.copy2(local, '.')
+                            print(filename, file=fp)
 
 
 def preprocess_grism():
 
-    grismfiles = [f'{grismdset}_{SUFFIX}.fits' for grismdset in DATASETS[GRATING]]
-    grismfiles = su.core.preprocess.crrej.drizzle(grismfiles, grouping=None)
-
     # create a background subtraction object
     back = su.core.preprocess.background.Background()
 
-    for imgdset, grismdset in zip(DATASETS[FILTER], DATASETS[GRATING]):
-        grismfile = f'{grismdset}_{SUFFIX}.fits'
-        imgfile = f'{imgdset}_{SUFFIX}.fits'
+    # process each image
+    grismfiles = []
+    with open(f'{GRATING}.lst') as fp:
+        for line in fp:
+            grismfile = line.strip()
 
-        # subtract background via master-sky
-        back.master(grismfile, inplace=True)
+            # subtract background via master-sky
+            back.master(grismfile, inplace=True)
 
-        # update WCS to match Gaia
-        su.core.preprocess.astrometry.upgrade_wcs(imgfile, grismfile,
-                                                  inplace=True)
+            # downgrade the WCS to be consistent
+            su.core.preprocess.astrometry.downgrade_wcs(grismfile, key='A',
+                                                        inplace=True)
+
+            grismfiles.append(grismfile)
+
+    # flag the cosmic rays
+    su.core.preprocess.crrej.drizzle(grismfiles, grouping=None)
 
 
 def preprocess_direct():
-    files = []
-    for imgdset in DATASETS[FILTER]:
-        imgfile = f'{imgdset}_{SUFFIX}.fits'
-        # su.core.preprocess.crrej.laplace(imgfile,inplace=True)
-        files.append(imgfile)
+
+    imagefiles = []
+    with open(f'{FILTER}.lst') as fp:
+        for line in fp:
+            imagefile = line.strip()
+
+            # make the WCS do the older version
+            su.core.preprocess.astrometry.downgrade_wcs(imagefile, key='A',
+                                                        inplace=True)
+
+            imagefiles.append(imagefile)
+
     # mosaic data via astrodrizzle
-    astrodrizzle.AstroDrizzle(files, output=ROOT, build=False,
+    astrodrizzle.AstroDrizzle(imagefiles, output=ROOT, build=False,
                               static=False, skysub=True, driz_separate=False,
                               median=False, blot=False, driz_cr=False,
                               driz_combine=True, final_wcs=True,
@@ -101,7 +125,7 @@ def preprocess_direct():
                               final_pixfrac=1.0,
                               overwrite=True, final_fillval=0.0)
 
-    # AGH gotta remove second extensions
+    # gotta remove second extensions
     # Must use memmap=False to force close all handles and allow file overwrite
     with fits.open(f'{ROOT}_{DRZSUF}_sci.fits', memmap=False) as hdulist:
         img = hdulist['PRIMARY'].data
@@ -123,6 +147,7 @@ def preprocess_direct():
 
     fitter = fitting.LevMarLSQFitter()
     yy, xx = np.indices(img[pix].shape, dtype=float)
+
     res = fitter(mod, xx, yy, img[pix])
     x = res.x_mean.value + xmin
     y = res.y_mean.value + ymin
@@ -141,11 +166,12 @@ def preprocess_direct():
     fits.writeto(f'{ROOT}_{DRZSUF}_seg.fits', seg, hdr, overwrite=True)
 
 
-def extract_single():
+def extract_single(tabulate=True):
 
     # load data into SU
-    files = [f'{f}_{SUFFIX}.fits' for f in DATASETS[GRATING]]
-    data = su.wfss.WFSSCollection.from_list(files)
+    # files = [f'{f}_{SUFFIX}.fits' for f in DATASETS[GRATING]]
+    # data = su.wfss.WFSSCollection.from_list(files)
+    data = su.wfss.WFSSCollection.from_file(f'{GRATING}.lst')
 
     # load the sources into SU
     sources = su.sources.SourceCollection(f'{ROOT}_{DRZSUF}_seg.fits',
@@ -153,12 +179,13 @@ def extract_single():
                                           zeropoint=ZEROPOINT)
 
     # project the sources onto the grism images
-    tab = su.modules.Tabulate(ncpu=1, orders=('+1',), remake=True)
-    pdtfiles = tab(data, sources)  # noqa: F841
+    if tabulate:
+        tab = su.modules.Tabulate(ncpu=1, orders=('+1',), remake=True)
+        pdtfiles = tab(data, sources)  # noqa: F841
 
     # run the single-orient extraction
     ext = su.modules.Single('+1', mskorders=None, root=ROOT, ncpu=1)
-    res = ext(data, sources, profile='forward')  # noqa: F841
+    res = ext(data, sources, profile='uniform')  # noqa: F841
 
 
 def plot_spectra():
@@ -173,10 +200,10 @@ def plot_spectra():
     l, f = np.loadtxt(reffile, unpack=True, usecols=(0, 1))
     f /= 1e-13
 
-    # smooth the Larsen spectrum.  the Scale factor is from comparing the
-    # notional ACS dispersion (40A/pix) to the spectrum quoted from
-    # Pasquali+ 2002 which has 1.26 A/pix. Therefore smoothing factor is
-    # 40./1.26 = 31.7
+    # smooth the A. Pasquali reference spectrum (kindly provided S. Larsen).
+    # the Scale factor is from comparing the notional ACS dispersion
+    # (40A/pix) to the spectrum quoted from Pasquali+ 2002 which has
+    # 1.26 A/pix. Therefore smoothing factor is 40./1.26 = 31.7
     ff = gaussian_filter1d(f, 31.7)
 
     # load the data and change the units
@@ -189,40 +216,59 @@ def plot_spectra():
     lmax = 8120.
     g = np.where((lmin <= dat['lamb']) & (dat['lamb'] <= lmax))[0]
     ff2 = np.interp(dat['lamb'], l, ff)
-    den = np.sum((dat['flam'][g] / dat['func'][g])**2)
-    num = np.sum((ff2[g] / dat['func'][g]) * (dat['flam'][g] / dat['func'][g]))
+    obssn = dat['flam'][g] / dat['func'][g]
+    calsn = ff2[g] / dat['func'][g]
+    den = np.nansum(obssn * obssn)
+    num = np.nansum(calsn * obssn)
     scl = num / den
-    # scl = np.median(ff2[g] / dat['flam'][g])
 
+    # we don't expect the scales to match, since the apertures of the
+    # Pasquali spectrum match ours
     print(f'Scaling factor: {scl}')
 
     # plot the SU spectrum
     plt.axvspan(lmin, lmax, color='lightgrey')
-    plt.plot(dat['lamb'], dat['flam'] * scl, label=GRATING)
-    plt.plot(l, ff, label='Larsen et al. (smoothed)')
+    plt.plot(dat['lamb'], dat['flam'], label='slitlessutils')
+    plt.plot(l, ff / scl, label='Pasquali et al. (2002) $-$ smoothed')
 
     # uncomment this to see the hi-res file.
-    # plt.plot(l, f, label='Larsen et al. (high-res)')
+    # plt.plot(l, f, label='Pasquali et al. (high-res)')
 
     # label the axes
-    plt.ylabel(r'$f_{\lambda}$ ($10^{-13}$ erg s$^{-1}$ cm$^{-2}$ $\mathrm{\AA}^{-1}$)')
+    unit = r'$10^{-13}$ erg s$^{-1}$ cm$^{-2}$ $\mathrm{\AA}^{-1}$)'
+    plt.ylabel(r'$f_{\lambda}$ (' + unit + ')')
     plt.xlabel(r'$\lambda$ ($\mathrm{\AA}$)')
 
     # put on legend and change limits
     plt.legend(loc='upper left')
-    plt.ylim(0.0, 0.85)
+    plt.ylim(0.0, 1.2)
     plt.xlim(5500, 10000)
+    plt.tight_layout()
 
     # write the file to disk
-    plt.savefig('wr96.pdf')
+    plt.savefig('acswfc_wr96.pdf')
     plt.show()
 
 
 def run_all(plot=True):
+
+    # step 1.  Fetch the data
     download()
+
+    # step 2.  Process the grism images
     preprocess_grism()
+
+    # step 3.  process the direct images
     preprocess_direct()
-    extract_single()
+
+    # step 4 (optional).  List the astrometry to verify that everything
+    # has the *SAME* WCSNAME
+    su.core.preprocess.astrometry.list_wcs('j*flc.fits')
+
+    # step 5.  Extract the 1d spectra
+    extract_single(tabulate=True)
+
+    # step 6 (optional).  Plot the 1d spectra
     if plot:
         plot_spectra()
 
