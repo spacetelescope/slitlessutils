@@ -58,12 +58,11 @@ jobs:
             allow_failure: false
             prefix: ''
 
-          # stregion dependency of drizzlepac does not build on Windows
-          # - os: windows-latest
-          #   python: '3.13'
-          #   tox_env: 'py313-test'
-          #   allow_failure: false
-          #   prefix: ''
+          - os: windows-latest
+            python: '3.13'
+            tox_env: 'py313-test'
+            allow_failure: false
+            prefix: ''
 
           - os: ubuntu-latest
             python: '3.14'
