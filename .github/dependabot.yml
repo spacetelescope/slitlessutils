@@ -9,6 +9,8 @@ updates:
     directory: ".github/workflows" # Location of package manifests
     schedule:
       interval: "monthly"
+    cooldown:
+      default-days: 7
     groups:
       actions:
         patterns:
