@@ -29,6 +29,8 @@ def list_wcs(arg):
             obs = (h0['TELESCOP'], h0['INSTRUME'], h0['DETECTOR'])
             if obs == ('HST', 'ACS', 'WFC'):
                 filtername = h0['FILTER1']
+            elif obs == ('HST', 'ACS', 'SBC'):
+                filtername = h0['FILTER1']
             elif obs == ('HST', 'WFC3', 'UVIS'):
                 filtername = h0['FILTER']
             elif obs == ('HST', 'WFC3', 'IR'):

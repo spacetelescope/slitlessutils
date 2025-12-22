@@ -52,8 +52,12 @@ class Matrix:
     INT = np.uint64     # DO NOT CHANGE THIS
     FLOAT = np.float64  # DO NOT CHANGE THIS
 
-    def __init__(self, extorders, mskorders=None, invmethod='lsqr', path='tables',
-                 minunc=1e-10):
+    def __init__(self, extorders, **kwargs):
+        # extract the defaults
+        mskorders = kwargs.get('mskorders', None)
+        invmethod = kwargs.get('invmethod', 'lsqr')
+        path = kwargs.get('path', 'su_tables')
+        minunc = kwargs.get('minunc', 1e-10)
 
         LOGGER.debug("must finish documentation")
 
@@ -309,21 +313,22 @@ class Matrix:
         # now do a default damping target
         LOGGER.debug('damping target might be suspect for 2d objects')
         LOGGER.info("Building Damping Target")
+
         target = np.zeros(self.nunknowns, dtype=float)
         for segid, source in sources.items():
 
             for sedkey, region in source.items():
                 extid = self.sedkeys.index(sedkey)
+                if extid in self.ri:
+                    g1 = self.ri[extid]
+                    g2 = self.lamids[g1]
 
-                g1 = self.ri[extid]
-                g2 = self.lamids[g1]
+                    if hasattr(source, 'extpars'):
+                        waves = source.extpars.wavelengths()
+                    else:
+                        waves = self.defpars.wavelengths()
 
-                if hasattr(source, 'extpars'):
-                    waves = source.extpars.wavelengths()
-                else:
-                    waves = self.defpars.wavelengths()
-
-                target[g1] = region.sed(waves[g2])
+                    target[g1] = region.sed(waves[g2])
 
         self.set_damping_target(target)
 

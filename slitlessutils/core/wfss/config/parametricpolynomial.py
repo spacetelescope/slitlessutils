@@ -3,376 +3,167 @@ import numpy as np
 from .spatialpolynomial import SpatialPolynomial
 
 
-class ParametricPolynomial(list):
+def arrayify(func):
     """
-    Class to implement a nested polynomial
-
-    Parameters
-    ----------
-    maxiter : int, optional
-        Maximum number of iterations for the Newton-Raphson Method.
-        default is 10
-
-    threshold : float, optional
-        Threshold for convergence of the Newton-Raphson Method.
-        default is 1e-3
+    A decorator that logs the execution time of a function.
     """
+    def wrapper(self, x, y, z, **kwargs):
 
-    def __init__(self, maxiter=10, threshold=1e-3):
+        x, y = np.atleast_1d(x, y)
+        if np.isscalar(z) or not kwargs.get('pairwise', False):
+            z = np.atleast_1d(z)
+            z = z[:, np.newaxis]
 
-        # set a default for the parametric order
-        self.order = -1
-        self.invert = lambda x, y, f: None    # a default functional inversion
+        x = x.astype(float)
+        y = y.astype(float)
+        z = z.astype(float)
 
-        # set some defaults
+        p = np.squeeze(func(self, x, y, z, **kwargs))
+
+        if p.ndim == 0:
+            return p.item()
+
+        return p
+    return wrapper
+
+
+class Polynomial(list):
+    def __init__(self, data, name, maxiter=10, threshold=1e-3):
+        self.name = name
         self.maxiter = maxiter
         self.threshold = threshold
 
-    def append(self, coefs):
-        """
-        Method to include another parametric order (overrides the
-        list.append method).
+        polys = []
+        indices = []
+        for k, v in data.items():
+            tokens = k.split('_')
+            if len(tokens) == 2 and tokens[0] == name:
 
-        Parameters
-        ----------
-        coefs : list, tuple, or `np.ndarray`
-            The coefficients to pass to the `SpatialPolynomial` object.
-            The length of this iterable must be a triangular number.
+                P = SpatialPolynomial(v)
+                if P:
+                    polys.append(P)
+                    indices.append(int(tokens[1]))
 
-        """
+        for i in sorted(indices):
+            self.append(polys[i])
 
-        poly = SpatialPolynomial(coefs)
-        if poly:
-            super().append(poly)
-            self.order += 1
-
-            if self.order == 1:
-                self.invert = self._first
-            else:
-                self.invert = self._nth
-
-    def coefs(self, x, y):
-        """
-        Method to evaluate all the `SpatialPolynomial` coefficients
-        for a given position.
-
-        Parameters
-        ----------
-        x : int or float
-            The x-coordinates for the `SpatialPolynomial`s
-
-        y : int or float
-            The y-coordinates for the `SpatialPolynomial`s
-
-        Returns
-        -------
-        coefs : list
-            The coefficients for each parametric order
-
-        """
-
-        coefs = [poly.evaluate(x, y) for poly in self]
-        return coefs
+        self.order = len(self) - 1
 
 
-class StandardPolynomial(ParametricPolynomial):
-    """
-    Class to implement a nested parametric polynomial of the form:
+class StandardPolynomial(Polynomial):
+    def __init__(self, data, name, **kwargs):
+        super().__init__(data, name, **kwargs)
 
-    .. math::
+        if self.order == 1:
+            self.invert = self._linear
+        elif self.order == 2:
+            self.invert = self._quadratic
+        else:
+            self.invert = self._newton
 
-       p(t|x,y) = a(x,y) + b(x,y)*t + c(x,y)*t^2 + ....
+    @arrayify
+    def _linear(self, x, y, p):
+        '''
+        Analytically find t that solves:
 
-    where :math:`a(x,y)`, :math:`b(x,y)`, and so on are `SpatialPolynomial`s.
+        p = b(x, y) + m(x,y)*t
+        on interval [0, 1]
+        '''
 
-    inherits from `ParametricPolynomial`
+        b = self[0].evaluate(x, y)
+        m = self[1].evaluate(x, y)
+        return np.clip((p - b) / m, 0, 1)
 
-    """
+    @arrayify
+    def _quadratic(self, x, y, p):
+        '''
+        Analytically find t that solves:
 
-    def __init__(self, **kwargs):
-        ParametricPolynomial.__init__(self, **kwargs)
+        p = a(x,y) + b(x,y)*t + c(x,y)*t^2
 
-    def evaluate(self, x, y, t):
-        """
-        Method to evaluate the polynomial at some position and parameter
+        on the interval [0,1]
+        '''
 
-        Parameters
-        ----------
-        x : float or int
-            The x-spatial coordinate to pass to the `SpatialPolynomial`s
+        a = self[0].evaluate(x, y)
+        b = self[1].evaluate(x, y)
+        c = self[2].evaluate(x, y)
 
-        y : float or int
-            The y-spatial coordinate to pass to the `SpatialPolynomial`s
+        const = -0.5 * b / c
+        sroot = np.sqrt(const * const + (p - a) / c)
 
-        t : float, int, or `np.ndarray`
-            The parameter to evaluate this `ParametricPolynomial`
+        tp = const + sroot
+        tm = const - sroot
 
-        Returns
-        -------
-        f : float, or `np.ndarray`
-            The value of the polynomial
-        """
+        return np.where((0 <= tp) & (tp <= 1), tp, tm)
 
-        return sum(p.evaluate(x, y) * t**i for i, p in enumerate(self))
+    @arrayify
+    def _newton(self, x, y, p):
+        '''
+        Use Newton's method with Halley update to find solution to
 
-    def deriv(self, x, y, t):
-        """
-        Method to evaluate the derivative of the polynomial at some
-        position and parameter
+        p = a(x,y) + b(x,y)*t + c(x,y)*t^2 + d(x,y)*t^3 + ...
 
-        Parameters
-        ----------
-        x : float or int
-            The x coordinates for the `SpatialPolynomial`s
+        on the interval [0,1]
+        '''
 
-        y : float or int
-            The y coordinates for the `SpatialPolynomial`s
+        # compute polynomial coefficients
+        c = np.empty((self.order + 1, x.size))
+        for k, poly in enumerate(self):
+            c[k, :] = poly.evaluate(x, y)
 
-        t : float, int, or `np.ndarray`
-            The parameter to evaluate this `ParametricPolynomial`
+        # initialize
+        t = np.full_like(p, 0.5)
+        for itr in range(self.maxiter):
 
-        Returns
-        -------
-        dfdt : float, or `np.ndarray`
-            The value of the derivative of the polynomial
-        """
+            # compute polynomials and derivatives
+            dP2 = 0.0  # the second derivative
+            dP = 0.0   # the first derivative
+            P = 0.0    # the polynomial
+            for i in range(self.order, -1, -1):
+                dP2 = dP2 * t + 2 * dP
+                dP = dP * t + P
+                P = P * t + c[i, :]
 
-        return sum(p.evaluate(x, y) * i * t**(i - 1) for i, p in enumerate(self[1:], start=1))
+            # compute a newton step
+            dt = (p - P) / dP
 
-    def _first(self, x, y, f):
-        """
-        Helper method to analytically invert a 1st order polynomial
+            # update the step for a Halley tweak
+            dt /= (1 + (dt / 2) * (dP2 / dP))
 
-        Parameters
-        ----------
-        x : float or int
-           The x-coordinates for the `SpatialPolynomial`s
+            # update the position
+            t = t + dt
 
-        y : float or int
-           The y-coordinates for the `SpatialPolynomial`s
-
-        f : float
-           The value of the polynomial
-
-        Returns
-        -------
-        t : float
-           The parameter that gives the value `f`.
-        """
-
-        coefs = self.coefs(x, y)
-        return (f - coefs[0]) / coefs[1]
-
-    def _nth(self, x, y, f):
-        """
-        Helper method to implement arbitrary order root-finding via the
-        Newton-Raphson algorithm with a Halley correction.
-
-        Parameters
-        ----------
-        x : float or int
-           The x-coordinates for the `SpatialPolynomial`s
-
-        y : float or int
-           The y-coordinates for the `SpatialPolynomial`s
-
-        f : float
-           The value of the polynomial
-
-        Returns
-        -------
-        t : float
-           The parameter that gives the value `f`
-
-        Notes
-        -----
-        For a second-order polynomial, this will terminate in one step and will
-        be exactly correct.
-
-        See the `wikipedia https://en.wikipedia.org/wiki/Halley%27s_method`
-        article on Halley's modification of Newton's method.
-
-        """
-
-        # compute the polynomial coefficients
-        p = np.polynomial.Polynomial(self.coefs(x, y))
-
-        # compute the derivatives
-        dpdt = p.deriv()
-        d2pdt2 = dpdt.deriv()
-
-        # initialize and start the Newton-Raphson method
-        t = np.full_like(f, 0.5, dtype=float)
-        for itn in range(self.maxiter):
-
-            # prepare for a NR step
-            funct = p(t)
-            deriv = dpdt(t)
-
-            # A Newton-Raphson step
-            dt = (funct - f) / deriv
-
-            # A Halley update
-            second = d2pdt2(t)
-            dt /= (1 - 0.5 * dt * (second / deriv))
-
-            # apply the step and force range
-            t = np.clip(t - dt, 0., 1.)
-
-            # check for early convergence
+            # clip to be in range
             if np.amax(np.abs(dt)) < self.threshold:
                 break
 
-        return t
+        # return and force to be in the domain
+        return np.clip(t, 0, 1)
+
+    @arrayify
+    def evaluate(self, x, y, t, pairwise=False):
+        '''
+        Evaluate polynomial using Horner's method
+        '''
+
+        p = self[-1].evaluate(x, y)
+        for k in range(self.order - 1, -1, -1):
+            p = p * t + self[k].evaluate(x, y)
+        return p
+
+    @arrayify
+    def deriv(self, x, y, t, pairwise=False):
+        dp = 0.
+        p = self[-1].evaluate(x, y)
+
+        for k in range(self.order - 1, -1, -1):
+            dp = dp * t + p
+            p = p * t + self[k].evaluate(x, y)
+
+        return dp
 
 
-class ReciprocalPolynomial(ParametricPolynomial):
-    """
-    Class to implement a nested parametric polynomial of the form:
-
-    .. math::
-       p(t|x,y) = a(x,y) + b(x,y)/(t-t^*) + c(x,y)/(t-t^*)^2 + ....
-
-    where :math:`a(x,y)`, :math:`b(x,y)`, and so on are `SpatialPolynomial`s.
-
-    inherits from `ParametricPolynomial`
-    """
-
-    def __init__(self, **kwargs):
-        ParametricPolynomial.__init__(self, **kwargs)
-        self.tstar = SpatialPolynomial([0.])
-
-    def evaluate(self, x, y, t):
-        """
-        Method to evaluate the polynomial at some position and parameter
-
-        Parameters
-        ----------
-        x : float or int
-            The x-spatial coordinate to pass to the `SpatialPolynomial`s
-
-        y : float or int
-            The y-spatial coordinate to pass to the `SpatialPolynomial`s
-
-        t : float, int, or `np.ndarray`
-            The parameter to evaluate this `ReciprocalPolynomial`
-
-        Returns
-        -------
-        f : float, or `np.ndarray`
-            The value of the polynomial
-        """
-
-        tstar = self.tstar.evaluate(x, y)
-        omega = 1. / (t - tstar)
-        return sum(p.evaluate(x, y) * omega**i for i, p in enumerate(self))
-
-    def deriv(self, x, y, t):
-        """
-        Method to evaluate the derivative of the polynomial at some
-        position and parameter
-
-        Parameters
-        ----------
-        x : float or int
-            The x coordinates for the `SpatialPolynomial`s
-
-        y : float or int
-            The y coordinates for the `SpatialPolynomial`s
-
-        t : float, int, or `np.ndarray`
-            The parameter to evaluate this `ParametricPolynomial`
-
-        Returns
-        -------
-        dfdt : float, or `np.ndarray`
-            The value of the derivative of the polynomial
-        """
-
-        tstar = self.tstar.evaluate(x, y)
-        omega = 1. / (t - tstar)
-        return -sum(p.evaluate(x, y) * i * omega**(i + 1) for i, p in enumerate(self[1:], start=1))
-
-    def _first(self, x, y, f):
-        """
-        Helper method to analytically invert a 1st order polynomial
-
-        Parameters
-        ----------
-        x : float or int
-           The x-coordinates for the `SpatialPolynomial`s
-
-        y : float or int
-           The y-coordinates for the `SpatialPolynomial`s
-
-        f : float
-           The value of the polynomial
-
-        Returns
-        -------
-        t : float
-           The parameter that gives the value `f`.
-        """
-
-        coefs = self.coefs(x, y)
-
-        t = coefs[1] / (f - coefs[0]) + self.tstar.evaluate(x, y)
-        return t
-
-    def _nth(self, x, y, f):
-        """
-        Helper method to implement arbitrary order root-finding via the
-        Newton-Raphson algorithm with a Halley correction.
-
-        Parameters
-        ----------
-        x : float or int
-           The x-coordinates for the `SpatialPolynomial`s
-
-        y : float or int
-           The y-coordinates for the `SpatialPolynomial`s
-
-        f : float
-           The value of the polynomial
-
-        Returns
-        -------
-        t : float
-           The parameter that gives the value `f`.
-        """
-
-        # compute the polynomial coefficients
-        coefs = np.asarray(self.coefs(x, y))[::-1]
-
-        # compute the derivative coeffs
-        i = np.arange(-self.order, 0)                    # for recip
-        dcoefs = coefs[:-1] * i
-        d2coefs = dcoefs * (i - 1)
-
-        # compute the bias
-        tstar = self.tstar.evaluate(x, y)                # for recip
-
-        # initialize and start the Newton-Raphson method
-        t = np.full_like(f, 0.5, dtype=float)
-        for itn in range(self.maxiter):
-
-            # prepare for a NR step
-            omega = 1. / (t - tstar)                        # for recip
-            funct = np.polyval(coefs, omega)             # for recip
-            deriv = np.polyval(dcoefs, omega) * omega**2   # for recip
-
-            # A Newton-Raphson step
-            dt = (funct - f) / deriv
-
-            # A Halley update
-            second = np.polyval(d2coefs, omega) * omega**3
-            dt /= (1 - 0.5 * dt * (second / deriv))
-
-            # apply the step and force range
-            t = np.clip(t - dt, 0., 1.)
-
-            # check for early convergence
-            if np.amax(np.abs(dt)) < self.threshold:
-                break
-
-        return t
+class LaurentPolynomial(Polynomial):
+    def __init__(self, data, name, **kwargs):
+        super().__init__(data, name, **kwargs)
+        raise NotImplementedError("Laurent Polynomial is not finished")

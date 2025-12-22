@@ -7,7 +7,7 @@ from astropy.stats import SigmaClip
 from .....config import SUFFIXES, Config
 from .....logger import LOGGER
 from ....tables import PDTFile
-from ....utilities import headers
+from ....utilities import headers, get_metadata
 from ...module import Module
 from .boxcar import boxcar
 from .contamination import Contamination
@@ -130,7 +130,8 @@ class Single(Module):
 
         # output file names
         if root is None:
-            root = __package__
+            root = get_metadata()['Name']
+
         self.filename = os.path.join(self.outpath, f"{root}_{SUFFIXES[self.FILETYPE]}.fits")
 
         if self.savecont:
