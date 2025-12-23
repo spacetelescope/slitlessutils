@@ -6,7 +6,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 
 from .....config import SUFFIXES, Config
 from .....logger import LOGGER
-from ....utilities import as_iterable, headers, get_metadata
+from ....utilities import as_iterable, get_metadata, headers
 from ...group import GroupCollection
 from ...module import Module
 from .matrix import Matrix

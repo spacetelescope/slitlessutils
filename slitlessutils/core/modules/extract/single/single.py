@@ -7,7 +7,7 @@ from astropy.stats import SigmaClip
 from .....config import SUFFIXES, Config
 from .....logger import LOGGER
 from ....tables import PDTFile
-from ....utilities import headers, get_metadata
+from ....utilities import get_metadata, headers
 from ...module import Module
 from .boxcar import boxcar
 from .contamination import Contamination

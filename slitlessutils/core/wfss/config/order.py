@@ -1,6 +1,6 @@
 import numpy as np
 
-from .parametricpolynomial import StandardPolynomial, LaurentPolynomial
+from .parametricpolynomial import LaurentPolynomial, StandardPolynomial
 from .sensitivity import Sensitivity
 
 

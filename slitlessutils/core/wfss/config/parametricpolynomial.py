@@ -7,6 +7,7 @@ def arrayify(func):
     """
     A decorator that logs the execution time of a function.
     """
+
     def wrapper(self, x, y, z, **kwargs):
 
         x, y = np.atleast_1d(x, y)
