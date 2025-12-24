@@ -117,7 +117,7 @@ class Source(list):
         self.ltv = [hdr.get('LTV1', 0.), hdr.get('LTV2', 0.)]
 
         # record some things
-        self.segid = segid  # hdr['SEGID']
+        self.segid = segid
         self.grpid = grpid
         # self.whttype = whttype
         self.backsize = max(backsize, 0)
@@ -225,6 +225,8 @@ class Source(list):
             # region image
             ri = indices.reverse(r, ignore=(0,))
             for regid, pixid in ri.items():
+                regid = int(regid)
+
                 # pixels and weights for this region
                 xx = x[pixid]
                 yy = y[pixid]
@@ -642,6 +644,8 @@ class Source(list):
 
             region.sed = sed
 
+            sed.write_file(f'spectra/{self.segid}_{region.regid}.csv')
+
     def load_sed_images(self):
         pass
 
@@ -664,8 +668,6 @@ class Source(list):
         """
 
         for regkey, region in self.items():
-
-            # region.sed.set_sed(waves,flam*np.sum(region.w))
             region.sed.append(waves, flam * np.sum(region.w))
 
     def write_seds(self, filetype='sed', path=None, **kwargs):

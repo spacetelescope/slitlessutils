@@ -164,6 +164,9 @@ class ImageFlatField(FlatField):
 
         return obj
 
+    def __str__(self):
+        return f'Image (gray) flatfield: {self.filename}'
+
     @check_in_field
     def __call__(self, x, y, l):
         """
@@ -187,11 +190,8 @@ class ImageFlatField(FlatField):
            be unity.
         """
 
-        f = self.data[y, x]
-        return f
-
-    # def update_header(self,hdr):
-    #    super().update_header(hdr)
+        ff = self.data[y, x]
+        return np.clip(ff, 0, None)
 
 
 class PolynomialFlatField(FlatField):
@@ -262,6 +262,9 @@ class PolynomialFlatField(FlatField):
 
         return obj
 
+    def __str__(self):
+        return f'Image (polynomial) flatfield: {self.filename}'
+
     @check_in_field
     def __call__(self, x, y, l):
         """
@@ -285,10 +288,8 @@ class PolynomialFlatField(FlatField):
         """
 
         ll = (l - self.wmin) / (self.wmax - self.wmin)
-        return sum(f[y, x] * ll**i for i, f in enumerate(self.data))
-
-    # def update_header(self,hdr):
-    #    super().update_header(hdr)
+        ff = sum(f[y, x] * ll**i for i, f in enumerate(self.data))
+        return np.clip(ff, 0, None)
 
 
 def load_flatfield(*args, **kwargs):

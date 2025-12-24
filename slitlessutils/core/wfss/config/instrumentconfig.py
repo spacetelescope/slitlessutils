@@ -333,9 +333,17 @@ class Noise:
         image.
         """
 
+        # expected value of the sky
         pvars = sci * self.time
+
+        # expected value of the background
         pvarb = (self.dark + self.back) * self.time
-        new = np.random.poisson(lam=pvars + pvarb, size=sci.shape) - pvarb
+
+        # expected value of total Poisson signals
+        pvar = pvars + pvarb
+
+        # the background subtracted data
+        new = np.random.poisson(lam=pvar, size=sci.shape) - pvarb
 
         gvar = self.read**2
         new = np.random.normal(loc=new, scale=np.sqrt(gvar)) / self.time
@@ -623,10 +631,13 @@ class InstrumentConfig(dict):
         self.bunit = data['bunit']
         self.suffix = data['suffix']
         self.subarray = subarray
-
         self.path = data['path']
         self.header = data.get('header', {})
         self.siaf = SIAF(*data['siaf'].values())
+
+        # check that the suffix is a single value
+        if isinstance(self.suffix, list):
+            self.suffix = self.suffix[0]
 
         if isinstance(disperser, str):
             blocking = None

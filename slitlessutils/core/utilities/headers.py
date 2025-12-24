@@ -1,8 +1,10 @@
 """
-Methods to work with fits headers
+Method to work with fits headers
 """
+
 from datetime import datetime
-from importlib.metadata import metadata
+
+from .get_metadata import get_metadata
 
 
 def add_software_log(hdr):
@@ -14,13 +16,22 @@ def add_software_log(hdr):
     hdr : `astropy.io.fits.Header`
         The fits header to update
     """
-    meta = metadata(__package__)
-    version = meta.get('Version', 'unknown')
-    author = meta.get('Author-email', 'unknown')
-    hdr.set('CODE', value=__package__, comment='software package')
-    hdr.set('VERSION', value=version, comment=f'{__package__} version number')
-    hdr.set('AUTHOR', value=author, comment=f'{__package__} author')
-    add_stanza(hdr, "Software Log", before='CODE')
+
+    # get the package meta data
+    meta = get_metadata()
+    package = meta.get('Name', '')
+
+    # update the header
+    hdr.set('PACKAGE', value=package, comment='software package')
+
+    hdr.set('VERSION', value=meta.get('Version', ''),
+            comment=f'{package} version number')
+
+    hdr.set('AUTHOR', value=meta.get('Author', ''),
+            comment=f'{package} author')
+
+    # finalize by adding a stanza header
+    add_stanza(hdr, "Software Log", before='PACKAGE')
 
 
 def add_preamble(hdr, **kwargs):

@@ -29,9 +29,9 @@ class SourceCollection(dict):
     # the default zeropoint
     DEFZERO = 26.
 
-    def __init__(self, segfile, detfile, maglim=np.inf, minpix=0, preprocessor=None,
-                 zeropoint=None, throughput=None, sedfile=None,
-                 **kwargs):
+    def __init__(self, segfile, detfile, maglim=np.inf, minpix=0,
+                 preprocessor=None, zeropoint=None, throughput=None,
+                 sedfile=None, **kwargs):
         """
         Initializer
 
@@ -196,6 +196,8 @@ class SourceCollection(dict):
         # find pixels for each object
         ri = indices.reverse(seg, ignore=(0,))
         for segid, (y, x) in ri.items():
+            segid = int(segid)
+
             # get a bounding box
             x0 = np.maximum(np.amin(x) - self.PAD, 0)
             x1 = np.minimum(np.amax(x) + self.PAD + 1, nx - 1)

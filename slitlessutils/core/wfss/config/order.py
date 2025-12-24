@@ -1,40 +1,44 @@
 import numpy as np
 
-from .parametricpolynomial import ReciprocalPolynomial, StandardPolynomial
+from .parametricpolynomial import LaurentPolynomial, StandardPolynomial
 from .sensitivity import Sensitivity
-from .spatialpolynomial import SpatialPolynomial
 
 
 class Order:
-
     def __init__(self, data, order):
+        # record the order
         self.order = order
+
+        # load the trace data
+        self.dispx = StandardPolynomial(data[self.order], 'DISPX')
+        self.dispy = StandardPolynomial(data[self.order], 'DISPY')
+
+        # load the wavelength data
         self.disptype = data.get('TYPE', 'grism').lower()
         if self.disptype == 'grism':
-            self.displ = StandardPolynomial()
+            self.displ = StandardPolynomial(data[self.order], 'DISPL')
         elif self.disptype == 'prism':
-            self.displ = ReciprocalPolynomial()
+            self.displ = LaurentPolynomial(data[self.order], 'DISPL')
         else:
             msg = f'disptype is invalid ({self.disptype})'
             raise ValueError(msg)
 
-        self.dispx = StandardPolynomial()
-        self.dispy = StandardPolynomial()
+        # load the sensitivity file
+        self.load_sensitivity(data[self.order].get('SENSITIVITY', ''))
 
-        # this may be fragile based on the order of the coefficients
-        for k, v in data[self.order].items():
-            if k.startswith('DISPX'):
-                self.dispx.append(v)
-            elif k.startswith('DISPY'):
-                self.dispy.append(v)
-            elif k.startswith('DISPL'):
-                self.displ.append(v)
-            elif k.startswith('TSTAR'):
-                self.displ.tstar = SpatialPolynomial(v)
-            elif k.startswith('SENSITIVITY'):
-                self.load_sensitivity(v)
-            else:
-                pass
+    def __str__(self):
+        return f'Spectral order: {self.disptype}, {self.order}'
+
+    @property
+    def name(self):
+        return str(self.order)
+
+    @classmethod
+    def from_asciifile(cls, filename, order):
+        from slitlessutils.core.wfss.config import WFSSConfig
+        cfg = WFSSConfig.read_asciifile(filename)
+        obj = cls(cfg, order)
+        return obj
 
     def load_sensitivity(self, sensfile, **kwargs):
         """
@@ -90,94 +94,22 @@ class Order:
 
         # compute the dispersion using:
         # t = h^-1(lambda)
-        # x(t) = a+ b*t + c*t^2 + ...
-        # x'(t) = b+ 2*c*t + ...
-        # y'(t) = r+ 2*s*t + ...
-        # l'(t) = u+ 2*v*t + ...
-        # r'(t) = sqrt(dxdt**2 + dydt**2)
-        # dl/dr = l'(t)/r'(t)
-
-        # invert the DISPL function
         t = self.displ.invert(x0, y0, wavelength)
 
-        # evaluate the derivatives (w.r.t. to t) of the DISPX,
-        # DISPY, and DISPL functions, which came from grism conf
+        # compute the derivative of the trace using:
+        # r'(t) = sqrt(x'(t)^2 + y'(t)^2)
         dxdt = self.dispx.deriv(x0, y0, t)
         dydt = self.dispy.deriv(x0, y0, t)
+        drdt = np.sqrt(dxdt * dxdt + dydt * dydt)
+
+        # compute the derivative of the wavelength solution
         dldt = self.displ.deriv(x0, y0, t)
 
-        # return the dispersion
-        dldr = dldt / np.sqrt(dxdt * dxdt + dydt * dydt)
-        return dldr
+        # the ratio is dl/dr = l'(t)/r'(t)
+        return dldt / drdt
 
     def deltas(self, x0, y0, wav):
-        """
-         Method to compute the offsets  with respect to the undispersed
-         position.  NOTE: the final WFSS position would be given by
-         adding back the undispersed positions.
-
-         Parameters
-         ----------
-         x0 : float, `np.ndarray`, or int
-            The undispersed x-position.
-
-         y0 : float, `np.ndarray`, or int
-            The undispersed y-position.
-
-         wav : `np.ndarray`
-            The wavelength (in A).
-
-         Returns
-         -------
-         dx : float or `np.ndarray`
-            The x-coordinate along the trace with respect to the undispersed
-            position.
-
-         dy : float or `np.ndarray`
-            The y-coordinate along the trace with respect to the undispersed
-            position.
-
-         Notes
-         -----
-         The undispersed positions (`x0` and `y0`) must be of the same
-         shape, hence either both scalars or `np.ndarray`s with the same
-         shape.  The dtype of the variables does not matter.  If these
-         variables are arrays, then the output will be a two-dimensional
-         array of shape (len(wav),len(x0)).  If they are scalars, then
-         the output will be a one-dimensional array with shape (len(wav),).
-
-         """
-
-        if np.isscalar(x0) or np.isscalar(wav):
-            t = self.displ.invert(x0, y0, wav)
-            dx = self.dispx.evaluate(x0, y0, t)
-            dy = self.dispy.evaluate(x0, y0, t)
-
-        else:
-            shape = (len(wav), len(x0))
-            dx = np.empty(shape=shape, dtype=float)
-            dy = np.empty(shape=shape, dtype=float)
-            for i, (_x, _y) in enumerate(zip(x0, y0)):
-                t = self.displ.invert(_x, _y, wav)
-                dx[:, i] = self.dispx.evaluate(_x, _y, t)
-                dy[:, i] = self.dispy.evaluate(_x, _y, t)
-
+        t = self.displ.invert(x0, y0, wav)
+        dx = self.dispx.evaluate(x0, y0, t)
+        dy = self.dispy.evaluate(x0, y0, t)
         return dx, dy
-
-    @property
-    def name(self):
-        """
-        The name of the order
-        """
-
-        return str(self.order)
-
-    def __str__(self):
-        return f'Spectral order: {self.disptype}, {self.order}'
-
-    # @classmethod
-    # def from_asciifile(cls, filename, order):
-    #    from .wfssconfig import WFSSConfig
-    #    data = WFSSConfig.read_asciifile(filename)
-    #    obj = cls(data, order)
-    #    return obj
