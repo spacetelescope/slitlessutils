@@ -117,6 +117,7 @@ filterwarnings = [
     "ignore: .*pkg_resources.*:DeprecationWarning",
     'ignore:unclosed file:ResourceWarning',
     'ignore: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.:UserWarning',
+    "ignore:'leaveWhitespace' deprecated:DeprecationWarning",
     # Ignore warning from astropy.io
     'ignore: Card is too long, comment will be truncated.',
     # Ignore cast warning in drizzle
