@@ -4,9 +4,10 @@ from .spatialpolynomial import SpatialPolynomial
 
 
 def arrayify(func):
-    """
-    A decorator that logs the execution time of a function.
-    """
+    '''
+    A decorator to ensure the inputs to the various functions have
+    the appropriate shape.
+    '''
 
     def wrapper(self, x, y, z, **kwargs):
 
