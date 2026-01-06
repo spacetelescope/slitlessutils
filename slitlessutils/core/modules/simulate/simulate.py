@@ -1,5 +1,4 @@
 from datetime import datetime
-from importlib.metadata import metadata
 
 import numpy as np
 from astropy.io import fits
@@ -77,16 +76,12 @@ class Simulate(Module):
            The filename of the image created
 
         """
-
         if sources.sedfile is None:
             LOGGER.critical("No SEDFile found.")
             return
 
         # grab the time
         t0 = datetime.now()
-
-        # grab the inputs
-        # insconf,insdata = data
 
         # open the table for reading
         with PDTFile(data, path=self.path, mode='r') as h5:
@@ -125,7 +120,6 @@ class Simulate(Module):
 
             # process each detector
             for detname, detdata in data.items():
-
                 # load a detector
                 # detconf=detdata.config
                 # detconf=insconf[detname]
@@ -202,6 +196,7 @@ class Simulate(Module):
                 # the function make_HDUs takes the noiseless sci, creates
                 # all ancillary data, packages into HDUs, and adds noise
                 # hdus= detdata.make_HDUs(sci,self.noisepars)
+
                 hdus = detdata.make_HDUs(sci, addnoise=self.addnoise)
 
                 # put the HDUs into the list, but first update some header info
@@ -217,18 +212,14 @@ class Simulate(Module):
                     # append the HDU
                     hdul.append(hdu)
 
-        # record the end time
-        t1 = datetime.now()
-        dt = t1 - t0
+        # compute runtime
+        dt = datetime.now() - t0
 
         # put some times into the header
-        version = metadata(__package__).get('Version', 'unknown')
-        phdu.header.set('ORIGIN', value=f'{__package__} v{version}',
-                        after='NAXIS')
-        phdu.header.set('DATE', value=t1.strftime('%Y-%m-%d'), after='ORIGIN',
-                        comment='date this file was written (yyyy-mm-dd)')
-        phdu.header.set('RUNTIME', value=dt.total_seconds(), after='DATE',
-                        comment='run time of this file in s')
+        headers.add_preamble(phdu.header,
+                             runtime=(dt.total_seconds(), 'runtime in s'))
+        headers.add_software_log(phdu.header)
+        sources.update_header(phdu.header)    # source props
 
         # put the primary header in the HDUL
         hdul.insert(0, phdu)

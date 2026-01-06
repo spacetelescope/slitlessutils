@@ -6,7 +6,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 
 from .....config import SUFFIXES, Config
 from .....logger import LOGGER
-from ....utilities import as_iterable, headers
+from ....utilities import as_iterable, get_metadata, headers
 from ...group import GroupCollection
 from ...module import Module
 from .matrix import Matrix
@@ -60,16 +60,22 @@ class Multi(Module):
     DESCRIPTION = "Extracting (multi)"
 
     def __init__(self, extorders, logdamp, mskorders=None, algorithm='golden',
-                 **kwargs):
+                 root=None, **kwargs):
         Module.__init__(self, self.extract, **kwargs, multiprocess=False)
+
+        # file root name
+        if not isinstance(root, str):
+            meta = get_metadata()
+            self.root = meta['Name']
+        else:
+            self.root = root
 
         self.extorders = as_iterable(extorders)
         self.mskorders = as_iterable(mskorders)
-
         self.optimizer = optimizer(algorithm, logdamp)
         self.matrix = Matrix(self.extorders, **kwargs)
 
-    def extract(self, data, sources, groups=None, root=None):
+    def extract(self, data, sources, groups=None):
         """
         Method to do the mult-ended spectral extraction
 
@@ -84,10 +90,6 @@ class Multi(Module):
         groups : `GroupCollection` or None
             The collection of groups.  If set as None, then no grouping
             will be performed.  Default is None
-
-        root : str, optional
-            The root name of the output products.  If None, then
-            'slitlessutils' is used.  Default is None
 
         Notes
         -----
@@ -116,9 +118,9 @@ class Multi(Module):
         hdul1.append(phdu)
         hdul3.append(phdu)
 
-        # file root name
-        if not isinstance(root, str):
-            root = __package__
+        # get the package meta data
+        meta = get_metadata()
+        package = meta.get('Name', '')
 
         # put loops over groups here
         if groups:
@@ -128,16 +130,16 @@ class Multi(Module):
             groups = GroupCollection()
 
         # open a PDF to write Grouping images
-        pdffile = f'{root}_{SUFFIXES["L-curve"]}.pdf'
+        pdffile = f'{self.root}_{SUFFIXES["L-curve"]}.pdf'
         LOGGER.info(f'Writing grouped L-curve figure: {pdffile}')
         with PdfPages(pdffile) as pdf:
             # add some info to the PDF
             d = pdf.infodict()
             d['Title'] = 'L-Curve Results'
             d['Author'] = getpass.getuser()
-            d['Subject'] = f'L-Curve results for grouped data from {__package__}'
-            d['Keywords'] = f'{__package__} WFSS L-curve groups'
-            d['Producer'] = __package__
+            d['Subject'] = f'L-Curve results for grouped data from {package}'
+            d['Keywords'] = f'{package} WFSS L-curve groups'
+            d['Producer'] = package
 
             for grpid, srcdict in enumerate(groups(sources)):
 
@@ -241,13 +243,13 @@ class Multi(Module):
 #
 #
 #
-#        self.matrix.lcurve.plot(f'{root}_{SUFFIXES["L-curve"]}.pdf')
+#        self.matrix.lcurve.plot(f'{self.root}_{SUFFIXES["L-curve"]}.pdf')
 
         # write out the files
         if len(hdul1) > 1:
             hdul1[0].header['FILETYPE'] = '1d spectra'
 
-            x1dfile = f'{root}_{SUFFIXES["1d spectra"]}.fits'
+            x1dfile = f'{self.root}_{SUFFIXES["1d spectra"]}.fits'
             LOGGER.info(f'Writing 1d extractions: {x1dfile}')
             hdul1.writeto(x1dfile, overwrite=True)
         else:
@@ -256,12 +258,12 @@ class Multi(Module):
         if len(hdul3) > 1:
             hdul3[0].header['FILETYPE'] = '3d spectra'
 
-            x3dfile = f'{root}_{SUFFIXES["3d spectra"]}.fits'
+            x3dfile = f'{self.root}_{SUFFIXES["3d spectra"]}.fits'
             LOGGER.info(f'Writing 3d extractions: {x3dfile}')
             hdul1.writeto(x3dfile, overwrite=True)
         else:
             LOGGER.warning('No 3d spectra written')
 
-        lcvfile = f'{root}_{SUFFIXES["L-curve"]}.fits'
+        lcvfile = f'{self.root}_{SUFFIXES["L-curve"]}.fits'
         LOGGER.info(f'Writing L-curve tabular data {lcvfile}')
         hdulL.writeto(lcvfile, overwrite=True)

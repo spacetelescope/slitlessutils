@@ -38,6 +38,7 @@ dependencies = [
     'h5py>=3.11',
     'drizzlepac>=3.9.1',
     'networkx>=3.3',
+    'numba>=0.62.0',
     'numpy>=2.0',
     'matplotlib>=3.9',
     'pandas>=2.2',

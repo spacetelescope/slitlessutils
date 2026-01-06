@@ -493,9 +493,6 @@ class SED:
         flam = self.flam[g]
         flux = np.interp(wave, lamb, flam, **kwargs, left=flam[0], right=flam[-1])
 
-        # flux=np.interp(wave,self.lamb[g],self.flam[g],**kwargs,
-        #               left=self.flam[g[0]],right=self.flam[g[-1]])
-
         if fnu:
             flux *= ((wave / c) * (wave / 1e10))
 
@@ -626,7 +623,7 @@ class SED:
         return obj
 
     @staticmethod
-    def get_from_CDBS(atlas, filename):
+    def get_from_CDBS(atlas, filename, outpath=''):
         """
         Staticmethod to retrieve a spectrum from the Calibration Database
         System (CDBS)
@@ -638,6 +635,9 @@ class SED:
 
         filename : str
             The filename in the atlas
+
+        outpath : str
+            The path for the output file.  Default is current working dir
 
         """
         # base URL for CDBS
@@ -659,6 +659,13 @@ class SED:
             LOGGER.warning(f"Unable to retrieve server file: {remotefile}")
             return
         shutil.move(tmpfile, filename)
+
+        if isinstance(outpath, str):
+            newfile = os.path.join(outpath, filename)
+            shutil.move(filename, newfile)
+            return newfile
+        else:
+            return filename
 
     @classmethod
     def from_CDBS(obj, atlas, filename, cleanup=True):
