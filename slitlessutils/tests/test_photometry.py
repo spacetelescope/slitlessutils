@@ -38,7 +38,7 @@ def test_throughput_has_wavelength_data():
 
     assert hasattr(tp, 'wave'), "Throughput must have wave attribute"
     assert tp.wave is not None, "Throughput wave array must not be None"
-    assert len(tp.wave) > 0, "Throughput must have wavelength data"
+    assert len(tp.wave) == 100, f"F105W throughput should have 100 wavelength points, got {len(tp.wave)}"
 
 
 def test_throughput_has_transmission_data():
@@ -50,7 +50,7 @@ def test_throughput_has_transmission_data():
 
     assert hasattr(tp, 'tran'), "Throughput must have tran attribute"
     assert tp.tran is not None, "Throughput tran array must not be None"
-    assert len(tp.tran) > 0, "Throughput must have transmission data"
+    assert len(tp.tran) == 100, f"F105W throughput should have 100 transmission points, got {len(tp.tran)}"
 
 
 def test_throughput_has_zeropoint(sample_throughput):
@@ -71,7 +71,7 @@ def test_photfnu_computable(sample_throughput):
     photfnu = sample_throughput.photfnu
 
     assert photfnu is not None, "PHOTFNU must be computable"
-    assert photfnu > 0, f"PHOTFNU must be positive, got {photfnu}"
+    assert np.allclose(photfnu, 3.63e-30, rtol=0.01), f"PHOTFNU calculation changed, got {photfnu}"
 
 
 def test_sed_creation_empty():
@@ -113,16 +113,16 @@ def test_sed_data_accessible():
 
 def test_sed_normalize_at_wavelength(flat_sed):
     """Verify SED can be normalized at specific wavelength."""
-    assert len(flat_sed) > 0, "SED must have data to normalize"
+    assert len(flat_sed) == 100, f"flat_sed fixture should have 100 points, got {len(flat_sed)}"
 
     original_value = flat_sed['flam'][50]
-    assert np.isclose(original_value, 1e-16), "Initial flux should be 1e-16"
+    assert np.allclose(original_value, 1e-16), "Initial flux should be 1e-16"
 
     target_flux = 5e-16
     flat_sed.normalize(10000., target_flux)
 
     new_value = flat_sed['flam'][50]
-    assert np.isclose(new_value, 5e-16, rtol=0.1), (
+    assert np.allclose(new_value, 5e-16, rtol=0.1), (
         f"Flux should be scaled to ~5e-16, got {new_value}"
     )
 
@@ -148,8 +148,8 @@ def test_throughput_sed_workflow():
     """Test complete workflow: load throughput, create SED, verify overlap."""
     tp = su.photometry.Throughput.from_keys('HST', 'WFC3', 'F105W')
     assert tp is not None
-    assert tp.zeropoint is not None
-    assert len(tp.wave) > 0
+    assert np.allclose(tp.zeropoint, 26.27, rtol=0.01), f"F105W zeropoint changed, got {tp.zeropoint}"
+    assert len(tp.wave) == 100, f"F105W throughput should have 100 wavelength points, got {len(tp.wave)}"
 
     wave = np.linspace(8000., 15000., 500)
     flux = np.ones_like(wave) * 1e-17
@@ -215,4 +215,4 @@ def test_sed_unity_flux_normalization():
     flux = np.ones_like(wave)
     sed = su.photometry.SED(wave, flux)
     sed.normalize(10000., 5.0)
-    assert np.isclose(sed['flam'][50], 5.0, rtol=0.1)
+    assert np.allclose(sed['flam'][50], 5.0, rtol=0.1)

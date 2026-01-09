@@ -8,6 +8,8 @@ accessible, which is essential for all downstream operations.
 
 import os
 
+import numpy as np
+
 from slitlessutils import config
 
 
@@ -39,7 +41,7 @@ def test_fluxscale_exists_and_positive(slitlessutils_config):
 
     fluxscale = slitlessutils_config.fluxscale
     assert fluxscale is not None, "fluxscale must not be None"
-    assert fluxscale > 0, f"fluxscale must be positive, got {fluxscale}"
+    assert np.allclose(fluxscale, 1e-17, rtol=0.01), f"fluxscale value changed, got {fluxscale}"
 
 
 def test_fluxunits_exists(slitlessutils_config):

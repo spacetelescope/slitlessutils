@@ -88,7 +88,7 @@ def test_from_wcsfile_preserves_orientat(sample_wcs_csv):
     for dataset_name in collection.keys():
         simdata = dict.__getitem__(collection, dataset_name)
         expected_orientat = expected[dataset_name]
-        assert np.isclose(simdata.orientat, expected_orientat), (
+        assert np.allclose(simdata.orientat, expected_orientat), (
             f"Dataset {dataset_name}: expected orientat={expected_orientat}, "
             f"got {simdata.orientat}"
         )
@@ -117,7 +117,7 @@ def test_detector_wcs_keywords(wfss_detector):
 
     naxis = detector.naxis
     assert naxis is not None and len(naxis) == 2
-    assert all(n > 0 for n in naxis), f"NAXIS must be positive, got {naxis}"
+    assert naxis[0] == 1014 and naxis[1] == 1014, f"WFC3IR detector should be 1014x1014, got {naxis}"
 
     crpix = detector.wcs.wcs.crpix
     assert crpix is not None and len(crpix) == 2
@@ -132,7 +132,7 @@ def test_detector_config_properties(wfss_detector):
 
     scale = detector.config.scale
     assert scale is not None and len(scale) == 2
-    assert all(0.01 < abs(s) < 1.0 for s in scale), f"Scale {scale} outside expected range"
+    assert np.allclose(scale, [0.121, 0.136], rtol=0.01), f"WFC3IR scale changed, got {scale}"
 
     extensions = detector.extensions
     assert extensions is not None
@@ -140,8 +140,8 @@ def test_detector_config_properties(wfss_detector):
 
     noise = detector.config.noise
     assert noise is not None
-    assert hasattr(noise, 'read') and noise.read >= 0
-    assert hasattr(noise, 'dark') and noise.dark >= 0
+    assert hasattr(noise, 'read') and np.allclose(noise.read, 12.0, rtol=0.01), f"WFC3IR read noise changed, got {noise.read}"
+    assert hasattr(noise, 'dark') and np.allclose(noise.dark, 0.045, rtol=0.01), f"WFC3IR dark current changed, got {noise.dark}"
 
 
 def test_detector_spectral_orders(wfss_detector):
@@ -149,7 +149,8 @@ def test_detector_spectral_orders(wfss_detector):
     detname, detector = wfss_detector
 
     orders = list(detector.orders)
-    assert len(orders) > 0, "At least one spectral order must be defined"
+    assert len(orders) == 5, f"G102 should have 5 spectral orders, got {len(orders)}"
+    assert set(orders) == {'+1', '0', '+2', '+3', '-1'}, f"G102 orders changed, got {orders}"
     for order in orders:
         assert isinstance(order, str), f"Order names should be strings, got {type(order)}"
 
@@ -168,7 +169,7 @@ def test_coordinate_edge_cases(ra, dec, orientat, description):
     for detname, detector in wfss.items():
         assert detector.wcs is not None, f"WCS should be valid for {description}"
         crval = detector.wcs.wcs.crval
-        assert 0 <= crval[0] <= 360 or np.isclose(crval[0], ra, atol=1.0)
+        assert 0 <= crval[0] <= 360 or np.allclose(crval[0], ra, atol=1.0)
         assert -90 <= crval[1] <= 90
 
 

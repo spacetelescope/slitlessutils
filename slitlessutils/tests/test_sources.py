@@ -79,7 +79,7 @@ def test_sourcecollection_loads_from_files(simple_segmentation_and_direct):
     )
 
     assert sources is not None, "SourceCollection should be created"
-    assert len(sources) > 0, "SourceCollection should contain at least one source"
+    assert len(sources) == 2, f"SourceCollection should contain exactly 2 sources, got {len(sources)}"
 
 
 def test_sourcecollection_finds_all_sources(simple_segmentation_and_direct):
@@ -133,8 +133,8 @@ def test_source_has_pixels(simple_segmentation_and_direct):
     )
 
     for segid, source in sources.items():
-        assert source.npixels > 0, (
-            f"Source {segid} must have pixels, got npixels={source.npixels}"
+        assert source.npixels == 25, (
+            f"Source {segid} should have 25 pixels (radius 3 circle), got npixels={source.npixels}"
         )
 
 
@@ -224,7 +224,9 @@ def test_complete_source_workflow(multi_source_data):
 
     sources.set_spectral_parameters(wave0=7500., wave1=11500., dwave=25.)
 
-    for segid, source in sources.items():
+    for segid in range(1, 6):
+        source = sources[segid]
+        assert source.npixels == 81, f"Source {segid} should have 81 pixels (radius 5 circle), got {source.npixels}"
         for region in source:
             assert region.wave0 == 7500.
             assert region.wave1 == 11500.
