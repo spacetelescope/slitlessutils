@@ -22,6 +22,9 @@ To install the latest development version of this repository, please use:
 pip install git+https://github.com/spacetelescope/slitlessutils.git
 ```
 
+You may run into an error building `llvmlite`, a dependency of `numba` (used to increase performance in `slitlessutils`) during installation.
+This can be fixed by running `conda install --channel=numba llvmlite` in your conda environment before installing `slitessutils`.
+
 You also need to obtain the calibration (reference) files, which are stored in a public box folder, which can be done with the slitlessutils config objects.  Please see [configuring slitlessutils](https://slitlessutils.readthedocs.io/en/latest/configure.html)
 for instructions and examples.  Please see our [documentation](https://slitlessutils.readthedocs.io/en/latest/install.html)
 for additional installation instructions and/or methods.

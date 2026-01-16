@@ -19,6 +19,11 @@ Start by creating an empty conda environment:
     conda create --name slitlessutils-env "python>=3.11"
     conda activate slitlessutils-env
 
+You may also need to manually install precompiled ``llvmlite`` binaries before installing
+``slitlessutils`` to avoid an error when building ``numba`` (used by ``slitlessutils`` to
+improve performance) during the installation. This can be done by running ``conda install --channel=numba llvmlite``
+in your conda environment before installing ``slitessutils``.
+
 
 Installing ``slitlessutils``
 ----------------------------
