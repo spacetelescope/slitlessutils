@@ -122,9 +122,11 @@ def embedsub_full_chip(subarray_file, instrument=None, y_size=None, x_size=None,
         hdu['ERR', 1].data = err
         hdu['DQ', 1].data = dq
 
-        hdu[0].header.add_history("This file was modified with function `embedsub_full_chip`")
-        hdu[0].header.add_history(f"    LTV1 and LTV2 were originally: {ltv1}, {ltv2}")
-        hdu[0].header.add_history(f"    NAXIS1 and NAXIS2 were originally: {naxis1}, {naxis2}")
+        hdu[0].header.add_history("This file was created with slitlessutils function, `embedsub_full_chip`")
+        hdu[0].header.add_history("As a result, some header keywords have been modified:")
+        hdu[0].header.add_history(f"    - CRPIX1 and CRPIX2 were originally: {crpix1}, {crpix2}")
+        hdu[0].header.add_history(f"    - LTV1 and LTV2 were originally: {ltv1}, {ltv2}")
+        hdu[0].header.add_history(f"    - NAXIS1 and NAXIS2 were originally: {naxis1}, {naxis2}")
 
     return embedded_file
 
