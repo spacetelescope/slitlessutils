@@ -102,22 +102,6 @@ class Simulate(Module):
                 headers.add_stanza(phdu.header, 'POINTING INFORMATION',
                                    before='PA_V3')
 
-            # put the wavelengths in the header
-            # insconf.parameters.update_header(phdu.header)
-            # data.grating.update_header(phdu.header)
-            # data.disperser.update_header(phdu.header)
-
-            # put the orders in the header
-            # orders=self.orders if self.orders else data.orders
-            # phdu.header['NORDER']=(len(orders),'Number of orders in the image')
-            # phdu.header['ORDERS']=(','.join(orders),'Order names')
-            # headers.add_stanza(phdu.header,'Orders Information',
-            # before='NORDER')
-
-            # update for the reference SIAF Information
-            # data.siaf.update_header(phdu.header)
-            # insconf.refsiaf.update_header(phdu.header)
-
             # process each detector
             for detname, detdata in data.items():
                 # load a detector

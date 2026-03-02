@@ -1,56 +1,21 @@
+from collections import namedtuple
+
 import numpy as np
-from scipy.sparse import coo_matrix, linalg
+from scipy import sparse
 from tqdm import tqdm
 
 from .....config import Config
 from .....logger import LOGGER
 from ....tables import PDTFile
-from ....utilities import as_iterable, headers, indices
+from ....utilities import as_iterable, headers  # , indices
 from .lcurve import LCurve
 from .result import Result
 
-# Just for notation sake
-# variables with a 'g' are in the WFSS image
-#                a 'u' are unique versions (so duplicates have been removed
-#                      or summed over as applicable)
-#                'comp' are compressed over the indices
-#                'uniq' are uniq such that this is true: i=iuniq[icomp].
-#                       which means that max(icomp)=len(iuniq)
-# pixel coordinates will be represented as either 1-d pixels (xyg) or
-# a 2-d pixel pair (xg,yg).  This is because 1d coordinates are easier to
-# work with in terms of summations, but harder when retrieving pixel
-# values out of an image
+
+ImageData = namedtuple("ImageData", ['dataset', 'detname', 'pixels'])
 
 
 class Matrix:
-    """
-    Class to implement the linear operator
-
-    Parameters
-    ----------
-    extorders : str or list
-       The spectral orders to extract.  If a list, tuple or set, then
-       multiple orders will aggregated.
-
-    mskorders : str or list or None, optional
-       The spectral orders to mask in the extraction.  If a list, tuple,
-       or set, then the multiple orders will be masked.
-
-    invmethod : str, optional
-       The inversion algorithm, options are 'lsqr' or 'lsmr'.  In general,
-       the LSMR algorithm is supposed to be faster, however it has not
-       been as thoroughly tested LSQR in this context.  Default is 'lsqr'
-
-    path : str, optional
-       The path where the HDF5 tables are stored.  Default is 'tables'
-
-    minunc : float, optional
-       The minimum value of the uncertainty.  This is to avoid divide by
-       zero errors and infinite signal-to-noise.  Default is 1e-10
-    """
-
-    INT = np.uint64     # DO NOT CHANGE THIS
-    FLOAT = np.float64  # DO NOT CHANGE THIS
 
     def __init__(self, extorders, **kwargs):
         # extract the defaults
@@ -73,33 +38,143 @@ class Matrix:
         return self.A.A.nnz if self else 0
 
     def __bool__(self):
-        return hasattr(self, 'A')
+        return hasattr(self, 'A') and (self.A.A.nnz > 0)
 
     def __str__(self):
         return f'Sparse matrix with {len(self)} elements'
 
-    def build_matrix(self, data, sources, group=0):
-        """
-        Method to build a matrix
+    def load_image_matrix(self, h5, detdata, sources, gpx):
+        '''
+        Load a CSR matrix for a given WFSS image
 
-        Parameters
-        ----------
-        data : `WFSSCollection`
-            The WFSS data to make into a matrix
+        Inputs
+        ------
+        h5 : h5py file object
+            The file to load the table from
+
+        detdata : `WFSSDetector`
+            The detector to load the table for
 
         sources : `SourceCollection`
-            The sources to build the matrix for
+            The source collection for this image
 
-        group : int, optional
-            The group ID.  Default is 0
+        gpx : `np.ndarray`
+            A mask of good pixels
 
-        Notes
-        -----
-        1) This is the heart-and-soul of the multi-ended spectral extraction
-        2) This operation can be very slow, but has been optimized to
-           be efficient in its memory usage.
+        Returns
+        -------
+        A : `scipy.sparse.csr_matrix`
+            The CSR sparse matrix for this image
 
-        """
+        yx : tuple of `np.ndarray`s
+            The pixel coordinates in the WFSS image for which we have data
+
+        '''
+
+        # will need this
+        npix = detdata.npixels()
+
+        # get the flat field
+        flatfield = detdata.config.load_flatfield()
+
+        # a container to hold all the submatrices
+        A = []
+        for ordname in self.extorders:
+            h5.load_order(ordname)
+            sensitivity = detdata.config[ordname].sensitivity
+
+            for source in sources.values():
+
+                # get the extration properties for this source
+                if hasattr(source, 'extpars'):
+                    extpars = source.extpars
+                else:
+                    extpars = self.defpars
+
+                # fetch the limits and the number of elements
+                limits = extpars.limits()
+                nlam = len(extpars)
+
+                # the dimensionality of this local submatrix
+                shape = (npix, nlam)
+
+                for regidx, region in enumerate(source):
+                    tab = h5.load_odt(region)
+                    if tab:
+                        wav = tab.wavelengths()
+                        x = tab.get('x', dtype=int)
+                        y = tab.get('y', dtype=int)
+                        val = tab.get('val')
+
+                        # remove badpixels
+                        g = np.where(gpx[y, x])[0]
+                        if g.size > 0:
+                            wav = wav[g]
+                            x = x[g]
+                            y = y[g]
+                            val = val[g]
+
+                            # matrix coordinates
+                            i = np.ravel_multi_index((y, x), dims=detdata.shape)
+                            j = np.digitize(wav, limits) - 1
+
+                            # compute weights
+                            sens = sensitivity(wav) * self.fluxscale
+                            flat = flatfield(x, y, wav)
+                            area = detdata.relative_pixelarea(x, y)
+
+                            # apply calibs to the weights
+                            aij = (val * sens * flat * area)
+
+                            # make the local sparse matrix
+                            Asub = sparse.csr_matrix((aij, (i, j)), shape=shape)
+
+                        else:
+                            # create an empty matrix in case all pixels got
+                            # masked out for whatever reason
+                            Asub = sparse.csr_matrix(shape)
+
+                    else:
+                        # create an empty matrix for objects out of the field
+                        Asub = sparse.csr_matrix(shape)
+
+                    # save it to the list, so we can stack them later
+                    A.append(Asub)
+
+        # stack all the sparse matrices
+        A = sparse.hstack(A)
+
+        # find the rows that are all zero
+        yx = np.where(np.diff(A.indptr))[0]
+
+        # remove the zero rows
+        A = A[yx]
+
+        # get the image coordinates
+        y, x = np.unravel_index(yx, shape=detdata.shape)
+
+        return A, (y, x)
+
+    def build_matrix(self, data, sources, group=0):
+        '''
+        Build a sparse matrix and ancillary data
+
+        Inputs
+        ------
+        data : `WFSSCollection`
+            The WFSS data
+
+        sources : `SourceCollection`
+            The sources to extract
+
+        grpid : int
+            The group that these sources refer to.  Default=0
+
+        Returns
+        -------
+        None
+
+        '''
 
         # do some quick checks
         if not self.extorders:
@@ -114,65 +189,32 @@ class Matrix:
         self.nfiles = len(data)
         self.nsources = len(sources)
         self.segids = list(sources.keys())
-
-        # get the extraction parameters
         self.defpars = data.get_parameters()
-        nwave = len(self.defpars)
 
-        # compute the cumulative number of wavelength elements
-        # this is to deal with uneven numbers of wavelength elements
-        self.cumlam = [0]
-        self.sedkeys = []         # to know which source/region goes with output
-        for segid, source in sources.items():
+        # issue a message
+        LOGGER.info("Building matrix with\n" +
+                    f"       WFSS files: {self.nfiles}\n" +
+                    f"          Sources: {self.nsources}\n" +
+                    f"         Group ID: {self.group}")
 
-            if hasattr(source, 'extpars'):
-                nw = len(source.extpars)
-            else:
-                nw = nwave
-
-            for sedkey, sedreg in source.items():
-                self.cumlam.append(self.cumlam[-1] + nw)
-                self.sedkeys.append(sedkey)
-        self.cumlam = np.array(self.cumlam, dtype=int)
-
-        # compute number of knowns (ie. total number of pixels) and
-        # unknowns (ie. total number of wavelengths
-        self.nknowns = data.npixels()     # total number of knowns
-        self.nunknowns = self.cumlam[-1]    # total number of unknowns
-
-        # record this value so we can make residuals
+        # lists for output data
+        # b = A.x, so b, and A are the linear variables
+        # pixels is a list of all the image pixels we've swept up
+        self.A = []
+        self.b = []
         self.imgdata = []
 
-        # print a message
-        LOGGER.info('Building a matrix\n' +
-                    f'      WFSS files: {self.nfiles}\n' +
-                    f'      Sources:     {self.nsources}\n' +
-                    f'      Unknowns:    {self.nunknowns}\n' +
-                    f'      Knowns:      {self.nknowns}')
-
-        # lists to save the matrix content
-        self.i = []     # knowns coordinate in matrix
-        self.j = []     # unknowns coordinate in matrix
-        self.aij = []   # matrix elements
-        self.bi = []    # vector of known values
-
         # process each WFSS image
-        self.detindex = 0
-        for datum in tqdm(data, desc='Loading WFSS Images', total=self.nfiles,
+        for datum in tqdm(data, desc="Loading WFSS Images", total=self.nfiles,
                           dynamic_ncols=True):
 
             # load the data for this WFSS image
             with PDTFile(datum, path=self.path, mode='r') as h5:
 
-                for detname, detdata in datum.items():
+                for detindex, (detname, detdata) in enumerate(datum.items()):
                     h5.load_detector(detname)
-                    flatfield = detdata.config.load_flatfield()
 
-                    # record which pixels were used for this detector,
-                    # this will be used later to get the unique pixels
-                    self.xyg = []
-
-                    # read the actual images
+                    # read the images
                     sci, hdr = detdata.readfits('science', header=True)
                     unc = detdata.readfits('uncertainty')
                     dqa = detdata.readfits('dataquality')
@@ -185,258 +227,107 @@ class Matrix:
                         sci /= time
                         unc /= time
 
-                    # make a good-pixel mask (gpx)
+                    # initialize a good-pixel mask as the pixels that are finite
+                    gpx = np.isfinite(sci) & np.isfinite(unc)
+
+                    # update the good-pixel mask with a bitmask
                     if detdata.config.bitmask:
-                        gpx = np.bitwise_and(dqa, detdata.config.bitmask) == 0
-                    else:
-                        gpx = np.ones_like(dqa, dtype=bool)
+                        gpx &= (np.bitwise_and(dqa, detdata.config.bitmask) == 0)
 
-                    # save the image dimensionalities
-                    if not hasattr(self, 'imgdim'):
-                        self.imgdim = tuple(reversed(sci.shape))
+                    # if detdata.config.bitmask:
+                    #    gpx = np.bitwise_and(dqa, detdata.config.bitmask) == 0
+                    # else:
+                    #    gpx = np.ones_like(dqa, dtype=bool)
 
-                    # update msk for the mskorders
+                    # this will work, but maybe less efficient?
+                    # bad = np.logical_not(np.isfinite(sci) & np.isfinite(unc))
+                    # gpx[bad] = False
+
+                    # update the mask for the mask orders
                     for ordname in self.mskorders:
                         h5.load_order(ordname)
                         for source in sources.values():
                             omt = h5.load_omt(source)
                             gpx[omt.get('y'), omt.get('x')] = False
 
-                    # read each order to extract
-                    for ordname in self.extorders:
-                        h5.load_order(ordname)
+                    # load all the submatrices for each order
+                    Aimg, yx = self.load_image_matrix(h5, detdata, sources, gpx)
 
-                        # set a variable that will be updated in subroutine
-                        self.srcindex = 0
+                    # grab the pixel values from data and uncertainty
+                    # but NB: the unc could potentially be zero, which will
+                    # cause problems with weighting by inverse-variance.
+                    # so the value minunc will set the minimum uncertainty
+                    # to avoid this problem
+                    s = sci[yx]
+                    u = np.maximum(unc[yx], self.minunc)
 
-                        # process each source
-                        for source in sources.values():
+                    # normalize the data and matrices by the uncertainties
+                    # for inverse-variance weighting of the solution (ie.
+                    # solving maximum likelihood).  But will change to a
+                    # column matrix for latter use
+                    Aimg /= u[:, np.newaxis]
+                    s /= u
 
-                            for region in source:  # .spectralregions:
-                                # read the table
-                                tab = h5.load_odt(region)
-                                if tab:
-                                    self._parse_table(tab, source, unc, gpx,
-                                                      ordname, detdata, flatfield)
+                    # save the data and matrices
+                    self.b.extend(s)
+                    self.A.append(Aimg.tocsc())
 
-                    # ok.  At this point, we've loaded all the data for
-                    # a WFSS detector.  But let's verify that there are
-                    # actually good pixels
-                    if self.xyg:
-                        # now must get the unique pixels from the observations
-                        self.xyg = np.unique(self.xyg)
+                    # save some light-weight things about this image
+                    imgdata = ImageData(datum.dataset, detname, yx)
+                    self.imgdata.append(imgdata)
 
-                        # compute the 2d pixel coordinates
-                        xg, yg = np.unravel_index(self.xyg, detdata.naxis, order='F')
+        # store things in a way to use later
+        self.A = sparse.linalg.aslinearoperator(sparse.vstack(self.A))
+        self.b = np.asarray(self.b)
+        self.frob = sparse.linalg.norm(self.A.A)
 
-                        # grab the observations and weight by uncertainty
-                        # (basically just the signal-to-noise)
-                        bi = sci[yg, xg] / np.maximum(unc[yg, xg], self.minunc)
+        # make a mask for spectral elements that have no constraints in the
+        # data, which corresponds to columns that are all zero
+        self.unconstrained = (np.diff(self.A.A.indptr) == 0)
 
-                        # save the results
-                        self.bi.extend(bi)
-
-                        # record the image info to make residual images later
-                        self.imgdata.append((datum.dataset, detname))
-
-                        # increment -- could just use len(self.imgdata)
-                        self.detindex += 1
-
-        # ok.  AT this point, we've loaded all the matrix data for the images
-        #      but we'll need to do some juggling to best use the memory
-        #      and computational resources
-
-        # first we need to compress over the indices, which can be slow
-        # so we'll print a message
-        LOGGER.info('Compressing indices')
-        self.icomp, self.iuniq = indices.compress(self.i)
-        self.i.clear()          # delete the data
-
-        self.jcomp, self.juniq = indices.compress(self.j)
-        self.j.clear()
-
-        # get some dimensionalities
-        self.npix = len(self.iuniq)
-        self.npar = len(self.juniq)
-        dim = np.array([self.npix, self.npar], int)   # dimensionality of matrix
-
-        # do a sanity check
-        if np.amax(self.icomp) != len(self.bi) - 1:
-            msg = f'Matrix has invalid dimensionlity: ({self.npix}\u00d7{self.npar})'
-            LOGGER.error(msg)
-            raise RuntimeError(msg)
-
-        # recast the vector
-        self.bi = np.array(self.bi, dtype=float)
-
-        # do some more checks
-        if not self.overdetermined:
-            dimlab = f"{self.npix}\u00d7{self.npar}"
-            msg = f"Underdetermined matrix: ({dimlab}).\nResults will be dubious"
-            LOGGER.warning(msg)
-
-        # compute some extra things for the ragged arrays (ie. where
-        # sources can have different number of spectral elements)
-        # and there are tuples lurking to describe (segid,regid).  Will
-        # call this as an extind for extraction index
-        if self.nsources == 1:
-            extind = np.zeros(self.npar, dtype=self.juniq.dtype)
+        # set some variables
+        self.npix, self.npar = self.A.shape
+        nel = self.npix * self.npar
+        if nel == 0:
+            self.density = np.nan
         else:
-            extind = np.digitize(self.juniq, self.cumlam) - 1
+            self.density = float(self.A.A.nnz) / nel
 
-        try:
-            self.lamids = self.juniq - self.cumlam[extind]
-
-        except BaseException:
-            LOGGER.debug(self.npix, self.npar, self.nsources)
-            raise RuntimeError("Matrix calculation has failed")
-
-        # get the indices to do all reverse calculations
-        self.ri = indices.reverse(extind)
-
-        # compute the density of the matrix
-        self.density = float(len(self.aij)) / float(dim[0] * dim[1])
-
-        # ok ok ok... NOW make a matrix
-        self.A = coo_matrix((self.aij, (self.icomp, self.jcomp)), shape=dim)
-        self.aij.clear()
-
-        # compute the norm
-        self.frob = linalg.norm(self.A)
-
-        # make it a linear operator
-        self.A = linalg.aslinearoperator(self.A)
-
-        # compute the Frobenius norm and initialize the LCurve
+        # build an L-Curve object to store the data
         self.lcurve = LCurve(norm=self.frob)
 
-        # now do a default damping target
-        LOGGER.debug('damping target might be suspect for 2d objects')
-        LOGGER.info("Building Damping Target")
+        if self:
+            # build a target spectrum
+            target = []
+            for segid, source in sources.items():
+                if hasattr(source, 'extpars'):
+                    waves = source.extpars.wavelengths()
+                else:
+                    waves = self.defpars.wavelengths()
 
-        target = np.zeros(self.nunknowns, dtype=float)
-        for segid, source in sources.items():
+                for regid, region in source.items():
+                    target.extend(region.sed(waves))
 
-            for sedkey, region in source.items():
-                extid = self.sedkeys.index(sedkey)
-                if extid in self.ri:
-                    g1 = self.ri[extid]
-                    g2 = self.lamids[g1]
+            target = np.asarray(target)
+            if len(target) != self.npar:
+                LOGGER.error("Invalid target spectrum")
+                exit()
 
-                    if hasattr(source, 'extpars'):
-                        waves = source.extpars.wavelengths()
-                    else:
-                        waves = self.defpars.wavelengths()
-
-                    target[g1] = region.sed(waves[g2])
-
-        self.set_damping_target(target)
-
-        # just update the printing...
-        LOGGER.info('Finished building a matrix')
-
-    def _parse_table(self, tab, source, unc, gpx, ordname, detdata, flatfield):
-        """
-        Helper function to parse data from a table
-
-        Parameters
-        ----------
-        tab : `su.tables.HDF5Table`
-            The table from which the data are taken
-
-        source : `su.sources.Source`
-            The source for which the table is to be read
-
-        unc : `np.ndarray`
-            The uncertainties from the image
-
-        gpx : `np.ndarray`
-            The good-pixel table
-
-        ordname : str or int
-            The name of the spectral order
-
-        detdata : `DetectorConfig`
-            The detector for which to parse the table
-
-        flatfield : `su.core.wfss.config.FlatField`
-            The flat field object to use
-
-
-        Notes
-        -----
-        This is an internal helper function and should not really be
-        explicitly called by a user.
-        """
-
-        # compute the wavelengths
-        wav = tab.wavelengths()
-        x = tab.get('x', dtype=int)
-        y = tab.get('y', dtype=int)
-        val = tab.get('val')
-
-        # remove any bad elements
-        g = np.where(gpx[y, x])[0]
-
-        x = x[g]
-        y = y[g]
-        val = val[g]
-
-        # compute some things to rescale the matrix values
-        # 1) sensitivity curve
-        # 2) flat field
-        # 3) pixel-area map (PAM)
-        # 4) uncertainty
-        sens = detdata.config[ordname].sensitivity(wav) * self.fluxscale
-        flat = flatfield(x, y, wav)
-        area = detdata.relative_pixelarea(x, y)
-        uval = np.maximum(unc[y, x], self.minunc)     # set the uncertaint floor
-
-        # rescale the tables' values
-        val *= (sens * flat * area / uval)
-
-        # group the wavelength indices according to the extraction settings
-        # NB: the -1 is because digitize is 1-indexed, but arrays are
-        #     0-indexed, so gotta shift it back
-        if hasattr(source, 'extpars'):
-            ll = np.digitize(wav, source.extpars.limits()) - 1
+            # set the damping target
+            self.set_damping_target(target)
         else:
-            ll = np.digitize(wav, self.defpars.limits()) - 1
+            LOGGER.warning('The matrix is empty, no calculations possible.')
 
-        # compute the knowns index (called 'i' above).  First compute a
-        # i-index offset based on number of pixels to add it here, but
-        # will need to subtract it off below.
-        ii0 = detdata.npixels() * self.detindex
-        ii = np.ravel_multi_index((x, y), dims=detdata.naxis, order='F') + ii0
+        LOGGER.info("Finished building matrix")
 
-        # compute the unknowns index (called 'j' above), but gotta take
-        # extra care here if there a different number of wavelength
-        # elements per source.
-        jj = ll + self.cumlam[self.srcindex]
-
-        # decimate over the matrix coordinates --- meaning, sum over
-        # repeated matrix indices (ii,jj).  This will leave only the
-        # unique pairs of (i,j), hence the 'u' designation
-        vu, iu, ju = indices.decimate(val, ii, jj, dims=(self.nknowns, self.nunknowns))
-
-        # get the WFSS-pixel coordinates (subtracting the offset as promised)
-        xygu = indices.uniq(iu - ii0)
-
-        # save all these values and increment a global counter
-        self.i.extend(list(iu))
-        self.j.extend(list(ju))
-        self.aij.extend(list(vu))
-        self.xyg.extend(list(xygu))
-        self.srcindex += 1
-
-    def compute_model(self, xj):
+    def compute_model(self, x):
         """
         Method to compute the model, which is given as a matrix-product
         between this object and a vector of spectral values
 
         Parameters
         ----------
-        xj : `np.ndarray`
+        x : `np.ndarray`
            An array of spectra that have been concatenated in the same way
            that this `Matrix` was created.  This is used to estimate the
            expected signal on the detector(s) given a known spectrum
@@ -461,29 +352,19 @@ class Matrix:
         set of spectra
 
         """
+
+        mod = {}
         if self:
+            b = self.A.matvec(x)
 
-            bi = self.A.matvec(xj)
+            s = slice(0, 0)
+            for imgdata in self.imgdata:
+                s = slice(s.stop, s.stop + len(imgdata.pixels[0]))
 
-            npix = self.imgdim[0] * self.imgdim[1]
+                key = (imgdata.dataset, imgdata.detname)
+                mod[key] = list(zip(imgdata.pixels[0], imgdata.pixels[1], b[s]))
 
-            imgindices, pixindices = np.divmod(self.iuniq, npix)
-
-            dtype = [('x', np.uint16), ('y', np.uint16), ('v', np.float64)]
-
-            out = {image: dict() for (image, detname) in self.imgdata}
-            for imgindex, (image, detname) in enumerate(self.imgdata):
-
-                g = np.where(imgindices == imgindex)
-
-                y, x = np.divmod(pixindices[g], self.imgdim[0])
-
-                out[image][detname] = np.array(list(zip(x, y, bi[g])), dtype=dtype)
-
-        else:
-            out = None
-
-        return out
+        return mod
 
     def set_damping_target(self, target):
         """
@@ -497,43 +378,16 @@ class Matrix:
         """
         if self:
             self.target = target / self.fluxscale
-            self.bi -= self.A.matvec(self.target)
+            self.b -= self.A.matvec(self.target)
         else:
             LOGGER.warning("Cannot set damping target until matrix is built")
 
-    # some flagging parameters
+    # --------------------------------------------------------------------
+    #
+    #              functions for solving the linear problem
+    #
+    # --------------------------------------------------------------------
 
-    @property
-    def underdetermined(self):
-        return self.npar > self.npix
-
-    @property
-    def determined(self):
-        return self.npar == self.npix
-
-    @property
-    def overdetermined(self):
-        return self.npar < self.npix
-
-    @property
-    def invmethod(self):
-        return self._invmethod
-
-    @invmethod.setter
-    def invmethod(self, invmethod):
-        im = invmethod.lower()
-        if im == 'lsqr':
-            self._invfunc = self._lsqr
-            self._invmethod = im
-        elif im == 'lsmr':
-            self._invfunc = self._lsmr
-            self._invmethod = im
-        else:
-            LOGGER.warning(f'{invmethod=} is not supported. Using `LSQR`')
-            self._invfunc = self._lsqr
-            self._invmethod = 'lsqr'
-
-    # stuff for inversions
     def invert(self, logdamp, scale=True, **kwargs):
         """
         Method to the matrix inversion
@@ -604,11 +458,11 @@ class Matrix:
 
         """
 
-        r = linalg.lsqr(self.A, self.bi, damp=damp, calc_var=True, **kwargs)
+        r = sparse.linalg.lsqr(self.A, self.b, damp=damp, calc_var=True, **kwargs)
         (x, istop, itn, r1norm, r2norm, anorm, acond, arnorm, xnorm, var) = r
 
-        r = Result('LSQR', x, istop, itn, r1norm, r2norm, anorm, acond, arnorm, xnorm,
-                   np.sqrt(var), damp)
+        r = Result('LSQR', x, istop, itn, r1norm, r2norm, anorm, acond,
+                   arnorm, xnorm, np.sqrt(var), damp)
 
         return r
 
@@ -636,40 +490,60 @@ class Matrix:
 
         """
 
-        (x, istop, itn, norm, arnorm, anorm, acond, xnorm) = linalg.lsmr(self.A, self.bi,
-                                                                         damp=damp, **kwargs)
+        r = sparse.linalg.lsmr(self.A, self.b, damp=damp, **kwargs)
+        (x, istop, itn, norm, arnorm, anorm, acond, xnorm) = r
+
         r1norm = arnorm
         r2norm = np.sqrt(arnorm**2 + (damp * xnorm)**2)
         unc = np.full_like(x, np.nan)
-        r = Result('LSMR', x, istop, itn, r1norm, r2norm, anorm, acond, arnorm, xnorm,
-                   unc, damp)
+        r = Result('LSMR', x, istop, itn, r1norm, r2norm, anorm, acond,
+                   arnorm, xnorm, unc, damp)
+
         return r
 
     def compute_uncertainty(self):
-        """
-        Function to compute the uncertainties
+        ones = np.ones_like(self.b, dtype=float)
+        A2 = self.A.A.copy()
+        A2.data = np.square(A2.data)
 
-        Notes
-        -----
-        The presence of damping means that the inversion algorithms
-        (either LSQR or LSMR) will generate uncertainties that are too small
-        as they are estimating diagonals of an altered matrix (Abar).
-        See the documentation for LSQR and the `calc_var` parameter
-        for a description of that altered matrix.  Therefore, this method
-        estimates the diagonal elements of AT.A and inverting them. This is
-        not explicitly correct, as we need the diagonal elements of (AT.A)-1.
+        r = sparse.linalg.lsqr(A2, ones)
+        return np.sqrt(r[0])
 
-        """
-        LOGGER.warning("Uncertainties are not exact in `matrix.py`")
+    # --------------------------------------------------------------------
+    #
+    #                      some properites
+    #
+    # --------------------------------------------------------------------
 
-        aij2, j = indices.decimate(self.A.A.data * self.A.A.data,
-                                   self.juniq[self.jcomp])
+    @property
+    def is_underdetermined(self):
+        return self.npar > self.npix
 
-        # these two lines to avoid divide-by-zero errors
-        unc = np.full_like(aij2, np.inf)
-        np.divide(1., np.sqrt(aij2), out=unc, where=(aij2 != 0))
+    @property
+    def is_determined(self):
+        return self.npar == self.npix
 
-        return unc
+    @property
+    def is_overdetermined(self):
+        return self.npar < self.npix
+
+    @property
+    def invmethod(self):
+        return self._invmethod
+
+    @invmethod.setter
+    def invmethod(self, invmethod):
+        im = invmethod.lower()
+        if im == 'lsqr':
+            self._invfunc = self._lsqr
+            self._invmethod = im
+        elif im == 'lsmr':
+            self._invfunc = self._lsmr
+            self._invmethod = im
+        else:
+            LOGGER.warning(f'{invmethod=} is not supported. Using `LSQR`')
+            self._invfunc = self._lsqr
+            self._invmethod = 'lsqr'
 
     # --------------------------------------------------------------------
     #
@@ -692,9 +566,8 @@ class Matrix:
             return
 
         hdr['NNZ'] = (len(self), 'number of non-zero matrix elements')
-
-        hdr['NPIX'] = (self.npix, 'number of pixels analyzed (ie. knowns)')
-        hdr['NPAR'] = (self.npar, 'number of parameters measured (ie. unknowns)')
+        hdr['NPIX'] = (self.npix, 'number of pixels analyzed (knowns)')
+        hdr['NPAR'] = (self.npar, 'number of parameters measured (unknowns)')
         hdr['NDOF'] = (self.npix - self.npar, 'number of degrees of freedom')
         hdr['DENSITY'] = (self.density, 'fraction of non-zero elements')
         hdr['FROBNORM'] = (self.frob, 'Frobenius norm')
@@ -704,29 +577,3 @@ class Matrix:
         hdr['EXTORDER'] = (','.join(self.extorders), 'extraction orders')
         hdr['MSKORDER'] = (','.join(self.mskorders), 'masked orders')
         headers.add_stanza(hdr, 'Matrix Properties', before='NNZ')
-
-    # --------------------------------------------------------------------
-    #
-    #                       helper functions
-    #
-    # --------------------------------------------------------------------
-    # @staticmethod
-    # def tuplize(d):
-    #    if d is not None:
-    #        if not isinstance(d,(tuple,list)):
-    #            d=(d,)
-    #    else:
-    #        d=()
-    #    return d
-
-    # def retype(self,k,dtype):
-    #    if dtype is np.nan:
-    #        if hasattr(self,k):
-    #            return getattr(self,k)
-    #        else:
-    #            return np.nan
-    #    else:
-    #        if hasattr(self,k):
-    #            return dtype(getattr(self,k))
-    #        else:
-    #            return dtype(0)
