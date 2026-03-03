@@ -215,6 +215,9 @@ class GroupCollection:
                 dct = {segid: sources[segid] for segid in segids}
                 yield dct
 
+    def __len__(self):
+        return nwx.number_connected_components(self.graph)
+
     def __add__(self, other):
         '''
         Method to merge two GroupCollections

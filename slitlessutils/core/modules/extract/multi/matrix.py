@@ -24,8 +24,6 @@ class Matrix:
         path = kwargs.get('path', 'su_tables')
         minunc = kwargs.get('minunc', 1e-10)
 
-        LOGGER.debug("must finish documentation")
-
         # save some things
         self.path = path
         self.invmethod = invmethod
@@ -43,7 +41,7 @@ class Matrix:
     def __str__(self):
         return f'Sparse matrix with {len(self)} elements'
 
-    def load_image_matrix(self, h5, detdata, sources, gpx):
+    def load_image_matrix(self, h5, detdata, sources, removezeros=False):
         '''
         Load a CSR matrix for a given WFSS image
 
@@ -58,16 +56,13 @@ class Matrix:
         sources : `SourceCollection`
             The source collection for this image
 
-        gpx : `np.ndarray`
-            A mask of good pixels
+        removezeros : bool
+            Flag to remove zero rows.  Default=False
 
         Returns
         -------
         A : `scipy.sparse.csr_matrix`
             The CSR sparse matrix for this image
-
-        yx : tuple of `np.ndarray`s
-            The pixel coordinates in the WFSS image for which we have data
 
         '''
 
@@ -106,33 +101,20 @@ class Matrix:
                         y = tab.get('y', dtype=int)
                         val = tab.get('val')
 
-                        # remove badpixels
-                        g = np.where(gpx[y, x])[0]
-                        if g.size > 0:
-                            wav = wav[g]
-                            x = x[g]
-                            y = y[g]
-                            val = val[g]
+                        # matrix coordinates
+                        i = np.ravel_multi_index((y, x), dims=detdata.shape)
+                        j = np.digitize(wav, limits) - 1
 
-                            # matrix coordinates
-                            i = np.ravel_multi_index((y, x), dims=detdata.shape)
-                            j = np.digitize(wav, limits) - 1
+                        # compute weights
+                        sens = sensitivity(wav) * self.fluxscale
+                        flat = flatfield(x, y, wav)
+                        area = detdata.relative_pixelarea(x, y)
 
-                            # compute weights
-                            sens = sensitivity(wav) * self.fluxscale
-                            flat = flatfield(x, y, wav)
-                            area = detdata.relative_pixelarea(x, y)
+                        # apply calibs to the weights
+                        aij = (val * sens * flat * area)
 
-                            # apply calibs to the weights
-                            aij = (val * sens * flat * area)
-
-                            # make the local sparse matrix
-                            Asub = sparse.csr_matrix((aij, (i, j)), shape=shape)
-
-                        else:
-                            # create an empty matrix in case all pixels got
-                            # masked out for whatever reason
-                            Asub = sparse.csr_matrix(shape)
+                        # make the local sparse matrix
+                        Asub = sparse.csr_matrix((aij, (i, j)), shape=shape)
 
                     else:
                         # create an empty matrix for objects out of the field
@@ -144,16 +126,18 @@ class Matrix:
         # stack all the sparse matrices
         A = sparse.hstack(A)
 
-        # find the rows that are all zero
-        yx = np.where(np.diff(A.indptr))[0]
+        if removezeros:
+            # find the rows that are all zero
+            yx = np.where(np.diff(A.indptr))[0]
 
-        # remove the zero rows
-        A = A[yx]
+            # remove the zero rows
+            A = A[yx]
 
-        # get the image coordinates
-        y, x = np.unravel_index(yx, shape=detdata.shape)
-
-        return A, (y, x)
+            # get the image coordinates
+            y, x = np.unravel_index(yx, shape=detdata.shape)
+            return A, (y, x)
+        else:
+            return A
 
     def build_matrix(self, data, sources, group=0):
         '''
@@ -214,66 +198,61 @@ class Matrix:
                 for detindex, (detname, detdata) in enumerate(datum.items()):
                     h5.load_detector(detname)
 
-                    # read the images
-                    sci, hdr = detdata.readfits('science', header=True)
-                    unc = detdata.readfits('uncertainty')
-                    dqa = detdata.readfits('dataquality')
-
-                    # adjust the units if necessary
-                    bunit = hdr.get('BUNIT', 'electron/s')
-                    if bunit.lower() in ('electron', 'electrons', 'e', 'e-'):
-                        phdr = detdata.primaryheader()
-                        time = phdr['EXPTIME']
-                        sci /= time
-                        unc /= time
-
-                    # initialize a good-pixel mask as the pixels that are finite
-                    gpx = np.isfinite(sci) & np.isfinite(unc)
-
-                    # update the good-pixel mask with a bitmask
-                    if detdata.config.bitmask:
-                        gpx &= (np.bitwise_and(dqa, detdata.config.bitmask) == 0)
-
-                    # if detdata.config.bitmask:
-                    #    gpx = np.bitwise_and(dqa, detdata.config.bitmask) == 0
-                    # else:
-                    #    gpx = np.ones_like(dqa, dtype=bool)
-
-                    # this will work, but maybe less efficient?
-                    # bad = np.logical_not(np.isfinite(sci) & np.isfinite(unc))
-                    # gpx[bad] = False
-
-                    # update the mask for the mask orders
-                    for ordname in self.mskorders:
-                        h5.load_order(ordname)
-                        for source in sources.values():
-                            omt = h5.load_omt(source)
-                            gpx[omt.get('y'), omt.get('x')] = False
-
                     # load all the submatrices for each order
-                    Aimg, yx = self.load_image_matrix(h5, detdata, sources, gpx)
+                    Aimg = self.load_image_matrix(h5, detdata, sources)
+                    if Aimg.nnz > 0:
 
-                    # grab the pixel values from data and uncertainty
-                    # but NB: the unc could potentially be zero, which will
-                    # cause problems with weighting by inverse-variance.
-                    # so the value minunc will set the minimum uncertainty
-                    # to avoid this problem
-                    s = sci[yx]
-                    u = np.maximum(unc[yx], self.minunc)
+                        # read the images
+                        sci, hdr = detdata.readfits('science', header=True)
+                        unc = detdata.readfits('uncertainty')
+                        dqa = detdata.readfits('dataquality')
 
-                    # normalize the data and matrices by the uncertainties
-                    # for inverse-variance weighting of the solution (ie.
-                    # solving maximum likelihood).  But will change to a
-                    # column matrix for latter use
-                    Aimg /= u[:, np.newaxis]
-                    s /= u
+                        # adjust the units if necessary
+                        bunit = hdr.get('BUNIT', 'electron/s')
+                        if bunit.lower() in ('electron', 'electrons', 'e', 'e-'):
+                            phdr = detdata.primaryheader()
+                            time = phdr['EXPTIME']
+                            sci /= time
+                            unc /= time
 
-                    # save the data and matrices
-                    self.b.extend(s)
-                    self.A.append(Aimg.tocsc())
+                        # initialize a good-pixel mask as the pixels that
+                        # are finite
+                        gpx = np.isfinite(sci) & np.isfinite(unc)
+
+                        # update the good-pixel mask with a bitmask
+                        if detdata.config.bitmask:
+                            gpx &= (np.bitwise_and(dqa, detdata.config.bitmask) == 0)
+
+                        # update the mask for the mask orders
+                        for ordname in self.mskorders:
+                            h5.load_order(ordname)
+                            for source in sources.values():
+                                omt = h5.load_omt(source)
+                                gpx[omt.get('y'), omt.get('x')] = False
+
+                        # get the bad pixels
+                        ncol = np.diff(Aimg.indptr)
+                        yx = np.where(gpx.flatten() & (ncol > 0))[0]
+                        y, x = np.unravel_index(yx, shape=detdata.shape)
+
+                        # remove the bad data
+                        Aimg = Aimg[yx]
+                        s = sci[y, x]
+                        u = np.maximum(unc[y, x], self.minunc)
+
+                        # normalize the data and matrices by the uncertainties
+                        # for inverse-variance weighting of the solution (ie.
+                        # solving maximum likelihood).  But will change to a
+                        # column matrix for latter use
+                        Aimg /= u[:, np.newaxis]
+                        s /= u
+
+                        # save the data and matrices
+                        self.b.extend(s)
+                        self.A.append(Aimg.tocsc())
 
                     # save some light-weight things about this image
-                    imgdata = ImageData(datum.dataset, detname, yx)
+                    imgdata = ImageData(datum.dataset, detname, (y, x))
                     self.imgdata.append(imgdata)
 
         # store things in a way to use later
