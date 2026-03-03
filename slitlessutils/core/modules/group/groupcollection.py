@@ -156,7 +156,8 @@ class GroupCollection:
 
         # draw and label the nodes
         nodes = nwx.draw_networkx_nodes(graph, pos, vmin=mag0,
-                                        vmax=mag1, node_color=mag, cmap=plt.cm.coolwarm,
+                                        vmax=mag1, node_color=mag,
+                                        cmap=plt.cm.coolwarm,
                                         node_size=200, ax=gax)
         nwx.draw_networkx_labels(graph, pos, font_size=10, ax=gax)
 
@@ -213,6 +214,28 @@ class GroupCollection:
             for segids in sorted(comps, key=len, reverse=True):
                 dct = {segid: sources[segid] for segid in segids}
                 yield dct
+
+    def __add__(self, other):
+        '''
+        Method to merge two GroupCollections
+
+        Inputs
+        ------
+        other : `GroupCollection()`
+            The other group to merge
+
+        Returns
+        -------
+        group : `GroupCollection()`
+            A new GroupCollection that is the merger of the two
+        '''
+
+        if isinstance(other, GroupCollection):
+            new = GroupCollection()
+            new.graph = nwx.compose(self.graph, other.graph)
+            return new
+        else:
+            raise NotImplementedError("Unable to add two GroupCollections")
 
 
 if __name__ == '__main__':
