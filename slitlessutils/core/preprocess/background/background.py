@@ -101,7 +101,7 @@ def background_processing(globalsky=False):
                                         LOGGER.warning(msg)
 
                                     # excise if need-be
-                                    if phdr['INSTRUME'] == 'WFC3':
+                                    if phdr['INSTRUME'] in ('WFC3', 'ACS'):
                                         x0 = -int(hdr.get('LTV1', 0))
                                         y0 = -int(hdr.get('LTV2', 0))
                                         nx = hdr['NAXIS1']
