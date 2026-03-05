@@ -47,6 +47,9 @@ class LCurve:
     def __str__(self):
         return str(self.data)
 
+    def __bool__(self):
+        return len(self.data) > 0
+
     def clear(self):
         """
         Method to clear this L-curve object from all its data
@@ -168,6 +171,9 @@ class LCurve:
 
         """
 
+        if not self:
+            return
+
         # get the colormap and lighten it
         cmap = plt.cm.get_cmap(colormap)
         cmap = self.remap_cmap(lambda x: lighten * (1. + x), cmap)
@@ -176,7 +182,9 @@ class LCurve:
         self.compute_curvature()
 
         # some plot windows
-        fig, (ax1, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [0.8, 1.]})
+        gridspec_kw = {'height_ratios': [0.8, 1.]}
+        fig, (ax1, ax2) = plt.subplots(2, 1, gridspec_kw=gridspec_kw,
+                                       figsize=(5, 5))
 
         # show the group ID
         if grpid is not None:
@@ -198,15 +206,14 @@ class LCurve:
         # line = ax1.plot(self.data['logchi2'], self.data['lognorm'], '-k',
         ax1.plot(logchi2, lognorm, '-k', linewidth=1, zorder=1)
 
-        # scat = ax1.scatter(self.data['logchi2'], self.data['lognorm'], zorder=2,
         scat = ax1.scatter(logchi2, lognorm, zorder=2,
-                           c=self.data['logdamp'], s=40, cmap=cmap, edgecolors='k',
-                           marker='o', vmin=lmin, vmax=lmax)
+                           c=self.data['logdamp'], s=40, cmap=cmap,
+                           edgecolors='k', marker='o', vmin=lmin, vmax=lmax)
 
         # put the frobenius norm in the plot
         # if self.norm is not None:
         if rescale:
-            ax1.text(0.67, 0.88, fr'$\log\ ||W||_F=${self.norm:+.3f}',
+            ax1.text(0.05, 0.08, fr'$\log\ ||W||_F=${self.norm:+.3f}',
                      horizontalalignment='left', transform=ax1.transAxes,
                      bbox=dict(facecolor='white', edgecolor='white'))
             ylabel = r'$\log\ ||W||_F^2\,||f||^2$'
@@ -214,39 +221,32 @@ class LCurve:
             ylabel = r'$\log\ ||f||^2$'
 
         # plot the labels
-        # ax1.set(xlabel=r'$\log\ ||Ax-b||^2$',
-        #        ylabel=r'$\log\ ||x||^2$')
-        ax1.set(xlabel=r'$\log\ ||Wf-{\cal I}||^2$',
-                ylabel=ylabel)
+        ax1.set(xlabel=r'$\log\ ||Wf-{\cal I}||^2$', ylabel=ylabel)
         ax1.set_axisbelow(True)
 
         # put on a grid
         ax1.grid(True)
 
         # plot the curvature
-
         ax2.plot(self.data['logdamp'], self.data['curvature'], '-k',
                  linewidth=1, zorder=1)
 
         scat = ax2.scatter(self.data['logdamp'], self.data['curvature'],
-                           zorder=3, s=40, cmap=cmap, edgecolors='k', marker='o',
-                           c=self.data['logdamp'], vmin=lmin, vmax=lmax)
+                           zorder=3, s=40, cmap=cmap, edgecolors='k',
+                           marker='o', c=self.data['logdamp'], vmin=lmin, vmax=lmax)
 
         # find and indicate the maximum
         if len(self.data) > 1:
             g = np.where(self.data['curvature'] == np.nanmax(self.data['curvature']))[0][0]
         else:
             g = 0
-            ax2.axvline(x=self.data['logdamp'][g], color='k', linestyle=':', zorder=2)
+        ax2.axvline(x=self.data['logdamp'][g], color='k', linestyle=':', zorder=2)
 
         # set the xrange
-        if lmax == lmin:
-            if np.isfinite(lmax):
-                ax2.set_xlim([lmin - 0.5, lmax + 0.5])
-            else:
-                ax2.set_xlim([-5, 0])
-        else:
-            ax2.set_xlim([lmin, lmax])
+        xlim = (-5, 0)   # default
+        if np.isfinite(lmin) and np.isfinite(lmax) and (lmin != lmax):
+            xlim = (lmin - 0.5, lmax + 0.5)
+        ax2.set_xlim(xlim)
 
         # label the axes
         ax2.set(ylabel='curvature')
