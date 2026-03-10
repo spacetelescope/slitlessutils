@@ -8,7 +8,6 @@ from ...tables import PDTFile
 from ..module import Module
 from .groupcollection import GroupCollection
 
-
 Key = namedtuple('Key', ['filename', 'detname', 'ordname', 'segid'])
 
 

@@ -11,7 +11,6 @@ from ....utilities import as_iterable, headers  # , indices
 from .lcurve import LCurve
 from .result import Result
 
-
 ImageData = namedtuple("ImageData", ['dataset', 'detname', 'pixels'])
 
 
@@ -80,7 +79,7 @@ class Matrix:
 
             for source in sources.values():
 
-                # get the extration properties for this source
+                # get the extraction properties for this source
                 if hasattr(source, 'extpars'):
                     extpars = source.extpars
                 else:
@@ -490,7 +489,7 @@ class Matrix:
 
     # --------------------------------------------------------------------
     #
-    #                      some properites
+    #                      some properties
     #
     # --------------------------------------------------------------------
 

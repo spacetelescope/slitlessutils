@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
-from matplotlib.lines import Line2D
 import networkx as nwx
+from matplotlib.lines import Line2D
 
 from ....logger import LOGGER
 from ...utilities import headers
