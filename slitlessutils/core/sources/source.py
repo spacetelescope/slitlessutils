@@ -142,13 +142,12 @@ class Source(list):
             # get a bounding box
             x0 = max(np.amin(x) - self.backsize, 0)
             y0 = max(np.amin(y) - self.backsize, 0)
-            x1 = min(np.amax(x) + self.backsize, img.shape[1] - 1)
-            y1 = min(np.amax(y) + self.backsize, img.shape[0] - 1)
+            x1 = min(np.amax(x) + self.backsize, img.shape[1])
+            y1 = min(np.amax(y) + self.backsize, img.shape[0])
 
             # cut out regions
             subimg = img[y0:y1, x0:x1]
             subseg = seg[y0:y1, x0:x1]
-            # subwht = wht[y0:y1, x0:x1]
 
             # compute and subtract the local sky background:
             if self.local_back:
@@ -170,8 +169,8 @@ class Source(list):
                 self.background = 0.0
 
             # convert the image into weights
-            w = self.compute_weights(subimg, x - x0, y - y0, whttype=whttype, profile=profile,
-                                     negfunc=negfunc, epsilon=1e-9)
+            w = self.compute_weights(subimg, x - x0, y - y0, whttype=whttype,
+                                     profile=profile, negfunc=negfunc, epsilon=1e-9)
 
             # remove pixels with zero weights
             g = np.where(w > 0)[0]
@@ -264,8 +263,9 @@ class Source(list):
             # else:
             #     LOGGER.warning(f"Ignoring {segid=}")
 
-    def compute_weights(self, subimg, x, y, whttype='pixels', profile='gaussian',
-                        negfunc='positivity', epsilon=1e-9):
+    def compute_weights(self, subimg, x, y, whttype='pixels',
+                        profile='gaussian', negfunc='positivity',
+                        epsilon=1e-9):
 
         # set some variables
         self.profile = profile.lower()
