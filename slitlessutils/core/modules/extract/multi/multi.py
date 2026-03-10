@@ -1,13 +1,13 @@
 import getpass
 
+import numpy as np
 from astropy.io import fits
 from matplotlib.backends.backend_pdf import PdfPages
-import numpy as np
 from tqdm import tqdm
 
 from .....config import SUFFIXES, Config
 from .....logger import LOGGER
-from ....utilities import as_iterable, get_metadata, headers, compression
+from ....utilities import as_iterable, compression, get_metadata, headers
 from ...group import GroupCollection
 from ...module import Module
 from .matrix import Matrix
@@ -176,7 +176,7 @@ class Multi(Module):
 
                     # do each source
                     for segid, source in grpsources.items():
-                        # get the extration properties for this source
+                        # get the extraction properties for this source
                         if hasattr(source, 'extpars'):
                             wave = source.extpars.wavelengths()
                         else:
@@ -246,7 +246,7 @@ class Multi(Module):
                     for y, x, m in models[key]:
                         mod[y, x] += m * unc[y, x]
 
-                    # udpate the header info
+                    # update the header info
                     hdr['EXTNAME'] = 'MOD'
 
                     # save to the output

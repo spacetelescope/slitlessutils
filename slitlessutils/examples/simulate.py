@@ -1,10 +1,10 @@
 import os
 import warnings
 
+import numpy as np
 from astropy.io import fits
 from astropy.modeling import models
 from astropy.wcs import WCS
-import numpy as np
 
 import slitlessutils as su
 
