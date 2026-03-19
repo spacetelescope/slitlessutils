@@ -10,6 +10,7 @@ from astropy.wcs import WCS
 from astropy.wcs import utils as wcsutils
 from skimage.segmentation import expand_labels
 
+from ...config import CONFIG
 from ...logger import LOGGER
 from ..utilities import headers, indices
 from .dispersedregion import DispersedRegion
@@ -493,6 +494,9 @@ class Source(list):
         hdr['FNU'] = (self.fnu, 'flux in erg/s/cm2/Hz in direct image')
         hdr['NPIXELS'] = (self.npixels, 'total number of extracted pixels')
         hdr['WHTTYPE'] = (self.whttype, 'Type of source profile weights')
+        hdr['LAMBUNIT'] = ('AA', 'Unit on the wavelength')
+        hdr['FLAMUNIT'] = (f'{Config().fluxunits} erg cm-2 s-1 AA-1', 'Unit on the flamb spectrum')
+
         if self.whttype == 'fitprofile':
             hdr['WHTPROF'] = (self.profile, 'The analytic profile for the weights')
         hdr['NREGIONS'] = (self.nregions, 'number of spectral regions')

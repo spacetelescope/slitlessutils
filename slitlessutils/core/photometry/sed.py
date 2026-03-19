@@ -120,7 +120,6 @@ class SED:
         """
         self._data = d
 
-    # def normalize(self,band,fnu):
     def normalize(self, wave, flux, abmag=False):
         """
         Method to renormalize the spectrum

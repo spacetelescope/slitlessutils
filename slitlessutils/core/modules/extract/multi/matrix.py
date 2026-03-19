@@ -16,6 +16,70 @@ ImageData = namedtuple("ImageData", ['dataset', 'detname', 'pixels'])
 
 
 class Matrix:
+    r"""
+    Builds a linear operator to implement the linear-reconstruction
+    as described in Ryan, Casertano, & Pirzkal (2018).
+
+    Here we describe the flux in a pixel in a spectroscopic image as a
+    weighted sum over all sources and all wavelengths.  Suppose there is a
+    collection of sources labeled as: :math:`{A, B, C, D, ...}`, each of
+    which has a collection of wavelenghts denoted as:
+    :math:`{1, 2, 3, 4, ...}`.  Now the spectral elements will be given
+    by: :math:`{F_{A,1}, F_{A,2}, F_{A,3}, ..., F_{B,1}, F_{B,2},
+    F_{B,3}, ...,  F_{C,1}, F_{C,2}, F_{C,3}, ...`.
+    Based on that, then the flux in a spectrsocopic image will be:
+
+    .. math::
+       f = w_{A,1}*F_{A,1} + w_{A,2}*F_{A,2} + w_{B,5}*F_{B,6} + w_{E, 8}*F_{E, 8} + ...
+
+    where :math:`f` is the observed flux in a pixel in the spectral image,
+    :math:`F_{A, 1}` is the spectrum of object :math:`A` at the first
+    wavelength of interest and similarly for object :math:`B`, :math:`E`,
+    and so on.  The weights :math:`w_{A,1}` (and so on for the other objects
+    and wavelengths) effectively act as unit conversions between the
+    incident spectra and the observed flux on the instrument, and can be
+    determined by a brute-force forward-model simulation.  Importantly, a
+    similar equation for each observed pixel can be established, which of
+    course will have different set of weights.  But with all the weights
+    determined, they can be formulated into a canonical matrix equation:
+
+    .. math::
+       \mathbf{b} = \mathbf{A}\mathbf{x}
+
+    where :math:`\mathbf{b}` is the "data vector" composed of the collection
+    of observed pixel-level data, :math:`\mathbf{A}` is the collection of
+    weights rearranged in a matrix format, and :math:`\mathbf{x}` is the
+    "unknown vector" composed of the spectra for each object.  Importantly,
+    many of the weighting factors will be identically zero, since only very
+    few sources at very select wavelengths will deposit flux on any given
+    pixel in any given observation.  Therefore the matrix :math:`A` will be
+    a very sparse matrix, and so internally, it is built and manipulated
+    as a `scipy.sparse.csr_matrix()` object.
+
+    This linear system can be solved in a chi2-sense using standard methods:
+    `scipy.sparse.linalg.lsqr()` and `scipy.sparse.linalg.lsmr()`, both of
+    which optimize the regularized penalty function:
+
+    .. math::
+       \chi^2 = ||\mathbf{A}\mathbf{x} - \mathbf{b}||^2 + \ell||\mathbf{x}||^2
+
+    where :math:`\ell` is the Tikhonov regularization parameter.  There
+    have been several techniques for proposed for optimizing this value, see:
+
+    - https://epubs.siam.org/doi/book/10.1137/1.9780898719697
+    - https://ui.adsabs.harvard.edu/abs/2020IOPSN...1b5004C/abstract
+    - https://ui.adsabs.harvard.edu/abs/2018PASP..130c4501R/
+    - https://ui.adsabs.harvard.edu/abs/2024A%26A...684A..21N/abstract
+    - https://ui.adsabs.harvard.edu/abs/2026arXiv260105233A/abstract
+
+    However, slitlessutils follows the prescription of Ryan, Casertano,
+    & Pirzkal (2018), which maximizes the curvature in the L-curve
+    based on Hansen (1998) including the golden-search methods of Cultrera
+    & Callegaro (2020).
+
+    """
+
+    _VALID_BUNITS = ('electron', 'electrons', 'e', 'e-')
 
     def __init__(self, extorders, **kwargs):
         # extract the defaults
@@ -41,13 +105,13 @@ class Matrix:
     def __str__(self):
         return f'Sparse matrix with {len(self)} elements'
 
-    def load_image_matrix(self, h5, detdata, sources, removezeros=False):
+    def load_image_matrix(self, h5_file, detdata, sources, removezeros=False):
         '''
         Load a CSR matrix for a given WFSS image
 
         Inputs
         ------
-        h5 : h5py file object
+        h5_file : h5py file object
             The file to load the table from
 
         detdata : `WFSSDetector`
@@ -73,9 +137,9 @@ class Matrix:
         flatfield = detdata.config.load_flatfield()
 
         # a container to hold all the submatrices
-        A = []
+        A_image = []
         for ordname in self.extorders:
-            h5.load_order(ordname)
+            h5_file.load_order(ordname)
             sensitivity = detdata.config[ordname].sensitivity
 
             for source in sources.values():
@@ -94,7 +158,7 @@ class Matrix:
                 shape = (npix, nlam)
 
                 for regidx, region in enumerate(source):
-                    tab = h5.load_odt(region)
+                    tab = h5_file.load_odt(region)
                     if tab:
                         wav = tab.wavelengths()
                         x = tab.get('x', dtype=int)
@@ -114,30 +178,30 @@ class Matrix:
                         aij = (val * sens * flat * area)
 
                         # make the local sparse matrix
-                        Asub = sparse.csr_matrix((aij, (i, j)), shape=shape)
+                        A_region = sparse.csr_matrix((aij, (i, j)), shape=shape)
 
                     else:
                         # create an empty matrix for objects out of the field
-                        Asub = sparse.csr_matrix(shape)
+                        A_region = sparse.csr_matrix(shape)
 
                     # save it to the list, so we can stack them later
-                    A.append(Asub)
+                    A_image.append(A_region)
 
         # stack all the sparse matrices
-        A = sparse.hstack(A)
+        A_image = sparse.hstack(A_image)
 
         if removezeros:
             # find the rows that are all zero
-            yx = np.where(np.diff(A.indptr))[0]
+            yx = np.where(np.diff(A_image.indptr))[0]
 
             # remove the zero rows
-            A = A[yx]
+            A_image = A_image[yx]
 
             # get the image coordinates
             y, x = np.unravel_index(yx, shape=detdata.shape)
-            return A, (y, x)
+            return A_image, (y, x)
         else:
-            return A
+            return A_image
 
     def build_matrix(self, data, sources, group=0):
         '''
@@ -193,14 +257,14 @@ class Matrix:
                           dynamic_ncols=True):
 
             # load the data for this WFSS image
-            with PDTFile(datum, path=self.path, mode='r') as h5:
+            with PDTFile(datum, path=self.path, mode='r') as h5_file:
 
                 for detindex, (detname, detdata) in enumerate(datum.items()):
-                    h5.load_detector(detname)
+                    h5_file.load_detector(detname)
 
                     # load all the submatrices for each order
-                    Aimg = self.load_image_matrix(h5, detdata, sources)
-                    if Aimg.nnz > 0:
+                    A_image = self.load_image_matrix(h5_file, detdata, sources)
+                    if A_image.nnz > 0:
 
                         # read the images
                         sci, hdr = detdata.readfits('science', header=True)
@@ -209,7 +273,7 @@ class Matrix:
 
                         # adjust the units if necessary
                         bunit = hdr.get('BUNIT', 'electron/s')
-                        if bunit.lower() in ('electron', 'electrons', 'e', 'e-'):
+                        if bunit.lower() in self._VALID_BUNITS:
                             phdr = detdata.primaryheader()
                             time = phdr['EXPTIME']
                             sci /= time
@@ -225,18 +289,18 @@ class Matrix:
 
                         # update the mask for the mask orders
                         for ordname in self.mskorders:
-                            h5.load_order(ordname)
+                            h5_file.load_order(ordname)
                             for source in sources.values():
-                                omt = h5.load_omt(source)
+                                omt = h5_file.load_omt(source)
                                 gpx[omt.get('y'), omt.get('x')] = False
 
                         # get the bad pixels
-                        ncol = np.diff(Aimg.indptr)
+                        ncol = np.diff(A_image.indptr)
                         yx = np.where(gpx.flatten() & (ncol > 0))[0]
                         y, x = np.unravel_index(yx, shape=detdata.shape)
 
                         # remove the bad data
-                        Aimg = Aimg[yx]
+                        A_image = A_image[yx]
                         s = sci[y, x]
                         u = np.maximum(unc[y, x], self.minunc)
 
@@ -244,12 +308,12 @@ class Matrix:
                         # for inverse-variance weighting of the solution (ie.
                         # solving maximum likelihood).  But will change to a
                         # column matrix for latter use
-                        Aimg /= u[:, np.newaxis]
+                        A_image /= u[:, np.newaxis]
                         s /= u
 
                         # save the data and matrices
                         self.b.extend(s)
-                        self.A.append(Aimg.tocsc())
+                        self.A.append(A_image.tocsc())
 
                     # save some light-weight things about this image
                     imgdata = ImageData(datum.dataset, detname, (y, x))

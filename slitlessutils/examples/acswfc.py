@@ -19,7 +19,7 @@ Description
 This file demonstrates the analysis of HST ACS/WFC grism spectroscopy using
 the G800L observations of the standard star WR96.  It will compare the
 spectrum extracted with slitlessutils to a reference spectrum from
-Pasquali et al. (2002) that is stored in the reference file database.
+Pasquali et al. (2001) that is stored in the reference file database.
 
 The grey bar shows the region used to normalize the spectra.
 
@@ -202,7 +202,7 @@ def plot_spectra():
 
     # smooth the A. Pasquali reference spectrum (kindly provided S. Larsen).
     # the Scale factor is from comparing the notional ACS dispersion
-    # (40A/pix) to the spectrum quoted from Pasquali+ 2002 which has
+    # (40A/pix) to the spectrum quoted from Pasquali+ 2001 which has
     # 1.26 A/pix. Therefore smoothing factor is 40./1.26 = 31.7
     ff = gaussian_filter1d(f, 31.7)
 
