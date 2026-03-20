@@ -53,6 +53,11 @@ class SED:
              ('func', np.float32),
              ('cont', np.float32),
              ('npix', np.uint16)]
+
+    # names of externally visible keywords
+    EXTKEYS = {'lamb': 'WAVELENGTH', 'flam': "FLUX", 'func': 'UNCERTAINTY',
+               'cont': 'CONTAMINATION', 'npix': 'NMEASUREMENTS'}
+
     FORMAT = ('%.4e', '%.4e', '%.4e', '%.4e', '%6u')
     GROW = 2     # factor to resize a dynamic array
 
@@ -249,6 +254,29 @@ class SED:
         self._data['cont'][self.count:self.count + nadd] = cont
         self._data['npix'][self.count:self.count + nadd] = npix
         self.count += nadd
+
+    def for_output(self):
+        """
+        Method to rename the internal numpy columns for a more descriptive
+        output in the fits tables
+
+        Returns
+        -------
+        dat : `np.ndarray()`
+           This will be a structured numpy array with descriptive column names
+        """
+
+        # get the data locally
+        dat = self._data
+
+        # get the new names by remapping the internal names to better
+        # external names for the ouptut files
+        new_names = tuple(self.EXTKEYS[inkey] for inkey, dtype in self.DTYPE)
+
+        # reset the outputs
+        dat.dtype.names = new_names
+
+        return dat
 
     def __bool__(self):
         """

@@ -120,8 +120,8 @@ def test_ACS_grism(tmp_path):
     # load the data and change the units
     cfg = su.config.Config()
     dat, hdr = fits.getdata(f'{ROOT}_x1d.fits', header=True)
-    dat['flam'] *= cfg.fluxscale / 1e-13
-    dat['func'] *= cfg.fluxscale / 1e-13
+    dat['FLUX'] *= cfg.fluxscale / 1e-13
+    dat['UNCERTAINTY'] *= cfg.fluxscale / 1e-13
 
     assert dat.shape == (119,)
     assert np.allclose(dat[1], (5620.0, 0.029815594, 0.00016166682, 0.0, 13))

@@ -59,18 +59,18 @@ def makeplot():
         for i, hdu in enumerate(hdul[1:]):
             data = hdu.data
 
-            nnan = np.sum(np.isnan(data['flam']))
-            ntot = len(data['flam'])
+            nnan = np.sum(np.isnan(data['FLUX']))
+            ntot = len(data['FLUX'])
 
             if nnan != ntot:
                 segid = hdu.header['SEGID']
 
-                xerr = (data['lamb'][1] - data['lamb'][0]) / 2
-                xerr = np.full_like(data['lamb'], xerr)
+                xerr = (data['WAVELENGTH'][1] - data['WAVELENGTH'][0]) / 2
+                xerr = np.full_like(data['WAVELENGTH'], xerr)
 
-                plt.plot(data['lamb'], data['flam'], color='darkgrey')
-                plt.errorbar(data['lamb'], data['flam'],
-                             xerr=xerr, yerr=data['func'],
+                plt.plot(data['WAVELENGTH'], data['FLUX'], color='darkgrey')
+                plt.errorbar(data['WAVELENGTH'], data['FLUX'],
+                             xerr=xerr, yerr=data['UNCERTAINTY'],
                              color='black', label='multi_extract', fmt='o')
 
                 specfile = os.path.join('spectra', f'{segid}_1.csv')

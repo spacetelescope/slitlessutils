@@ -10,7 +10,7 @@ from astropy.wcs import WCS
 from astropy.wcs import utils as wcsutils
 from skimage.segmentation import expand_labels
 
-from ...config import CONFIG
+from ...config import Config
 from ...logger import LOGGER
 from ..utilities import headers, indices
 from .dispersedregion import DispersedRegion
@@ -489,13 +489,14 @@ class Source(list):
         hdr['DEC'] = (self.adc[1], 'Declination (deg)')
         hdr['X'] = (self.xyc[0], 'X barycenter')
         hdr['Y'] = (self.xyc[1], 'Y barycenter')
-        hdr['FLUX'] = (self.flux, 'instrumental flux in direct image')
-        hdr['MAG'] = (self.mag, 'AB magnitude in direct image')
-        hdr['FNU'] = (self.fnu, 'flux in erg/s/cm2/Hz in direct image')
+        hdr['IMGFLUX'] = (self.flux, 'instrumental flux in direct image')
+        hdr['IMGMAG'] = (self.mag, 'AB magnitude in direct image')
+        hdr['IMGFNU'] = (self.fnu, 'flux in erg/s/cm2/Hz in direct image')
         hdr['NPIXELS'] = (self.npixels, 'total number of extracted pixels')
         hdr['WHTTYPE'] = (self.whttype, 'Type of source profile weights')
-        hdr['LAMBUNIT'] = ('AA', 'Unit on the wavelength')
-        hdr['FLAMUNIT'] = (f'{Config().fluxunits} erg cm-2 s-1 AA-1', 'Unit on the flamb spectrum')
+        hdr['WAVEUNIT'] = ('AA', 'Unit on the wavelength')
+        hdr['FLUXUNIT'] = (f'{Config().fluxunits} erg cm-2 s-1 AA-1', 'Unit on the flamb spectrum')
+        hdr['FLUXTYPE'] = ('flam', 'Is spectrum `flam` or `fnu` units')
 
         if self.whttype == 'fitprofile':
             hdr['WHTPROF'] = (self.profile, 'The analytic profile for the weights')
@@ -548,11 +549,11 @@ class Source(list):
             # set the data
             dat = np.zeros((hdr['NAXIS3'], hdr['NAXIS2'], hdr['NAXIS1']),
                            dtype=float)
-
+            raise NotImplementedError("three-dimensional extraction is not yet supported")
             hdu = fits.ImageHDU(dat, hdr)
         else:
             # set the data as a single spectrum
-            dat = self[0].sed.data
+            dat = self[0].sed.for_output()
             hdu = fits.BinTableHDU(dat, hdr)
         return hdu
 
