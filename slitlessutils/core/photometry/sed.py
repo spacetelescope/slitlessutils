@@ -255,29 +255,6 @@ class SED:
         self._data['npix'][self.count:self.count + nadd] = npix
         self.count += nadd
 
-    def for_output(self):
-        """
-        Method to rename the internal numpy columns for a more descriptive
-        output in the fits tables
-
-        Returns
-        -------
-        dat : `np.ndarray()`
-           This will be a structured numpy array with descriptive column names
-        """
-
-        # get the data locally
-        dat = self._data
-
-        # get the new names by remapping the internal names to better
-        # external names for the ouptut files
-        new_names = tuple(self.EXTKEYS[inkey] for inkey, dtype in self.DTYPE)
-
-        # reset the outputs
-        dat.dtype.names = new_names
-
-        return dat
-
     def __bool__(self):
         """
         Method to enable to boolean testing based on the count
@@ -783,27 +760,39 @@ class SED:
             np.savetxt(filename, self.data, delimiter=delimiter, fmt=self.FORMAT,
                        header=delimiter.join(self._data.dtype.names))
 
-    def as_HDU(self, **kwargs):
+    def as_HDU(self, header=None):
         """
-        Method to package the spectrum in to an `astropy.io.fits.BinTableHDU`
+        Method to rename the internal numpy columns for a more descriptive
+        output in the fits tables
 
-        Parameters
-        ----------
-        kwargs : dict, optional
-            Keyword/value pairs set as header keyword/value pairs
-
+        Returns
+        -------
+        hdu : `fits.astropy.io.BinTableHDU()`
+           This will be a structured numpy array with descriptive column names
         """
 
-        fluxunits = Config().fluxunits
+        # get the data locally and trim the padding
+        data = self.data
 
-        hdu = fits.BinTableHDU(self.data)
+        # get the new names by remapping the internal names to better
+        # external names for the ouptut files
+        new_names = tuple(self.EXTKEYS[inkey] for inkey, dtype in self.DTYPE)
 
-        hdu.header.set('TUNIT1', value='angstrom', after='TFORM1')
-        hdu.header.set('TUNIT2', value=fluxunits, after='TFORM2')
-        hdu.header.set('TUNIT3', value=fluxunits, after='TFORM3')
-        hdu.header.set('TUNIT4', value=fluxunits, after='TFORM4')
-        hdu.header.set('TUNIT5', value='number', after='TFORM5')
+        # reset the outputs
+        data.dtype.names = new_names
 
-        for k, v in kwargs.items():
-            hdu.header[k] = v
+        # put into an HDU
+        hdu = fits.BinTableHDU(data, header=header)
+
+        # get units of the spectrum
+        cfg = Config()
+        fluxunit = f'{cfg.fluxscale} {cfg.fluxunits}'
+
+        # update the output units
+        hdu.data.columns['WAVELENGTH'].unit = 'Angstrom'
+        hdu.data.columns['FLUX'].unit = fluxunit
+        hdu.data.columns['UNCERTAINTY'].unit = fluxunit
+        hdu.data.columns['CONTAMINATION'].unit = fluxunit
+        hdu.data.columns['NMEASUREMENTS'].unit = ''
+
         return hdu
