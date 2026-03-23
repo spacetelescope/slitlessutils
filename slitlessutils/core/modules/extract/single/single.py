@@ -415,8 +415,7 @@ class Single(Module):
 
                                 # get the contam data
                                 chdu = self.contamination(segid, ordname,
-                                                          h5, sources,
-                                                          detdata, flatfield,
+                                                          h5, sources, detdata, flatfield,
                                                           bbx=(x0, x1), bby=(y0, y1))
 
                                 if self.savecont:
@@ -425,10 +424,13 @@ class Single(Module):
                                 # get the offsets in the contamination image
                                 # xoff = -chdu.header.get('LTV1', 0)
                                 # yoff = -chdu.header.get('LTV2', 0)
+                            else:
+                                chdu = fits.ImageHDU()
 
                             if extmode == 'boxcar':
-                                spectrum = boxcar(source, detdata, sci, unc, dqa, flatfield, order,
-                                                  odt, width=width)
+                                spectrum = boxcar(source, detdata, sci, unc,
+                                                  dqa, flatfield, order, odt, chdu,
+                                                  width=width)
 
                                 spectra[segid] += spectrum
 

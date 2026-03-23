@@ -19,7 +19,7 @@ Description
 This file demonstrates the analysis of HST ACS/WFC grism spectroscopy using
 the G800L observations of the standard star WR96.  It will compare the
 spectrum extracted with slitlessutils to a reference spectrum from
-Pasquali et al. (2002) that is stored in the reference file database.
+Pasquali et al. (2001) that is stored in the reference file database.
 
 The grey bar shows the region used to normalize the spectra.
 
@@ -90,8 +90,8 @@ def preprocess_grism():
         for line in fp:
             grismfile = line.strip()
 
-            # subtract background via master-sky
-            back.master(grismfile, inplace=True)
+            # subtract background via global-sky technique
+            back.image(grismfile, inplace=True)
 
             # downgrade the WCS to be consistent
             su.core.preprocess.astrometry.downgrade_wcs(grismfile, key='A',
@@ -202,22 +202,22 @@ def plot_spectra():
 
     # smooth the A. Pasquali reference spectrum (kindly provided S. Larsen).
     # the Scale factor is from comparing the notional ACS dispersion
-    # (40A/pix) to the spectrum quoted from Pasquali+ 2002 which has
+    # (40A/pix) to the spectrum quoted from Pasquali+ 2001 which has
     # 1.26 A/pix. Therefore smoothing factor is 40./1.26 = 31.7
     ff = gaussian_filter1d(f, 31.7)
 
     # load the data and change the units
     dat, hdr = fits.getdata(f'{ROOT}_x1d.fits', header=True)
-    dat['flam'] *= cfg.fluxscale / 1e-13
-    dat['func'] *= cfg.fluxscale / 1e-13
+    dat['FLUX'] *= cfg.fluxscale / 1e-13
+    dat['UNCERTAINTY'] *= cfg.fluxscale / 1e-13
 
     # get a good range of points to compute a (variance-weighted) scale factor
     lmin = 7350.
     lmax = 8120.
-    g = np.where((lmin <= dat['lamb']) & (dat['lamb'] <= lmax))[0]
-    ff2 = np.interp(dat['lamb'], l, ff)
-    obssn = dat['flam'][g] / dat['func'][g]
-    calsn = ff2[g] / dat['func'][g]
+    g = np.where((lmin <= dat['WAVELENGTH']) & (dat['WAVELENGTH'] <= lmax))[0]
+    ff2 = np.interp(dat['WAVELENGTH'], l, ff)
+    obssn = dat['FLUX'][g] / dat['UNCERTAINTY'][g]
+    calsn = ff2[g] / dat['UNCERTAINTY'][g]
     den = np.nansum(obssn * obssn)
     num = np.nansum(calsn * obssn)
     scl = num / den
@@ -228,7 +228,7 @@ def plot_spectra():
 
     # plot the SU spectrum
     plt.axvspan(lmin, lmax, color='lightgrey')
-    plt.plot(dat['lamb'], dat['flam'], label='slitlessutils')
+    plt.plot(dat['WAVELENGTH'], dat['FLUX'], label='slitlessutils')
     plt.plot(l, ff / scl, label='Pasquali et al. (2002) $-$ smoothed')
 
     # uncomment this to see the hi-res file.

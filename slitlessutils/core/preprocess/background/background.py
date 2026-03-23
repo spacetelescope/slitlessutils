@@ -15,14 +15,14 @@ from ...utilities import headers
 from ...wfss import WFSS
 
 
-def background_processing(mastersky=False):
+def background_processing(globalsky=False):
     """
     A decorator so that all background methods prep the data in the same way
 
     Parameters
     ----------
-    mastersky : bool, optional
-        flag to read master sky image
+    globalsky : bool, optional
+        flag to read global sky image
 
     """
 
@@ -36,9 +36,9 @@ def background_processing(mastersky=False):
 
             # load it as an observed image
             data = WFSS.observed(filename)
-            if mastersky:
+            if globalsky:
                 # get the name of the background file:
-                backfile = data.background_filename('master')
+                backfile = data.background_filename('global')
 
             with fits.open(filename, mode=mode) as hdul:
                 # will need the primary header below
@@ -72,20 +72,20 @@ def background_processing(mastersky=False):
                             gpx = (dqa == 0)      # these are good pixels
                             ave, med, sig = sigma_clipped_stats(sci[gpx], sigma=self.skysigma)
 
-                            # if doing master sky, then need to prep the sky
-                            if mastersky:
+                            # if doing global sky, then need to prep the sky
+                            if globalsky:
                                 if isinstance(backfile, str) and os.path.exists(backfile):
                                     # get the model and check normalization
                                     if phdr.get('SUBARRAY', False):
                                         # In the subarray case, we could have both CCDCHIP and
                                         # EXTVER both be 1, so we need to make sure we get the correct
-                                        # extension from the master background file.
+                                        # extension from the global background file.
                                         if hdr['CCDCHIP'] == 1:
                                             back_vers = 2
                                         elif hdr['CCDCHIP'] == 2:
                                             back_vers = 1
                                         # Warn that results might still be suspect
-                                        msg = ("Master-sky subtraction may give poor results for subarray"
+                                        msg = ("Global-sky subtraction may give poor results for subarray"
                                                f"data, especially for small subarrays: {filename}")
                                         LOGGER.knownissue(msg)
                                     else:
@@ -95,13 +95,13 @@ def background_processing(mastersky=False):
 
                                     a, m, s = sigma_clipped_stats(mod)
                                     if np.abs(a - 1) > 1e-2:
-                                        msg = (f'The master sky image ({backfile}) is '
+                                        msg = (f'The global sky image ({backfile}) is '
                                                f'unnormalized {a}. Results will be fine, '
                                                f'but the values may be suspect.')
                                         LOGGER.warning(msg)
 
                                     # excise if need-be
-                                    if phdr['INSTRUME'] == 'WFC3':
+                                    if phdr['INSTRUME'] in ('WFC3', 'ACS'):
                                         x0 = -int(hdr.get('LTV1', 0))
                                         y0 = -int(hdr.get('LTV2', 0))
                                         nx = hdr['NAXIS1']
@@ -110,7 +110,7 @@ def background_processing(mastersky=False):
 
                                     ret, src = func(self, sci, hdr, unc, med, gpx, mod, **kwargs)
                                 else:
-                                    msg = f'The master-sky image is invalid: {backfile}.  ' + \
+                                    msg = f'The global-sky image is invalid: {backfile}.  ' + \
                                         'No subtraction performed.'
                                     LOGGER.warning(msg)
                                     ret = 0.
@@ -272,12 +272,12 @@ class Background:
         # return the sky pixels (ie those that are *NOT* sources)
         return np.logical_not(src)
 
-    @background_processing(mastersky=True)
-    def master(self, sci, hdr, unc, mod, gpx, img):
+    @background_processing(globalsky=True)
+    def image(self, sci, hdr, unc, mod, gpx, img):
         r"""
-        Function to fit a *single* master sky image to a WFSS image.
+        Function to fit a *single* global sky image to a WFSS image.
 
-        The master-sky image is a two-dimensional model of the dispersed
+        The global-sky image is a two-dimensional model of the dispersed
         sky background.  Ideally, this image is scaled to match the background
         pixels in a dispersed image, however requires flagging all of the
         pixels that contain any additional signal (such as, but not limited to,
@@ -333,7 +333,7 @@ class Background:
         Returns
         -------
         outfile : str
-           The name of the master-sky subtracted file.
+           The name of the global-sky subtracted file.
         """
         # do inverse-variance weighting:
         sci2 = sci / np.maximum(unc, self.MINUNC)
@@ -384,7 +384,7 @@ class Background:
 
         # update the header
         self.update_header(hdr)
-        hdr.set('METHOD', value='master', comment='method')
+        hdr.set('METHOD', value='global', comment='method')
         hdr.set('ALPHA', value=alpha,
                 comment='Normalization of sky model')
 
@@ -393,7 +393,7 @@ class Background:
 
         return out, np.logical_not(sky)
 
-    @background_processing(mastersky=False)
+    @background_processing(globalsky=False)
     def constant(self, sci, hdr, unc, mod, gpx):
         r"""
         Function to fit a constant background to a WFSS image, which
@@ -408,7 +408,7 @@ class Background:
         Returns
         -------
         outfile : str
-           The name of the master-sky subtracted file.
+           The name of the global-sky subtracted file.
         """
         # find the initial sky pixels
         sky = self.skypixels(sci, unc, mod)
@@ -445,7 +445,7 @@ class Background:
 
         return out, np.logical_not(sky)
 
-    @background_processing(mastersky=False)
+    @background_processing(globalsky=False)
     def poly1d(self, sci, hdr, unc, mod, gpx, degree=2, filtwindow=51, filtorder=1):
         r"""
         Method to fit polynomials in the cross-dispersion axis and
@@ -477,7 +477,7 @@ class Background:
         Returns
         -------
         outfile : str
-           The name of the master-sky subtracted file.
+           The name of the global-sky subtracted file.
 
 
         Notes
@@ -570,7 +570,7 @@ class Background:
             The fits header to update
         """
 
-        hdr.set('SKYCORR', value=True, comment='Master sky subtracted?')
+        hdr.set('SKYCORR', value=True, comment='Global sky subtracted?')
         hdr.set('SKYNSIG', value=self.skysigma,
                 comment='Nsigma for constant sky model')
         hdr.set('SRCNSIG', value=self.srcsigma,

@@ -85,8 +85,8 @@ def preprocess_grism():
         for line in fp:
             grismfile = line.strip()
 
-            # subtract the background
-            back.master(grismfile, inplace=True)
+            # subtract the background with the global sky technique
+            back.image(grismfile, inplace=True)
 
             # update the astrometry
             su.core.preprocess.astrometry.downgrade_wcs(grismfile, key='A',
@@ -152,7 +152,7 @@ def extract_single(tabulate=False):
                                           local_back=False,
                                           zeropoint=ZEROPOINT)
 
-    reg = su.modules.Region()
+    reg = su.modules.Region(ncpu=1)
     regfiles = reg(data, sources)  # noqa: F841
 
     # project the sources onto the grism images
@@ -203,11 +203,11 @@ def plot_spectra():
 
     # compute the relative offset
     lrange = (8000, 11550)
-    g = np.where((lrange[0] < dat['lamb']) & (dat['lamb'] < lrange[1]))
-    fint = np.interp(dat['lamb'][g], cs['WAVELENGTH'], cs['FLUX'])
-    num = np.sum((dat['flam'][g] / dat['func'][g]) * (fint / dat['func'][g]))
-    den = np.sum((dat['flam'][g] / dat['func'][g])
-                 * (dat['flam'][g] / dat['func'][g]))
+    g = np.where((lrange[0] < dat['WAVELENGTH']) & (dat['WAVELENGTH'] < lrange[1]))
+    fint = np.interp(dat['WAVELENGTH'][g], cs['WAVELENGTH'], cs['FLUX'])
+    num = np.sum((dat['FLUX'][g] / dat['UNCERTAINTY'][g]) * (fint / dat['UNCERTAINTY'][g]))
+    den = np.sum((dat['FLUX'][g] / dat['UNCERTAINTY'][g])
+                 * (dat['FLUX'][g] / dat['UNCERTAINTY'][g]))
     scl = num / den
     dif = np.abs(scl - 1) * 100.
 
@@ -230,9 +230,9 @@ def plot_spectra():
 
     # plot the two spectra
     ax[0].errorbar(
-        dat['lamb'],
-        dat['flam'],
-        yerr=dat['func'],
+        dat['WAVELENGTH'],
+        dat['FLUX'],
+        yerr=dat['UNCERTAINTY'],
         label='slitlessutils')
     ax[0].plot(cs['WAVELENGTH'], cs['FLUX'], label='CALSPEC')
 

@@ -1,8 +1,14 @@
-from shapely import geometry
+from collections import namedtuple
+
+import networkx
+import numpy as np
+from shapely import Polygon
 
 from ...tables import PDTFile
 from ..module import Module
 from .groupcollection import GroupCollection
+
+Key = namedtuple('Key', ['filename', 'detname', 'ordname', 'segid'])
 
 
 class Group(Module):
@@ -30,210 +36,69 @@ class Group(Module):
 
     DESCRIPTION = "Grouping WFSS"
 
-    def __init__(self, minarea=0.1, orders=None, **kwargs):
-        Module.__init__(self, self.group_wfss, postfunc=self.group_return,
+    def __init__(self, threshold=0.01, orders=None, **kwargs):
+
+        Module.__init__(self, self.group_oneimage, postfunc=self.group_images,
                         **kwargs)
 
-        self.minarea = minarea
+        self.threshold = np.clip(threshold, 0, 1)
         self.orders = orders
 
-    def group_wfss(self, data, sources, **kwargs):
-        """
-        Method to group the WFSS images
+    def group_oneimage(self, data, sources, **kwargs):
 
+        group = GroupCollection(threshold=self.threshold,
+                                orders=self.orders)
 
-        Parameters
-        ----------
-        data : `WFSSCollection`
-           The WFSS data to group
-
-        sources : `SourceCollection`
-           The sources to group
-
-        kwargs : dict, optional
-           Dictionary of optional keywords.  Not currently used.
-
-        Returns
-        -------
-        segids : list
-           A list of sets, where each element of the list is a given
-           group.  Therefore, this list has 1<=len(segids)<=len(sources).
-
-
-        Notes
-        -----
-        This is the main routine, but is unlikely to be directly called
-
-        """
-
-        # conf,wfss=data
+        # read all sources as Shapely polygons
+        polys = []
         with PDTFile(data, path=self.path, mode='r') as h5:
-            groups = []
             for detname, detconf in data.items():
                 h5.load_detector(detname)
 
-                # the collection of Shapely Polygons and segids
-                polys = []
-                ids = []
-                for i, (segid, source) in enumerate(sources.items()):
-                    poly = []
+                for ordname in self.orders:
+                    h5.load_order(ordname)
 
-                    # read each order as a Shapely Polygon
-                    for ordname in self.orders:
-                        h5.load_order(ordname)
+                    for segid, source in sources.items():
                         odt = h5.load_odt(source)
-                        poly.append(odt.shapelyPolygon())
+                        if odt:
 
-                    # glue the individual orders together as a MultiPolygon
-                    poly = geometry.MultiPolygon(poly)
+                            # load the vertices
+                            x0, x1, y0, y1 = odt.bounding_box()
+                            vertices = ((x0, y0), (x0, y1), (x1, y1),
+                                        (x1, y0), (x0, y0))
 
-                    # aggregate all the MultiPolygons and orders
-                    polys.append(poly)
-                    ids.append([source.segid])
+                            # store some data for this trace
+                            key = Key(data.filename, detname, ordname, segid)
+                            poly = Polygon(vertices)
 
-                # package the ids and polygons
-                data = list(zip(ids, polys))
+                            # save the trace data
+                            polys.append((key, poly))
 
-                # group all of the sources' polygons using Shapely math
-                grouped = self.group_polygons(data)
+        # add vertices for each source
+        for segid, source in sources.items():
+            group.add_object(segid, source.mag)
 
-                # collect the grouped polygons
-                groups.append(grouped)
+        # now test all n^2 operations.  But we can ignore the lower triangle
+        n = len(polys)
+        for i in range(n):
+            keyi, polyi = polys[i]
 
-        # at this point, we no longer need the shapely polygons. and instead
-        # will just work with SEGIDs as sets, and use set math (is faster)
-        segids = list(list(zip(*groups[0]))[0])
-        segids = [set(i) for i in segids]
-        segids = self.group_ids(segids)
+            for j in range(i + 1, n):
+                keyj, polyj = polys[j]
 
-        return segids
+                inter = polyi.intersection(polyj)
+                if inter:
+                    union = polyi.union(polyj)
 
-    def group_polygons(self, data):
-        """
-        Helper function to group sources based on shapely math
+                    ratio = inter.area / union.area
+                    if ratio > self.threshold:
+                        group.add_contamination(keyi.segid, keyj.segid, ratio)
 
-        Parameters
-        ----------
-        data : list
-           A list of 2-tuples to group.  The elements of the tuple are given
-           as the segmentation ID and a `shapely.geometry.Polygon` object
-           respectively.
+        return group
 
-        Returns
-        -------
-        new : list
-           A list of 2-tuples that have been grouped.  The output tuples
-           have the same meaning as the input
-
-        """
-        nnew = ndata = len(data)
-
-        # process until there is nothing left to process
-        while nnew:
-            groups = []
-
-            while data:
-
-                # grab the first polygon and ID
-                thisid, thispoly = data.pop(0)
-
-                # iterate over all other polygons and IDs
-                for i, (testid, testpoly) in enumerate(data):
-                    inter = thispoly.intersection(testpoly)
-
-                    # is the intersection a positive region?
-                    if (inter.area > self.minarea * testpoly.area) and \
-                       (inter.area > self.minarea * thispoly.area):
-
-                        # remove the test polygon, glue the test polygon and
-                        # segIDs to the primary polygon and list
-                        data.pop(i)
-                        thispoly = thispoly.union(testpoly)
-                        thisid.extend(testid)
-
-                # collect this result
-                groups.append((thisid, thispoly))
-
-            # iterate until we've cycled thru everything
-            N = len(data)
-            data = groups
-            nnew = ndata - N
-            ndata = N
-        return data
-
-    def group_ids(self, data):
-        """
-        Helper method to group segmentation IDs using set-logic
-
-        Parameters
-        ----------
-        data : list
-            A list of sets.  Each element of the list represents a putative
-            group, while each element of any set represents the segmentation
-            ID of a source that has been grouped.
-
-        Returns
-        -------
-        new : list
-            A list of sets, with the same interpretation as the input list.
-        """
-
-        nnew = ndata = len(data)
-
-        while nnew:
-            new = []
-            while data:
-                this = data.pop(0)
-                for i, test in enumerate(data):
-                    if this.intersection(test):
-                        this = this.union(test)
-                        data.pop(i)
-                new.append(this)
-            data = new
-            n = len(data)
-            nnew = ndata - n
-            ndata = n
-        return data
-
-    def group_return(self, ids, data, sources, **kwargs):
-        """
-        Helper method to package the results into a `GroupCollection`
-
-        Parameters
-        ----------
-        ids : list
-            The list of sets from `self.group_ids()`
-
-        data : `WFSSCollection`
-            The WFSS data that was used to group
-
-        sources : `SourceCollection`
-            The sources to group
-
-        kwargs : dict, optional
-            Not used, but is a place holder for optional parameters
-
-        Returns
-        -------
-        out : `GroupCollection`
-           A collection of groups
-
-        """
-
-        sets = []
-        for i in ids:
-            sets.extend(i)
-
-        # group the IDs and sort by size
-        groups = self.group_ids(sets)
-        groups.sort(key=len, reverse=True)
-
-        # sort out what is the output product going to look like
-        out = GroupCollection(minarea=self.minarea, orders=self.orders)
+    def group_images(self, groups, data, sources, **kwargs):
+        group = GroupCollection()
         for grp in groups:
-            out.append(grp)
+            group.graph = networkx.compose(group.graph, grp.graph)
 
-        # out={k:list(v) for k,v in enumerate(groups)}
-        # out=[list(g) for g in groups]
-
-        return out
+        return group
