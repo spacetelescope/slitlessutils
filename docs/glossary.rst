@@ -44,10 +44,16 @@ Since many terms may be used colloquially and/or have different definitions in o
 	grism
 	    A transmissive and dispersive spectral element that often has a (nearly) constant rate of dispersion.  A grism differs from a :term:`prism` by having an additional diffractive surface on one side, which results in the constant dispersion, little spatial offset between the :term:`spectral trace` and :term:`undispersed position`, and multiple spectral orders.  See also :term:`prism`.
 
-	master-sky image
-		A model of the sky background for a WFSS image.  In principle, one should have a separate master-sky image for each spectral component present in the sky background.  However, only the HST/WFC3-IR detector has multiple-components measured (see `WFC3_back_sub <https://github.com/NorPirzkal/WFC3_Back_Sub>`_).
+	global-sky image
+		A model of the sky background for a WFSS image.  In principle, one should have a separate global-sky image for each spectral component present in the sky background.  However, only the HST/WFC3-IR detector has multiple-components measured (see `WFC3_back_sub <https://github.com/NorPirzkal/WFC3_Back_Sub>`_).
 
-	pick-off mirror
+	grouping
+                The process of identifying the spectral traces that overlap in any image or collection of images.  Consider a dataset of two images observing a scene of three objects.  Further suppose that in image 1 perhaps the spectral trace object A overlaps that of object B while object C is isolated, whereas in image 2 object A is isolated and the spectral traces of object B and C now overlap.  Therefore, if one is to simultaneously analyze image 1 and 2, then the group is considered as objects A, B, and C.   See also :term:`node`.
+
+	node
+	        The :term:`grouping` algorithm uses ideas from graph theory and the package `NetworkX <https://networkx.org/en/>`_ to catalog all spectral traces that may overlap in any slitless observation.  A `node <https://en.wikipedia.org/wiki/Graph_theory>`_ represents a given spectral trace.
+
+        pick-off mirror
 	    An optical element that redirects the light to the instrument in question.
 
 	pixel-area map
