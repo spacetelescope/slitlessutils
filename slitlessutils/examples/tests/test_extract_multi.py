@@ -1,4 +1,4 @@
-from slitlessutils.examples import simulate, extract_multi
+from slitlessutils.examples import extract_multi, simulate
 
 
 def test_extract_multi():

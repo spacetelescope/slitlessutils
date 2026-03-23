@@ -175,7 +175,7 @@ class LCurve:
             return
 
         # get the colormap and lighten it
-        cmap = plt.cm.get_cmap(colormap)
+        cmap = plt.get_cmap(colormap)
         cmap = self.remap_cmap(lambda x: lighten * (1. + x), cmap)
 
         # compute curvatures
