@@ -24,6 +24,7 @@ Listing WCS (`~slitlessutils.core.preprocess.astrometry.list_wcs()`)
 This is a convenience function to list the WCS information for a collection of dispersed and direct images.  This is often run as a command-line tool:
 
 .. code-block:: bash
+		
    $ listwcs flt
 
 This will list the WCSs for all the `flt` files in the current-working directory. 

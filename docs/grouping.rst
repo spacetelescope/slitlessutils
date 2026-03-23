@@ -1,18 +1,18 @@
-.. _grouping:
+.. _groupingalgorithm:
 
 Source Grouping (`~slitlessutils.modules.Group()`)
 ==================================================
 
-The :doc:`multi` method uses a forward model to determine the weights that describe the linear operator that transforms between the incident, astrophysical signal (in physical units) to the pixelated observation recorded by the detector (in instrumental units).  As shown in `Ryan, Casertano, & Pirzkal (2018) <https://ui.adsabs.harvard.edu/abs/2018PASP..130c4501R/abstract>`_, this linear system is often very sparse, where typically 99.99% of the elements are identically zero.  Therefore `specialized libraries<https://docs.scipy.org/doc/scipy/reference/sparse.html>`_ for describing and solving sparse systems can be used to tackle otherwise computationally intractable problems.  Still, the computational requirements can be further improved by reducing the scale of the problem by only considering the sources that overlap.
+The :doc:`multi` method uses a forward model to determine the weights that describe the linear operator that transforms between the incident, astrophysical signal (in physical units) to the pixelated observation recorded by the detector (in instrumental units).  As shown in `Ryan, Casertano, & Pirzkal (2018) <https://ui.adsabs.harvard.edu/abs/2018PASP..130c4501R/abstract>`_, this linear system is often very sparse, where typically 99.99% of the elements are identically zero.  Therefore `specialized libraries <https://docs.scipy.org/doc/scipy/reference/sparse.html>`_ for describing and solving sparse systems can be used to tackle otherwise computationally intractable problems.  Still, the computational requirements can be further improved by reducing the scale of the problem by only considering the sources that overlap.
 
-.. _grouping:
+.. _groupingfigure:
 .. figure:: images/contam.png
    :align: center
    :alt: Illustration of grouping
 
    An illustration of the :term:`grouping` methodology.  In the grayscale, we show a hypothetical direct image scene, with the source numbers indicated in red.  We show two position angles: :math:`\theta=0^\circ` (blue) and :math:`\theta=42^\circ` (red).
 
-In :numref:`grouping`, we show the methodology for identifying distinct groups.  In the :math:`\theta=0^\circ` position angle (blue), there are four distinct groups, based on their overlaps: {{7}, {1, 5}, {2, 4, 6}, {3}}.  On the other hand, at :math:`\theta=42^\circ` (red), there are now three distinct groups: {{4, 5, 7}, {1, 2, 6}, {3}}.  Therefore for the total contamination is given by the combination of these two groups: {{1, 2, 4, 5, 6, 7}, {3}}, which can be solved sequentially.  These calculations are implemented using `networkx<https://networkx.org/en/>`_, where each object is represented as a :term:`node` and objects that overlap in the dispersed image are connected with edges.  For the purposes of defining overlaps in the grouping algorithm, we take the ratio of the intersection of the two regions to their union:
+In :numref:`groupingfigure`, we show the methodology for identifying distinct groups.  In the :math:`\theta=0^\circ` position angle (blue), there are four distinct groups, based on their overlaps: {{7}, {1, 5}, {2, 4, 6}, {3}}.  On the other hand, at :math:`\theta=42^\circ` (red), there are now three distinct groups: {{4, 5, 7}, {1, 2, 6}, {3}}.  Therefore for the total contamination is given by the combination of these two groups: {{1, 2, 4, 5, 6, 7}, {3}}, which can be solved sequentially.  These calculations are implemented using `NetworkX <https://networkx.org/en/>`_, where each object is represented as a :term:`node` and objects that overlap in the dispersed image are connected with edges.  For the purposes of defining overlaps in the grouping algorithm, we take the ratio of the intersection of the two regions to their union:
 
 .. math::
 
@@ -44,6 +44,7 @@ This ratio is used as a weight in the in the `networkx.Graph()`.  Below we show 
 Example
 -------
 .. code:: python
+	  
 	  from slitlessutils.core.modules.group import GroupCollection
 
 	  # make an empty collection
