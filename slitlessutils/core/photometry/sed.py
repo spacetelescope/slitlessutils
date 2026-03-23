@@ -775,7 +775,7 @@ class SED:
         data = self.data
 
         # get the new names by remapping the internal names to better
-        # external names for the ouptut files
+        # external names for the output files
         new_names = tuple(self.EXTKEYS[inkey] for inkey, dtype in self.DTYPE)
 
         # reset the outputs

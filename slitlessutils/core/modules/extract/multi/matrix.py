@@ -22,7 +22,7 @@ class Matrix:
     Here we describe the flux in a pixel in a spectroscopic image as a
     weighted sum over all sources and all wavelengths.  Suppose there is a
     collection of sources labeled as: :math:`{A, B, C, D, ...}`, each of
-    which has a collection of wavelenghts denoted as:
+    which has a collection of wavelengths denoted as:
     :math:`{1, 2, 3, 4, ...}`.  Now the spectral elements will be given
     by: :math:`{F_{A,1}, F_{A,2}, F_{A,3}, ..., F_{B,1}, F_{B,2},
     F_{B,3}, ...,  F_{C,1}, F_{C,2}, F_{C,3}, ...`.
