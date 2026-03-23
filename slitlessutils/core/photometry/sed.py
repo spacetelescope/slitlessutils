@@ -790,9 +790,9 @@ class SED:
 
         # update the output units in the header
         hdu.header.set('TUNIT1', value='angstrom', after='TFORM1')
-        hdu.header.set('TUNIT2', value=fluxunits, after='TFORM2')
-        hdu.header.set('TUNIT3', value=fluxunits, after='TFORM3')
-        hdu.header.set('TUNIT4', value=fluxunits, after='TFORM4')
+        hdu.header.set('TUNIT2', value=fluxunit, after='TFORM2')
+        hdu.header.set('TUNIT3', value=fluxunit, after='TFORM3')
+        hdu.header.set('TUNIT4', value=fluxunit, after='TFORM4')
         hdu.header.set('TUNIT5', value='number', after='TFORM5')
         # update the output units on the data itself
         hdu.data.columns['WAVELENGTH'].unit = 'Angstrom'
