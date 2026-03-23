@@ -30,10 +30,10 @@ where :math:`i` refers to the :math:`i^{\rm th}` WFSS image in the collection.  
 
 .. math::
 
-   \begin{aligned}
+   \begin{eqnarray}
       \vartheta &=& x + n_x\,y+ n_x\,n_y\,i\\
       \varphi &=& l + n_l\,k
-   \end{aligned}
+   \end{eqnarray}
 
 respectively.  Now the above double sum is recast as a simple matrix equation:
 
@@ -51,10 +51,10 @@ which is simplified by subsuming the WFSS uncertainties into the data and linear
 
 .. math::
 
-   \begin{aligned}
+   \begin{eqnarray}
       S_{\vartheta} &\rightarrow& \frac{I_{\vartheta}}{U_{\vartheta}}\\
       W_{\vartheta,\varphi} &\rightarrow& \frac{W_{\vartheta,\varphi}}{U_{\vartheta}}
-   \end{aligned}
+   \end{eqnarray}
 
 so that now :math:`\chi^2(f_{\varphi}) = ||I - W\,f_{\varphi}||^2`.  Although this can be directly solved, the poor condition number of :math:`W` can amplify the input noise into the output result, which can be ameliorated by including a `regularization term <https://en.wikipedia.org/wiki/Ridge_regression>`_.  Additionally, for most WFSS observations, the linear operator :math:`W` will be extremely sparse, which permits specialized techniques to iteratively compute the unknown vector :math:`f_{\varphi}` without computing the pseudo-inverse of :math:`W`.  However, `Ryan, Casertano, & Pirzkal (2018) <https://ui.adsabs.harvard.edu/abs/2018PASP..130c4501R/abstract>`_ re-frame the regularization term so that the :term:`regularization parameter` becomes dimensionless.
 
@@ -94,7 +94,7 @@ Notes on the Uncertainties
 Based on the above mathematical formulation, the linear-reconstruction methods will produce uncertainties as the diagonals of the matrix:
 
 .. math::
-   u_{\varphi} = \sqrt{\left(W^\mathrm{T}W+\ell^2||W_F||^2\right)^{-1}}
+   u_{\varphi}^2 = \mathrm{diag}\left({\left(W^\mathrm{T}W+\ell^2||W_F||^2\right)^{-1}}\right)
 
 However, the propagation of uncertainties that accounts for only the detector/astrophysical effects should come from the diagonal elements of :math:`\sqrt{\left(W^\mathrm{T}W\right)^{-1}}` (ie. :math:`\ell=0`).  Therefore for :math:`\ell\neq0`, the uncertainties will be underestimated.  In any case, although the matrix :math:`W` is constructed to be sparse, the product with its transpose :math:`W^\mathrm{T}` is not guaranteed to be sparse.  Therefore these estimates for :math:`u_{\varphi}` are compute iteratively, without explicitly computing :math:`W^\mathrm{T}W`.
 
@@ -107,10 +107,7 @@ However, the propagation of uncertainties that accounts for only the detector/as
 
 Sparse Linear-Operator Construction
 -----------------------------------
-
-Coming Soon.
-
-
+The sparse linear-operator is constructed internally using `scipy.sparse.csr_matrix() <https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.html>`_, which is very convenient for removing rows that have all zeros.  Such rows refer to observed pixels that have no spectral information (ie. contain only sky background).  Internally a CSR matrix is created for each source for each WFSS image, which are stacked to create a complete CSR matrix (see Griggio et al. 2026 for more details).  After creating a full matrix, it is converted to a `scipy.sparse.csc_matrix() <https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csc_matrix.html>`_ to identify columns that are all zeros.  An all-zero column represents a spectral element that has no observed constraints, which will be returned as `np.nan`.  
 
 
 .. _solutions:
@@ -150,7 +147,8 @@ As discussed above, the regularized least-squares introduces a tunable parameter
 
    The top panel shows the standard L-curve with the scaling factor of the Frobenius norm to ensure that the :term:`regularization parameter` :math:`\ell` is dimensionless, which is encoded in the color of the plot symbols (see colorbar at the very bottom).  The lower panel shows the curvature [#curvefoot]_ as a function of the log of the (dimensionless) :term:`regularization parameter`.  The clear peak at :math:`\log\ell\sim-1.9` represents the sharp vertex in the L-curve at :math:`(\log\chi^2,\log\xi^2)\sim(2.1,3.6)`.  This point is adopted as it represents a roughly "equal" compromise between modeling the data (ie. the :math:`\chi^2`-term) and damping high-frequency structure (ie. the :math:`\xi^2`-term).  This plot was made using the grid-based search with :math:`\Delta\log\ell=0.1`.
 
-
+.. important::
+   It may be that the resultant spectra show high-frequency oscillations, which is usually a sign the damping was not sufficiently optimized.  Users should change the range and tolerance of the damping optimization.xs
 
 
 Grouping
@@ -161,10 +159,29 @@ As framed above, the multi-orient extraction simultaneously solves for the spect
 
 Example
 -------
+.. code:: python
+	  import slitlessutils as su
 
-Coming Soon.
+	    
+	  # load the grism images
+	  data = su.wfss.data.WFSSCollection.from_glob(f'i*flt.fits.gz')
+    
+	  # load the sources into SU
+	  sources = su.sources.SourceCollection('seg.fits', 'sci.fits', local_back=False)
 
+	  # test grouping
+	  grp = su.modules.Group(ncpu=1, orders=('+1',))
+	  groups = grp(data, sources)
+    
+	  # run the multi-orient extraction using grid-based optimization
+	  # of the L-curve
+	  ext = su.modules.Multi('+1', (-6., -1., 0.1), root='test', algorithm='grid')
 
+	  # run the extraction with the grouping on
+	  grp_result = ext(data, sources, groups=groups)
+
+	  # run the extraction with the grouping off
+	  result = ext(data, sources)	  
 
 .. rubric:: Footnotes
 .. [#curvefoot] The curvature is adopted as the `Menger curvature <https://en.wikipedia.org/wiki/Menger_curvature>`_.

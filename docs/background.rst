@@ -11,21 +11,21 @@ The background in a slitless spectroscopic image is generally far more complex t
 .. _backgroundexample:
 .. figure:: images/acs_g800l.png
    :align: center
-   :alt: Example master sky image for HST/ACS G800L.
+   :alt: Example global-sky image for HST/ACS G800L.
 
-   The smoothed master sky image for the Advanced Camera for Surveys (ACS) G800L grating.
+   The smoothed global-sky image for the Advanced Camera for Surveys (ACS) G800L grating.
 
 
 
-Master Sky Subtraction
+Global-Sky Subtraction
 ----------------------
 
-Given the issues inherent in the sky background for wide-field slitless spectroscopy summarized above, the canonical approach to separating this signal from the astrophysical sources of interest is the use of a :term:`master-sky image`.  Here many science and calibration exposures have been combined in a way to remove the sources, and provide a clean image of the sky background.  Therefore the present task is to scale this sky image such that it matches the sky pixels in a :math:`{\chi}^2`-sense.  For a single sky image, this multiplicative scaling is given by:
+Given the issues inherent in the sky background for wide-field slitless spectroscopy summarized above, the canonical approach to separating this signal from the astrophysical sources of interest is the use of a :term:`global-sky image`.  Here many science and calibration exposures have been combined in a way to remove the sources, and provide a clean image of the sky background.  Therefore the present task is to scale this sky image such that it matches the sky pixels in a :math:`{\chi}^2`-sense.  For a single sky image, this multiplicative scaling is given by:
 
 .. math::
    \alpha = \frac{\sum_{x,y} w_{x,y}\,S_{x,y}\,B_{x,y}}{\sum_{x,y} w_{x,y}\,B_{x,y}\,B_{x,y}}
 
-where :math:`(x,y)` refer to the WFSS-image pixel positions, :math:`w_{x,y}`, :math:`I_{x,y}`, and :math:`B_{x,y}` represent the pixel weights (more on this below), wide-field slitless image, and master-sky image, respectively.  Therefore sky-subtracted slitless image will be given by
+where :math:`(x,y)` refer to the WFSS-image pixel positions, :math:`w_{x,y}`, :math:`I_{x,y}`, and :math:`B_{x,y}` represent the pixel weights (more on this below), wide-field slitless image, and global-sky image, respectively.  Therefore sky-subtracted slitless image will be given by
 
 .. math::
    B'_{x,y} = \alpha\,B_{x,y}.
@@ -44,6 +44,15 @@ but is initialized to all sky pixels (ie. :math:`\Theta_{x,y}=0`).  Now the fina
 .. math::
    w_{x,y} = \frac{1-\Theta_{x,y}}{U_{x,y}^2}
 
+
+.. tip::
+   You may receive the warning:
+
+   "The global-sky image (XXXX) is unnormalized YYY. Results will be fine, but the values may be suspect."
+
+   This is benign warning that background image :math:`B_{x,y}` is not normalized to unity, and so the :math:`\alpha`
+   
+   
 .. note::
    Classical local-sky subtraction (with sky annuli above/below the trace) is generally discouraged, as these regions are often contaminated.  Therefore ``slitlessutils`` currently has no facility for such operations.
 
@@ -77,20 +86,20 @@ A consequence of this iterative approach is the optimized scaling parameter :mat
 .. math::
    S'_{x,y} = S_{x,y} - \alpha^{(k)} B_{x,y}
 
-At this point there are two things worth mentioning.  Firstly, there are effectively two parameters that govern the master-sky subtraction: :math:`n_{sig}` and :math:`\epsilon` that control the sigma clipping for sources and convergence tolerance, respectively.  Secondly, while the foremost goal was to determine the sky background level, a useful byproduct is the updated object model :math:`\Theta_{x,y}`, which is saved by default to a file named :code:`f"{base}_src.fits"`.
+At this point there are two things worth mentioning.  Firstly, there are effectively two parameters that govern the global-sky subtraction: :math:`n_{sig}` and :math:`\epsilon` that control the sigma clipping for sources and convergence tolerance, respectively.  Secondly, while the foremost goal was to determine the sky background level, a useful byproduct is the updated object model :math:`\Theta_{x,y}`, which is saved by default to a file named :code:`f"{base}_src.fits"`.
 
 
 Example
 ^^^^^^^
 
-Here we show a quick example to use the master-sky subtraction for a single grism exposure given by the filename :code:`grismfile`:
+Here we show a quick example to use the global-sky subtraction for a single grism exposure given by the filename :code:`grismfile`:
 
 .. code:: python
 
    import slitlessutils as su
 
-   # perform the master sky subtraction on the filename "grismfile"
-   su.core.preprocess.background.mastersky(grismfile, inplace=True)
+   # perform the global sky subtraction on the filename "grismfile"
+   su.core.preprocess.background.image(grismfile, inplace=True)
 
 This will update the file in place, as the flag is set: :code:`inplace=True`, but will additionally write a :code:`f"{base}_src.fits"` file to disk.
 
