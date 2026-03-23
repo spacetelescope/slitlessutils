@@ -19,6 +19,16 @@ The corrections can be either downgrading the astrometry in the direct image to 
 .. note::
 	It is the responsibility of the user to verify that the WCS in the WFSS and direct image(s) are on the same astrometric reference, which is usually (but not always) answered by the ``WCSNAME`` keyword.  However, if the WCS solutions are inconsistent, then any subsequent spectral extraction or modeling will be assuredly incorrect.
 
+Listing WCS (`~slitlessutils.core.preprocess.astrometry.list_wcs()`)
+--------------------------------------------------------------------
+This is a convenience function to list the WCS information for a collection of dispersed and direct images.  This is often run as a command-line tool:
+
+.. code-block:: bash
+   $ listwcs flt
+
+This will list the WCSs for all the `flt` files in the current-working directory. 
+
+	
 
 Downgrading WCS (`~slitlessutils.core.preprocess.astrometry.downgrade_wcs()`)
 -----------------------------------------------------------------------------
