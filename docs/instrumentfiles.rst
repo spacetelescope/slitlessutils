@@ -45,9 +45,9 @@ Instrument-Wide Grating/Blocking Parameters
    * - Keyword
      - Unit
      - Description
-   * - Master-Sky Image
+   * - Global-Sky Image
      -
-     - The name of the master-sky image.
+     - The name of the global-sky image.
    * - Tabulation Parameters
      - ``dict``
      - | This contains the starting wavelength (``wave0``), ending

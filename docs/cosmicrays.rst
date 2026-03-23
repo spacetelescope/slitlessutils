@@ -69,7 +69,7 @@ This are the kernels and can be controlled by the subscript, for example
 
    import slitlessutils as su
 
-   # perform the master sky subtraction on the filename "grismfile"
+   # perform the global-sky subtraction on the filename "grismfile"
    su.core.preprocess.crrej.laplace(grismfile, kernel='3a', inplace=True)
 
 This will update the file in place, as the flag is set: :code:`inplace=True`.  See :numref:`animatedcrs` for an animation of how cosmic rays appear and then can be bilinearly-interpolated over (but see note above).
@@ -115,7 +115,7 @@ Examples
 
    # FIRST, we should perform background subtraction
    for wfssfile in wfssfiles:
-      su.core.preprocess.background.mastersky(wfssfile, inplace=True)
+      su.core.preprocess.background.image(wfssfile, inplace=True)
 
    # group images by VISIT before processing
    su.core.preprocess.crrej.drizzle(wfssfiles, grouping='visit')

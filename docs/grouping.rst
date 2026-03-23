@@ -26,15 +26,15 @@ This ratio is used as a weight in the in the `networkx.Graph()`.  Below we show 
    :widths: 33 33 33
    :class: borderless
 
-   * - .. image:: g1.png
+   * - .. image:: images/g1.png
          :width: 100%
          :alt: Graph for the blue orient.
 
-     - .. image:: g2.png
+     - .. image:: images/g2.png
          :width: 100%
          :alt: Graph for the red orient.
 
-     - .. image:: gcomb.png
+     - .. image:: images/gcomb.png
          :width: 100%
          :alt: Graph for the combined dataset.
 

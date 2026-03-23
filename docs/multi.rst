@@ -160,9 +160,9 @@ As framed above, the multi-orient extraction simultaneously solves for the spect
 Example
 -------
 .. code:: python
+
 	  import slitlessutils as su
 
-	    
 	  # load the grism images
 	  data = su.wfss.data.WFSSCollection.from_glob(f'i*flt.fits.gz')
     
