@@ -142,13 +142,12 @@ class Source(list):
             # get a bounding box
             x0 = max(np.amin(x) - self.backsize, 0)
             y0 = max(np.amin(y) - self.backsize, 0)
-            x1 = min(np.amax(x) + self.backsize, img.shape[1] - 1)
-            y1 = min(np.amax(y) + self.backsize, img.shape[0] - 1)
+            x1 = min(np.amax(x) + self.backsize, img.shape[1])
+            y1 = min(np.amax(y) + self.backsize, img.shape[0])
 
             # cut out regions
             subimg = img[y0:y1, x0:x1]
             subseg = seg[y0:y1, x0:x1]
-            # subwht = wht[y0:y1, x0:x1]
 
             # compute and subtract the local sky background:
             if self.local_back:
@@ -170,8 +169,8 @@ class Source(list):
                 self.background = 0.0
 
             # convert the image into weights
-            w = self.compute_weights(subimg, x - x0, y - y0, whttype=whttype, profile=profile,
-                                     negfunc=negfunc, epsilon=1e-9)
+            w = self.compute_weights(subimg, x - x0, y - y0, whttype=whttype,
+                                     profile=profile, negfunc=negfunc, epsilon=1e-9)
 
             # remove pixels with zero weights
             g = np.where(w > 0)[0]
@@ -264,8 +263,9 @@ class Source(list):
             # else:
             #     LOGGER.warning(f"Ignoring {segid=}")
 
-    def compute_weights(self, subimg, x, y, whttype='pixels', profile='gaussian',
-                        negfunc='positivity', epsilon=1e-9):
+    def compute_weights(self, subimg, x, y, whttype='pixels',
+                        profile='gaussian', negfunc='positivity',
+                        epsilon=1e-9):
 
         # set some variables
         self.profile = profile.lower()
@@ -479,77 +479,82 @@ class Source(list):
         If the source is compound, then it will be written with 3-dimensional
             WCS.
         """
-        hdr = fits.Header()
-        hdr['EXTNAME'] = (str(self.segid),)
 
-        hdr['SEGID'] = (self.segid, 'Segmentation ID')
-        hdr['GRPID'] = (kwargs.get('group', self.grpid), 'Group ID')
-        hdr['RA'] = (self.adc[0], 'Right Ascension (deg)')
-        hdr['DEC'] = (self.adc[1], 'Declination (deg)')
-        hdr['X'] = (self.xyc[0], 'X barycenter')
-        hdr['Y'] = (self.xyc[1], 'Y barycenter')
-        hdr['FLUX'] = (self.flux, 'instrumental flux in direct image')
-        hdr['MAG'] = (self.mag, 'AB magnitude in direct image')
-        hdr['FNU'] = (self.fnu, 'flux in erg/s/cm2/Hz in direct image')
-        hdr['NPIXELS'] = (self.npixels, 'total number of extracted pixels')
-        hdr['WHTTYPE'] = (self.whttype, 'Type of source profile weights')
+        # make an output header
+        header = fits.Header()
+
+        # make some basic keywords
+        header['EXTNAME'] = (str(self.segid),)
+
+        header['SEGID'] = (self.segid, 'Segmentation ID')
+        header['GRPID'] = (kwargs.get('group', self.grpid), 'Group ID')
+        header['RA'] = (self.adc[0], 'Right Ascension (deg)')
+        header['DEC'] = (self.adc[1], 'Declination (deg)')
+        header['X'] = (self.xyc[0], 'X barycenter')
+        header['Y'] = (self.xyc[1], 'Y barycenter')
+        header['IMGFLUX'] = (self.flux, 'instrumental flux in direct image')
+        header['IMGMAG'] = (self.mag, 'AB magnitude in direct image')
+        header['IMGFNU'] = (self.fnu, 'flux in erg/s/cm2/Hz in direct image')
+        header['NPIXELS'] = (self.npixels, 'total number of extracted pixels')
+        header['WHTTYPE'] = (self.whttype, 'Type of source profile weights')
+        header['FLUXTYPE'] = ('flam', 'Is spectrum `flam` or `fnu` units')
+
         if self.whttype == 'fitprofile':
-            hdr['WHTPROF'] = (self.profile, 'The analytic profile for the weights')
-        hdr['NREGIONS'] = (self.nregions, 'number of spectral regions')
-        hdr['AREA'] = (self.npixels * self.pixelarea, 'source area (arcsec2)')
-        headers.add_stanza(hdr, 'Source Properties', before='SEGID')
+            header['WHTPROF'] = (self.profile, 'The analytic profile for the weights')
+        header['NREGIONS'] = (self.nregions, 'number of spectral regions')
+        header['AREA'] = (self.npixels * self.pixelarea, 'source area (arcsec2)')
+        headers.add_stanza(header, 'Source Properties', before='SEGID')
 
-        hdr['BCKSUB'] = (self.local_back, 'Was local background in direct image subtracted')
-        hdr['BCKSIZE'] = (self.backsize, 'Size of background annulus (in pix)')
-        hdr['BCKVAL'] = (self.background, 'Background level in direct image')
-        hdr['BCKLOSIG'] = (self.nsig[0], 'N sigma for low level')
-        hdr['BCKHISIG'] = (self.nsig[1], 'N sigma for high level')
-        headers.add_stanza(hdr, 'Direct Image Background', before='BCKSUB')
+        header['BCKSUB'] = (self.local_back, 'Was local background in direct image subtracted')
+        header['BCKSIZE'] = (self.backsize, 'Size of background annulus (in pix)')
+        header['BCKVAL'] = (self.background, 'Background level in direct image')
+        header['BCKLOSIG'] = (self.nsig[0], 'N sigma for low level')
+        header['BCKHISIG'] = (self.nsig[1], 'N sigma for high level')
+        headers.add_stanza(header, 'Direct Image Background', before='BCKSUB')
 
         if self.is_compound:
-            hdr['NAXIS'] = (3, 'number of WCS axes')
-            hdr['NAXIS1'] = self.wcs._naxis[0]
-            hdr['NAXIS2'] = self.wcs._naxis[1]
-            # hdr['NAXIS3']=nlam
+            header['NAXIS'] = (3, 'number of WCS axes')
+            header['NAXIS1'] = self.wcs._naxis[0]
+            header['NAXIS2'] = self.wcs._naxis[1]
+            # header['NAXIS3']=nlam
             raise RuntimeError("gotta get nlam")
 
-            hdr['CTYPE1'] = self.wcs.ctype[0]
-            hdr['CTYPE2'] = self.wcs.ctype[1]
-            hdr['CTYPE3'] = 'wavelength (A)'
+            header['CTYPE1'] = self.wcs.ctype[0]
+            header['CTYPE2'] = self.wcs.ctype[1]
+            header['CTYPE3'] = 'wavelength (A)'
 
-            hdr['CRPIX1'] = self.wcs.crpix[0]
-            hdr['CRPIX2'] = self.wcs.crpix[1]
-            hdr['CRPIX3'] = 1
+            header['CRPIX1'] = self.wcs.crpix[0]
+            header['CRPIX2'] = self.wcs.crpix[1]
+            header['CRPIX3'] = 1
 
-            hdr['CRVAL1'] = self.wcs.crval[0]
-            hdr['CRVAL2'] = self.wcs.crval[1]
-            # hdr['CRVAL3']=lam0
+            header['CRVAL1'] = self.wcs.crval[0]
+            header['CRVAL2'] = self.wcs.crval[1]
+            # header['CRVAL3']=lam0
 
-            hdr['LTV1'] = self.ltv[0]
-            hdr['LTV2'] = self.ltv[1]
+            header['LTV1'] = self.ltv[0]
+            header['LTV2'] = self.ltv[1]
 
-            hdr['CD1_1'] = self.wcs.cd[0, 0]
-            hdr['CD1_2'] = self.wcs.cd[0, 1]
-            hdr['CD2_1'] = self.wcs.cd[1, 0]
-            hdr['CD2_2'] = self.wcs.cd[1, 1]
-            # hdr['CD3_3']=dlam
+            header['CD1_1'] = self.wcs.cd[0, 0]
+            header['CD1_2'] = self.wcs.cd[0, 1]
+            header['CD2_1'] = self.wcs.cd[1, 0]
+            header['CD2_2'] = self.wcs.cd[1, 1]
+            # header['CD3_3']=dlam
 
-            hdr['CUNIT1'] = self.wcs.cunit[0]
-            hdr['CUNIT2'] = self.wcs.cunit[1]
-            hdr['CUNIT3'] = 'A'
+            header['CUNIT1'] = self.wcs.cunit[0]
+            header['CUNIT2'] = self.wcs.cunit[1]
+            header['CUNIT3'] = 'A'
 
-            hdr['DISPAXIS'] = (3, 'dispersion axis')
-            headers.add_stanza(hdr, 'WORLD-COORDINATE SYSTEM', before='NAXIS')
+            header['DISPAXIS'] = (3, 'dispersion axis')
+            headers.add_stanza(header, 'WORLD-COORDINATE SYSTEM', before='NAXIS')
 
             # set the data
-            dat = np.zeros((hdr['NAXIS3'], hdr['NAXIS2'], hdr['NAXIS1']),
-                           dtype=float)
-
-            hdu = fits.ImageHDU(dat, hdr)
+            dim = (header['NAXIS3'], header['NAXIS2'], header['NAXIS1'])
+            dat = np.zeros(dim, dtype=float)
+            raise NotImplementedError("three-dimensional extraction is not yet supported")
+            hdu = fits.ImageHDU(dat, header)
         else:
-            # set the data as a single spectrum
-            dat = self[0].sed.data
-            hdu = fits.BinTableHDU(dat, hdr)
+            hdu = self[0].sed.as_HDU(header=header)
+
         return hdu
 
     def image_coordinates(self, x, y, dtype=None):

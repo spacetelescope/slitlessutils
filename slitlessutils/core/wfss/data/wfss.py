@@ -633,6 +633,18 @@ class WFSS(dict):
 
         return '\n'.join(s)
 
+    def primaryheader(self):
+        """
+        Method to read the primary header
+
+        Returns
+        -------
+        phdr : `astropy.io.fits.Header`
+            The primary header.
+        """
+        phdr = fits.getheader(self.filename, 0)
+        return phdr
+
     def extensions(self):
         """
         An iterator to loop over the detectors and all possible extensions

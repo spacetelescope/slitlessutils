@@ -381,17 +381,18 @@ def compare(nsig=1.):
                     s = str(segid)
                     if s in hdul:
                         hdu = hdul[s]
-                        flam = hdu.data['flam']
+                        flam = hdu.data['FLUX']
                         if label == 'single-exposure':
                             flam -= hdu.data['cont']
 
-                        lo = flam - nsig * hdu.data['func']
-                        hi = flam + nsig * hdu.data['func']
+                        lo = flam - nsig * hdu.data['UNCERTAINTY']
+                        hi = flam + nsig * hdu.data['UNCERTAINTY']
 
-                        patch = ax.fill_between(hdu.data['lamb'], lo, hi,
+                        patch = ax.fill_between(hdu.data['WAVELENGTH'], lo, hi,
                                                 color=c, alpha=0.2)
-                        meas = ax.plot(hdu.data['lamb'], flam, color=c)
-                        contplot = ax.plot(hdu.data['lamb'], hdu.data['cont'], color='magenta')
+                        meas = ax.plot(hdu.data['WAVELENGTH'], flam, color=c)
+                        contplot = ax.plot(hdu.data['WAVELENGTH'],
+                                           hdu.data['cont'], color='magenta')
 
                         if first:
                             artists.append((patch, meas[0]))
