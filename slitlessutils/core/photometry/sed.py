@@ -53,6 +53,11 @@ class SED:
              ('func', np.float32),
              ('cont', np.float32),
              ('npix', np.uint16)]
+
+    # names of externally visible keywords
+    EXTKEYS = {'lamb': 'WAVELENGTH', 'flam': "FLUX", 'func': 'UNCERTAINTY',
+               'cont': 'CONTAMINATION', 'npix': 'NMEASUREMENTS'}
+
     FORMAT = ('%.4e', '%.4e', '%.4e', '%.4e', '%6u')
     GROW = 2     # factor to resize a dynamic array
 
@@ -120,7 +125,6 @@ class SED:
         """
         self._data = d
 
-    # def normalize(self,band,fnu):
     def normalize(self, wave, flux, abmag=False):
         """
         Method to renormalize the spectrum
@@ -756,27 +760,45 @@ class SED:
             np.savetxt(filename, self.data, delimiter=delimiter, fmt=self.FORMAT,
                        header=delimiter.join(self._data.dtype.names))
 
-    def as_HDU(self, **kwargs):
+    def as_HDU(self, header=None):
         """
-        Method to package the spectrum in to an `astropy.io.fits.BinTableHDU`
+        Method to rename the internal numpy columns for a more descriptive
+        output in the fits tables
 
-        Parameters
-        ----------
-        kwargs : dict, optional
-            Keyword/value pairs set as header keyword/value pairs
-
+        Returns
+        -------
+        hdu : `fits.astropy.io.BinTableHDU()`
+           This will be a structured numpy array with descriptive column names
         """
 
-        fluxunits = Config().fluxunits
+        # get the data locally and trim the padding
+        data = self.data
 
-        hdu = fits.BinTableHDU(self.data)
+        # get the new names by remapping the internal names to better
+        # external names for the output files
+        new_names = tuple(self.EXTKEYS[inkey] for inkey, dtype in self.DTYPE)
 
+        # reset the outputs
+        data.dtype.names = new_names
+
+        # put into an HDU
+        hdu = fits.BinTableHDU(data, header=header)
+
+        # get units of the spectrum
+        cfg = Config()
+        fluxunit = f'{cfg.fluxscale} {cfg.fluxunits}'
+
+        # update the output units in the header
         hdu.header.set('TUNIT1', value='angstrom', after='TFORM1')
-        hdu.header.set('TUNIT2', value=fluxunits, after='TFORM2')
-        hdu.header.set('TUNIT3', value=fluxunits, after='TFORM3')
-        hdu.header.set('TUNIT4', value=fluxunits, after='TFORM4')
+        hdu.header.set('TUNIT2', value=fluxunit, after='TFORM2')
+        hdu.header.set('TUNIT3', value=fluxunit, after='TFORM3')
+        hdu.header.set('TUNIT4', value=fluxunit, after='TFORM4')
         hdu.header.set('TUNIT5', value='number', after='TFORM5')
+        # update the output units on the data itself
+        hdu.data.columns['WAVELENGTH'].unit = 'Angstrom'
+        hdu.data.columns['FLUX'].unit = fluxunit
+        hdu.data.columns['UNCERTAINTY'].unit = fluxunit
+        hdu.data.columns['CONTAMINATION'].unit = fluxunit
+        hdu.data.columns['NMEASUREMENTS'].unit = ''
 
-        for k, v in kwargs.items():
-            hdu.header[k] = v
         return hdu

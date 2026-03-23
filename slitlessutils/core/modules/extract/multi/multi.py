@@ -3,10 +3,11 @@ import getpass
 import numpy as np
 from astropy.io import fits
 from matplotlib.backends.backend_pdf import PdfPages
+from tqdm import tqdm
 
 from .....config import SUFFIXES, Config
 from .....logger import LOGGER
-from ....utilities import as_iterable, get_metadata, headers
+from ....utilities import as_iterable, compression, get_metadata, headers
 from ...group import GroupCollection
 from ...module import Module
 from .matrix import Matrix
@@ -75,7 +76,7 @@ class Multi(Module):
         self.optimizer = optimizer(algorithm, logdamp)
         self.matrix = Matrix(self.extorders, **kwargs)
 
-    def extract(self, data, sources, groups=None):
+    def extract(self, data, sources, groups=None, computemodel=True, gzip=True):
         """
         Method to do the mult-ended spectral extraction
 
@@ -90,6 +91,12 @@ class Multi(Module):
         groups : `GroupCollection` or None
             The collection of groups.  If set as None, then no grouping
             will be performed.  Default is None
+
+        computemodel : bool
+            Flag to compute the model spectral image.  Default is True
+
+        gzip : bool
+            Flag to gzip model images.  Default is True
 
         Notes
         -----
@@ -113,6 +120,8 @@ class Multi(Module):
         sources.update_header(phdu.header)                 # about the sources
         self.optimizer.update_header(phdu.header)
         Config().update_header(phdu.header)                # global config info
+        if groups is not None:
+            groups.update_header(phdu.header)
 
         # add the primary to the file
         hdul1.append(phdu)
@@ -129,6 +138,9 @@ class Multi(Module):
             LOGGER.info('No grouping')
             groups = GroupCollection()
 
+        # container to hold the model values
+        models = {}
+
         # open a PDF to write Grouping images
         pdffile = f'{self.root}_{SUFFIXES["L-curve"]}.pdf'
         LOGGER.info(f'Writing grouped L-curve figure: {pdffile}')
@@ -141,49 +153,124 @@ class Multi(Module):
             d['Keywords'] = f'{package} WFSS L-curve groups'
             d['Producer'] = package
 
-            for grpid, srcdict in enumerate(groups(sources)):
+            # keep a list of segids that have not had their spectrum measured.
+            # so to start, no objects have been measured, so initialize to
+            # the full list of segids
+            segids = list(sources.keys())
 
-                self.matrix.build_matrix(data, srcdict)
+            # process each group
+            for grpid, grpsources in enumerate(groups.groups(sources)):
 
-                res = self.optimizer(self.matrix)
-                unc = self.matrix.compute_uncertainty()
+                # build a matrix for these sources
+                self.matrix.build_matrix(data, grpsources, group=grpid)
 
-                for sid, lid in self.matrix.ri.items():
-                    segid, regid = self.matrix.sedkeys[sid]
-                    lamid = self.matrix.lamids[lid]
+                # only continue if the matrix is valid
+                if self.matrix:
 
-                    if hasattr(sources[segid], 'extpars'):
-                        pars = sources[segid].extpars
-                    else:
-                        pars = self.matrix.defpars
+                    # solve the system
+                    res = self.optimizer(self.matrix)
+                    unc = self.matrix.compute_uncertainty()
 
-                    # variables for outputting
-                    wave = pars.wavelengths()
-                    flam = np.full_like(wave, np.nan, dtype=float)
-                    func = np.full_like(wave, np.nan, dtype=float)
+                    # initialize a counter
+                    s = slice(0, 0)
 
-                    # nota bene:  the methods LSQR and LSMR will formally
-                    # return the uncertainties, but are the diagonal
-                    # elements of (A'A + ell *I)^-1, which will be
-                    # incorrect if ell != 0 (see Ryan Casertano Pirzkal 2018)
-                    # Therefore, we also estimate the diagonal elements of
-                    # A'A, and invert them.  This is not correct, but a
-                    # different error than including the damping.
+                    # do each source
+                    for segid, source in grpsources.items():
+                        # get the extraction properties for this source
+                        if hasattr(source, 'extpars'):
+                            wave = source.extpars.wavelengths()
+                        else:
+                            wave = self.matrix.defpars.wavelengths()
+                        nwave = len(wave)
 
-                    # populate the results
-                    flam[lamid] = res.x[lid]
-                    func[lamid] = unc[lid]      # from matrix elements
-                    # func[lamid]=res.lo[lid]   # from matrix inversion (wrong!)
+                        segids.remove(segid)
 
-                    # update the outputting structures
-                    sources[segid].grpid = grpid
-                    # sources[segid].spectralregions[regid].sed.reset(wave,flam,
-                    sources[segid][regid].sed.reset(wave, flam, func=func)
+                        # do each spectral region
+                        for regid, region in enumerate(source):
+                            s = slice(s.stop, s.stop + nwave)
+
+                            # get the fluxes from the objects
+                            flam = res.x[s]
+                            func = unc[s]
+
+                            # if something has unc == 0, then it's bad
+                            uncons = self.matrix.unconstrained[s]
+                            flam[uncons] = np.nan
+                            func[uncons] = np.nan
+
+                            # update the outputting structures
+                            sources[segid].grpid = grpid
+                            sources[segid][regid].sed.reset(wave, flam,
+                                                            func=func)
+
+                    # compute the model values
+                    if computemodel:
+                        model = self.matrix.compute_model(res.x)
+
+                        for key, mod in model.items():
+                            if key not in models:
+                                models[key] = []
+                            models[key].extend(mod)
 
                 # update results for the L-curve data
-                kwargs = {'nobj': (len(srcdict), 'Number of sources')}
+                kwargs = {'nobj': (len(grpsources), 'Number of sources')}
                 hdulL.append(self.matrix.lcurve.as_HDU(grpid=grpid, **kwargs))
-                self.matrix.lcurve.pdfplot(pdf)
+                self.matrix.lcurve.pdfplot(pdf, grpid=grpid)
+
+        if computemodel:
+            # issue a logging message
+            LOGGER.info("Making model images")
+
+            # now let's compute the residuals from the linear model
+            for datum in tqdm(data, desc='Rendering models', total=len(data),
+                              dynamic_ncols=True):
+
+                # get the output image
+                modfile = f'{datum.dataset}_mod.fits'
+
+                # for output file
+                hdul = fits.HDUList()
+                hdul.append(fits.PrimaryHDU(header=datum.primaryheader()))
+
+                # process each extension
+                for detname, detdata in datum.items():
+                    # get some info
+                    hdr = detdata.headfits('science')
+                    unc = detdata.readfits('uncertainty')
+                    mod = np.zeros_like(unc, dtype=float)
+
+                    # sum over the model, but recall we need the uncertainty
+                    # to undo the inverse-variance weighting ineherent in
+                    # the matrix inversion algorithm (see Ryan+ 2018, PASP)
+                    key = (datum.dataset, detname)
+                    for y, x, m in models[key]:
+                        mod[y, x] += m * unc[y, x]
+
+                    # update the header info
+                    hdr['EXTNAME'] = 'MOD'
+
+                    # save to the output
+                    hdul.append(fits.ImageHDU(data=mod, header=hdr))
+
+                # write the file to disk
+                hdul.writeto(modfile, overwrite=True)
+
+                # gzip the file if asked
+                if gzip:
+                    compression.compress(modfile)
+
+        # remove the sources for which we didn't measure a spectrum
+        for segid in segids:
+            if hasattr(source, 'extpars'):
+                wave = source.extpars.wavelengths()
+            else:
+                wave = self.matrix.defpars.wavelengths()
+
+            nans = np.full_like(wave, np.nan)
+
+            # update the outputting structures
+            sources[segid].grpid = -1
+            sources[segid][regid].sed.reset(wave, nans, func=nans)
 
         # loop over sources for outputting
         for source in sources.values():
@@ -193,57 +280,6 @@ class Multi(Module):
                 hdul3.append(hdu)
             else:
                 hdul1.append(hdu)
-
-
-#        self.matrix.build_matrix(data,sources)
-#
-#        res=self.optimizer(self.matrix)
-#
-#
-#        # loop over elements
-#        for sid,lid in self.matrix.ri.items():
-#            segid,regid=self.matrix.sedkeys[sid]
-#            lamid=self.matrix.lamids[lid]
-#
-#            if hasattr(sources[segid],'extpars'):
-#                pars=sources[segid].extpars
-#            else:
-#                pars=self.matrix.defpars
-#
-#            # variables for outputting
-#            wave=pars.wavelengths()
-#            flam=np.full_like(wave,np.nan,dtype=float)
-#            func=np.full_like(wave,np.nan,dtype=float)
-#
-#
-#            # populate the results
-#            flam[lamid]=res.x[lid]
-#            func[lamid]=res.lo[lid]
-#
-#            # update the outputting structures
-#            sources[segid].spectralregions[regid].sed.reset(wave,flam,func=func#)
-#
-#            # output ascii spectrum
-#            #with open(f'multi_{segid}_{regid}.csv','w') as fp:
-#            #    print('wavelength,flam,func',file=fp)
-#            #    for w,f,df in zip(wave,flam,func):
-#            #'        print(f'{w},{f},{df}',file=fp)
-#
-#
-#
-#        # loop over sources for outputting
-#        for source in sources.values():
-#
-#            hdu=source.as_HDU()
-#            if source.is_compound:
-#                hdul3.append(hdu)
-#            else:
-#                hdul1.append(hdu)
-#
-#
-#
-#
-#        self.matrix.lcurve.plot(f'{self.root}_{SUFFIXES["L-curve"]}.pdf')
 
         # write out the files
         if len(hdul1) > 1:

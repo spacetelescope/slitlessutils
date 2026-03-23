@@ -7,7 +7,7 @@ from ....utilities import indices
 from .spectraltable import SpectralTable
 
 
-def boxcar(source, det, sci, unc, dqa, flatfield, order, odt,
+def boxcar(source, det, sci, unc, dqa, flatfield, order, odt, chdu,
            width=17, summation='cartesian', plot=False):
     '''
     Worker function to perform boxcar or "aperture" spectroscopy
@@ -37,6 +37,9 @@ def boxcar(source, det, sci, unc, dqa, flatfield, order, odt,
 
     odt : `slitlessutils.core.tables.ODT`
        The object-dispersion table (ODT).
+
+    chdu : `fits.ImageHDU()`
+       The contamination data
 
     width : int or float
        The extraction width in pixels.  Default is 15 pix
@@ -120,24 +123,39 @@ def boxcar(source, det, sci, unc, dqa, flatfield, order, odt,
             calib = flat * area * sens * disp
 
             # apply the calibrations
-            maxcal = np.amax(calib)
-            if maxcal > 1e-15:
+            g = np.where(calib > 0)[0]
+            if len(g) > 0:
+                # use only the valid data
+                xs = xs[g]
+                ys = ys[g]
+                calib = calib[g]
+                aper = aper[g]
+
                 # the calibrated images
                 calsci = (sci[ys, xs] / calib)
                 calvar = (unc[ys, xs] / calib)**2
 
+                # compute the contamination, but recall, we store the
+                # contamination image in a cut out.... So have to get the
+                # apply that offset from the LTV1/2 keywords
+                xc = xs + chdu.header['LTV1']
+                yc = ys + chdu.header['LTV2']
+                calcnt = chdu.data[yc, xc]
+
                 # sum the data with calibrations applied
                 flam = np.sum(calsci * aper)
+                cont = np.sum(calcnt * aper)
                 fvar = np.sum(calvar * aper)
             else:
                 flam = np.inf
                 fvar = np.inf
+                cont = 0.0
 
             # sum the data
             flux = np.nansum(sci[ys, xs] * aper)
 
             # save the results
-            spec.append(wave, disp, flam, np.sqrt(fvar), flux, 0.0, npix)
+            spec.append(wave, disp, flam, np.sqrt(fvar), flux, cont, npix)
 
         # make a diagnostic plot?
         if plot:

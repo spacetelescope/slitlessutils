@@ -196,7 +196,7 @@ def plot_spectra():
     axe['FERROR'] /= cfg.fluxscale
 
     # make the plot
-    plt.plot(dat['lamb'], dat['flam'], label='slitlessutils')
+    plt.plot(dat['WAVELENGTH'], dat['FLUX'], label='slitlessutils')
     plt.plot(axe['LAMBDA'], axe['FLUX'], label='aXe')
 
     plt.legend()
