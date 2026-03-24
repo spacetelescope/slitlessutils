@@ -148,7 +148,11 @@ class Multi(Module):
             # add some info to the PDF
             d = pdf.infodict()
             d['Title'] = 'L-Curve Results'
-            d['Author'] = getpass.getuser()
+            try:
+                d['Author'] = getpass.getuser()
+            except OSError:
+                # This probably only happens running in CI
+                d['Author'] = 'Unknown User'
             d['Subject'] = f'L-Curve results for grouped data from {package}'
             d['Keywords'] = f'{package} WFSS L-curve groups'
             d['Producer'] = package
