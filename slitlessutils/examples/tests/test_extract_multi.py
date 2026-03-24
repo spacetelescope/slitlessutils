@@ -1,7 +1,8 @@
+import pytest
 from astropy.io import fits
 from astropy.table import Table
 from numpy.testing import assert_almost_equal
-import pytest
+
 from slitlessutils.examples import extract_multi, simulate
 
 
