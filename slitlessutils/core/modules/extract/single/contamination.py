@@ -1,7 +1,7 @@
 from collections import namedtuple
 
-from astropy.io import fits
 import numpy as np
+from astropy.io import fits
 
 from .....logger import LOGGER
 from ....utilities import headers, indices
