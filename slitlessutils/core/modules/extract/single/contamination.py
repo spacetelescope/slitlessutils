@@ -1,8 +1,12 @@
+from collections import namedtuple
+
 import numpy as np
 from astropy.io import fits
 
 from .....logger import LOGGER
 from ....utilities import headers, indices
+
+ContaminationKey = namedtuple('ContaminationTuple', ('segid', 'ordname'))
 
 
 class ContaminantOrders:
@@ -116,7 +120,8 @@ class Contamination(dict):
             for segid, source in sources.items():
                 poly = h5.load_polygon(source)
                 if poly:
-                    self[(segid, ordname)] = poly
+                    key = ContaminationKey(segid, ordname)
+                    self[key] = poly
 
     def __call__(self, segid, ordname, h5, sources, detdata, flatfield, bbx=None, bby=None):
         """
@@ -155,9 +160,9 @@ class Contamination(dict):
 
         """
 
-        # grab the polygon
-        key = (segid, ordname)
-        poly = self[key]
+        # grab the polygon for this given object
+        objkey = ContaminationKey(segid, ordname)
+        objpoly = self[objkey]
 
         if bbx is None:
             bbx = (0, detdata.naxis[0] - 1)
@@ -171,20 +176,20 @@ class Contamination(dict):
         img = np.zeros((ny, nx), dtype=float)
 
         # process each polygon
-        for k, ply in self.items():
+        for contkey, contpoly in self.items():
 
             # ignore if it's the polygon in question
-            if k != key:
+            if contkey != objkey:
 
                 # find out if it overlaps
-                dp = poly.intersection(ply)
+                dp = objpoly.intersection(contpoly)
                 if not dp.is_empty:
 
                     # load the data for this order
-                    h5.load_order(ordname)
+                    h5.load_order(contkey.ordname)
 
                     # process each spectral region
-                    for regid, region in sources[k[0]].items():
+                    for regid, region in sources[contkey.segid].items():
                         for x, y in region.pixels(applyltv=True, dtype=int):
                             # load the data
                             pdt = h5.load_pdt(x, y)
@@ -207,7 +212,7 @@ class Contamination(dict):
 
                                 # apply the calibrations for this pixel
                                 flat = flatfield(xg, yg, wav)
-                                sens = detdata.config[ordname].sensitivity(wav)
+                                sens = detdata.config[contkey.ordname].sensitivity(wav)
                                 area = detdata.relative_pixelarea(xg, yg)
                                 flam = region.sed(wav, fnu=False)
                                 val *= (sens * area * flat * flam)
@@ -239,7 +244,7 @@ class Contamination(dict):
         # add an extname and a few things
         hdr['EXTNAME'] = f'{detdata.name},{segid},{ordname}'
         hdr['DETNAME'] = (detdata.name, 'Detector name')
-        hdr['SEGID'] = (segid, 'Segmentation ID for this cont model')
-        hdr['ORDNAME'] = (ordname, 'Order for cont model')
+        hdr['SEGID'] = (objkey.segid, 'Segmentation ID for this cont model')
+        hdr['ORDNAME'] = (objkey.ordname, 'Order for cont model')
 
         return fits.ImageHDU(data=img, header=hdr)

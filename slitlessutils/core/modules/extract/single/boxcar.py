@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from astropy.io import fits
 from astropy.stats import sigma_clipped_stats
 
 from .....config import Config
@@ -38,8 +39,9 @@ def boxcar(source, det, sci, unc, dqa, flatfield, order, odt, chdu,
     odt : `slitlessutils.core.tables.ODT`
        The object-dispersion table (ODT).
 
-    chdu : `fits.ImageHDU()`
-       The contamination data
+    chdu : `fits.ImageHDU()` or `None`
+       The contamination data.  If this is a valid `fits.ImageHDU()`, then a
+       contamination model will be computed.  Otherwise, it will not.
 
     width : int or float
        The extraction width in pixels.  Default is 15 pix
@@ -135,17 +137,23 @@ def boxcar(source, det, sci, unc, dqa, flatfield, order, odt, chdu,
                 calsci = (sci[ys, xs] / calib)
                 calvar = (unc[ys, xs] / calib)**2
 
-                # compute the contamination, but recall, we store the
-                # contamination image in a cut out.... So have to get the
-                # apply that offset from the LTV1/2 keywords
-                xc = xs + chdu.header['LTV1']
-                yc = ys + chdu.header['LTV2']
-                calcnt = chdu.data[yc, xc]
-
                 # sum the data with calibrations applied
                 flam = np.sum(calsci * aper)
-                cont = np.sum(calcnt * aper)
                 fvar = np.sum(calvar * aper)
+
+                # sort out the contamination
+                if isinstance(chdu, fits.ImageHDU):
+                    # compute the contamination, but recall, we store the
+                    # contamination image in a cut out.... So have to get the
+                    # apply that offset from the LTV1/2 keywords
+                    xc = xs + chdu.header['LTV1']
+                    yc = ys + chdu.header['LTV2']
+                    contam = chdu.data[yc, xc]
+                    cont = np.sum(contam * aper)
+                else:
+                    # did no contamination
+                    cont = 0.0
+
             else:
                 flam = np.inf
                 fvar = np.inf
