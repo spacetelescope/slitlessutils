@@ -42,19 +42,19 @@ Since many terms may be used colloquially and/or have different definitions in o
 		A method for combining multiple images while correcting for image distortion and offsets/dithers.  See the `drizzlepac <https://drizzlepac.readthedocs.io/en/latest/>`_ documentation.
 
 	grism
-	    A transmissive and dispersive spectral element that often has a (nearly) constant rate of dispersion.  A grism differs from a :term:`prism` by having an additional diffractive surface on one side, which results in the constant dispersion, little spatial offset between the :term:`spectral trace` and :term:`undispersed position`, and multiple spectral orders.  See also :term:`prism`.
+		A transmissive and dispersive spectral element that often has a (nearly) constant rate of dispersion.  A grism differs from a :term:`prism` by having an additional diffractive surface on one side, which results in the constant dispersion, little spatial offset between the :term:`spectral trace` and :term:`undispersed position`, and multiple spectral orders.  See also :term:`prism`.
 
 	global-sky image
 		A model of the sky background for a WFSS image.  In principle, one should have a separate global-sky image for each spectral component present in the sky background.  However, only the HST/WFC3-IR detector has multiple-components measured (see `WFC3_back_sub <https://github.com/NorPirzkal/WFC3_Back_Sub>`_).
 
 	grouping
-                The process of identifying the spectral traces that overlap in any image or collection of images.  Consider a dataset of two images observing a scene of three objects.  Further suppose that in image 1 perhaps the spectral trace object A overlaps that of object B while object C is isolated, whereas in image 2 object A is isolated and the spectral traces of object B and C now overlap.  Therefore, if one is to simultaneously analyze image 1 and 2, then the group is considered as objects A, B, and C.   See also :term:`node`.
+		The process of identifying the spectral traces that overlap in any image or collection of images.  Consider a dataset of two images observing a scene of three objects.  Further suppose that in image 1 perhaps the spectral trace object A overlaps that of object B while object C is isolated, whereas in image 2 object A is isolated and the spectral traces of object B and C now overlap.  Therefore, if one is to simultaneously analyze image 1 and 2, then the group is considered as objects A, B, and C.   See also :term:`node`.
 
 	node
-	        The :term:`grouping` algorithm uses ideas from graph theory and the package `NetworkX <https://networkx.org/en/>`_ to catalog all spectral traces that may overlap in any slitless observation.  A `node <https://en.wikipedia.org/wiki/Graph_theory>`_ represents a given spectral trace.
+		The :term:`grouping` algorithm uses ideas from graph theory and the package `NetworkX <https://networkx.org/en/>`_ to catalog all spectral traces that may overlap in any slitless observation.  A `node <https://en.wikipedia.org/wiki/Graph_theory>`_ represents a given spectral trace.
 
-        pick-off mirror
-	        An optical element that redirects the light to the instrument in question.
+	pick-off mirror
+		An optical element that redirects the light to the instrument in question.
 
 	pixel-area map
 		The relative area of each pixel with respect to the area of the reference pixel, which is given by the absolute value of the determinant of the Jacobian matrix.  This arises due to geometric distortion, and in the case of a SIP distortion model is a polynomial in the pixel coordinates.  Also called PAM.
@@ -63,10 +63,10 @@ Since many terms may be used colloquially and/or have different definitions in o
 		A look-up table that describes the weights that the :term:`direct imaging` pixel projects onto the pixels of a WFSS image/detector as a function of wavelength for each spectral order.  Due to the hierarchical nature of this transformation, these data are stored as `hierarchical data-format 5 (HDF) <https://www.hdfgroup.org/solutions/hdf5/>`_.  This intermediate data product is also referred to as a PDT.
 
 	post-imaging
-	 	The contemporaneously :term:`direct imaging` taken *after* the WFSS observation.  See also :term:`pre-imaging`.
+		The contemporaneously :term:`direct imaging` taken *after* the WFSS observation.  See also :term:`pre-imaging`.
 
 	pre-imaging
-	 	The contemporaneously :term:`direct imaging` taken *before* the WFSS observation.  See also :term:`post-imaging`.
+		The contemporaneously :term:`direct imaging` taken *before* the WFSS observation.  See also :term:`post-imaging`.
 
 	prism
 		A transmissive and dispersive spectral element with a highly non-uniform rate of dispersion.  See :term:`grism` for the similarities/differences between the two.
@@ -105,7 +105,7 @@ Since many terms may be used colloquially and/or have different definitions in o
 		The observed position of the two-dimensional spectra on the detector.
 
 	undispersed position
-	    The position a source would have in the absence of the spectral grating: :math:`(x_0,y_0)`.  Importantly, this is **not** equivalent to the zeroth-order spectral trace.
+		The position a source would have in the absence of the spectral grating: :math:`(x_0,y_0)`.  Importantly, this is **not** equivalent to the zeroth-order spectral trace.
 
 	wide-field slitless spectroscopy
 		The broad term for the use of a transmissive and dispersive optic to provide a complete, unbiased spectroscopic view of a scene.  This term may also refer to the data product of a single exposure/file taken through one of these optics.  May also be called WFSS for short.
