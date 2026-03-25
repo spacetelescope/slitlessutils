@@ -1,7 +1,7 @@
 Citing ``Slitlessutils``
 ========================
 
-If you use ``slitlessutils`` for a project that leads to a publication, whether directly or as a dependency of another package, please cite the work on Zenodo:
+If you use ``slitlessutils`` for a project that leads to a publication, whether directly or as a dependency of another package, please cite the following DOI:
 
 `https://doi.org/10.5281/zenodo.10215187 <https://doi.org/10.5281/zenodo.10215187>`_.
 

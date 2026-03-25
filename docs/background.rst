@@ -50,7 +50,7 @@ but is initialized to all sky pixels (ie. :math:`\Theta_{x,y}=0`).  Now the fina
 
    "The global-sky image (XXXX) is unnormalized YYY. Results will be fine, but the values may be suspect."
 
-   This is benign warning that background image :math:`B_{x,y}` is not normalized to unity, and so the :math:`\alpha`
+   This is benign warning that background image :math:`B_{x,y}` is not normalized to unity, and so the :math:`\alpha` does not represent a physical quantity butstill optimizes the background subtraction.  So the the subtraction can be trusted, but the :math:`\alpha` value has no physical interpretation.
    
    
 .. note::

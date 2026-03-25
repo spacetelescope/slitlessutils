@@ -148,8 +148,7 @@ As discussed above, the regularized least-squares introduces a tunable parameter
    The top panel shows the standard L-curve with the scaling factor of the Frobenius norm to ensure that the :term:`regularization parameter` :math:`\ell` is dimensionless, which is encoded in the color of the plot symbols (see colorbar at the very bottom).  The lower panel shows the curvature [#curvefoot]_ as a function of the log of the (dimensionless) :term:`regularization parameter`.  The clear peak at :math:`\log\ell\sim-1.9` represents the sharp vertex in the L-curve at :math:`(\log\chi^2,\log\xi^2)\sim(2.1,3.6)`.  This point is adopted as it represents a roughly "equal" compromise between modeling the data (ie. the :math:`\chi^2`-term) and damping high-frequency structure (ie. the :math:`\xi^2`-term).  This plot was made using the grid-based search with :math:`\Delta\log\ell=0.1`.
 
 .. important::
-   It may be that the resultant spectra show high-frequency oscillations, which is usually a sign the damping was not sufficiently optimized.  Users should change the range and tolerance of the damping optimization.xs
-
+   It may be that the resultant spectra show high-frequency oscillations, which is usually a sign the damping was not sufficiently optimized.  Users should change the range and tolerance of the damping optimization.
 
 Grouping
 --------

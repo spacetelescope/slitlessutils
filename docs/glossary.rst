@@ -54,7 +54,7 @@ Since many terms may be used colloquially and/or have different definitions in o
 	        The :term:`grouping` algorithm uses ideas from graph theory and the package `NetworkX <https://networkx.org/en/>`_ to catalog all spectral traces that may overlap in any slitless observation.  A `node <https://en.wikipedia.org/wiki/Graph_theory>`_ represents a given spectral trace.
 
         pick-off mirror
-	    An optical element that redirects the light to the instrument in question.
+	        An optical element that redirects the light to the instrument in question.
 
 	pixel-area map
 		The relative area of each pixel with respect to the area of the reference pixel, which is given by the absolute value of the determinant of the Jacobian matrix.  This arises due to geometric distortion, and in the case of a SIP distortion model is a polynomial in the pixel coordinates.  Also called PAM.

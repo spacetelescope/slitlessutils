@@ -37,11 +37,11 @@ The single-orient extraction is essentially the optimal spectroscopy algorithm p
 
 			.. math::
 
-				\begin{aligned}
+				\begin{eqnarray}
 					f_{\lambda,i} &=& \frac{\sum_y P_{x,y}S_{x,y}/U_{x,y}^2}{\sum_y P_{x,y}^2/U_{x,y}^2}\\
 					u_{\lambda,i} &=& \sqrt{\frac{\sum_y P_{x,y}}{\sum_y P_{x,y}^2/U_{x,y}^2}}\\
 					c_{\lambda,i} &=& \frac{\sum_y P_{x,y}C_{x,y}/U_{x,y}^2}{\sum_y P_{x,y}^2/U_{x,y}^2}
-				\end{aligned}
+				\end{eqnarray}
 
 			where :math:`f_{\lambda,i}`, :math:`u_{\lambda,i}`, and :math:`c_{\lambda,i}` are the optimal flux, uncertainty, and contamination, respectively for the :math:`i^\mathrm{th}` WFSS image.  Additionally, :math:`S_{x,y}`, :math:`U_{x,y}`, :math:`P_{x,y}`, and :math:`C_{x,y}` are the science, uncertainty, cross-dispersion profile, and contamination images (more on this below in :ref:`Contamination Model <contmodel>`), respectively.  ``Slitlessutils`` offers three choices for the cross-dispersion profile :math:`P_{x,y}`:
 

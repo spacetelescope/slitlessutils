@@ -63,19 +63,19 @@ Now the expected total number of electrons will be :math:`E = \left(\tilde{S}_{x
 
 .. math::
 
-  \begin{aligned}
+  \begin{eqnarray}
     p_{x,y} &\sim& \mathcal{P}\left(E\right)\\
     g_{x,y} &\sim& \mathcal{N}\left(0,R^2\right)
-  \end{aligned}
+  \end{eqnarray}
 
 where :math:`B` and :math:`t` are the background and exposure time described in :numref:`usertab`, and :math:`D` and :math:`R` are the dark current and read noise (see the :doc:`instrument tables <instrumentfiles>`). Now the final, noised-science :math:`S_{x,y}` and uncertainty :math:`U_{x,y}` rate images are then:
 
 .. math::
 
-  \begin{aligned}
+  \begin{eqnarray}
     S_{x,y} &=& \frac{p_{x,y}+g_{x,y}}{t} - B - D\\
     U_{x,y} &=& \sqrt{\left(\frac{\tilde{S}_{x,y} + B + D}{t}\right)+ \left(\frac{R}{t}\right)^2}
-  \end{aligned}
+  \end{eqnarray}
 
 both in units of :math:`\mathrm{e}^-/\mathrm{s}`.  The background rate and dark current are subtracted here to produce an image equivalent to a :doc:`sky-subtracted WFSS image <background>`.
 
@@ -132,9 +132,9 @@ where all of these partial derivatives are (by definition) polynomials of :math:
 
 .. math::
 
-  \begin{aligned}
+  \begin{eqnarray}
     P_{x,y} &=& \left|\det(J)\right|\\
             &=& \left|\frac{\partial a}{\partial x}\frac{\partial b}{\partial y} - \frac{\partial b}{\partial x}\frac{\partial a}{\partial y}\right|.
-  \end{aligned}
+  \end{eqnarray}
 
 ``Slitlessutils`` computes these values on-the-fly as needed.

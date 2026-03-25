@@ -19,18 +19,18 @@ Spectral Trace
 The :term:`spectral trace` describes the position of the spectrum on the detector(s).  The relative position of the spectral trace is given as a polynomial in the parameter:
 
 .. math::
-   \begin{aligned}
+   \begin{eqnarray}
 		\tilde{x}(t;x_0,y_0) &=& a_0(x_0,y_0) + a_1(x_0,y_0)\,t + a_2(x_0,y_0)\,t^2 + \ldots \\
 		\tilde{y}(t;x_0,y_0) &=& b_0(x_0,y_0) + b_1(x_0,y_0)\,t + b_2(x_0,y_0)\,t^2 + \ldots
-	\end{aligned}
+   \end{eqnarray}
 
 However, the spectral element may be rotated with respect to the calibration observations (by an angle :math:`\theta`; the default value is :math:`\theta=0^{\circ}`), and therefore, requires introducing a small rotation matrix.  Now the position in the spectroscopic image will be:
 
 .. math::
-	\begin{aligned}
+	\begin{eqnarray}
 		x(t;x_0,y_0,\theta) &=& x_0 + \cos(\theta)\,\tilde{x}(t;x_0,y_0) + \sin(\theta)\,\tilde{y}(t;x_0,y_0) + \Delta x \\
 		y(t;x_0,y_0,\theta) &=& y_0 - \sin(\theta)\,\tilde{x}(t;x_0,y_0) + \cos(\theta)\,\tilde{y}(t;x_0,y_0) + \Delta y
-	\end{aligned}
+	\end{eqnarray}
 
 where :math:`(\Delta x, \Delta y)` are the :term:`wedge offsets`.
 
