@@ -212,17 +212,18 @@ class SpectralTable(dict):
                 flamsum = np.nansum(w * thisflam) / wsum
                 fluxsum = np.nansum(w * thisflux) / wsum
                 flamvar = 1. / np.sqrt(wsum)
+                contsum = np.nansum(w * thiscont) / wsum
             else:
-                flamsum = np.inf
-                fluxsum = np.inf
-                flamvar = np.inf
+                flamsum = np.nan
+                fluxsum = np.nan
+                flamvar = np.nan
+                contsum = np.nan
 
             numb = np.sum(thisnpix)
-            contam = 0.0
 
             # save the results
             spectrum.append(outw[ind], pars.dwave, flamsum,
-                            np.sqrt(flamvar), fluxsum, contam, numb)
+                            np.sqrt(flamvar), fluxsum, contsum, numb)
 
         return spectrum
 

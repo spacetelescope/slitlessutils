@@ -421,11 +421,9 @@ class Single(Module):
                                 if self.savecont:
                                     chdul.append(chdu)
 
-                                # get the offsets in the contamination image
-                                # xoff = -chdu.header.get('LTV1', 0)
-                                # yoff = -chdu.header.get('LTV2', 0)
                             else:
-                                chdu = fits.ImageHDU()
+                                # this is an empty contamination
+                                chdu = None  # fits.ImageHDU()
 
                             if extmode == 'boxcar':
                                 spectrum = boxcar(source, detdata, sci, unc,

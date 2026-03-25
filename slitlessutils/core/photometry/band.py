@@ -41,8 +41,8 @@ class Band:
             where = np.arange(len(wave), dtype=int)
 
         self.unit = unit.lower()
-        self.wave = wave
-        self.tran = tran
+        self.wave = wave.copy()
+        self.tran = tran.copy()
         self.name = name
 
         if self.unit in ('micron', 'microns', 'um'):
