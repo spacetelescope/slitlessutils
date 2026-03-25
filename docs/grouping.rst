@@ -21,7 +21,7 @@ In :numref:`groupingfigure`, we show the methodology for identifying distinct gr
 This ratio is used as a weight in the in the `networkx.Graph()`.  Below we show an example of the graphing for just the blue position angle (left), the red position angle (middle), and the combination (right).  Here the thickness of the edge represents the maximum of the fractional areas (given above) while the color of the node indicates the (approximate) apparent magnitude of the object.
 
 .. _graphs:
-.. list-table:: The connected graphs for the blue orient (left), red orient (middle), and the combined dataset (right).  
+.. list-table:: The connected graphs for the blue orient (left), red orient (middle), and the combined dataset (right).
    :width: 100%
    :widths: 33 33 33
    :class: borderless
@@ -39,12 +39,12 @@ This ratio is used as a weight in the in the `networkx.Graph()`.  Below we show 
          :alt: Graph for the combined dataset.
 
 .. note::
-   The apparent magnitudes are simply labeled in the graph to highlight the constrast ratio between sources, and are not used in any weighting.
+   The apparent magnitudes are simply labeled in the graph to highlight the contrast ratio between sources, and are not used in any weighting.
 
 Example
 -------
 .. code:: python
-	  
+
 	  from slitlessutils.core.modules.group import GroupCollection
 
 	  # make an empty collection
@@ -67,19 +67,11 @@ Example
 
 	  # make a plot
 	  g1.plot(filename='g1.png', minobj=1)
-	  
+
 
 To Group or Not to Group?
 -------------------------
 Although grouping is designed to reduce the computing requirements, in particular the RAM and CPU usage, it is not always beneficial.  For example, a scene and observational geometry that results in many, uncontaminated sources may actually require longer runtime (but still reduce the RAM usage).   This happens because the total time required to make the matrix for each group separately (ie. the time to build one matrix times the number of independent groups) becomes longer than the runtime for solving the equivalent problem with a single group.
 
-.. tip:: 
+.. tip::
    Users are encouraged to perform the grouping and plot the network graph to get a sense of the number of distinct, disconnected groups.  For this, consider the `GroupCollection.plot()` function and checking the size of a given `GroupCollection` using the `len()` function.
-
-
-
-
-
-
-
-

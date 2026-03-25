@@ -51,8 +51,8 @@ but is initialized to all sky pixels (ie. :math:`\Theta_{x,y}=0`).  Now the fina
    "The global-sky image (XXXX) is unnormalized YYY. Results will be fine, but the values may be suspect."
 
    This is a benign warning that background image :math:`B_{x,y}` is not normalized to unity, and so :math:`\alpha` does not represent a physical quantity but still optimizes the background subtraction.  Therefore the subtraction can be trusted, however the :math:`\alpha` value has no physical interpretation.
-   
-   
+
+
 .. note::
    Classical local-sky subtraction (with sky annuli above/below the trace) is generally discouraged, as these regions are often contaminated.  Therefore ``slitlessutils`` currently has no facility for such operations.
 

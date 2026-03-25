@@ -107,7 +107,7 @@ However, the propagation of uncertainties that accounts for only the detector/as
 
 Sparse Linear-Operator Construction
 -----------------------------------
-The sparse linear-operator is constructed internally using `scipy.sparse.csr_matrix() <https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.html>`_, which is very convenient for removing rows that have all zeros.  Such rows refer to observed pixels that have no spectral information (ie. contain only sky background).  Internally a CSR matrix is created for each source for each WFSS image, which are stacked to create a complete CSR matrix (see Griggio et al. 2026 for more details).  After creating a full matrix, it is converted to a `scipy.sparse.csc_matrix() <https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csc_matrix.html>`_ to identify columns that are all zeros.  An all-zero column represents a spectral element that has no observed constraints, which will be returned as `np.nan`.  
+The sparse linear-operator is constructed internally using `scipy.sparse.csr_matrix() <https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.html>`_, which is very convenient for removing rows that have all zeros.  Such rows refer to observed pixels that have no spectral information (ie. contain only sky background).  Internally a CSR matrix is created for each source for each WFSS image, which are stacked to create a complete CSR matrix (see Griggio et al. 2026 for more details).  After creating a full matrix, it is converted to a `scipy.sparse.csc_matrix() <https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csc_matrix.html>`_ to identify columns that are all zeros.  An all-zero column represents a spectral element that has no observed constraints, which will be returned as `np.nan`.
 
 
 .. _solutions:
@@ -164,14 +164,14 @@ Example
 
 	  # load the grism images
 	  data = su.wfss.data.WFSSCollection.from_glob(f'i*flt.fits.gz')
-    
+
 	  # load the sources into SU
 	  sources = su.sources.SourceCollection('seg.fits', 'sci.fits', local_back=False)
 
 	  # test grouping
 	  grp = su.modules.Group(ncpu=1, orders=('+1',))
 	  groups = grp(data, sources)
-    
+
 	  # run the multi-orient extraction using grid-based optimization
 	  # of the L-curve
 	  ext = su.modules.Multi('+1', (-6., -1., 0.1), root='test', algorithm='grid')
@@ -180,7 +180,7 @@ Example
 	  grp_result = ext(data, sources, groups=groups)
 
 	  # run the extraction with the grouping off
-	  result = ext(data, sources)	  
+	  result = ext(data, sources)
 
 .. rubric:: Footnotes
 .. [#curvefoot] The curvature is adopted as the `Menger curvature <https://en.wikipedia.org/wiki/Menger_curvature>`_.
