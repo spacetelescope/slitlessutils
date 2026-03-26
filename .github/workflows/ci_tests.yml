@@ -34,15 +34,9 @@ jobs:
           # deprecation (requires drizzlepac >= 3.11.0)
           # https://github.com/spacetelescope/drizzlepac/pull/2059
           - os: ubuntu-latest
-            python: '3.11'
-            tox_env: 'py311-test-cov'
-            toxposargs: --remote-data=any
-            allow_failure: false
-            prefix: ''
-
-          - os: ubuntu-latest
             python: '3.12'
-            tox_env: 'py312-test'
+            tox_env: 'py312-test-cov'
+            toxposargs: --remote-data=any
             allow_failure: false
             prefix: ''
 

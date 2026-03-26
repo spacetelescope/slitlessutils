@@ -1,8 +1,9 @@
-1.1 (unreleased)
+2.0 (unreleased)
 ================
 
 - Added support for NumPy 2.0. [#70]
 
+- Bumped python minimum version to 3.12. [#143]
 
 1.0 (2023-11-28)
 ================
