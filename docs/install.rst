@@ -16,12 +16,12 @@ Start by creating an empty conda environment:
 
 .. code-block:: bash
 
-    conda create --name slitlessutils-env "python>=3.11"
+    conda create --name slitlessutils-env "python>=3.12"
     conda activate slitlessutils-env
 
 You may also need to manually install precompiled ``llvmlite`` binaries before installing
 ``slitlessutils`` to avoid an error when building ``numba`` (used by ``slitlessutils`` to
-improve performance) during the installation. This can be done by running ``conda install --channel=numba llvmlite``
+improve performance) during the installation. This can be done by running ``conda install --channel=conda-forge llvmlite``
 in your conda environment before installing ``slitessutils``.
 
 
