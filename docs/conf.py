@@ -139,6 +139,14 @@ pygments_style = 'sphinx'
 # If true, keep warnings as "system message" paragraphs in the built documents.
 # keep_warnings = False
 
+# -- Options for linkcheck output ---------------------------------------------
+linkcheck_retry = 5
+linkcheck_ignore = ['http://data.astropy.org',
+                    # Zenodo/doi: 403 Client Error: Forbidden for url
+                    r'https://zenodo.org/records/*',
+                    r'https://doi.org/*',
+                    ]
+linkcheck_timeout = 180
 
 # -- Options for HTML output ----------------------------------------------
 
