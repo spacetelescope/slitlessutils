@@ -4,11 +4,6 @@
 
 Slitlessutils is a package for simulating and extracting wide-field slitless spectroscopy (WFSS) data, highly focused on data from the Advanced Camera for Surveys (ACS) and Wide-Field Camera 3 (WFC3) on the *Hubble Space Telescope*.
 
-
-## Early Development Software Warning
-Slitlessutils is under active development software and subject to change.
-
-
 ## Quickstart
 
 The latest released version of this package can be installed using pip
