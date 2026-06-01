@@ -3,7 +3,7 @@ name: Check PR milestone
 on:
   # So it cannot be skipped.
   pull_request_target:
-    types: [opened, synchronize, milestoned, demilestoned]
+    types: [opened, reopened, synchronize, milestoned, demilestoned]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
