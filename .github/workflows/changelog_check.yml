@@ -13,8 +13,8 @@ jobs:
     name: Check if change log entry is correct
     runs-on: ubuntu-latest
     steps:
-    - name: Check change log entry
-      uses: scientific-python/action-check-changelogfile@1fc669db9618167166d5a16c10282044f51805c0  # 0.3
-      env:
-        CHANGELOG_FILENAME: CHANGES.rst
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check change log entry
+        uses: scientific-python/action-check-changelogfile@1fc669db9618167166d5a16c10282044f51805c0 # 0.3
+        env:
+          CHANGELOG_FILENAME: CHANGES.rst
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

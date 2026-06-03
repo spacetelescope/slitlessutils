@@ -32,10 +32,10 @@ repos:
         # Checks for the existence of private keys.
       - id: end-of-file-fixer
         # Makes sure files end in a newline and only a newline.
-        exclude: ".*(svg.*|extern.*)$"
+        exclude: '.*(svg.*|extern.*)$'
       - id: trailing-whitespace
         # Trims trailing whitespace.
-        exclude: ".*(data.*|extern.*)$"
+        exclude: '.*(data.*|extern.*)$'
 
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.10.0
@@ -56,7 +56,7 @@ repos:
     rev: v3.21.2
     hooks:
       - id: pyupgrade
-        args: ["--py311-plus"]
+        args: ['--py311-plus']
 
   - repo: https://github.com/pycqa/isort
     rev: 9.0.0a3
@@ -69,7 +69,7 @@ repos:
     rev: 7.3.0
     hooks:
       - id: flake8
-        args: ["--ignore", "E501,E741,W503,W504"]
+        args: ['--ignore', 'E501,E741,W503,W504']
 
   - repo: https://github.com/asottile/yesqa
     rev: v1.5.0
@@ -80,8 +80,14 @@ repos:
     rev: v2.4.2
     hooks:
       - id: codespell
-        args: ["--write-changes", "--ignore-words-list",
-               "Pidgeon, exten, som, ot", "--skip", "*.pdf"]
+        args:
+          [
+            '--write-changes',
+            '--ignore-words-list',
+            'Pidgeon, exten, som, ot',
+            '--skip',
+            '*.pdf',
+          ]
         additional_dependencies:
           - tomli
 
@@ -89,4 +95,16 @@ repos:
     rev: v2.3.2
     hooks:
       - id: autopep8
-        args: ["--in-place", "--aggressive"]
+        args: ['--in-place', '--aggressive']
+
+  - repo: https://github.com/rbubley/mirrors-prettier
+    rev: v3.8.3
+    hooks:
+      - id: prettier
+        types_or: [css, rst, json, yaml, toml, markdown]
+        args: ['--single-quote']
+        # Exclude codeql.yml, dependabot.yml, README.md
+        exclude: |
+          (?x)^(
+            (.*\/)?(codeql\.yml|dependabot\.yml|README.md)$
+          )
