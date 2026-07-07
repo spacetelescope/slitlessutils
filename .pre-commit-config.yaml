@@ -98,7 +98,7 @@ repos:
         args: ['--in-place', '--aggressive']
 
   - repo: https://github.com/rbubley/mirrors-prettier
-    rev: v3.8.3
+    rev: v3.9.4
     hooks:
       - id: prettier
         types_or: [css, rst, json, yaml, toml, markdown]
