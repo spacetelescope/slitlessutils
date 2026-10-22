@@ -41,7 +41,7 @@ class HDF5Table(HDF5Columns):
         """
 
         self.dims = dims
-        self.attrs = {k: v for k, v in kwargs.items()}
+        self.attrs = {**kwargs}
 
         self.compargs = Config().h5pyargs
 
