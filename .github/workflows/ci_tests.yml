@@ -87,7 +87,7 @@ jobs:
 
           - os: ubuntu-latest
             python: '3.x'
-            tox_env: 'securityaudit'
+            tox_env: 'bandit'
             allow_failure: false
             prefix: ''
 

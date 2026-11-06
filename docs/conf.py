@@ -22,6 +22,9 @@ with (Path(__file__).parents[1] / 'pyproject.toml').open('rb') as fh:
     project_meta = conf['project']
 
 # -- General configuration ------------------------------------------------
+# If your documentation needs a minimal Sphinx version, state it here.
+needs_sphinx = '8.2'  # keep in sync with pyproject.toml
+
 # Configuration for intersphinx: refer to the Python standard library.
 # Uncomment if you cross-ref to API doc from other packages.
 # intersphinx_mapping = {

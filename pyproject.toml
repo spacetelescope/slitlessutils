@@ -60,18 +60,22 @@ listwcs = "slitlessutils.core.preprocess.astrometry.list_wcs:main"
 
 [project.optional-dependencies]
 test = [
-    'pytest-astropy>=0.11',
-    'tox>=4.12',
+    'pytest>=9.0',
+    'pytest-astropy-header>=0.2.2',
+    'pytest-doctestplus>=1.4',
+    'pytest-remotedata>=0.4.1',
+    'tox>=4.24',
 ]
 docs = [
-    'sphinx-astropy>=1.6',
+    'sphinx>=8.2',  # keep in sync with docs/conf.py
+    'sphinx-astropy>=1.11',
     'sphinx-rtd-theme',
 ]
 
 [build-system]
 requires = [
-    'setuptools>=77.0',
-    'setuptools-scm>=8.1',
+    'setuptools>=77.0.1',
+    'setuptools_scm>=8.2',
     'numpy>=2.0',
 ]
 build-backend = 'setuptools.build_meta'
@@ -86,8 +90,8 @@ include-package-data = false
 [tool.setuptools.packages.find]
 namespaces = false
 
-[tool.pytest.ini_options]
-minversion = "8.0"
+[tool.pytest]
+minversion = "9.0"
 testpaths = [
     'slitlessutils',
     'docs',
@@ -107,7 +111,6 @@ addopts = [
     '--strict-markers',
 ]
 log_level = 'INFO'
-log_cli_level = 'INFO'
 xfail_strict = true
 remote_data_strict = false
 filterwarnings = [
