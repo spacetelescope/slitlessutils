@@ -94,6 +94,17 @@ def test_from_wcsfile_preserves_orientat(sample_wcs_csv):
         )
 
 
+def test_from_wcsfile_empty_blocking_is_none(sample_wcs_csv):
+    """
+    Verify an empty blocking field is read as None, not NaN.
+    """
+    collection = su.wfss.WFSSCollection.from_wcsfile(sample_wcs_csv)
+
+    for dataset_name in collection.keys():
+        simdata = dict.__getitem__(collection, dataset_name)
+        assert simdata.blocking is None
+
+
 def test_collection_iteration_yields_wfss_objects(sample_wcs_csv):
     """Verify iterating over collection yields WFSS objects with required components."""
     collection = su.wfss.WFSSCollection.from_wcsfile(sample_wcs_csv)
