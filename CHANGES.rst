@@ -19,6 +19,9 @@ Bug Fixes
 - Updated to use scipy sparse arrays instead of sparse matrices, due to upcoming
   deprecation of the latter. [#158]
 
+- Fixed ``WFSSCollection.from_wcsfile`` failing with pandas 3.1 when the
+  ``blocking`` field is empty. [#167]
+
 2.0 (2026-03-27)
 ================
 

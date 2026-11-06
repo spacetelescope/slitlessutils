@@ -156,7 +156,8 @@ class SimulatedData:
         This should never be directly called.
         """
 
-        if self.blocking == '':
+        # An empty CSV field can be read as NaN by pandas.
+        if self.blocking == '' or pd.isna(self.blocking):
             self.blocking = None
 
 
