@@ -10,6 +10,7 @@ Bug Fixes
 Other Changes and Additions
 ---------------------------
 
+
 2.0.1 (unreleased)
 ==================
 
@@ -21,6 +22,15 @@ Bug Fixes
 
 - Fixed ``WFSSCollection.from_wcsfile`` failing with pandas 3.1 when the
   ``blocking`` field is empty. [#167]
+
+Other Changes and Additions
+---------------------------
+
+- Bumped the minimum required versions of ``drizzlepac`` to 3.11,
+  ``numpy`` to 2.0.1, ``pandas`` to 2.2.2, ``psutil`` to 5.9.6,
+  ``pypolyclip`` to 1.1.0, ``pysiaf`` to 0.24.0, ``scikit-image`` to
+  0.23.1, ``scipy`` to 1.13, and ``shapely`` to 2.0.4. [#168]
+
 
 2.0 (2026-03-27)
 ================

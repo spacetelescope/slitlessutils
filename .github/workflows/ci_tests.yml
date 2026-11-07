@@ -16,11 +16,11 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  TOXARGS: '-v'
-
 permissions:
   contents: read
+
+env:
+  TOXARGS: '-v'
 
 jobs:
   tests:
@@ -30,9 +30,6 @@ jobs:
     strategy:
       matrix:
         include:
-          # remote-data test fails with 3.13 due to drizzlepac
-          # deprecation (requires drizzlepac >= 3.11.0)
-          # https://github.com/spacetelescope/drizzlepac/pull/2059
           - os: ubuntu-latest
             python: '3.12'
             tox_env: 'py312-test-cov'
@@ -48,13 +45,13 @@ jobs:
 
           - os: macos-latest
             python: '3.14'
-            tox_env: 'py313-test'
+            tox_env: 'py314-test'
             allow_failure: false
             prefix: ''
 
           - os: windows-latest
             python: '3.14'
-            tox_env: 'py313-test'
+            tox_env: 'py314-test'
             allow_failure: false
             prefix: ''
 
@@ -117,7 +114,7 @@ jobs:
           python -c "import setuptools; print(f'setuptools {setuptools.__version__}')"
           python -c "import tox; print(f'tox {tox.__version__}')"
       - name: Run tests
-        run: tox -e ${{ matrix.tox_env }} -- ${{ matrix.toxposargs }}
+        run: python -m tox -e ${{ matrix.tox_env }} -- ${{ matrix.toxposargs }}
       - name: Upload coverage to codecov
         if: ${{ contains(matrix.tox_env, '-cov') }}
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1

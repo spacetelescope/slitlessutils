@@ -36,19 +36,21 @@ dependencies = [
     'astropy>=6.1',
     'astroquery>=0.4.7',
     'h5py>=3.11',
-    'drizzlepac>=3.9.1',
+    'drizzlepac>=3.11',
     'networkx>=3.3',
     'numba>=0.62.0',
-    'numpy>=2.0',
+    'numpy>=2.0.1',
     'matplotlib>=3.9',
-    'pandas>=2.2',
-    'psutil>=5.9.0',
-    'pypolyclip>=1.0.0',
-    'pysiaf>=0.16.4',
-    'scikit-image>=0.23',
-    'scipy>=1.12',
-    'shapely>=2.0',
-    'tqdm>=4.66'
+    'packaging>=24.2',
+    'pandas>=2.2.2',
+    'psutil>=5.9.6',
+    'pypolyclip>=1.1.0',
+    'pysiaf>=0.24.0',
+    'pyyaml>=6.0.1',
+    'scikit-image>=0.23.1',
+    'scipy>=1.13',
+    'shapely>=2.0.4',
+    'tqdm>=4.67'
 ]
 
 [project.urls]
@@ -64,24 +66,27 @@ test = [
     'pytest-astropy-header>=0.2.2',
     'pytest-doctestplus>=1.4',
     'pytest-remotedata>=0.4.1',
-    'tox>=4.24',
 ]
 docs = [
     'sphinx>=8.2',  # keep in sync with docs/conf.py
     'sphinx-astropy>=1.11',
     'sphinx-rtd-theme',
 ]
+dev = [
+    'slitlessutils[docs,test]',
+    'pre-commit>=4.0',
+    'tox>=4.24',
+]
 
 [build-system]
 requires = [
     'setuptools>=77.0.1',
     'setuptools_scm>=8.2',
-    'numpy>=2.0',
 ]
 build-backend = 'setuptools.build_meta'
 
 [tool.setuptools_scm]
-write_to = 'slitlessutils/version.py'
+version_file = 'slitlessutils/version.py'
 
 [tool.setuptools]
 zip-safe = false
@@ -98,7 +103,6 @@ testpaths = [
 ]
 norecursedirs = [
     'docs/_build',
-    'extern',
 ]
 astropy_header = true
 doctest_plus = 'enabled'
