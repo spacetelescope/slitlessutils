@@ -64,11 +64,14 @@ jobs:
             allow_failure: false
             prefix: ''
 
-          - os: ubuntu-latest
-            python: '3.15'
-            tox_env: 'py315-test'
-            allow_failure: false
-            prefix: ''
+          # Disabled until h5py provides Python 3.15 wheels. Without a
+          # wheel, pip builds h5py from source, which fails because the
+          # HDF5 library is not installed on the runner.
+          # - os: ubuntu-latest
+          #   python: '3.15'
+          #   tox_env: 'py315-test'
+          #   allow_failure: false
+          #   prefix: ''
 
           - os: ubuntu-latest
             python: '3.x'
