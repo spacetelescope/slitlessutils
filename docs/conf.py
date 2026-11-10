@@ -148,6 +148,8 @@ linkcheck_ignore = ['http://data.astropy.org',
                     # Zenodo/doi: 403 Client Error: Forbidden for url
                     r'https://zenodo.org/records/*',
                     r'https://doi.org/*',
+                    # ADS: 405 Client Error: Not Allowed for url
+                    r'https://ui\.adsabs\.harvard\.edu/.*',
                     ]
 linkcheck_timeout = 180
 

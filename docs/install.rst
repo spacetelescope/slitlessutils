@@ -12,11 +12,13 @@ You may want to consider installing ``slitlessutils`` in a new virtual or
 conda environment to avoid version conflicts with other packages you may
 have installed.
 
-Start by creating an empty conda environment:
+Start by creating an empty conda environment. ``slitlessutils`` requires
+Python 3.12 or later, but some of its dependencies (e.g., ``h5py``) do not yet
+provide Python 3.15 wheels, so we currently recommend Python 3.14:
 
 .. code-block:: bash
 
-    conda create --name slitlessutils-env "python>=3.12"
+    conda create --name slitlessutils-env "python=3.14"
     conda activate slitlessutils-env
 
 You may also need to manually install precompiled ``llvmlite`` binaries before installing
