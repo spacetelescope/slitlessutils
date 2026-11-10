@@ -170,5 +170,46 @@ exclude_lines = [
     'def main\\(.*\\):',
 ]
 
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+# Preview enables the fixable pycodestyle whitespace and blank-line rules
+preview = true
+select = [
+    'E',  # pycodestyle errors
+    'F',  # pyflakes
+    'W',  # pycodestyle warnings
+    'UP',  # pyupgrade
+    'RUF100',  # unused noqa directives
+]
+ignore = [
+    'E501',  # line too long
+    'E741',  # ambiguous variable name
+]
+
 [tool.bandit.assert_used]
 skips = ['*_test.py', '*/test_*.py']
+
+[tool.repo-review]
+ignore = [
+    'MY',  # ignore MyPy
+    'PC110',  # ignore using black or ruff-format in pre-commit
+    'PC111',  # ignore using blacken-docs in pre-commit
+    'PC140',  # ignore using mypy in pre-commit
+    'PC180',  # ignore using prettier in pre-commit
+    'PC901',  # ignore using custom pre-commit update message
+    'PC902',  # ignore custom pre-commit CI autofix message
+    'PP006',  # ignore missing dependency-groups in pyproject.toml
+    'PY005',  # ignore having a tests/ folder
+    'RF101',  # ignore not selecting the Ruff flake8-bugbear rules
+]
+
+[tool.codespell]
+skip = '*.pdf'
+ignore-words-list = """
+    exten,
+    ot,
+    Pidgeon,
+    som,
+"""

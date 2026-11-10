@@ -13,7 +13,7 @@
 
 import sys
 import tomllib
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 # Get configuration information from pyproject.toml
@@ -66,7 +66,7 @@ master_doc = 'index'
 # General information about the project
 project = project_meta['name']
 author = project_meta['authors'][0]['name']
-year = datetime.now(tz=timezone.utc).year
+year = datetime.now(tz=UTC).year
 copyright = f'{year}, {author}'
 
 # The version info for the project you're documenting, acts as replacement for

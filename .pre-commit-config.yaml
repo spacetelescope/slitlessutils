@@ -35,7 +35,7 @@ repos:
         exclude: '.*svg.*$'
       - id: trailing-whitespace
         # Trims trailing whitespace.
-        exclude: '.*(data.*|extern.*)$'
+        exclude: '.*data.*$'
 
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.10.0
@@ -52,64 +52,49 @@ repos:
       - id: python-check-blanket-noqa
         # Enforce that all noqa annotations always occur with specific codes.
 
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v3.22.0
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.17.4
     hooks:
-      - id: pyupgrade
-        args: ['--py311-plus']
+      - id: ruff-check
+        args: ['--fix', '--show-fixes']
+
+  - repo: https://github.com/scientific-python/cookie
+    rev: 2026.08.14
+    hooks:
+      - id: sp-repo-review
 
   - repo: https://github.com/pycqa/isort
     rev: 10.0.0b2
     hooks:
       - id: isort
         name: isort (python)
-        additional_dependencies: [toml]
 
   - repo: https://github.com/PyCQA/flake8
     rev: 7.5.0
     hooks:
       - id: flake8
-        args: ['--ignore', 'E501,E741,W503,W504']
 
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
-    rev: v1.31.1
+    rev: v1.32.0
     hooks:
       - id: zizmor
-
-  - repo: https://github.com/asottile/yesqa
-    rev: v1.5.0
-    hooks:
-      - id: yesqa
-
-  - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.3
-    hooks:
-      - id: codespell
-        args:
-          [
-            '--write-changes',
-            '--ignore-words-list',
-            'Pidgeon, exten, som, ot',
-            '--skip',
-            '*.pdf',
-          ]
-        additional_dependencies:
-          - tomli
-
-  - repo: https://github.com/hhatto/autopep8
-    rev: v2.3.2
-    hooks:
-      - id: autopep8
-        args: ['--in-place', '--aggressive']
 
   - repo: https://github.com/rbubley/mirrors-prettier
     rev: v3.9.10
     hooks:
       - id: prettier
-        types_or: [css, rst, json, yaml, toml, markdown]
+        types_or: [css, json, yaml, markdown]
         args: ['--single-quote']
-        # Exclude codeql.yml, dependabot.yml, README.md
+        # Exclude README.md
         exclude: |
           (?x)^(
-            (.*\/)?(codeql\.yml|dependabot\.yml|README.md)$
+            (.*\/)?README.md$
           )
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.3
+    hooks:
+      - id: codespell
+        args: ['--write-changes']
+        additional_dependencies:
+          - tomli
