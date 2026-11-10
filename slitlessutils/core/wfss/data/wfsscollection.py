@@ -511,7 +511,7 @@ class WFSSCollection(dict):
         """
 
         obj = cls(filetype='simulated', **kwargs)
-        for dataset, row in df.iterrows():
+        for dataset, row in df.to_dict(orient='index').items():
             obj[dataset] = SimulatedData(dataset=dataset, **row)
 
         return obj
