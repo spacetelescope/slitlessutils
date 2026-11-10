@@ -143,12 +143,7 @@ xfail_strict = true
 remote_data_strict = false
 filterwarnings = [
     'error',  # turn warnings into exceptions
-    'ignore:numpy.ufunc size changed:RuntimeWarning',
-    'ignore:numpy.ndarray size changed:RuntimeWarning',
-    # drizzlepac warnings
-    "ignore: .*pkg_resources.*:DeprecationWarning",
     'ignore:unclosed file:ResourceWarning',
-    'ignore: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.:UserWarning',
     "ignore:'leaveWhitespace' deprecated:DeprecationWarning",
     # Ignore warning from astropy.io
     'ignore: Card is too long, comment will be truncated.',
@@ -158,24 +153,21 @@ filterwarnings = [
 
 [tool.coverage.run]
 omit = [
-    'slitlessutils/conftest.py',
-    'slitlessutils/tests/*',
-    'slitlessutils/*/tests/*',
+    'slitlessutils/__init__*',
+    'slitlessutils/**/conftest.py',
+    'slitlessutils/**/tests/*',
     'slitlessutils/version*',
-    '*/slitlessutils/tests/*',
-    '*/slitlessutils/*/tests/*',
+    '*/slitlessutils/__init__*',
+    '*/slitlessutils/**/conftest.py',
+    '*/slitlessutils/**/tests/*',
     '*/slitlessutils/version*',
 ]
 
 [tool.coverage.report]
 exclude_lines = [
     'pragma: no cover',
-    'except ImportError',
-    'raise AssertionError',
     'raise NotImplementedError',
     'def main\\(.*\\):',
-    'pragma: py{ignore_python_version}',
-    'def _ipython_key_completions_',
 ]
 
 [tool.bandit.assert_used]
