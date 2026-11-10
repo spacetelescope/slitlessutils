@@ -64,6 +64,7 @@ listwcs = "slitlessutils.core.preprocess.astrometry.list_wcs:main"
 test = [
     'pytest>=9.0',
     'pytest-astropy-header>=0.2.2',
+    'pytest-cov>=7.0',
     'pytest-doctestplus>=1.4',
     'pytest-remotedata>=0.4.1',
 ]
@@ -105,6 +106,29 @@ norecursedirs = [
     'docs/_build',
 ]
 astropy_header = true
+# Packages whose versions are shown in the pytest header. Keep this
+# list in sync with the dependencies above.
+astropy_header_packages = [
+    'slitlessutils',
+    'astropy',
+    'astroquery',
+    'drizzlepac',
+    'h5py',
+    'matplotlib',
+    'networkx',
+    'numba',
+    'numpy',
+    'packaging',
+    'pandas',
+    'psutil',
+    'pypolyclip',
+    'pysiaf',
+    'scipy',
+    'shapely',
+    'skimage',
+    'tqdm',
+    'yaml',
+]
 doctest_plus = 'enabled'
 text_file_format = 'rst'
 addopts = [

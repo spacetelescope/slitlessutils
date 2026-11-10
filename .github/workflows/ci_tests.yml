@@ -31,6 +31,12 @@ jobs:
         include:
           - os: ubuntu-latest
             python: '3.12'
+            tox_env: 'py312-test-oldestdeps'
+            allow_failure: false
+            prefix: ''
+
+          - os: ubuntu-latest
+            python: '3.12'
             tox_env: 'py312-test'
             allow_failure: false
             prefix: ''
