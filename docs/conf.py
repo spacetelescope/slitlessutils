@@ -9,6 +9,9 @@ from datetime import UTC, datetime
 from importlib import metadata
 from pathlib import Path
 
+from docutils import nodes
+from sphinx import addnodes
+
 # Get configuration information from pyproject.toml
 with (Path(__file__).parents[1] / 'pyproject.toml').open('rb') as fh:
     project_meta = tomllib.load(fh)['project']
@@ -82,6 +85,7 @@ dev = 'dev' in release
 html_static_path = ['_static']
 html_css_files = ['custom.css']
 html_title = f'{project} {release}'
+templates_path = ['_templates']
 
 html_theme = 'pydata_sphinx_theme'
 html_show_sourcelink = False
@@ -96,6 +100,9 @@ html_theme_options = {
     'navbar_align': 'left',
     'use_edit_page_button': False,
     'logo': {'text': 'slitlessutils', 'alt_text': 'slitlessutils'},
+    # Show one dropdown for each index.rst section instead of a link to
+    # every page
+    'navbar_center': ['navbar-sections'],
     'icon_links': [
         {'name': 'GitHub',
          'url': 'https://github.com/spacetelescope/slitlessutils',
@@ -180,3 +187,71 @@ linkcheck_ignore = [
     r'https://doi.org/*',
 ]
 linkcheck_timeout = 180
+
+
+# -- Header navigation --------------------------------------------------------
+def get_nav_sections(app):
+    """
+    Return the root toctree entries grouped by their index.rst section.
+
+    Parameters
+    ----------
+    app : `~sphinx.application.Sphinx`
+        The Sphinx application.
+
+    Returns
+    -------
+    sections : list of tuple
+        A ``(title, entries)`` tuple for each toctree in the root
+        document, where ``title`` is the title of the section that
+        contains the toctree and ``entries`` is a list of ``(text,
+        docname)`` tuples for its pages.
+    """
+    env = app.env
+    doctree = env.get_doctree(app.config.root_doc)
+    sections = []
+    for toctree in doctree.findall(addnodes.toctree):
+        section = toctree.parent
+        while not isinstance(section, nodes.section):
+            section = section.parent
+        title = section.next_node(nodes.title).astext()
+        entries = [(text or env.titles[docname].astext(), docname)
+                   for text, docname in toctree['entries']]
+        sections.append((title, entries))
+    return sections
+
+
+def add_nav_sections(app, pagename, templatename, context, doctree):
+    """
+    Add the header navigation sections to the HTML page context.
+
+    Parameters
+    ----------
+    app : `~sphinx.application.Sphinx`
+        The Sphinx application.
+
+    pagename : str
+        The name of the page being rendered.
+
+    templatename : str
+        The name of the page template.
+
+    context : dict
+        The page context, which is updated in place.
+
+    doctree : `~docutils.nodes.document` or None
+        The doctree of the page, or `None` for pages without one.
+    """
+    context['nav_sections'] = get_nav_sections(app)
+
+
+def setup(app):
+    """
+    Connect the header navigation to the HTML page context.
+
+    Parameters
+    ----------
+    app : `~sphinx.application.Sphinx`
+        The Sphinx application.
+    """
+    app.connect('html-page-context', add_nav_sections)

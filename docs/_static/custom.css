@@ -40,3 +40,16 @@ h6 {
   padding-bottom: 0.4rem;
   margin-bottom: 1.2rem;
 }
+
+/* In the narrow-screen sidebar, open the header nav dropdowns in place
+   instead of over the other entries, and wrap long page titles */
+.bd-sidebar-primary .navbar-nav .dropdown-menu {
+  position: static !important;
+  transform: none !important;
+  border: none;
+  box-shadow: none;
+}
+
+.bd-sidebar-primary .navbar-nav .dropdown-item {
+  white-space: normal;
+}
