@@ -85,11 +85,6 @@ repos:
       - id: prettier
         types_or: [css, json, yaml, markdown]
         args: ['--single-quote']
-        # Exclude README.md
-        exclude: |
-          (?x)^(
-            (.*\/)?README.md$
-          )
 
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.3
