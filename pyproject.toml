@@ -36,19 +36,21 @@ dependencies = [
     'astropy>=6.1',
     'astroquery>=0.4.7',
     'h5py>=3.11',
-    'drizzlepac>=3.9.1',
+    'drizzlepac>=3.11',
     'networkx>=3.3',
     'numba>=0.62.0',
-    'numpy>=2.0',
+    'numpy>=2.0.1',
     'matplotlib>=3.9',
-    'pandas>=2.2',
-    'psutil>=5.9.0',
-    'pypolyclip>=1.0.0',
-    'pysiaf>=0.16.4',
-    'scikit-image>=0.23',
-    'scipy>=1.12',
-    'shapely>=2.0',
-    'tqdm>=4.66'
+    'packaging>=24.2',
+    'pandas>=2.2.2',
+    'psutil>=5.9.6',
+    'pypolyclip>=1.1.0',
+    'pysiaf>=0.24.0',
+    'pyyaml>=6.0.1',
+    'scikit-image>=0.23.1',
+    'scipy>=1.13',
+    'shapely>=2.0.4',
+    'tqdm>=4.67'
 ]
 
 [project.urls]
@@ -60,24 +62,32 @@ listwcs = "slitlessutils.core.preprocess.astrometry.list_wcs:main"
 
 [project.optional-dependencies]
 test = [
-    'pytest-astropy>=0.11',
-    'tox>=4.12',
+    'pytest>=9.0',
+    'pytest-astropy-header>=0.2.2',
+    'pytest-cov>=7.0',
+    'pytest-doctestplus>=1.4',
+    'pytest-remotedata>=0.4.1',
 ]
 docs = [
-    'sphinx-astropy>=1.6',
+    'sphinx>=8.2',  # keep in sync with docs/conf.py
+    'sphinx-astropy>=1.11',
     'sphinx-rtd-theme',
+]
+dev = [
+    'slitlessutils[docs,test]',
+    'pre-commit>=4.0',
+    'tox>=4.24',
 ]
 
 [build-system]
 requires = [
-    'setuptools>=77.0',
-    'setuptools-scm>=8.1',
-    'numpy>=2.0',
+    'setuptools>=77.0.1',
+    'setuptools_scm>=8.2',
 ]
 build-backend = 'setuptools.build_meta'
 
 [tool.setuptools_scm]
-write_to = 'slitlessutils/version.py'
+version_file = 'slitlessutils/version.py'
 
 [tool.setuptools]
 zip-safe = false
@@ -86,17 +96,39 @@ include-package-data = false
 [tool.setuptools.packages.find]
 namespaces = false
 
-[tool.pytest.ini_options]
-minversion = "8.0"
+[tool.pytest]
+minversion = "9.0"
 testpaths = [
     'slitlessutils',
     'docs',
 ]
 norecursedirs = [
     'docs/_build',
-    'extern',
 ]
 astropy_header = true
+# Packages whose versions are shown in the pytest header. Keep this
+# list in sync with the dependencies above.
+astropy_header_packages = [
+    'slitlessutils',
+    'astropy',
+    'astroquery',
+    'drizzlepac',
+    'h5py',
+    'matplotlib',
+    'networkx',
+    'numba',
+    'numpy',
+    'packaging',
+    'pandas',
+    'psutil',
+    'pypolyclip',
+    'pysiaf',
+    'scipy',
+    'shapely',
+    'skimage',
+    'tqdm',
+    'yaml',
+]
 doctest_plus = 'enabled'
 text_file_format = 'rst'
 addopts = [
@@ -107,17 +139,11 @@ addopts = [
     '--strict-markers',
 ]
 log_level = 'INFO'
-log_cli_level = 'INFO'
 xfail_strict = true
 remote_data_strict = false
 filterwarnings = [
     'error',  # turn warnings into exceptions
-    'ignore:numpy.ufunc size changed:RuntimeWarning',
-    'ignore:numpy.ndarray size changed:RuntimeWarning',
-    # drizzlepac warnings
-    "ignore: .*pkg_resources.*:DeprecationWarning",
     'ignore:unclosed file:ResourceWarning',
-    'ignore: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.:UserWarning',
     "ignore:'leaveWhitespace' deprecated:DeprecationWarning",
     # Ignore warning from astropy.io
     'ignore: Card is too long, comment will be truncated.',
@@ -127,25 +153,63 @@ filterwarnings = [
 
 [tool.coverage.run]
 omit = [
-    'slitlessutils/conftest.py',
-    'slitlessutils/tests/*',
-    'slitlessutils/*/tests/*',
+    'slitlessutils/__init__*',
+    'slitlessutils/**/conftest.py',
+    'slitlessutils/**/tests/*',
     'slitlessutils/version*',
-    '*/slitlessutils/tests/*',
-    '*/slitlessutils/*/tests/*',
+    '*/slitlessutils/__init__*',
+    '*/slitlessutils/**/conftest.py',
+    '*/slitlessutils/**/tests/*',
     '*/slitlessutils/version*',
 ]
 
 [tool.coverage.report]
 exclude_lines = [
     'pragma: no cover',
-    'except ImportError',
-    'raise AssertionError',
     'raise NotImplementedError',
     'def main\\(.*\\):',
-    'pragma: py{ignore_python_version}',
-    'def _ipython_key_completions_',
+]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+# Preview enables the fixable pycodestyle whitespace and blank-line rules
+preview = true
+select = [
+    'E',  # pycodestyle errors
+    'F',  # pyflakes
+    'W',  # pycodestyle warnings
+    'UP',  # pyupgrade
+    'RUF100',  # unused noqa directives
+]
+ignore = [
+    'E501',  # line too long
+    'E741',  # ambiguous variable name
 ]
 
 [tool.bandit.assert_used]
 skips = ['*_test.py', '*/test_*.py']
+
+[tool.repo-review]
+ignore = [
+    'MY',  # ignore MyPy
+    'PC110',  # ignore using black or ruff-format in pre-commit
+    'PC111',  # ignore using blacken-docs in pre-commit
+    'PC140',  # ignore using mypy in pre-commit
+    'PC180',  # ignore using prettier in pre-commit
+    'PC901',  # ignore using custom pre-commit update message
+    'PC902',  # ignore custom pre-commit CI autofix message
+    'PP006',  # ignore missing dependency-groups in pyproject.toml
+    'PY005',  # ignore having a tests/ folder
+    'RF101',  # ignore not selecting the Ruff flake8-bugbear rules
+]
+
+[tool.codespell]
+skip = '*.pdf'
+ignore-words-list = """
+    exten,
+    ot,
+    Pidgeon,
+    som,
+"""

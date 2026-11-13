@@ -13,7 +13,7 @@
 
 import sys
 import tomllib
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 # Get configuration information from pyproject.toml
@@ -22,6 +22,9 @@ with (Path(__file__).parents[1] / 'pyproject.toml').open('rb') as fh:
     project_meta = conf['project']
 
 # -- General configuration ------------------------------------------------
+# If your documentation needs a minimal Sphinx version, state it here.
+needs_sphinx = '8.2'  # keep in sync with pyproject.toml
+
 # Configuration for intersphinx: refer to the Python standard library.
 # Uncomment if you cross-ref to API doc from other packages.
 # intersphinx_mapping = {
@@ -63,7 +66,7 @@ master_doc = 'index'
 # General information about the project
 project = project_meta['name']
 author = project_meta['authors'][0]['name']
-year = datetime.now(tz=timezone.utc).year
+year = datetime.now(tz=UTC).year
 copyright = f'{year}, {author}'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -145,6 +148,8 @@ linkcheck_ignore = ['http://data.astropy.org',
                     # Zenodo/doi: 403 Client Error: Forbidden for url
                     r'https://zenodo.org/records/*',
                     r'https://doi.org/*',
+                    # ADS: 405 Client Error: Not Allowed for url
+                    r'https://ui\.adsabs\.harvard\.edu/.*',
                     ]
 linkcheck_timeout = 180
 

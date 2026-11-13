@@ -6,6 +6,7 @@ from numpy.testing import assert_allclose
 from slitlessutils.examples import extract_multi, simulate
 
 
+@pytest.mark.remote_data
 @pytest.mark.filterwarnings("ignore::astropy.units.UnitsWarning")
 def test_extract_multi():
     # Need the outputs of simulate to run extract_multi

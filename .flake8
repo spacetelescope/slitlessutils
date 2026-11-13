@@ -5,3 +5,7 @@ max-line-length = 100
 # W503: line break before binary operator
 # W504: line break after binary operator
 ignore = E501,E741,W503,W504
+# Ruff checks F401 in __init__.py files. pyflakes also reports unused
+# star imports as F401, which ruff does not, so the two disagree on
+# which noqa codes are needed.
+per-file-ignores = __init__.py:F401

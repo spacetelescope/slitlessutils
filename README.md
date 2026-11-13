@@ -2,26 +2,28 @@
 
 [![PyPI Version](https://img.shields.io/pypi/v/slitlessutils.svg)](https://pypi.org/project/slitlessutils/) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10215187.svg)](https://doi.org/10.5281/zenodo.10215187) [![CI Tests](https://github.com/spacetelescope/slitlessutils/actions/workflows/ci_tests.yml/badge.svg?branch=main)](https://github.com/spacetelescope/slitlessutils/actions/workflows/ci_tests.yml) [![Documentation Status](https://readthedocs.org/projects/slitlessutils/badge/?version=latest)](https://slitlessutils.readthedocs.io/en/latest/)
 
-Slitlessutils is a package for simulating and extracting wide-field slitless spectroscopy (WFSS) data, highly focused on data from the Advanced Camera for Surveys (ACS) and Wide-Field Camera 3 (WFC3) on the *Hubble Space Telescope*.
+Slitlessutils is a package for simulating and extracting wide-field slitless spectroscopy (WFSS) data, highly focused on data from the Advanced Camera for Surveys (ACS) and Wide-Field Camera 3 (WFC3) on the _Hubble Space Telescope_.
 
 ## Quickstart
 
 The latest released version of this package can be installed using pip
 from the command line:
+
 ```
 pip install slitlessutils
 ```
 
 To install the latest development version of this repository, please use:
+
 ```
 pip install git+https://github.com/spacetelescope/slitlessutils.git
 ```
 
 You may run into an error building `llvmlite`, a dependency of `numba` (used to increase performance in `slitlessutils`) during installation.
-This can be fixed by running `conda install --channel=numba llvmlite` in your conda environment before installing `slitessutils`.
+This can be fixed by running `conda install --channel=numba llvmlite` in your conda environment before installing `slitlessutils`.
 
-You also need to obtain the calibration (reference) files, which are stored in a public box folder, which can be done with the slitlessutils config objects.  Please see [configuring slitlessutils](https://slitlessutils.readthedocs.io/en/latest/configure.html)
-for instructions and examples.  Please see our [documentation](https://slitlessutils.readthedocs.io/en/latest/install.html)
+You also need to obtain the calibration (reference) files, which are stored in a public box folder, which can be done with the slitlessutils config objects. Please see [configuring slitlessutils](https://slitlessutils.readthedocs.io/en/latest/configure.html)
+for instructions and examples. Please see our [documentation](https://slitlessutils.readthedocs.io/en/latest/install.html)
 for additional installation instructions and/or methods.
 
-We have encountered several frequently-asked questions and give some examples our [FAQ page](https://slitlessutils.readthedocs.io/en/latest/faq.html).
+We have encountered several frequently-asked questions and give some examples on our [FAQ page](https://slitlessutils.readthedocs.io/en/latest/faq.html).

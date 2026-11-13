@@ -1,4 +1,4 @@
-Copyright (c) 2023, Association of Universities for Research in Astronomy (AURA)
+Copyright (c) 2022, Association of Universities for Research in Astronomy (AURA)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

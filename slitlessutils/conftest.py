@@ -1,3 +1,7 @@
+"""
+Configuration file for the pytest test suite.
+"""
+
 import os
 
 import numpy as np
@@ -7,9 +11,34 @@ from astropy.wcs import WCS
 
 from slitlessutils import config
 
-cfg = config.Config()
 
-reffile = cfg.retrieve_reffiles(update=True)
+@pytest.fixture(scope='session', autouse=True)
+def _reference_files():
+    """
+    Download the latest reference files before running the tests.
+
+    If the download fails (e.g., without network access), the tests
+    use the previously downloaded reference files. If there are none,
+    all tests are skipped.
+    """
+    cfg = None
+    reffile = None
+    try:
+        cfg = config.Config()
+        reffile = cfg.retrieve_reffiles(update=True)
+    except Exception as exc:
+        error = f'{type(exc).__name__}: {exc}'
+    else:
+        error = 'the download returned no file'
+
+    if reffile is None:
+        cached = (cfg is not None
+                  and os.path.isfile(os.path.join(cfg.refpath,
+                                                  cfg.VERSIONFILE)))
+        if not cached:
+            pytest.skip('Unable to download the slitlessutils reference '
+                        f'files ({error}) and no cached reference files '
+                        f'exist in {config.Config.REFROOT}')
 
 
 # Copied over from https://github.com/spacetelescope/ci_watson

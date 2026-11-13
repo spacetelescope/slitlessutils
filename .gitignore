@@ -1,27 +1,65 @@
-*.pyc
-*.py~
-**/build
-**/_build
-**/OLD
-**/FOO
-todo*txt*
-slitlessutils_plans*
-**/__pycache__
-*.DS_Store
-test/
-*~
+# Compiled files
+__pycache__
+*.py[cod]
+*.a
+*.o
 *.so
-*egg-info
-*.ipy*
-*.pyd
-*figures
 
-env*/
-*.fits
-*.sed
-*.h5
-*.log
-*.csv
-.vscode/
+# Generated C source files
+*.c
 
+# Generated version file
 */version.py
+
+# Build and packaging
+build
+dist
+*.egg-info
+.eggs
+*.whl
+
+# Dependency pin files written by tox
+*oldest_deps*.txt
+requirements-min.txt
+
+# Lock files
+uv.lock
+poetry.lock
+Pipfile
+Pipfile.lock
+
+# Testing and coverage
+.tox
+.pytest_cache
+.coverage*
+coverage.xml
+htmlcov
+
+# Sphinx
+docs/_build
+docs/api
+
+# Jupyter
+.ipynb_checkpoints
+
+# Virtual environments
+.venv
+venv
+
+# Editors
+.idea
+.vscode
+.project
+.pydevproject
+.settings
+.*.sw[op]
+*~
+
+# macOS
+.DS_Store
+
+# Local
+.cache
+.tmp
+slitlessutils*.log
+/dev

@@ -14,10 +14,12 @@ jobs:
   tests:
     name: ${{ matrix.os }}, ${{ matrix.tox_env }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
 
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
+        # Use Python 3.14 until h5py provides Python 3.15 wheels
         include:
           - os: ubuntu-latest
             python: '3.14'
